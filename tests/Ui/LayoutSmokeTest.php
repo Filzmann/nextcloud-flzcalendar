@@ -20,7 +20,8 @@ foreach (['id="adc-period-week"', 'id="adc-period-month"', 'id="adc-month-number
     if (!str_contains($template, $contract)) throw new RuntimeException("Monatsansicht-Vertrag fehlt: {$contract}");
 }
 if (!str_contains($template, "\\OCP\\Util::addScript('adcalendar', 'modules/calendar-timeline')")) throw new RuntimeException('Zeitachsenmodul fehlt im Template.');
-if (!str_contains($template, "\\OCP\\Util::addScript('adcalendar', 'modules/berlin-public-holidays')")) throw new RuntimeException('Berliner Feiertagsmodul wird nicht vor der Kalendermatrix geladen.');
+if (!str_contains($template, "\\OCP\\Util::addScript('adcalendar', 'modules/holiday-calendar')")) throw new RuntimeException('Datengetriebenes Feiertagsmodul wird nicht vor der Kalendermatrix geladen.');
+if (str_contains($template, 'berlin-public-holidays')) throw new RuntimeException('Manuelle Berliner Feiertagsberechnung wird weiterhin geladen.');
 foreach (['data-orgsuite data-suite="ad" data-current-app="adcalendar"'] as $contract) {
     if (!str_contains($template, $contract)) throw new RuntimeException("Suite-Navigationsvertrag fehlt: {$contract}");
 }

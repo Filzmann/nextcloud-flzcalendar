@@ -13,7 +13,7 @@ const shiftDefaults = readFileSync(new URL('../../js/components/shift-defaults.j
 const shiftCalendarSync = readFileSync(new URL('../../js/components/shift-calendar-sync.js', import.meta.url), 'utf8');
 const externalCalendars = readFileSync(new URL('../../js/components/external-calendars.js', import.meta.url), 'utf8');
 const dateSource = readFileSync(new URL('../../js/modules/calendar-date.js', import.meta.url), 'utf8');
-const publicHolidaysSource = readFileSync(new URL('../../js/modules/berlin-public-holidays.js', import.meta.url), 'utf8');
+const publicHolidaysSource = readFileSync(new URL('../../js/modules/holiday-calendar.js', import.meta.url), 'utf8');
 const timelineSource = readFileSync(new URL('../../js/modules/calendar-timeline.js', import.meta.url), 'utf8');
 const stateSource = readFileSync(new URL('../../js/modules/calendar-state.js', import.meta.url), 'utf8');
 const entryWorkflow = readFileSync(new URL('../../js/modules/entry-workflow.js', import.meta.url), 'utf8');
@@ -37,6 +37,7 @@ for (const contract of [
     'repository.range(range.start, range.end)',
     "state.period === 'month'",
     'meetingCapabilities.apply(data.entries, data.employees)',
+    'weekTable.setHolidays(data.holidayCalendars || [])',
     "state.isUnfiltered() ? 'Alle Personen'",
     'const sequence = ++loadSequence',
     'if (sequence !== loadSequence) return;',
@@ -140,12 +141,21 @@ runInNewContext(dateSource, tableContext);
 runInNewContext(publicHolidaysSource, tableContext);
 runInNewContext(timelineSource, tableContext);
 runInNewContext(weekTable, tableContext);
-const publicHolidays = new tableContext.window.AdCalendar.modules.BerlinPublicHolidays();
+const publicHolidays = new tableContext.window.AdCalendar.modules.HolidayCalendar([{
+    year: 2026,
+    publicHolidays: [
+        { name: 'Karfreitag', startDate: '2026-04-03', endDate: '2026-04-03' },
+        { name: 'Tag der Arbeit', startDate: '2026-05-01', endDate: '2026-05-01' },
+    ],
+}, {
+    year: 2028,
+    publicHolidays: [{ name: '75. Jahrestag des Aufstandes vom 17. Juni 1953', startDate: '2028-06-17', endDate: '2028-06-17' }],
+}]);
 if (publicHolidays.name(new Date(2026, 4, 1)) !== 'Tag der Arbeit'
     || publicHolidays.name(new Date(2026, 3, 3)) !== 'Karfreitag'
     || publicHolidays.name(new Date(2028, 5, 17)) !== '75. Jahrestag des Aufstandes vom 17. Juni 1953'
     || publicHolidays.name(new Date(2026, 4, 2)) !== '') {
-    throw new Error('Gesetzliche Berliner Feiertage werden nicht vollständig und datumsstabil bestimmt.');
+    throw new Error('Gemeinsame gesetzliche Feiertage werden nicht vollständig und datumsstabil gelesen.');
 }
 const clusterTable = Object.create(tableContext.window.AdCalendar.components.WeekTable.prototype);
 clusterTable.organization = () => ({
@@ -172,6 +182,7 @@ const monthTable = new tableContext.window.AdCalendar.components.WeekTable({
     calendarCell: { render: () => '' },
     organization: clusterTable.organization,
 });
+monthTable.setHolidays([{ year: 2026, publicHolidays: [{ name: 'Tag der Arbeit', startDate: '2026-05-01', endDate: '2026-05-01' }] }]);
 const monthDate = tableContext.window.AdCalendar.modules.CalendarDate;
 monthTable.render([{ uid: 'person-a', displayName: 'Person A', roles: ['ad-Buero'], areas: ['ad-Bereich-West'] }], {
     period: 'month', month: new Date(2026, 6, 1), vertical: false, selected: new Set(),
@@ -196,7 +207,7 @@ if (!verticalMonthNodes.some(node => node.tagName === 'TH' && node.scope === 'ro
 if (!verticalMonthNodes.some(node => node.tagName === 'TH' && node.scope === 'col' && node.className.includes('adc-weekend') && node.textContent.includes('Wochenende'))) throw new Error('Wochenendspalten werden in der vertikalen Monatsausrichtung nicht barrierefrei gekennzeichnet.');
 if (!monthTable.dayLabel(new Date(2026, 4, 1), { weekday: 'long', day: '2-digit', month: '2-digit' }).includes('Tag der Arbeit')
     || !monthTable.dayClasses(new Date(2026, 4, 1), null).includes('adc-holiday')) {
-    throw new Error('Berliner Feiertage erhalten in der Kalendermatrix keine sichtbare und textliche Kennzeichnung.');
+    throw new Error('Gemeinsame Feiertage erhalten in der Kalendermatrix keine sichtbare und textliche Kennzeichnung.');
 }
 for (const contract of ["params.set('people'", "params.set('roles'", "params.set('areas'", "params.set('period', 'month')", 'this.data.defaultFilters ||', 'this.data.currentUserProfile?.roles', 'if (this.selected.size) return this.selected.has(employee.uid)', 'showLeadershipStaff: this.showLeadershipStaff', 'period: this.period']) {
     if (!stateSource.includes(contract)) throw new Error(`Kalenderzustandsvertrag fehlt: ${contract}`);

@@ -2,7 +2,7 @@
 
 Wochen- und monatsbasierte Dienst- und Terminplanung mit wiederkehrenden Terminen, Personensuche, Gruppenfiltern, Meetinglückensuche, Standarddienstzeiten, read-only Urlaubsmarkierungen und persönlichem Dienstexport in Nextcloud sowie externe Kalender.
 
-Die Monatsansicht stellt alle betroffenen Kalenderwochen untereinander dar und lässt sich wie die Wochenansicht zwischen „Tage als Zeilen“ und „Personen als Zeilen“ umschalten. Die zu den Personen gehörende erste Spalte beziehungsweise Kopfzeile bleibt beim Scrollen sichtbar. Tage außerhalb des gewählten Monats sind abgedunkelt; Samstag und Sonntag werden zusätzlich als „Wochenende“ beschriftet. Gesetzliche Berliner Feiertage werden nach dem [Berliner Feiertagsgesetz](https://gesetze.berlin.de/perma?j=FeiertG_BE) berechnet, namentlich gekennzeichnet und bleiben ohne Auswirkung auf Dienste, Termine oder Rechte. Zeitraum und Ausrichtung können zusammen mit den Filtern als persönlicher Standard gespeichert werden.
+Die Monatsansicht stellt alle betroffenen Kalenderwochen untereinander dar und lässt sich wie die Wochenansicht zwischen „Tage als Zeilen“ und „Personen als Zeilen“ umschalten. Die zu den Personen gehörende erste Spalte beziehungsweise Kopfzeile bleibt beim Scrollen sichtbar. Tage außerhalb des gewählten Monats sind abgedunkelt; Samstag und Sonntag werden zusätzlich als „Wochenende“ beschriftet. Gesetzliche Feiertage der organisationsweit konfigurierten Kalenderregion werden über den gemeinsamen LocalBase-Kalendervertrag geliefert, namentlich gekennzeichnet und bleiben ohne Auswirkung auf Dienste, Termine oder Rechte. Berlin bleibt Bestandsdefault. Zeitraum und Ausrichtung können zusammen mit den Filtern als persönlicher Standard gespeichert werden.
 
 ## Staging-Kompatibilität
 

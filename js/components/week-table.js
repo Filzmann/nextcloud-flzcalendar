@@ -12,8 +12,10 @@
             this.calendarCell = options.calendarCell;
             this.organization = options.organization;
             this.timeline = new window.AdCalendar.modules.CalendarTimeline();
-            this.holidays = options.holidays || new window.AdCalendar.modules.BerlinPublicHolidays();
+            this.holidays = options.holidays || new window.AdCalendar.modules.HolidayCalendar();
         }
+
+        setHolidays(calendars) { this.holidays.set(calendars); }
 
         render(employees, state) {
             const orderedEmployees = this.orderedEmployees(employees);

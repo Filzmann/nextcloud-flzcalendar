@@ -7,7 +7,7 @@
 \OCP\Util::addScript('adcalendar', 'models/organization');
 \OCP\Util::addScript('adcalendar', 'repositories/calendar-repository');
 \OCP\Util::addScript('adcalendar', 'modules/calendar-date');
-\OCP\Util::addScript('adcalendar', 'modules/berlin-public-holidays');
+\OCP\Util::addScript('adcalendar', 'modules/holiday-calendar');
 \OCP\Util::addScript('adcalendar', 'modules/calendar-state');
 \OCP\Util::addScript('adcalendar', 'modules/calendar-timeline');
 \OCP\Util::addScript('adcalendar', 'modules/entry-workflow');
