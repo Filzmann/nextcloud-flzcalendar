@@ -1,4 +1,5 @@
 import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import { runInNewContext } from 'node:vm';
 
 const source = readFileSync(new URL('../../js/admin.js', import.meta.url), 'utf8');
@@ -55,7 +56,7 @@ const context = {
     document: { getElementById: id => elements[id] || null },
     navigator: { clipboard: { writeText: async value => { copied = value; } } },
 };
-runInNewContext(source, context);
+runInNewContext(source, context, { filename: fileURLToPath(new URL('../../js/admin.js', import.meta.url)) });
 
 await form.listeners.submit({ preventDefault() {} });
 if (calls[0][0] !== '/api/admin/google-oauth' || calls[0][1].method !== 'PUT' || JSON.parse(calls[0][1].body).clientSecret !== 'new-secret') throw new Error('Google-OAuth-Adminformular speichert nicht über den geschützten API-Pfad.');

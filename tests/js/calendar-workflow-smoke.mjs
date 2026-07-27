@@ -1,5 +1,10 @@
 import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import { runInNewContext } from 'node:vm';
+
+const execute = (relativePath, source, context) => runInNewContext(source, context, {
+    filename: fileURLToPath(new URL(relativePath, import.meta.url)),
+});
 
 const source = readFileSync(new URL('../../js/main.js', import.meta.url), 'utf8');
 const repository = readFileSync(new URL('../../js/repositories/calendar-repository.js', import.meta.url), 'utf8');
@@ -49,7 +54,7 @@ for (const contract of ['class EntryWorkflow', "['delete', 'Dienst und Termine l
     if (!entryWorkflow.includes(contract)) throw new Error(`Eintragsworkflow-Vertrag fehlt: ${contract}`);
 }
 const workflowContext = { window: { confirm: () => true }, document: {}, Element: class {}, Date, Number, Promise };
-runInNewContext(entryWorkflow, workflowContext);
+execute('../../js/modules/entry-workflow.js', entryWorkflow, workflowContext);
 const workflow = Object.create(workflowContext.window.AdCalendar.modules.EntryWorkflow.prototype);
 let deletionError = null;
 workflow.repository = { remove: async () => { throw new Error('Löschen fehlgeschlagen'); } };
@@ -58,7 +63,7 @@ workflow.reload = async () => {};
 await workflow.remove({ id: 7, type: 'appointment', meetingUid: null });
 if (deletionError?.message !== 'Löschen fehlgeschlagen') throw new Error('Fehler beim abschließenden Löschen wird nicht angezeigt.');
 const capabilitiesContext = { window: {}, Map };
-runInNewContext(meetingCapabilities, capabilitiesContext);
+execute('../../js/modules/meeting-capabilities.js', meetingCapabilities, capabilitiesContext);
 const capabilities = new capabilitiesContext.window.AdCalendar.modules.MeetingCapabilities();
 const mixedMeeting = [{ employeeUid: 'a', meetingUid: 'meeting-1' }, { employeeUid: 'b', meetingUid: 'meeting-1' }];
 capabilities.apply(mixedMeeting, [{ uid: 'a', canManage: true }, { uid: 'b', canManage: false }]);
@@ -76,7 +81,7 @@ for (const contract of ['class WeekTable', 'adc-group-heading', 'adc-week-block'
     if (!weekTable.includes(contract)) throw new Error(`Wochenmatrix-Komponentenvertrag fehlt: ${contract}`);
 }
 const timelineContext = { window: {}, Date, Set, Math };
-runInNewContext(timelineSource, timelineContext);
+execute('../../js/modules/calendar-timeline.js', timelineSource, timelineContext);
 const CalendarTimeline = timelineContext.window.AdCalendar.modules.CalendarTimeline;
 const calendarTimeline = new CalendarTimeline();
 const timelineDay = new Date(2026, 6, 6);
@@ -92,8 +97,8 @@ for (const contract of ['class WeekNavigation', "this.setPeriod('week')", "this.
     if (!weekNavigation.includes(contract)) throw new Error(`Wochennavigations-Komponentenvertrag fehlt: ${contract}`);
 }
 const navigationContext = { window: {}, document: {}, Date, Number, String };
-runInNewContext(dateSource, navigationContext);
-runInNewContext(weekNavigation, navigationContext);
+execute('../../js/modules/calendar-date.js', dateSource, navigationContext);
+execute('../../js/components/week-navigation.js', weekNavigation, navigationContext);
 const navigation = Object.create(navigationContext.window.AdCalendar.components.WeekNavigation.prototype);
 let navigationPersisted = false; let navigationLoaded = false;
 navigation.state = { monday: new Date(2026, 0, 5), persist: () => { navigationPersisted = true; } };
@@ -137,10 +142,10 @@ class FakeNode {
 }
 const tableDocument = { createElement: tag => new FakeNode(tag) };
 const tableContext = { window: {}, document: tableDocument, Date, Number, Set, Math };
-runInNewContext(dateSource, tableContext);
-runInNewContext(publicHolidaysSource, tableContext);
-runInNewContext(timelineSource, tableContext);
-runInNewContext(weekTable, tableContext);
+execute('../../js/modules/calendar-date.js', dateSource, tableContext);
+execute('../../js/modules/holiday-calendar.js', publicHolidaysSource, tableContext);
+execute('../../js/modules/calendar-timeline.js', timelineSource, tableContext);
+execute('../../js/components/week-table.js', weekTable, tableContext);
 const publicHolidays = new tableContext.window.AdCalendar.modules.HolidayCalendar([{
     year: 2026,
     publicHolidays: [
@@ -221,7 +226,7 @@ for (const contract of ['class Organization extends BaseModel', 'roleLabel(group
     if (!organizationModel.includes(contract)) throw new Error(`Organisationsmodell-Vertrag fehlt: ${contract}`);
 }
 const organizationContext = { window: { LocalBase: { models: { Model: class {} } } }, Number, String, JSON };
-runInNewContext(organizationModel, organizationContext);
+execute('../../js/models/organization.js', organizationModel, organizationContext);
 const sortableOrganization = new organizationContext.window.AdCalendar.models.Organization({
     roles: { office: { groupId: 'ad-Buero', label: 'Büro', sortOrder: 20 } },
     areas: { northeast: { groupId: 'ad-Bereich-Nordost', label: 'Nordost', sortOrder: 30 } },
@@ -272,7 +277,7 @@ const externalContext = {
     },
     Object, Promise,
 };
-runInNewContext(externalCalendars, externalContext);
+execute('../../js/components/external-calendars.js', externalCalendars, externalContext);
 const externalComponent = new externalContext.window.AdCalendar.components.ExternalCalendars({ repository: externalRepository, onMessage() {} });
 await externalComponent.load();
 await externalComponent.connect('kopano');
@@ -290,7 +295,7 @@ const syncContext = { window: {}, document: { getElementById: id => ({
     'adc-calendar-sync-enabled': syncInput,
     'adc-calendar-sync-status': syncStatus,
 }[id]) } };
-runInNewContext(shiftCalendarSync, syncContext);
+execute('../../js/components/shift-calendar-sync.js', shiftCalendarSync, syncContext);
 let savedSync = null;
 const syncComponent = new syncContext.window.AdCalendar.components.ShiftCalendarSync({ onSave: async enabled => { savedSync = enabled; } });
 syncComponent.set({ enabled: true, calendarName: 'AD Dienste' });
@@ -304,7 +309,7 @@ const componentContext = {
     window: { LocalBase: { ui: { esc: value => String(value ?? '') } } },
     Date,
 };
-runInNewContext(calendarCell, componentContext);
+execute('../../js/components/calendar-cell.js', calendarCell, componentContext);
 const cell = new componentContext.window.AdCalendar.components.CalendarCell();
 const cellHtml = cell.render([
     { id: 1, type: 'shift', start: '2026-07-06T08:00:00Z', end: '2026-07-06T16:00:00Z', title: '', parentEntryId: null },
@@ -326,7 +331,7 @@ const seriesHtml = cell.render([
 if (!seriesHtml.includes('adc-entry__series-marker') || !seriesHtml.includes('Serientermin')) throw new Error('Serientermin wird nicht zusätzlich zur visuellen Markierung textlich gekennzeichnet.');
 
 const tabContext = { window: {} };
-runInNewContext(tabNavigation, tabContext);
+execute('../../js/components/tab-navigation.js', tabNavigation, tabContext);
 const fakeButton = () => ({ listeners: {}, attributes: {}, addEventListener(type, listener) { this.listeners[type] = listener; }, setAttribute(name, value) { this.attributes[name] = value; }, click() { this.listeners.click(); } });
 const calendarButton = fakeButton(); const settingsButton = fakeButton();
 const calendarPanel = { hidden: false }; const settingsPanel = { hidden: true }; const tabChanges = [];
@@ -337,8 +342,8 @@ if (!calendarPanel.hidden || settingsPanel.hidden || settingsButton.attributes['
 }
 
 const stateContext = { window: {}, Date, Set, URLSearchParams, Number };
-runInNewContext(dateSource, stateContext);
-runInNewContext(stateSource, stateContext);
+execute('../../js/modules/calendar-date.js', dateSource, stateContext);
+execute('../../js/modules/calendar-state.js', stateSource, stateContext);
 const historyCalls = [];
 const CalendarState = stateContext.window.AdCalendar.modules.CalendarState;
 const CalendarDate = stateContext.window.AdCalendar.modules.CalendarDate;
@@ -441,7 +446,7 @@ emptyFilterState.period = 'month';
 if (emptyFilterState.toPreference().period !== 'month') throw new Error('Der Ansichtszeitraum wird nicht im persönlichen Standard gespeichert.');
 
 const dialogContext = { window: {}, document: {}, Date };
-runInNewContext(entryDialog, dialogContext);
+execute('../../js/components/entry-dialog.js', entryDialog, dialogContext);
 const dialog = Object.create(dialogContext.window.AdCalendar.components.EntryDialog.prototype);
 let startValidity = '';
 let endValidity = '';
