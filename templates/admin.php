@@ -22,6 +22,23 @@ $googleOAuth = $_['googleOAuth'] ?? ['configured' => false, 'clientId' => '', 's
         <?php endif; ?>
         <p class="adc-sync-privacy">Keine Konten- oder Kalenderkennungen werden in diesem Status gespeichert oder angezeigt.</p>
     </section>
+    <section class="adc-admin-panel" aria-labelledby="adc-kopano-caldav-heading">
+        <h3 id="adc-kopano-caldav-heading">Kopano und CalDAV</h3>
+        <p><strong>Voraussetzung:</strong> Der Kopano-Betreiber muss CalDAV per HTTPS bereitstellen und Methoden wie <code>PROPFIND</code> an den Kopano-CalDAV-Dienst weiterleiten. AD Kalender kann diesen Zugang nicht selbst auf dem fremden Server freischalten.</p>
+        <p>HTTP 405 bedeutet: Der Betreiber erlaubt an dieser Adresse keine CalDAV-Verbindung. Ohne Zugangsdaten ist HTTP 401 eine erwartbare Anmeldeaufforderung; ein erfolgreicher authentifizierter <code>PROPFIND</code> antwortet üblicherweise mit HTTP 207.</p>
+        <p>Die Vorgabe <code>https://mail.adberlin.org</code> bleibt im persönlichen Verbindungsdialog änderbar. Bei einer abweichenden veröffentlichten CalDAV-Adresse muss dort die vollständige HTTPS-Adresse eingetragen werden.</p>
+        <form id="adc-kopano-test-form" class="adc-kopano-test-form">
+            <label for="adc-kopano-test-url">HTTPS-CalDAV-Adresse</label>
+            <input id="adc-kopano-test-url" type="url" value="https://mail.adberlin.org" inputmode="url" autocomplete="url" required>
+            <label for="adc-kopano-test-username">Kopano-Benutzername</label>
+            <input id="adc-kopano-test-username" type="text" autocomplete="username" maxlength="320" required>
+            <label for="adc-kopano-test-password">Kopano-Passwort</label>
+            <input id="adc-kopano-test-password" type="password" autocomplete="off" maxlength="4096" required>
+            <small>Der Test führt ausschließlich eine lesende CalDAV-Anfrage aus. Zugangsdaten werden nicht gespeichert und kein Kalender wird angelegt.</small>
+            <div><button id="adc-kopano-test-submit" type="submit" class="primary">Verbindung testen</button></div>
+        </form>
+        <p id="adc-kopano-test-status" class="adc-kopano-test-status" role="status" aria-live="polite">Noch nicht getestet.</p>
+    </section>
     <section class="adc-admin-panel" aria-labelledby="adc-google-oauth-heading">
         <h3 id="adc-google-oauth-heading">Google Calendar OAuth</h3>
         <p>Diese systemweite Webclient-Konfiguration ermöglicht allen Nutzer*innen, ihr eigenes Google-Konto im persönlichen Einstellungs-Tab zu verbinden.</p>

@@ -12,7 +12,10 @@
             this.calendarCell = options.calendarCell;
             this.organization = options.organization;
             this.timeline = new window.AdCalendar.modules.CalendarTimeline();
+            this.holidays = options.holidays || new window.AdCalendar.modules.HolidayCalendar();
         }
+
+        setHolidays(calendars) { this.holidays.set(calendars); }
 
         render(employees, state) {
             const orderedEmployees = this.orderedEmployees(employees);
@@ -42,14 +45,17 @@
             wrap.append(table);
             block.append(wrap);
             const activeMonth = state.period === 'month' ? state.month : null;
-            if (state.period === 'month' || state.vertical) this.vertical(employees, state, days, head, body, activeMonth);
-            else this.horizontal(employees, state, days, head, body);
+            if (state.vertical) this.vertical(employees, state, days, head, body, activeMonth);
+            else this.horizontal(employees, state, days, head, body, activeMonth);
             return block;
         }
 
         vertical(employees, state, days, head, body, activeMonth = null) {
             const header = document.createElement('tr'); header.append(this.node('th', 'Mitarbeiter*in'));
-            for (const day of days) header.append(this.node('th', day.toLocaleDateString('de-DE', { weekday: 'short', day: '2-digit', month: '2-digit' }), this.outsideMonth(day, activeMonth) ? 'adc-outside-month' : ''));
+            for (const day of days) {
+                const dayHeading = this.node('th', this.dayLabel(day, { weekday: 'short', day: '2-digit', month: '2-digit' }), this.dayClasses(day, activeMonth));
+                dayHeading.scope = 'col'; header.append(dayHeading);
+            }
             head.replaceChildren(header);
 
             const rows = [];
@@ -62,7 +68,7 @@
                     groupCell.colSpan = 8; groupRow.append(groupCell); rows.push(groupRow); previousCluster = cluster;
                 }
                 const row = document.createElement('tr');
-                const name = this.node('th', employee.displayName, state.selected.has(employee.uid) ? 'adc-selected' : '');
+                const name = this.node('th', employee.displayName, this.classes('adc-person-heading', state.selected.has(employee.uid) ? 'adc-selected' : ''));
                 name.scope = 'row'; row.append(name);
                 const employeeEntries = state.data.entries.filter(entry => entry.employeeUid === employee.uid);
                 const layout = this.timeline.layout(employeeEntries, days);
@@ -72,19 +78,22 @@
             body.replaceChildren(...rows);
         }
 
-        horizontal(employees, state, days, head, body) {
+        horizontal(employees, state, days, head, body, activeMonth = null) {
             const header = document.createElement('tr'); header.append(this.node('th', 'Tag'));
-            for (const employee of employees) header.append(this.node('th', employee.displayName, state.selected.has(employee.uid) ? 'adc-selected' : ''));
+            for (const employee of employees) {
+                const name = this.node('th', employee.displayName, this.classes('adc-person-heading', state.selected.has(employee.uid) ? 'adc-selected' : ''));
+                name.scope = 'col'; header.append(name);
+            }
             head.replaceChildren(header);
             const rows = days.map(day => {
                 const row = document.createElement('tr');
-                const label = this.node('th', day.toLocaleDateString('de-DE', { weekday: 'long', day: '2-digit', month: '2-digit' }));
+                const label = this.node('th', this.dayLabel(day, { weekday: 'long', day: '2-digit', month: '2-digit' }), this.dayClasses(day, activeMonth));
                 label.scope = 'row'; row.append(label);
                 const dayEnd = new Date(day); dayEnd.setDate(dayEnd.getDate() + 1);
                 const visibleUids = new Set(employees.map(employee => employee.uid));
                 const dayEntries = state.data.entries.filter(entry => visibleUids.has(entry.employeeUid) && new Date(entry.start) < dayEnd && new Date(entry.end) > day);
                 const layout = this.timeline.layout(dayEntries, [day]);
-                for (const employee of employees) row.append(this.cellFor(employee, day, state.data.entries, state.data.absences || [], layout));
+                for (const employee of employees) row.append(this.cellFor(employee, day, state.data.entries, state.data.absences || [], layout, activeMonth));
                 return row;
             });
             body.replaceChildren(...rows);
@@ -98,8 +107,31 @@
             cell.dataset.employeeUid = employee.uid;
             cell.dataset.day = CalendarDate.isoDay(day);
             if (this.outsideMonth(day, activeMonth)) cell.classList.add('adc-outside-month');
+            if (this.isWeekend(day)) cell.classList.add('adc-weekend');
+            const holiday = this.holidays.name(day);
+            if (holiday) {
+                cell.classList.add('adc-holiday');
+                cell.dataset.holiday = holiday;
+            }
             cell.innerHTML = this.calendarCell.render(entries, employee, absences, layout, day, this.timeline);
             return cell;
+        }
+
+        dayLabel(day, options) {
+            const label = day.toLocaleDateString('de-DE', options);
+            return [label, this.isWeekend(day) ? 'Wochenende' : '', this.holidays.name(day)].filter(Boolean).join(' · ');
+        }
+
+        dayClasses(day, activeMonth) {
+            return this.classes(
+                this.outsideMonth(day, activeMonth) ? 'adc-outside-month' : '',
+                this.isWeekend(day) ? 'adc-weekend' : '',
+                this.holidays.name(day) ? 'adc-holiday' : '',
+            );
+        }
+
+        isWeekend(day) {
+            return day.getDay() === 0 || day.getDay() === 6;
         }
 
         outsideMonth(day, activeMonth) {
@@ -159,6 +191,7 @@
         }
 
         days(monday) { return Array.from({ length: 7 }, (_, offset) => { const day = new Date(monday); day.setDate(day.getDate() + offset); return day; }); }
+        classes(...values) { return values.filter(Boolean).join(' '); }
         node(tag, value, className) { const result = document.createElement(tag); result.textContent = value; if (className) result.className = className; return result; }
     }
 

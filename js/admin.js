@@ -68,6 +68,40 @@
         });
     }
 
+    function initCalDavTest() {
+        const form = document.getElementById('adc-kopano-test-form');
+        if (!form) return;
+        const serverUrl = document.getElementById('adc-kopano-test-url');
+        const username = document.getElementById('adc-kopano-test-username');
+        const password = document.getElementById('adc-kopano-test-password');
+        const status = document.getElementById('adc-kopano-test-status');
+        const submit = document.getElementById('adc-kopano-test-submit');
+
+        const showStatus = (message, error = false) => {
+            status.textContent = message;
+            status.classList.remove('is-success', 'is-error');
+            status.classList.add(error ? 'is-error' : 'is-success');
+        };
+
+        form.addEventListener('submit', async event => {
+            event.preventDefault();
+            submit.disabled = true;
+            showStatus('Kopano-CalDAV-Verbindung wird geprüft.');
+            try {
+                const response = await client.request('/api/admin/external-calendars/caldav/test', {
+                    method: 'POST',
+                    body: JSON.stringify({ serverUrl: serverUrl.value, username: username.value, password: password.value }),
+                });
+                showStatus(response.message || 'Kopano-CalDAV-Verbindung erfolgreich geprüft.');
+            } catch (error) {
+                showStatus(error.message || 'Die Kopano-CalDAV-Verbindung konnte nicht geprüft werden.', true);
+            } finally {
+                password.value = '';
+                submit.disabled = false;
+            }
+        });
+    }
+
     function initDemoPack() {
         const confirmation = document.getElementById('adc-demo-confirm');
         const button = document.getElementById('adc-demo-install');
@@ -96,5 +130,6 @@
     }
 
     initGoogleOAuth();
+    initCalDavTest();
     initDemoPack();
 }());

@@ -13,6 +13,7 @@ use OCA\AdCalendar\Service\CalendarSettingsService;
 use OCA\AdCalendar\Service\CalendarPreferenceService;
 use OCA\AdCalendar\Service\RecurringAppointmentService;
 use OCA\AdCalendar\Service\ShiftCalendarSyncService;
+use OCA\LocalBase\Calendar\HolidayCalendarService;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\Attribute\NoAdminRequired;
@@ -30,6 +31,7 @@ final class ApiController extends Controller {
         private CalendarPreferenceService $preferences,
         private RecurringAppointmentService $recurrences,
         private ShiftCalendarSyncService $shiftSync,
+        private HolidayCalendarService $holidays,
         private LoggerInterface $logger,
     ) {
         parent::__construct(Application::APP_ID, $request);
@@ -234,7 +236,20 @@ final class ApiController extends Controller {
         $response['shiftDefaults'] = $this->preferences->shiftDefaults($uid);
         $response['calendarSync'] = $this->shiftSync->status($uid);
         $response['organization'] = $this->settingsService->organization();
+        $response['holidayCalendars'] = $this->holidayCalendars($response);
         return $response;
+    }
+
+    private function holidayCalendars(array $response): array {
+        $start = $this->date((string)($response['start'] ?? ''));
+        $end = $this->date((string)($response['end'] ?? ''));
+        if ($end <= $start) throw new InvalidArgumentException('Ungültiger Kalenderbereich.');
+        $lastVisibleDay = $end->modify('-1 day');
+        $calendars = [];
+        for ($year = (int)$start->format('Y'); $year <= (int)$lastVisibleDay->format('Y'); $year++) {
+            $calendars[] = $this->holidays->forYear($year)->toArray();
+        }
+        return $calendars;
     }
 
     private function preferencesFor(array $employees): ?array {

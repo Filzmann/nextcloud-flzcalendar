@@ -5,7 +5,7 @@
         kopano: {
             title: 'Kopano verbinden',
             serverUrl: 'https://mail.adberlin.org',
-            instruction: 'Melde dich mit deinem Kopano-Benutzernamen und Passwort an. Die vorbelegte Serveradresse kann geändert werden.',
+            instruction: 'Melde dich mit deinem Kopano-Benutzernamen und Passwort an. Die vorbelegte Serveradresse kann geändert werden. Voraussetzung: Der Kopano-Betreiber muss CalDAV per HTTPS erlauben; die App kann diesen Serverzugang nicht selbst freischalten.',
             usernameLabel: 'Kopano-Benutzername',
             passwordLabel: 'Kopano-Passwort',
         },

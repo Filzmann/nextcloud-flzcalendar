@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.12.0-rc.11
+
+- Kopano-/CalDAV-Fehlerdiagnose mit verständlicher HTTP-405-Meldung im persönlichen Connector und einem rein lesenden administrativen Verbindungstest ergänzt.
+- Umschaltbare Zeilen-/Spaltenausrichtung auch in der Monatsansicht sowie fixierte Personenachse beim Scrollen abgesichert.
+- Samstage, dunklere Sonntage, gesetzliche Berliner Feiertage und getrennte Markierungen für Heiligabend und Silvester ergänzt, ohne Tagesspalten zu verbreitern.
+- Den DAV-Konsistenzjob bei Updates bestehender Installationen idempotent registriert.
+
 ## 0.12.0-rc.9
 
 - Google-OAuth-Konfiguration im Nextcloud-Adminabschnitt von AD Kalender ergänzt.

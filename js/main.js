@@ -120,6 +120,7 @@
             data.entries = EntryModel.get_all(data.entries);
             meetingCapabilities.apply(data.entries, data.employees);
             state.data = data;
+            weekTable.setHolidays(data.holidayCalendars || []);
             applyOrganization(data.organization);
             state.applyInitialFilters();
             if (state.period !== requestedPeriod) {

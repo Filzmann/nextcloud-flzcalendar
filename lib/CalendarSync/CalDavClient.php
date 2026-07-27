@@ -35,6 +35,19 @@ final class CalDavClient {
         return $this->discoverOrCreateCalendar($connection);
     }
 
+    /** Prüft Adresse und Anmeldung ausschließlich lesend und gibt den erfolgreichen HTTP-Status zurück. */
+    public function probe(array $connection): int {
+        $this->assertCredentials($connection);
+        $baseUrl = $this->urls->normalize((string)$connection['serverUrl']);
+        $parts = parse_url($baseUrl);
+        $probeUrl = (($parts['path'] ?? '/') === '/')
+            ? 'https://' . $parts['host'] . (isset($parts['port']) ? ':' . $parts['port'] : '') . '/.well-known/caldav'
+            : rtrim($baseUrl, '/');
+        $response = $this->request('PROPFIND', $probeUrl, $connection, $this->properties(['current-user-principal', 'calendar-home-set']), ['Depth' => '0']);
+        $this->expect($response, [200, 207]);
+        return $response['status'];
+    }
+
     /** @param list<CalendarEntry> $shifts */
     public function replaceAll(array $connection, array $shifts): void {
         $calendarUrl = $this->connect($connection);
@@ -174,7 +187,7 @@ final class CalDavClient {
                 } catch (\Throwable) {
                     throw new RuntimeException('Der Kalenderanbieter ist nicht erreichbar.', 0, $error);
                 }
-                if (!in_array($response->getStatusCode(), $acceptedErrors, true)) throw new RuntimeException('Der Kalenderanbieter hat die Anfrage abgewiesen.', 0, $error);
+                if (!in_array($response->getStatusCode(), $acceptedErrors, true)) throw $this->rejectedResponse($response->getStatusCode(), $error);
             }
             if (!in_array($response->getStatusCode(), [301, 302, 307, 308], true)) break;
             if ($redirects >= 3) throw new RuntimeException('Der Kalenderanbieter leitet zu häufig weiter.');
@@ -186,7 +199,18 @@ final class CalDavClient {
     }
 
     private function expect(array $response, array $statuses): void {
-        if (!in_array($response['status'], $statuses, true)) throw new RuntimeException('Der Kalenderanbieter hat unerwartet geantwortet.');
+        if (!in_array($response['status'], $statuses, true)) throw $this->rejectedResponse($response['status']);
+    }
+
+    private function rejectedResponse(int $status, ?\Throwable $previous = null): RuntimeException {
+        if ($status === 405) {
+            return new ExternalCalendarConnectionException(
+                'Der Kalenderanbieter erlaubt an dieser Adresse keine CalDAV-Verbindung (HTTP 405). Bitte wende dich an die Administration des Anbieters.',
+                $status,
+                $previous,
+            );
+        }
+        return new RuntimeException('Der Kalenderanbieter hat die Anfrage abgewiesen.', $status, $previous);
     }
 
     private function body(mixed $body): string {

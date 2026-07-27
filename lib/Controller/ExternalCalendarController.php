@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace OCA\AdCalendar\Controller;
 
 use OCA\AdCalendar\AppInfo\Application;
+use OCA\AdCalendar\CalendarSync\ExternalCalendarConnectionException;
 use OCA\AdCalendar\CalendarSync\GoogleOAuthService;
 use OCA\AdCalendar\Service\CalendarAccessService;
 use OCA\AdCalendar\Service\ExternalCalendarService;
@@ -45,6 +46,9 @@ final class ExternalCalendarController extends Controller {
             return new JSONResponse(['externalCalendars' => $this->calendars->connectCalDav($uid, $provider, $serverUrl, $username, $password)]);
         } catch (\InvalidArgumentException $error) {
             return new JSONResponse(['error' => $error->getMessage()], Http::STATUS_BAD_REQUEST);
+        } catch (ExternalCalendarConnectionException $error) {
+            $this->logger->error('Der externe Kalenderanbieter erlaubt keine CalDAV-Verbindung.', ['provider' => $provider, 'status' => $error->getCode()]);
+            return new JSONResponse(['error' => $error->userMessage($provider)], Http::STATUS_BAD_REQUEST);
         } catch (\Throwable $error) {
             $this->logger->error('Externe CalDAV-Verbindung konnte nicht hergestellt werden.', ['provider' => $provider, 'exception' => $error]);
             return new JSONResponse(['error' => 'Die Kalenderverbindung konnte nicht hergestellt werden. Bitte Adresse und Zugangsdaten prüfen.'], Http::STATUS_BAD_REQUEST);

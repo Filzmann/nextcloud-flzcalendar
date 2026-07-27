@@ -13,9 +13,11 @@ namespace {
     require_once __DIR__ . '/../../lib/CalendarSync/ShiftCalendarPublisher.php';
     require_once __DIR__ . '/../../lib/CalendarSync/ShiftCalendarEventSerializer.php';
     require_once __DIR__ . '/../../lib/CalendarSync/ExternalCalendarUrlValidator.php';
+    require_once __DIR__ . '/../../lib/CalendarSync/ExternalCalendarConnectionException.php';
     require_once __DIR__ . '/../../lib/CalendarSync/CalDavClient.php';
 
     use OCA\AdCalendar\CalendarSync\CalDavClient;
+    use OCA\AdCalendar\CalendarSync\ExternalCalendarConnectionException;
     use OCA\AdCalendar\CalendarSync\ExternalCalendarUrlValidator;
     use OCA\AdCalendar\CalendarSync\ShiftCalendarEventSerializer;
     use OCA\AdCalendar\Model\CalendarEntry;
@@ -78,6 +80,47 @@ namespace {
     foreach ($client->calls as [, $url, $options]) {
         if (str_contains($url, 'secret') || ($options['auth'] ?? null) !== ['person', 'secret'] || ($options['allow_redirects'] ?? null) !== false) {
             throw new RuntimeException('CalDAV-Zugangsdaten oder HTTPS-Weiterleitungsgrenze sind unsicher.');
+        }
+    }
+
+    $probeClient = new class($response(207, $calendarXml)) implements IClient {
+        public array $calls = [];
+        public function __construct(private IResponse $response) {}
+        public function request(string $method, string $uri, array $options = []): IResponse { $this->calls[] = [$method, $uri, $options]; return $this->response; }
+        public function getResponseFromThrowable(\Throwable $error): IResponse { throw $error; }
+    };
+    $probeClients = new class($probeClient) implements IClientService {
+        public function __construct(private IClient $client) {}
+        public function newClient(): IClient { return $this->client; }
+    };
+    $probeStatus = (new CalDavClient($probeClients, new ExternalCalendarUrlValidator(), new ShiftCalendarEventSerializer()))->probe([
+        'serverUrl' => 'https://calendar.example.test/caldav/person/',
+        'username' => 'person',
+        'password' => 'secret',
+    ]);
+    if ($probeStatus !== 207 || array_column($probeClient->calls, 0) !== ['PROPFIND']) {
+        throw new RuntimeException('Administrativer CalDAV-Test ist nicht rein lesend.');
+    }
+
+    $blockedClient = new class($response(405)) implements IClient {
+        public function __construct(private IResponse $response) {}
+        public function request(string $method, string $uri, array $options = []): IResponse { throw new RuntimeException('HTTP 405'); }
+        public function getResponseFromThrowable(\Throwable $error): IResponse { return $this->response; }
+    };
+    $blockedClients = new class($blockedClient) implements IClientService {
+        public function __construct(private IClient $client) {}
+        public function newClient(): IClient { return $this->client; }
+    };
+    try {
+        (new CalDavClient($blockedClients, new ExternalCalendarUrlValidator(), new ShiftCalendarEventSerializer()))->connect([
+            'serverUrl' => 'https://calendar.example.test/caldav/person/',
+            'username' => 'person',
+            'password' => 'secret',
+        ]);
+        throw new RuntimeException('HTTP 405 wurde nicht als blockierter CalDAV-Zugang erkannt.');
+    } catch (ExternalCalendarConnectionException $error) {
+        if ($error->getMessage() !== 'Der Kalenderanbieter erlaubt an dieser Adresse keine CalDAV-Verbindung (HTTP 405). Bitte wende dich an die Administration des Anbieters.') {
+            throw new RuntimeException('HTTP-405-Diagnose ist für Nutzer*innen nicht eindeutig.');
         }
     }
 

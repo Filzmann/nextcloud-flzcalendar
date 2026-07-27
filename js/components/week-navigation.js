@@ -44,7 +44,7 @@
             this.monthNumber.value = CalendarDate.monthValue(this.state.month);
             this.weekPicker.hidden = isMonth;
             this.monthPicker.hidden = !isMonth;
-            this.toggleView.hidden = isMonth;
+            this.toggleView.hidden = false;
             this.weekButton.setAttribute('aria-pressed', String(!isMonth));
             this.monthButton.setAttribute('aria-pressed', String(isMonth));
             this.previous.textContent = isMonth ? 'Vorheriger Monat' : 'Vorherige Woche';

@@ -24,6 +24,7 @@ namespace OCP\AppFramework\Http {
 }
 namespace Psr\Log { interface LoggerInterface { public function error(string|\Stringable $message, array $context = []): void; } }
 namespace OCA\AdCalendar\AppInfo { final class Application { public const APP_ID = 'adcalendar'; } }
+namespace OCA\LocalBase\Calendar { class HolidayCalendarService {} }
 namespace OCA\AdCalendar\Service {
     class CalendarAccessService {
         public ?\OCP\IUser $user = null;
@@ -54,6 +55,7 @@ namespace {
     use OCA\AdCalendar\Service\CalendarSettingsService;
     use OCA\AdCalendar\Service\RecurringAppointmentService;
     use OCA\AdCalendar\Service\ShiftCalendarSyncService;
+    use OCA\LocalBase\Calendar\HolidayCalendarService;
     use OCP\IRequest;
     use OCP\IUser;
     use Psr\Log\LoggerInterface;
@@ -65,7 +67,7 @@ namespace {
         public array $errors = [];
         public function error(string|\Stringable $message, array $context = []): void { $this->errors[] = [(string)$message, $context]; }
     };
-    $controller = new ApiController($request, $access, new CalendarService(), new CalendarSettingsService(), new CalendarPreferenceService(), new RecurringAppointmentService(), $sync, $logger);
+    $controller = new ApiController($request, $access, new CalendarService(), new CalendarSettingsService(), new CalendarPreferenceService(), new RecurringAppointmentService(), $sync, new HolidayCalendarService(), $logger);
 
     if ($controller->saveCalendarSync(true)->getStatus() !== 403) throw new RuntimeException('Nicht angemeldete Person kann die Synchronisation aktivieren.');
     $access->user = new class implements IUser { public function getUID(): string { return 'sync-person'; } };

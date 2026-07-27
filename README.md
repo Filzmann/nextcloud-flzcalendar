@@ -2,7 +2,7 @@
 
 Wochen- und monatsbasierte Dienst- und Terminplanung mit wiederkehrenden Terminen, Personensuche, Gruppenfiltern, Meetinglückensuche, Standarddienstzeiten, read-only Urlaubsmarkierungen und persönlichem Dienstexport in Nextcloud sowie externe Kalender.
 
-Die Monatsansicht stellt alle betroffenen Kalenderwochen untereinander dar. Tage außerhalb des gewählten Monats sind abgedunkelt; die Personenspalte bleibt beim horizontalen Scrollen sichtbar. Die Auswahl `Woche` oder `Monat` kann zusammen mit den Filtern als persönlicher Standard gespeichert werden.
+Die Monatsansicht stellt alle betroffenen Kalenderwochen untereinander dar und lässt sich wie die Wochenansicht zwischen „Tage als Zeilen“ und „Personen als Zeilen“ umschalten. Die zu den Personen gehörende erste Spalte beziehungsweise Kopfzeile bleibt beim Scrollen sichtbar. Tage außerhalb des gewählten Monats sind abgedunkelt; Samstag und Sonntag werden zusätzlich als „Wochenende“ beschriftet. Gesetzliche Feiertage der organisationsweit konfigurierten Kalenderregion werden über den gemeinsamen LocalBase-Kalendervertrag geliefert, namentlich gekennzeichnet und bleiben ohne Auswirkung auf Dienste, Termine oder Rechte. Berlin bleibt Bestandsdefault. Zeitraum und Ausrichtung können zusammen mit den Filtern als persönlicher Standard gespeichert werden.
 
 ## Staging-Kompatibilität
 
@@ -24,6 +24,8 @@ Der Befehl `adcalendar:demo:seed` ist ausschließlich für synthetische Testdate
 Jede angemeldete Person verwaltet Kopano-, Google-, Apple- und manuelle CalDAV-Verbindungen im eigenen Tab `Einstellungen`. AD Calendar erzeugt beim Anbieter einen sichtbaren Kalender `AD Dienste` und exportiert ausschließlich Dienste. Anbieterinhalte werden nicht in AD Calendar eingeblendet oder zurückimportiert.
 
 - Kopano ist mit `https://mail.adberlin.org` vorbelegt; die Adresse bleibt im Verbindungsdialog änderbar.
+- Der Kopano-Betreiber muss einen HTTPS-CalDAV-Endpunkt bereitstellen. HTTP 405 wird im Connector ausdrücklich als nicht freigegebener CalDAV-Zugriff erklärt; die notwendige Serverfreigabe kann nicht durch AD Kalender erfolgen.
+- Nextcloud-Admins können Adresse und Zugang im AD-Kalender-Adminabschnitt mit einer ausschließlich lesenden CalDAV-Anfrage prüfen. Das Passwort wird weder gespeichert noch zurückgegeben; der Test legt keinen Kalender an.
 - Apple und manuelles CalDAV verwenden ein Anbieter- beziehungsweise app-spezifisches Passwort.
 - CalDAV-Ziele müssen HTTPS verwenden. Nextclouds HTTP-Client erzwingt zusätzlich seine serverseitige SSRF-Sperre.
 - Persönliche Passwörter und Google-Tokens liegen verschlüsselt und als sensible Nextcloud-Benutzerkonfiguration vor.

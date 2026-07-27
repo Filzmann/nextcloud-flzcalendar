@@ -56,6 +56,38 @@
     font-size: var(--font-size-small);
 }
 
+.adc-kopano-test-form {
+    display: grid;
+    grid-template-columns: minmax(12rem, 15rem) minmax(18rem, 1fr);
+    gap: 8px 12px;
+    align-items: center;
+    max-width: 760px;
+    margin-top: 14px;
+}
+
+.adc-kopano-test-form > label {
+    font-weight: 600;
+}
+
+.adc-kopano-test-form > input {
+    min-width: 0;
+    width: 100%;
+}
+
+.adc-kopano-test-form > small,
+.adc-kopano-test-form > div {
+    grid-column: 2;
+}
+
+.adc-kopano-test-status {
+    margin: 12px 0 0;
+    padding-inline-start: 10px;
+    border-inline-start: 4px solid var(--color-text-maxcontrast);
+}
+
+.adc-kopano-test-status.is-success { border-inline-start-color: var(--color-success); }
+.adc-kopano-test-status.is-error { border-inline-start-color: var(--color-error); }
+
 .adc-google-oauth-status {
     margin: 12px 0;
     padding-inline-start: 10px;
@@ -156,7 +188,8 @@
 }
 
 @media (max-width: 700px) {
-    .adc-google-oauth-form { grid-template-columns: 1fr; }
+    .adc-google-oauth-form, .adc-kopano-test-form { grid-template-columns: 1fr; }
+    .adc-kopano-test-form > small, .adc-kopano-test-form > div,
     .adc-google-oauth-form > small,
     .adc-google-oauth-actions { grid-column: 1; }
     .adc-google-redirect-row { align-items: stretch; flex-direction: column; }

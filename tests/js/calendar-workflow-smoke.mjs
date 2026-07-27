@@ -1,5 +1,10 @@
 import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import { runInNewContext } from 'node:vm';
+
+const execute = (relativePath, source, context) => runInNewContext(source, context, {
+    filename: fileURLToPath(new URL(relativePath, import.meta.url)),
+});
 
 const source = readFileSync(new URL('../../js/main.js', import.meta.url), 'utf8');
 const repository = readFileSync(new URL('../../js/repositories/calendar-repository.js', import.meta.url), 'utf8');
@@ -13,6 +18,7 @@ const shiftDefaults = readFileSync(new URL('../../js/components/shift-defaults.j
 const shiftCalendarSync = readFileSync(new URL('../../js/components/shift-calendar-sync.js', import.meta.url), 'utf8');
 const externalCalendars = readFileSync(new URL('../../js/components/external-calendars.js', import.meta.url), 'utf8');
 const dateSource = readFileSync(new URL('../../js/modules/calendar-date.js', import.meta.url), 'utf8');
+const publicHolidaysSource = readFileSync(new URL('../../js/modules/holiday-calendar.js', import.meta.url), 'utf8');
 const timelineSource = readFileSync(new URL('../../js/modules/calendar-timeline.js', import.meta.url), 'utf8');
 const stateSource = readFileSync(new URL('../../js/modules/calendar-state.js', import.meta.url), 'utf8');
 const entryWorkflow = readFileSync(new URL('../../js/modules/entry-workflow.js', import.meta.url), 'utf8');
@@ -36,6 +42,7 @@ for (const contract of [
     'repository.range(range.start, range.end)',
     "state.period === 'month'",
     'meetingCapabilities.apply(data.entries, data.employees)',
+    'weekTable.setHolidays(data.holidayCalendars || [])',
     "state.isUnfiltered() ? 'Alle Personen'",
     'const sequence = ++loadSequence',
     'if (sequence !== loadSequence) return;',
@@ -47,7 +54,7 @@ for (const contract of ['class EntryWorkflow', "['delete', 'Dienst und Termine l
     if (!entryWorkflow.includes(contract)) throw new Error(`Eintragsworkflow-Vertrag fehlt: ${contract}`);
 }
 const workflowContext = { window: { confirm: () => true }, document: {}, Element: class {}, Date, Number, Promise };
-runInNewContext(entryWorkflow, workflowContext);
+execute('../../js/modules/entry-workflow.js', entryWorkflow, workflowContext);
 const workflow = Object.create(workflowContext.window.AdCalendar.modules.EntryWorkflow.prototype);
 let deletionError = null;
 workflow.repository = { remove: async () => { throw new Error('Löschen fehlgeschlagen'); } };
@@ -56,7 +63,7 @@ workflow.reload = async () => {};
 await workflow.remove({ id: 7, type: 'appointment', meetingUid: null });
 if (deletionError?.message !== 'Löschen fehlgeschlagen') throw new Error('Fehler beim abschließenden Löschen wird nicht angezeigt.');
 const capabilitiesContext = { window: {}, Map };
-runInNewContext(meetingCapabilities, capabilitiesContext);
+execute('../../js/modules/meeting-capabilities.js', meetingCapabilities, capabilitiesContext);
 const capabilities = new capabilitiesContext.window.AdCalendar.modules.MeetingCapabilities();
 const mixedMeeting = [{ employeeUid: 'a', meetingUid: 'meeting-1' }, { employeeUid: 'b', meetingUid: 'meeting-1' }];
 capabilities.apply(mixedMeeting, [{ uid: 'a', canManage: true }, { uid: 'b', canManage: false }]);
@@ -74,7 +81,7 @@ for (const contract of ['class WeekTable', 'adc-group-heading', 'adc-week-block'
     if (!weekTable.includes(contract)) throw new Error(`Wochenmatrix-Komponentenvertrag fehlt: ${contract}`);
 }
 const timelineContext = { window: {}, Date, Set, Math };
-runInNewContext(timelineSource, timelineContext);
+execute('../../js/modules/calendar-timeline.js', timelineSource, timelineContext);
 const CalendarTimeline = timelineContext.window.AdCalendar.modules.CalendarTimeline;
 const calendarTimeline = new CalendarTimeline();
 const timelineDay = new Date(2026, 6, 6);
@@ -90,8 +97,8 @@ for (const contract of ['class WeekNavigation', "this.setPeriod('week')", "this.
     if (!weekNavigation.includes(contract)) throw new Error(`Wochennavigations-Komponentenvertrag fehlt: ${contract}`);
 }
 const navigationContext = { window: {}, document: {}, Date, Number, String };
-runInNewContext(dateSource, navigationContext);
-runInNewContext(weekNavigation, navigationContext);
+execute('../../js/modules/calendar-date.js', dateSource, navigationContext);
+execute('../../js/components/week-navigation.js', weekNavigation, navigationContext);
 const navigation = Object.create(navigationContext.window.AdCalendar.components.WeekNavigation.prototype);
 let navigationPersisted = false; let navigationLoaded = false;
 navigation.state = { monday: new Date(2026, 0, 5), persist: () => { navigationPersisted = true; } };
@@ -114,6 +121,14 @@ navigation.setPeriod('week');
 if (navigation.state.period !== 'week' || navigation.state.monday.getDay() !== 1) {
     throw new Error('Umschalter stellt beim Wechsel zur Woche keinen gültigen Wochenanfang her.');
 }
+const navigationElement = () => ({ hidden: null, value: '', textContent: '', attributes: {}, setAttribute(name, value) { this.attributes[name] = value; } });
+const monthNavigation = Object.create(navigationContext.window.AdCalendar.components.WeekNavigation.prototype);
+monthNavigation.state = { monday: new Date(2026, 6, 13), month: new Date(2026, 6, 1), period: 'month', vertical: false };
+for (const property of ['label', 'weekNumber', 'monthNumber', 'weekPicker', 'monthPicker', 'previous', 'next', 'weekButton', 'monthButton', 'toggleView', 'heading']) monthNavigation[property] = navigationElement();
+monthNavigation.render();
+if (monthNavigation.toggleView.hidden !== false || monthNavigation.toggleView.textContent !== 'Personen als Zeilen' || monthNavigation.toggleView.attributes['aria-pressed'] !== 'true') {
+    throw new Error('Ausrichtungsumschalter bleibt in der Monatsansicht nicht sichtbar oder verliert seinen Zustand.');
+}
 class FakeNode {
     constructor(tag = 'div') {
         this.tagName = tag.toUpperCase(); this.children = []; this.dataset = {}; this.className = ''; this.textContent = '';
@@ -127,9 +142,26 @@ class FakeNode {
 }
 const tableDocument = { createElement: tag => new FakeNode(tag) };
 const tableContext = { window: {}, document: tableDocument, Date, Number, Set, Math };
-runInNewContext(dateSource, tableContext);
-runInNewContext(timelineSource, tableContext);
-runInNewContext(weekTable, tableContext);
+execute('../../js/modules/calendar-date.js', dateSource, tableContext);
+execute('../../js/modules/holiday-calendar.js', publicHolidaysSource, tableContext);
+execute('../../js/modules/calendar-timeline.js', timelineSource, tableContext);
+execute('../../js/components/week-table.js', weekTable, tableContext);
+const publicHolidays = new tableContext.window.AdCalendar.modules.HolidayCalendar([{
+    year: 2026,
+    publicHolidays: [
+        { name: 'Karfreitag', startDate: '2026-04-03', endDate: '2026-04-03' },
+        { name: 'Tag der Arbeit', startDate: '2026-05-01', endDate: '2026-05-01' },
+    ],
+}, {
+    year: 2028,
+    publicHolidays: [{ name: '75. Jahrestag des Aufstandes vom 17. Juni 1953', startDate: '2028-06-17', endDate: '2028-06-17' }],
+}]);
+if (publicHolidays.name(new Date(2026, 4, 1)) !== 'Tag der Arbeit'
+    || publicHolidays.name(new Date(2026, 3, 3)) !== 'Karfreitag'
+    || publicHolidays.name(new Date(2028, 5, 17)) !== '75. Jahrestag des Aufstandes vom 17. Juni 1953'
+    || publicHolidays.name(new Date(2026, 4, 2)) !== '') {
+    throw new Error('Gemeinsame gesetzliche Feiertage werden nicht vollständig und datumsstabil gelesen.');
+}
 const clusterTable = Object.create(tableContext.window.AdCalendar.components.WeekTable.prototype);
 clusterTable.organization = () => ({
     staffRoleGroups: () => [], staffBlockLabel: 'Leitungen',
@@ -155,6 +187,7 @@ const monthTable = new tableContext.window.AdCalendar.components.WeekTable({
     calendarCell: { render: () => '' },
     organization: clusterTable.organization,
 });
+monthTable.setHolidays([{ year: 2026, publicHolidays: [{ name: 'Tag der Arbeit', startDate: '2026-05-01', endDate: '2026-05-01' }] }]);
 const monthDate = tableContext.window.AdCalendar.modules.CalendarDate;
 monthTable.render([{ uid: 'person-a', displayName: 'Person A', roles: ['ad-Buero'], areas: ['ad-Bereich-West'] }], {
     period: 'month', month: new Date(2026, 6, 1), vertical: false, selected: new Set(),
@@ -165,7 +198,22 @@ const flattenNodes = node => [node, ...node.children.flatMap(flattenNodes)];
 const renderedNodes = flattenNodes(monthContainer);
 if (monthContainer.children.length !== 5 || !monthContainer.className.includes('adc-month-weeks')) throw new Error('Monatsansicht rendert nicht alle betroffenen Wochenblöcke.');
 if (!renderedNodes.some(node => node.className.includes('adc-outside-month'))) throw new Error('Randtage der Monatsansicht werden nicht gekennzeichnet.');
-if (!renderedNodes.some(node => node.tagName === 'TH' && node.scope === 'row' && node.textContent === 'Person A')) throw new Error('Monatsansicht behält Personen als Zeilen bei.');
+if (!renderedNodes.some(node => node.tagName === 'TH' && node.scope === 'col' && node.className.includes('adc-person-heading') && node.textContent === 'Person A')) throw new Error('Monatsansicht übernimmt die gewählte Ausrichtung mit Personen als Spalten nicht.');
+if (renderedNodes.some(node => node.tagName === 'TH' && node.scope === 'row' && node.textContent === 'Person A')) throw new Error('Monatsansicht erzwingt trotz Umschaltung weiterhin Personen als Zeilen.');
+if (!renderedNodes.some(node => node.tagName === 'TH' && node.scope === 'row' && node.className.includes('adc-weekend') && node.textContent.includes('Wochenende'))) throw new Error('Wochenenden werden in der Tagesbeschriftung nicht barrierefrei gekennzeichnet.');
+if (!renderedNodes.some(node => node.tagName === 'TD' && node.className.includes('adc-weekend'))) throw new Error('Wochenendspalten oder -zeilen werden in der Kalendermatrix nicht markiert.');
+monthTable.render([{ uid: 'person-a', displayName: 'Person A', roles: ['ad-Buero'], areas: ['ad-Bereich-West'] }], {
+    period: 'month', month: new Date(2026, 6, 1), vertical: true, selected: new Set(),
+    data: { entries: [], absences: [] },
+    visibleRange: () => monthDate.monthRange(new Date(2026, 6, 1)),
+});
+const verticalMonthNodes = flattenNodes(monthContainer);
+if (!verticalMonthNodes.some(node => node.tagName === 'TH' && node.scope === 'row' && node.className.includes('adc-person-heading') && node.textContent === 'Person A')) throw new Error('Personenspalte der Monatsansicht ist nicht als fixierter Personenbezug gekennzeichnet.');
+if (!verticalMonthNodes.some(node => node.tagName === 'TH' && node.scope === 'col' && node.className.includes('adc-weekend') && node.textContent.includes('Wochenende'))) throw new Error('Wochenendspalten werden in der vertikalen Monatsausrichtung nicht barrierefrei gekennzeichnet.');
+if (!monthTable.dayLabel(new Date(2026, 4, 1), { weekday: 'long', day: '2-digit', month: '2-digit' }).includes('Tag der Arbeit')
+    || !monthTable.dayClasses(new Date(2026, 4, 1), null).includes('adc-holiday')) {
+    throw new Error('Gemeinsame Feiertage erhalten in der Kalendermatrix keine sichtbare und textliche Kennzeichnung.');
+}
 for (const contract of ["params.set('people'", "params.set('roles'", "params.set('areas'", "params.set('period', 'month')", 'this.data.defaultFilters ||', 'this.data.currentUserProfile?.roles', 'if (this.selected.size) return this.selected.has(employee.uid)', 'showLeadershipStaff: this.showLeadershipStaff', 'period: this.period']) {
     if (!stateSource.includes(contract)) throw new Error(`Kalenderzustandsvertrag fehlt: ${contract}`);
 }
@@ -178,7 +226,7 @@ for (const contract of ['class Organization extends BaseModel', 'roleLabel(group
     if (!organizationModel.includes(contract)) throw new Error(`Organisationsmodell-Vertrag fehlt: ${contract}`);
 }
 const organizationContext = { window: { LocalBase: { models: { Model: class {} } } }, Number, String, JSON };
-runInNewContext(organizationModel, organizationContext);
+execute('../../js/models/organization.js', organizationModel, organizationContext);
 const sortableOrganization = new organizationContext.window.AdCalendar.models.Organization({
     roles: { office: { groupId: 'ad-Buero', label: 'Büro', sortOrder: 20 } },
     areas: { northeast: { groupId: 'ad-Bereich-Nordost', label: 'Nordost', sortOrder: 30 } },
@@ -201,7 +249,7 @@ for (const contract of ['class ShiftDefaults', 'Array.from({ length: 7 }', 'data
 for (const contract of ['class ShiftCalendarSync', 'this.onSave(this.input.checked)', 'status.calendarName', 'Kalender ist aktiv']) {
     if (!shiftCalendarSync.includes(contract)) throw new Error(`Dienstkalender-Komponentenvertrag fehlt: ${contract}`);
 }
-for (const contract of ['class ExternalCalendars', "provider === 'google'", 'window.location.assign(response.authorizationUrl)', 'this.dialog.showModal()', 'this.repository.connectCalDav', 'this.repository.disconnectExternalCalendar', 'window.confirm(', 'this.password.value = \'\'', 'https://mail.adberlin.org']) {
+for (const contract of ['class ExternalCalendars', "provider === 'google'", 'window.location.assign(response.authorizationUrl)', 'this.dialog.showModal()', 'this.repository.connectCalDav', 'this.repository.disconnectExternalCalendar', 'window.confirm(', 'this.password.value = \'\'', 'https://mail.adberlin.org', 'Der Kopano-Betreiber muss CalDAV']) {
     if (!externalCalendars.includes(contract)) throw new Error(`Externe-Kalender-Komponentenvertrag fehlt: ${contract}`);
 }
 const externalElements = {};
@@ -229,7 +277,7 @@ const externalContext = {
     },
     Object, Promise,
 };
-runInNewContext(externalCalendars, externalContext);
+execute('../../js/components/external-calendars.js', externalCalendars, externalContext);
 const externalComponent = new externalContext.window.AdCalendar.components.ExternalCalendars({ repository: externalRepository, onMessage() {} });
 await externalComponent.load();
 await externalComponent.connect('kopano');
@@ -247,7 +295,7 @@ const syncContext = { window: {}, document: { getElementById: id => ({
     'adc-calendar-sync-enabled': syncInput,
     'adc-calendar-sync-status': syncStatus,
 }[id]) } };
-runInNewContext(shiftCalendarSync, syncContext);
+execute('../../js/components/shift-calendar-sync.js', shiftCalendarSync, syncContext);
 let savedSync = null;
 const syncComponent = new syncContext.window.AdCalendar.components.ShiftCalendarSync({ onSave: async enabled => { savedSync = enabled; } });
 syncComponent.set({ enabled: true, calendarName: 'AD Dienste' });
@@ -261,7 +309,7 @@ const componentContext = {
     window: { LocalBase: { ui: { esc: value => String(value ?? '') } } },
     Date,
 };
-runInNewContext(calendarCell, componentContext);
+execute('../../js/components/calendar-cell.js', calendarCell, componentContext);
 const cell = new componentContext.window.AdCalendar.components.CalendarCell();
 const cellHtml = cell.render([
     { id: 1, type: 'shift', start: '2026-07-06T08:00:00Z', end: '2026-07-06T16:00:00Z', title: '', parentEntryId: null },
@@ -283,7 +331,7 @@ const seriesHtml = cell.render([
 if (!seriesHtml.includes('adc-entry__series-marker') || !seriesHtml.includes('Serientermin')) throw new Error('Serientermin wird nicht zusätzlich zur visuellen Markierung textlich gekennzeichnet.');
 
 const tabContext = { window: {} };
-runInNewContext(tabNavigation, tabContext);
+execute('../../js/components/tab-navigation.js', tabNavigation, tabContext);
 const fakeButton = () => ({ listeners: {}, attributes: {}, addEventListener(type, listener) { this.listeners[type] = listener; }, setAttribute(name, value) { this.attributes[name] = value; }, click() { this.listeners.click(); } });
 const calendarButton = fakeButton(); const settingsButton = fakeButton();
 const calendarPanel = { hidden: false }; const settingsPanel = { hidden: true }; const tabChanges = [];
@@ -294,8 +342,8 @@ if (!calendarPanel.hidden || settingsPanel.hidden || settingsButton.attributes['
 }
 
 const stateContext = { window: {}, Date, Set, URLSearchParams, Number };
-runInNewContext(dateSource, stateContext);
-runInNewContext(stateSource, stateContext);
+execute('../../js/modules/calendar-date.js', dateSource, stateContext);
+execute('../../js/modules/calendar-state.js', stateSource, stateContext);
 const historyCalls = [];
 const CalendarState = stateContext.window.AdCalendar.modules.CalendarState;
 const CalendarDate = stateContext.window.AdCalendar.modules.CalendarDate;
@@ -398,7 +446,7 @@ emptyFilterState.period = 'month';
 if (emptyFilterState.toPreference().period !== 'month') throw new Error('Der Ansichtszeitraum wird nicht im persönlichen Standard gespeichert.');
 
 const dialogContext = { window: {}, document: {}, Date };
-runInNewContext(entryDialog, dialogContext);
+execute('../../js/components/entry-dialog.js', entryDialog, dialogContext);
 const dialog = Object.create(dialogContext.window.AdCalendar.components.EntryDialog.prototype);
 let startValidity = '';
 let endValidity = '';

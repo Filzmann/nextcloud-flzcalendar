@@ -13,6 +13,8 @@ Nextcloud-App-ID:
     adcalendar
 
 Die priorisierte Produktplanung und offene Entscheidungen stehen in `ROADMAP.md`; verbindliche Fach-, Sicherheits- und Architekturregeln bleiben in dieser Datei.
+Der ausführliche geltende Ist-Vertrag steht in `docs/architecture.md`; diese
+Datei hält die bei jeder Arbeit benötigten Grenzen und Prüfungen.
 
 ## Zielsetzung und Fachkontext
 
@@ -21,7 +23,7 @@ AD Kalender uebertraegt den fachlichen Kern des bisherigen WordPress-Plugins `ad
 Kernprozess:
 
 - Eine Wochenansicht zeigt Mitarbeiter*innen als Zeilen und Kalendertage als Spalten.
-- Eine umschaltbare Monatsansicht zeigt die betroffenen Wochenblöcke untereinander, behält Mitarbeiter*innen als Zeilen bei, dimmt Randtage und fixiert die Personenspalte beim horizontalen Scrollen.
+- Eine umschaltbare Monatsansicht zeigt die betroffenen Wochenblöcke untereinander und unterstützt wie die Wochenansicht „Tage als Zeilen“ sowie „Personen als Zeilen“. Die zu den Personen gehörende erste Spalte beziehungsweise Kopfzeile bleibt beim Scrollen sichtbar. Randtage werden gedimmt; Samstag und Sonntag werden flächig und zusätzlich mit dem Text „Wochenende“ gekennzeichnet. Gesetzliche Feiertage der organisationsweit konfigurierten Kalenderregion werden serverseitig über den gemeinsamen read-only LocalBase-Vertrag geliefert und erscheinen mit ihrem Namen als reine Anzeigeebene. `DE`, `DE-BE` und `Europe/Berlin` bleiben Bestandsdefaults; persönliche Zeitzonen beeinflussen nur individuelle Terminanzeigen. Feiertage verändern weder Einträge noch Verfügbarkeit oder Rechte.
 - Dienste besitzen Mitarbeiter*in, Beginn und Ende. Der Titel bleibt bei Diensten optional.
 - Termine besitzen zusaetzlich einen sprechenden Titel.
 - Termine innerhalb eines Dienstes werden diesem Dienst in der Darstellung zugeordnet.
@@ -45,6 +47,7 @@ Kernprozess:
 - Jede angemeldete Person kann im eigenen Einstellungs-Tab Kopano, Google, Apple und einen manuellen CalDAV-Anbieter verbinden. Kopano ist mit `https://mail.adberlin.org` vorbelegt, bleibt aber änderbar. Externe Anbieter erhalten einen sichtbaren, app-eigenen Kalender „AD Dienste“; ihre Kalenderinhalte werden nicht in AD Calendar eingeblendet.
 - Persönliche CalDAV-Zugangsdaten und Google-Tokens werden mit Nextclouds Kryptodienst verschlüsselt und als sensible Benutzerkonfiguration gespeichert. Antworten und Logs enthalten weder Passwörter, Tokens, Konto- noch Kalenderkennungen. Google benötigt einen systemweit administrierten OAuth-Webclient; ohne ihn bleibt der persönliche Verbindungsweg deaktiviert.
 - Der Google-OAuth-Webclient wird im app-eigenen Nextcloud-Adminabschnitt konfiguriert. Das Client-Secret ist nur schreibbar, wird als sensible lazy AppConfig gespeichert und niemals an Templates oder Statusantworten zurückgegeben; die installationsspezifische Redirect-URI wird dort kopierbar angezeigt.
+- Nextcloud-Admins können im app-eigenen Adminabschnitt eine Kopano-CalDAV-Adresse mit temporär eingegebenen Zugangsdaten rein lesend prüfen. Der Test verwendet denselben Kopano-Pfadvertrag wie die persönliche Verbindung, speichert keine Zugangsdaten und legt keinen Kalender an.
 - Persönliche Providerverbindungen können parallel bestehen und arbeiten unabhängig vom Opt-out für den internen Nextcloud-Kalender. Ein Providerfehler blockiert weder andere Provider noch die führende AD-Mutation. Der Abgleich bleibt einseitig und überträgt auch extern ausschließlich Dienste.
 - Das Kalender-Demo-Pack wird ausschließlich nach ausdrücklicher Bestätigung im app-eigenen Nextcloud-Adminabschnitt installiert; `adcalendar:demo:seed` delegiert auf denselben Service. Es synchronisiert neutrale, benannte Demokonten für jede Kalenderrolle und jeden Bürobereich. Namen tragen die fachliche Demo-Zuordnung in Klammern; Mehrfachrollen werden auch in Gruppentiteln als Hauptrolle mit weiteren Rollen in Klammern dargestellt.
 - Demo-Provisioning übernimmt niemals ein vorhandenes fremdes oder LDAP-verwaltetes Konto. Read-only LDAP-Gruppen brechen das Pack im Preflight vor der ersten Mutation ab; eigene lokale Demokonten werden explizit in LocalBase registriert.
@@ -147,9 +150,9 @@ Urlaubsansichten sind dynamisch ergänzbare Rollen-/Bereichsschnitte. Die Standa
 
 ## DDEV
 
-Die gemeinsame Umgebung liegt unter:
-
-    ~/projects/br-nextcloud-apps/nextcloud-dev
+Die gemeinsame Umgebung wird aus dem dokumentierten Parent-Unterverzeichnis
+`nextcloud-dev` gesteuert. Bei einem eigenständigen Checkout ist der lokale
+DDEV-Pfad zuerst anhand der realen Umgebung zu ermitteln.
 
 Geplante Checks:
 
@@ -170,13 +173,9 @@ Geplante Checks:
 - Reale Tombstone-/Urlaubsintegration in DDEV: `ddev exec -d /var/www/html/html php custom_apps/adcalendar/tests/integration/DefaultShiftVacationSmoke.php`
 - Selbstaufräumender persönlicher DAV-Dienstabgleich in DDEV: `ddev exec -d /var/www/html/html php custom_apps/adcalendar/tests/integration/ShiftCalendarSyncSmoke.php`
 
-## Learnings
-
-### Gemeinsame Suite-Navigation
+## Verbindliche Navigation und optionale Integration
 
 - Ohne aktive OrgSuite registriert AD Kalender einen eigenen Nextcloud-Hauptnavigationseintrag. Ab zwei AD-Produkten ersetzt `orgsuite` diesen durch den gemeinsamen Einstieg `AD`.
 - Das Template stellt den optionalen Menühost mit `data-suite="ad"` und `data-current-app="adcalendar"` bereit, lädt aber keine OrgSuite-Assets direkt.
 - Ohne AD Urlaub bleiben Sperrtermine der manuelle Abwesenheitsweg; fehlende optionale Provider dürfen die Wochenansicht nicht verhindern.
 - Fachliche Lese- und Bearbeitungsrechte bleiben ausschliesslich serverseitig im AD Kalender; Menuesichtbarkeit ist keine Berechtigung.
-
-- App-spezifische Kandidaten zielen auf diese Datei; app-uebergreifende Kandidaten werden dem Parent nur als unverbindlicher Vorschlag berichtet. Bewertung und Freigabe folgen dem lokalen Skill `work-in-nextcloud-app`.

@@ -35,18 +35,9 @@ final class ExternalCalendarService {
     }
 
     public function connectCalDav(string $uid, string $provider, string $serverUrl, string $username, string $password): array {
-        if (!in_array($provider, ExternalCalendarConnectionStore::CALDAV_PROVIDERS, true)) throw new InvalidArgumentException('Unbekannter CalDAV-Anbieter.');
         if (trim($uid) === '') throw new InvalidArgumentException('Die angemeldete Person fehlt.');
-        $serverUrl = trim($serverUrl) === '' ? self::DEFAULTS[$provider] : $serverUrl;
-        $serverUrl = $this->urls->normalize($serverUrl);
-        $username = trim($username);
-        if ($username === '' || $password === '') throw new InvalidArgumentException('Benutzername und Passwort sind erforderlich.');
-        if (strlen($username) > 320 || strlen($password) > 4096) throw new InvalidArgumentException('Die Zugangsdaten sind zu lang.');
-        if ($provider === 'kopano' && (parse_url($serverUrl, PHP_URL_PATH) ?: '/') === '/') {
-            $serverUrl .= 'caldav/' . rawurlencode($username) . '/';
-        }
+        $connection = $this->calDavConnection($provider, $serverUrl, $username, $password);
         $previous = $this->connections->connection($uid, $provider);
-        $connection = ['serverUrl' => $serverUrl, 'username' => $username, 'password' => $password];
         $connection['calendarUrl'] = $this->calDav->connect($connection);
         if ($previous !== null && ($previous['calendarUrl'] ?? '') !== $connection['calendarUrl']) {
             $this->publisher->removeProviderCalendar($uid, $provider, $previous);
@@ -63,6 +54,24 @@ final class ExternalCalendarService {
             throw $error;
         }
         return $this->status($uid);
+    }
+
+    /** Prüft dieselbe Provideradresse wie die persönliche Verbindung, ohne Daten zu speichern oder Kalender anzulegen. */
+    public function testCalDavConnection(string $provider, string $serverUrl, string $username, string $password): int {
+        return $this->calDav->probe($this->calDavConnection($provider, $serverUrl, $username, $password));
+    }
+
+    private function calDavConnection(string $provider, string $serverUrl, string $username, string $password): array {
+        if (!in_array($provider, ExternalCalendarConnectionStore::CALDAV_PROVIDERS, true)) throw new InvalidArgumentException('Unbekannter CalDAV-Anbieter.');
+        $serverUrl = trim($serverUrl) === '' ? self::DEFAULTS[$provider] : $serverUrl;
+        $serverUrl = $this->urls->normalize($serverUrl);
+        $username = trim($username);
+        if ($username === '' || $password === '') throw new InvalidArgumentException('Benutzername und Passwort sind erforderlich.');
+        if (strlen($username) > 320 || strlen($password) > 4096) throw new InvalidArgumentException('Die Zugangsdaten sind zu lang.');
+        if ($provider === 'kopano' && (parse_url($serverUrl, PHP_URL_PATH) ?: '/') === '/') {
+            $serverUrl .= 'caldav/' . rawurlencode($username) . '/';
+        }
+        return ['serverUrl' => $serverUrl, 'username' => $username, 'password' => $password];
     }
 
     public function connectGoogle(string $uid, array $tokens): array {

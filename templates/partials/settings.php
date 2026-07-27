@@ -15,6 +15,7 @@
             <article class="adc-provider-card">
                 <h3>Kopano</h3>
                 <small>Vorgabe: https://mail.adberlin.org (änderbar)</small>
+                <p class="adc-provider-requirement"><strong>Voraussetzung:</strong> Der Kopano-Betreiber muss CalDAV per HTTPS erlauben. HTTP 405 bedeutet, dass der Betreiber den CalDAV-Zugriff an dieser Adresse nicht freigegeben hat.</p>
                 <p id="adc-external-kopano-status" role="status">Status wird geladen.</p>
                 <div><button type="button" data-external-connect="kopano">Kopano verbinden</button><button type="button" data-external-disconnect="kopano" hidden>Verbindung trennen</button></div>
             </article>

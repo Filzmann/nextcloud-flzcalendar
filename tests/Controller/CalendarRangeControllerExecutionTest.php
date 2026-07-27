@@ -24,6 +24,13 @@ namespace OCP\AppFramework\Http {
 }
 namespace Psr\Log { interface LoggerInterface { public function error(string|\Stringable $message, array $context = []): void; } }
 namespace OCA\AdCalendar\AppInfo { final class Application { public const APP_ID = 'adcalendar'; } }
+namespace OCA\LocalBase\Calendar {
+    class HolidayCalendar { public function __construct(private int $year) {} public function toArray(): array { return ['year' => $this->year, 'publicHolidays' => []]; } }
+    class HolidayCalendarService {
+        public array $calls = [];
+        public function forYear(int $year): HolidayCalendar { $this->calls[] = $year; return new HolidayCalendar($year); }
+    }
+}
 namespace OCA\AdCalendar\Service {
     class CalendarAccessService {
         public bool $view = false;
@@ -58,18 +65,20 @@ namespace {
     use OCA\AdCalendar\Service\CalendarSettingsService;
     use OCA\AdCalendar\Service\RecurringAppointmentService;
     use OCA\AdCalendar\Service\ShiftCalendarSyncService;
+    use OCA\LocalBase\Calendar\HolidayCalendarService;
     use OCP\IRequest;
     use Psr\Log\LoggerInterface;
 
     $access = new CalendarAccessService();
     $calendar = new CalendarService();
+    $holidays = new HolidayCalendarService();
     $logger = new class implements LoggerInterface {
         public array $errors = [];
         public function error(string|\Stringable $message, array $context = []): void { $this->errors[] = (string)$message; }
     };
     $controller = new ApiController(
         new class implements IRequest {}, $access, $calendar, new CalendarSettingsService(),
-        new CalendarPreferenceService(), new RecurringAppointmentService(), new ShiftCalendarSyncService(), $logger,
+        new CalendarPreferenceService(), new RecurringAppointmentService(), new ShiftCalendarSyncService(), $holidays, $logger,
     );
 
     if ($controller->range('2026-06-29', '2026-08-03')->getStatus() !== 403 || $calendar->calls !== []) {
@@ -77,9 +86,11 @@ namespace {
     }
     $access->view = true;
     $response = $controller->range('2026-06-29', '2026-08-03');
-    if ($response->getStatus() !== 200 || $calendar->calls !== [['2026-06-29', '2026-08-03']] || ($response->getData()['defaultFilters']['period'] ?? '') !== 'month') {
+    if ($response->getStatus() !== 200 || $calendar->calls !== [['2026-06-29', '2026-08-03']] || $holidays->calls !== [2026] || ($response->getData()['holidayCalendars'][0]['year'] ?? null) !== 2026 || ($response->getData()['defaultFilters']['period'] ?? '') !== 'month') {
         throw new RuntimeException('Berechtigte Monatsabfrage liefert nicht den vollständigen persönlichen Ansichtskontext.');
     }
+    $controller->range('2026-12-28', '2027-01-11');
+    if ($holidays->calls !== [2026, 2026, 2027]) throw new RuntimeException('Ein Kalenderbereich über den Jahreswechsel lädt nicht beide gemeinsamen Jahresstände.');
     if ($controller->range('kein-datum', '2026-08-03')->getStatus() !== 400 || $logger->errors === []) {
         throw new RuntimeException('Ungültiger Monatsbereich wird nicht sicher behandelt und protokolliert.');
     }
