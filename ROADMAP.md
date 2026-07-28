@@ -2,6 +2,41 @@
 
 Diese Datei bündelt geplante Erweiterungen und offene Produktentscheidungen. Verbindliche Fach-, Sicherheits- und Architekturregeln stehen in `AGENTS.md`.
 
+## Freigegebene Umsetzungsaufgaben
+
+### ADC-ADMIN-DEFAULTS – Kalenderdefaults administrierbar machen
+
+Status: bereit nach Entscheidung zum Verhalten vorhandener Kalender
+
+- Kopano-/CalDAV-Vorgabe und sichtbaren Zielkalendernamen aus je einer
+  validierten serverseitigen AppConfig-Quelle liefern und in
+  PHP, JavaScript, Templates und Tests nur noch konsumieren.
+- Bestehende Werte als Migrationsdefaults behalten. Technische DAV-IDs,
+  reservierte URIs und Objektkennungen bleiben stabil.
+- Bereits gespeicherte persönliche Verbindungen niemals mit einem neuen
+  Default überschreiben. HTTPS-, SSRF-, Same-Origin-, Secret- und
+  Adminschutz vollständig erhalten.
+- Vor Implementierung entscheiden, ob eine Änderung des sichtbaren Namens
+  vorhandene app-eigene Kalender idempotent umbenennt oder nur neue Kalender
+  betrifft.
+- Fresh Install, Upgrade, alte persönliche Verbindung, ungültige URL,
+  Nichtadmin-Deny, Secret-Ausgabe, stabile DAV-ID und gewählte
+  Umbenennungssemantik testen.
+
+### ADC-L10N – AD Kalender vollständig lokalisieren
+
+Status: bereit nach Auswahl einer Pilot-App und ihres l10n-Vertrags
+
+- Feste `de-DE`-Formatierung, Wochentagslisten sowie sichtbare UI-, Admin-,
+  Provider- und Fehlermeldungen auf aktive Nextcloud-Locale und
+  Nextcloud-l10n umstellen.
+- ISO-Daten, Zeitzonen, Serien-/Statuswerte, DAV-IDs und konfigurierte
+  Kalendernamen unverändert lassen.
+- Abkürzungen locale-fähig erzeugen; deutsche Ausgabe, eine weitere Locale,
+  Fallback, Zeitumstellungen, Jahresgrenzen, Platzhalter und Escaping testen.
+- Erst nach vollständiger Migration einen Rohtext-Check für AD Kalender
+  verbindlich schalten.
+
 ## Aktueller Fokus
 
 - Wochen- und Monatsplanung, Meeting-Lückensuche, persönliche Standards und optionale Urlaubsmarkierungen auf einem realitätsnahen Staging fachlich abnehmen.
