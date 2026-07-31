@@ -2,7 +2,7 @@
 
 Wochen- und monatsbasierte Dienst- und Terminplanung mit wiederkehrenden Terminen, Personensuche, Gruppenfiltern, Meetinglückensuche, Standarddienstzeiten, read-only Urlaubsmarkierungen und persönlichem Dienstexport in Nextcloud sowie externe Kalender.
 
-Die Monatsansicht stellt alle betroffenen Kalenderwochen untereinander dar und lässt sich wie die Wochenansicht zwischen „Tage als Zeilen“ und „Personen als Zeilen“ umschalten. Die zu den Personen gehörende erste Spalte beziehungsweise Kopfzeile bleibt beim Scrollen sichtbar. Tage außerhalb des gewählten Monats sind abgedunkelt; Samstag und Sonntag werden zusätzlich als „Wochenende“ beschriftet. Gesetzliche Feiertage der organisationsweit konfigurierten Kalenderregion werden über den gemeinsamen LocalBase-Kalendervertrag geliefert, namentlich gekennzeichnet und bleiben ohne Auswirkung auf Dienste, Termine oder Rechte. Berlin bleibt Bestandsdefault. Zeitraum und Ausrichtung können zusammen mit den Filtern als persönlicher Standard gespeichert werden.
+Die Monatsansicht stellt den vollständigen sichtbaren Monatszeitraum in einer einzigen durchgehenden Planungsmatrix dar und lässt sich wie die Wochenansicht zwischen „Tage als Zeilen“ und „Personen als Zeilen“ umschalten. Sie wiederholt keine Wochenblöcke: Die gemeinsame Tagesachse wächst je nach Ausrichtung um Zeilen oder Spalten. Die zu den Personen gehörende erste Spalte beziehungsweise Kopfzeile bleibt beim Scrollen sichtbar. Tage außerhalb des gewählten Monats sind abgedunkelt; Samstag und Sonntag werden ausschließlich über ihren Wochentagsnamen gekennzeichnet. Leere Wochenend- und Feiertagstage erscheinen kompakt und erhalten bei „Tage als Spalten“ eine feste schmale Breite. Sie wechseln nur bei vorhandenen Diensten oder Terminen automatisch auf Normalgröße; ein Urlaubsmarker allein verhindert die kompakte Darstellung nicht. Die Kalendermatrix scrollt innerhalb des sichtbaren Tabellenbereichs in beide Richtungen; ihre horizontale Leiste bleibt unabhängig von der Inhaltshöhe am unteren Rand dieses Bereichs erreichbar. Gesetzliche Feiertage der organisationsweit konfigurierten Kalenderregion werden über den gemeinsamen LocalBase-Kalendervertrag geliefert, namentlich gekennzeichnet und bleiben ohne Auswirkung auf Dienste, Termine oder Rechte. Berlin bleibt Bestandsdefault. Zeitraum und Ausrichtung können zusammen mit den Filtern als persönlicher Standard gespeichert werden.
 
 ## Staging-Kompatibilität
 
@@ -43,5 +43,7 @@ Bei installationsweit aktivem Pretty-URL-Rewriting kann `index.php` entfallen. M
 ## Roadmap
 
 Geplante Erweiterungen und offene Produktentscheidungen stehen in der [Roadmap](ROADMAP.md).
+
+Für die fachliche Prüfung auf Staging steht ein ausfüllbares [manuelles Abnahmeformular](docs/manual-acceptance.md) bereit. Zugangsdaten, Tokens und personenbezogene Echtdaten werden darin nicht dokumentiert.
 
 Installations-, Betriebs- und Abnahmeunterlagen stehen im öffentlichen [AD-Suite-Projekt](https://github.com/Filzmann/ad-suite).

@@ -12,12 +12,24 @@ Beginn und Ende; ihr Titel ist optional. Termine besitzen einen sprechenden
 Titel. Termine innerhalb eines Dienstes referenzieren ihn über
 `parent_entry_id`; Termine ohne Parent sind Sperrtermine.
 
-Die Wochenansicht und die aus Wochenblöcken zusammengesetzte Monatsansicht
-unterstützen „Tage als Zeilen“ und „Personen als Zeilen“. Personenachsen
-bleiben beim Scrollen sichtbar, Randtage werden gedimmt und Wochenenden
-zusätzlich textlich gekennzeichnet. Gesetzliche Feiertage werden über den
-gemeinsamen read-only LocalBase-Kalendervertrag geliefert und verändern weder
-Einträge, Verfügbarkeit noch Rechte.
+Die Wochenansicht und die durchgehende Monatsmatrix unterstützen „Tage als
+Zeilen“ und „Personen als Zeilen“. Die Monatsansicht wiederholt keine
+Wochenblöcke: Ihr vollständiger sichtbarer Tagesbereich bildet je nach
+Ausrichtung eine gemeinsame Zeilen- oder Spaltenachse. Personenachsen bleiben
+beim Scrollen sichtbar, Randtage werden gedimmt und Wochenenden ausschließlich
+über ihren Wochentagsnamen gekennzeichnet. Leere Wochenend- und Feiertagstage
+verwenden eine kompakte Tagesachse und in der Tages-Spalten-Ausrichtung eine
+feste schmale Breite; vorhandene Dienste oder Termine stellen den betroffenen
+Tag für alle sichtbaren Personen auf die normale Größe zurück. Ein Urlaubsmarker
+allein verhindert die kompakte Darstellung nicht.
+Der direkte App-Root füllt die verfügbare Fensterbreite; nur die innere
+Kalendermatrix scrollt innerhalb des verfügbaren sichtbaren Bereichs in beide
+Richtungen. Ihre horizontale Scrollleiste bleibt unabhängig von der Höhe des
+Tabelleninhalts am unteren Rand des sichtbaren Kalender-Viewports; beide
+Scrollrichtungen sind dort jederzeit erreichbar.
+Gesetzliche Feiertage werden über den gemeinsamen read-only
+LocalBase-Kalendervertrag geliefert und verändern weder Einträge, Verfügbarkeit
+noch Rechte.
 
 Filter nach Personen, Rollen und Bereichen verwenden den konfigurierten
 Organisationsvertrag. Rollen und Bereiche werden jeweils als ODER-Auswahl und

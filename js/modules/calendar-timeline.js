@@ -2,8 +2,8 @@
     'use strict';
 
     /**
-     * Zweck: Berechnet ein gemeinsames, komprimiertes Tagesraster für alle Zellen einer Wochenansicht.
-     * Zusammenspiel: WeekTable erzeugt einmal das Wochenlayout; CalendarCell positioniert Dienste und Sperrtermine darin.
+     * Zweck: Berechnet ein gemeinsames, komprimiertes Tagesraster für alle Zellen einer Kalenderansicht.
+     * Zusammenspiel: WeekTable erzeugt einmal das Zeitraumslayout; CalendarCell positioniert Dienste und Sperrtermine darin.
      * Vertrag: Jede Eintragsgrenze wird zur gemeinsamen Rasterlinie. Belegte Intervalle sind mindestens hoch genug für eine kompakte Karte.
      */
     class CalendarTimeline {

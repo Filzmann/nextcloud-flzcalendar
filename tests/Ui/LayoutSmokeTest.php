@@ -28,13 +28,26 @@ foreach (['data-orgsuite data-suite="ad" data-current-app="adcalendar"'] as $con
 if (str_contains($template, "addScript('orgsuite'") || str_contains($template, "addStyle('orgsuite'")) throw new RuntimeException('Direkte OrgSuite-Assetkopplung vorhanden.');
 if (preg_match('/^\\s*(?:script|style)\\s*\\(/m', $template) === 1) throw new RuntimeException('Veralteter globaler Templatehelfer gefunden.');
 if (!str_contains($template, 'erscheinen als feste Dienste im Kalender')) throw new RuntimeException('Standarddienst-Erklaerung fehlt in den Einstellungen.');
-foreach (['height: 100%', 'min-height: 0', 'overflow-y: auto', 'overflow-x: hidden', 'background: var(--color-main-background)', '.adc-app [hidden] { display: none !important; }', '.adc-table-wrap { width: 100%; max-width: 100%; min-width: 0; overflow-x: auto', 'width: max-content', 'min-width: 0', 'table-layout: auto', '.adc-filter-grid', '.adc-selection-actions', 'height: auto !important', '.adc-dialog:not([open])', 'max-height: calc(100vh - 24px)', '.adc-dialog button:focus-visible', '.adc-recurrence__options', '.adc-quick-add', '.adc-quick-add[data-tooltip]::after', '.adc-meeting-people', '.adc-tabs', '.adc-shift-default-row', '.adc-provider-grid', '.adc-provider-card', '.adc-external-fields', '.adc-overview-header', 'white-space: nowrap', '.adc-settings-view { display: grid; gap: 12px; width: 100%; max-width: none', '.adc-entry--blocked { border: 2px solid var(--color-error)', 'background: var(--color-error)', 'color: var(--color-error-text)'] as $contract) {
+if (preg_match('/\.adc-app\s*\{[^}]*width:\s*100%[^}]*height:\s*100%/s', $css) !== 1) throw new RuntimeException('App-Root nutzt die verfügbare Fensterbreite nicht vollständig.');
+foreach (['height: 100%', 'min-height: 0', 'overflow-y: auto', 'overflow-x: hidden', 'background: var(--color-main-background)', '.adc-app [hidden] { display: none !important; }', 'overflow: auto; scrollbar-gutter: stable both-edges;', 'width: max-content', 'min-width: 0', 'table-layout: auto', '.adc-filter-grid', '.adc-selection-actions', 'height: auto !important', '.adc-dialog:not([open])', 'max-height: calc(100vh - 24px)', '.adc-dialog button:focus-visible', '.adc-recurrence__options', '.adc-quick-add', '.adc-quick-add[data-tooltip]::after', '.adc-meeting-people', '.adc-tabs', '.adc-shift-default-row', '.adc-provider-grid', '.adc-provider-card', '.adc-external-fields', '.adc-overview-header', 'white-space: nowrap', '.adc-settings-view { display: grid; gap: 12px; width: 100%; max-width: none', '.adc-entry--blocked { border: 2px solid var(--color-error)', 'background: var(--color-error)', 'color: var(--color-error-text)'] as $contract) {
     if (!str_contains($css, $contract)) throw new RuntimeException("Scroll-/Layoutvertrag fehlt: {$contract}");
 }
 foreach (['.adc-cell-entries { display: grid', 'repeating-linear-gradient'] as $contract) {
     if (!str_contains($css, $contract)) throw new RuntimeException("Zeitachsen-Layoutvertrag fehlt: {$contract}");
 }
-foreach (['.adc-calendar tbody th[scope="row"]', '.adc-person-heading', 'position: sticky', 'inset-inline-start: 0', '.adc-weekend', '.adc-holiday', '.adc-outside-month', '.adc-month-weeks', '.adc-week-block'] as $contract) {
+foreach (['.adc-calendar tbody th[scope="row"]', '.adc-person-heading', 'position: sticky', 'inset-inline-start: 0', '.adc-weekend', '.adc-holiday', '.adc-outside-month', '.adc-period-matrix'] as $contract) {
     if (!str_contains($css, $contract)) throw new RuntimeException("Fixierter Monatslayoutvertrag fehlt: {$contract}");
+}
+foreach (['.adc-calendar th.adc-compact-day', '.adc-calendar td.adc-compact-day', '.adc-cell-entries:empty', 'min-width: 4.5rem', 'min-height: 0'] as $contract) {
+    if (!str_contains($css, $contract)) throw new RuntimeException("Adaptiver Sondertagvertrag fehlt: {$contract}");
+}
+foreach (['.adc-app { display: flex; flex-direction: column;', '#adc-calendar-view { display: flex; flex: 1 1 auto; min-height: 0; flex-direction: column;', '.adc-overview { display: flex; flex: 1 1 auto; min-height: 0; flex-direction: column;', '.adc-calendar-tables, .adc-period-matrix { flex: 1 1 auto; min-height: 0;', '.adc-calendar thead th.adc-compact-day { width: 4.5rem; min-width: 4.5rem; max-width: 4.5rem;'] as $contract) {
+    if (!str_contains($css, $contract)) throw new RuntimeException("Ständig zugänglicher Tabellen-Scrollvertrag fehlt: {$contract}");
+}
+foreach (['.adc-calendar-tables { display: flex; overflow: hidden;', '.adc-period-matrix { display: flex; min-width: 0; overflow: hidden;', '.adc-table-wrap { flex: 1 1 auto; width: 100%; max-width: 100%; min-width: 0; height: auto; max-height: none; overflow: auto;'] as $contract) {
+    if (!str_contains($css, $contract)) throw new RuntimeException("Viewport-fester horizontaler Scrollvertrag fehlt: {$contract}");
+}
+if (!str_contains($css, 'max-height: calc(100dvh - var(--header-height, 50px))')) {
+    throw new RuntimeException('Der App-Root wächst über den sichtbaren Nextcloud-Inhaltsbereich hinaus.');
 }
 echo "LayoutSmokeTest: OK\n";

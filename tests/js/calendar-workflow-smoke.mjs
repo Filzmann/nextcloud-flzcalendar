@@ -77,7 +77,7 @@ for (const contract of ['class CalendarFilters', 'this.renderLeadershipStaffChec
 for (const contract of ['class TabNavigation', "addEventListener('click'", "this.show('settings')", "this.onChange(active)"]) {
     if (!tabNavigation.includes(contract)) throw new Error(`Tab-Komponentenvertrag fehlt: ${contract}`);
 }
-for (const contract of ['class WeekTable', 'adc-group-heading', 'adc-week-block', 'adc-outside-month', 'this.calendarCell.render(entries, employee, absences, layout, day, this.timeline)', 'this.timeline.layout(employeeEntries, days)', 'this.timeline.layout(dayEntries, [day])', 'organization.staffBlockLabel', 'organization.roleLabel(value)', 'organization.areaLabel(value)', 'groupCell.colSpan = 8', 'this.orderedEmployees(employees)', 'this.staffRank(a) - this.staffRank(b)', 'roleNames.slice(1)', "join(' / ')"]) {
+for (const contract of ['class WeekTable', 'adc-group-heading', 'adc-period-matrix', 'adc-outside-month', 'this.calendarCell.render(entries, employee, absences, layout, day, this.timeline)', 'this.timeline.layout(employeeEntries, days)', 'this.timeline.layout(dayEntries, [day])', 'organization.staffBlockLabel', 'organization.roleLabel(value)', 'organization.areaLabel(value)', 'this.daysInRange(range.start, range.end)', 'groupCell.colSpan = days.length + 1', 'this.orderedEmployees(employees)', 'this.staffRank(a) - this.staffRank(b)', 'roleNames.slice(1)', "join(' / ')"]) {
     if (!weekTable.includes(contract)) throw new Error(`Wochenmatrix-Komponentenvertrag fehlt: ${contract}`);
 }
 const timelineContext = { window: {}, Date, Set, Math };
@@ -187,7 +187,13 @@ const monthTable = new tableContext.window.AdCalendar.components.WeekTable({
     calendarCell: { render: () => '' },
     organization: clusterTable.organization,
 });
-monthTable.setHolidays([{ year: 2026, publicHolidays: [{ name: 'Tag der Arbeit', startDate: '2026-05-01', endDate: '2026-05-01' }] }]);
+monthTable.setHolidays([{
+    year: 2026,
+    publicHolidays: [
+        { name: 'Tag der Arbeit', startDate: '2026-05-01', endDate: '2026-05-01' },
+        { name: 'Beispieltag', startDate: '2026-07-01', endDate: '2026-07-01' },
+    ],
+}]);
 const monthDate = tableContext.window.AdCalendar.modules.CalendarDate;
 monthTable.render([{ uid: 'person-a', displayName: 'Person A', roles: ['ad-Buero'], areas: ['ad-Bereich-West'] }], {
     period: 'month', month: new Date(2026, 6, 1), vertical: false, selected: new Set(),
@@ -196,11 +202,24 @@ monthTable.render([{ uid: 'person-a', displayName: 'Person A', roles: ['ad-Buero
 });
 const flattenNodes = node => [node, ...node.children.flatMap(flattenNodes)];
 const renderedNodes = flattenNodes(monthContainer);
-if (monthContainer.children.length !== 5 || !monthContainer.className.includes('adc-month-weeks')) throw new Error('Monatsansicht rendert nicht alle betroffenen Wochenblöcke.');
+if (monthContainer.children.length !== 1
+    || renderedNodes.filter(node => node.tagName === 'TABLE').length !== 1
+    || renderedNodes.some(node => node.tagName === 'H3')) {
+    throw new Error('Monatsansicht wird nicht als eine durchgehende Planungsmatrix gerendert.');
+}
+if (renderedNodes.filter(node => node.tagName === 'TH' && node.scope === 'row' && !node.className.includes('adc-person-heading')).length !== 35) {
+    throw new Error('Tage-als-Zeilen-Monatsansicht bildet den sichtbaren Zeitraum nicht als fortlaufende Tageszeilen ab.');
+}
 if (!renderedNodes.some(node => node.className.includes('adc-outside-month'))) throw new Error('Randtage der Monatsansicht werden nicht gekennzeichnet.');
+if (!renderedNodes.some(node => node.tagName === 'TD' && node.className.includes('adc-holiday') && node.dataset.holiday === 'Beispieltag')) throw new Error('Feiertage bleiben in der durchgehenden Monatsmatrix nicht an den Kalenderzellen gekennzeichnet.');
+if (!renderedNodes.some(node => node.tagName === 'TD' && node.dataset.day === '2026-07-01' && node.className.includes('adc-compact-day'))
+    || !renderedNodes.some(node => node.tagName === 'TD' && node.dataset.day === '2026-07-04' && node.className.includes('adc-compact-day'))) {
+    throw new Error('Leere Feiertage und Wochenenden werden nicht als kompakte Kalendertage gerendert.');
+}
 if (!renderedNodes.some(node => node.tagName === 'TH' && node.scope === 'col' && node.className.includes('adc-person-heading') && node.textContent === 'Person A')) throw new Error('Monatsansicht übernimmt die gewählte Ausrichtung mit Personen als Spalten nicht.');
 if (renderedNodes.some(node => node.tagName === 'TH' && node.scope === 'row' && node.textContent === 'Person A')) throw new Error('Monatsansicht erzwingt trotz Umschaltung weiterhin Personen als Zeilen.');
-if (!renderedNodes.some(node => node.tagName === 'TH' && node.scope === 'row' && node.className.includes('adc-weekend') && node.textContent.includes('Wochenende'))) throw new Error('Wochenenden werden in der Tagesbeschriftung nicht barrierefrei gekennzeichnet.');
+if (!renderedNodes.some(node => node.tagName === 'TH' && node.scope === 'row' && node.className.includes('adc-weekend') && node.textContent.includes('Samstag'))) throw new Error('Samstage werden nicht über den Wochentagsnamen gekennzeichnet.');
+if (renderedNodes.some(node => node.textContent.includes('Wochenende'))) throw new Error('Wochenendtage tragen weiterhin das redundante Zusatzwort „Wochenende“.');
 if (!renderedNodes.some(node => node.tagName === 'TD' && node.className.includes('adc-weekend'))) throw new Error('Wochenendspalten oder -zeilen werden in der Kalendermatrix nicht markiert.');
 monthTable.render([{ uid: 'person-a', displayName: 'Person A', roles: ['ad-Buero'], areas: ['ad-Bereich-West'] }], {
     period: 'month', month: new Date(2026, 6, 1), vertical: true, selected: new Set(),
@@ -208,11 +227,53 @@ monthTable.render([{ uid: 'person-a', displayName: 'Person A', roles: ['ad-Buero
     visibleRange: () => monthDate.monthRange(new Date(2026, 6, 1)),
 });
 const verticalMonthNodes = flattenNodes(monthContainer);
+if (verticalMonthNodes.filter(node => node.tagName === 'TH' && node.scope === 'col' && !node.className.includes('adc-person-heading')).length !== 35) {
+    throw new Error('Personen-als-Zeilen-Monatsansicht bildet den sichtbaren Zeitraum nicht als fortlaufende Tagesspalten ab.');
+}
+if (!verticalMonthNodes.some(node => node.className.includes('adc-group-heading') && node.colSpan === 36)) {
+    throw new Error('Gruppenüberschriften überspannen nicht die vollständige monatliche Tagesachse.');
+}
 if (!verticalMonthNodes.some(node => node.tagName === 'TH' && node.scope === 'row' && node.className.includes('adc-person-heading') && node.textContent === 'Person A')) throw new Error('Personenspalte der Monatsansicht ist nicht als fixierter Personenbezug gekennzeichnet.');
-if (!verticalMonthNodes.some(node => node.tagName === 'TH' && node.scope === 'col' && node.className.includes('adc-weekend') && node.textContent.includes('Wochenende'))) throw new Error('Wochenendspalten werden in der vertikalen Monatsausrichtung nicht barrierefrei gekennzeichnet.');
+if (!verticalMonthNodes.some(node => node.tagName === 'TH' && node.scope === 'col' && node.className.includes('adc-weekend') && node.className.includes('adc-compact-day') && node.textContent.includes('Sa'))) throw new Error('Leere Samstage werden in der Tages-Spalten-Ansicht nicht kompakt gekennzeichnet.');
+if (verticalMonthNodes.some(node => node.textContent.includes('Wochenende'))) throw new Error('Wochenendspalten tragen weiterhin das redundante Zusatzwort „Wochenende“.');
 if (!monthTable.dayLabel(new Date(2026, 4, 1), { weekday: 'long', day: '2-digit', month: '2-digit' }).includes('Tag der Arbeit')
     || !monthTable.dayClasses(new Date(2026, 4, 1), null).includes('adc-holiday')) {
     throw new Error('Gemeinsame Feiertage erhalten in der Kalendermatrix keine sichtbare und textliche Kennzeichnung.');
+}
+monthTable.render([{ uid: 'person-a', displayName: 'Person A', roles: ['ad-Buero'], areas: ['ad-Bereich-West'] }], {
+    period: 'month', month: new Date(2026, 6, 1), vertical: false, selected: new Set(),
+    data: {
+        entries: [{ employeeUid: 'person-a', type: 'shift', start: '2026-07-04T08:00:00', end: '2026-07-04T12:00:00' }],
+        absences: [{
+            employeeUid: 'person-a',
+            start: '2026-07-05T00:00:00',
+            end: '2026-07-06T00:00:00',
+            marker: 'U',
+            status: 'approved',
+            blocks: false,
+        }],
+    },
+    visibleRange: () => monthDate.monthRange(new Date(2026, 6, 1)),
+});
+const occupiedWeekendNodes = flattenNodes(monthContainer);
+if (occupiedWeekendNodes.some(node => node.tagName === 'TD' && node.dataset.day === '2026-07-04' && node.className.includes('adc-compact-day'))) {
+    throw new Error('Ein Sondertag mit Dienst wechselt nicht auf Normalgröße zurück.');
+}
+if (!occupiedWeekendNodes.some(node => node.tagName === 'TD' && node.dataset.day === '2026-07-05' && node.className.includes('adc-compact-day'))) {
+    throw new Error('Ein Urlaubsmarker verhindert die Kompaktklasse eines ansonsten leeren Sondertags.');
+}
+monthTable.render([{ uid: 'person-a', displayName: 'Person A', roles: ['ad-Buero'], areas: ['ad-Bereich-West'] }], {
+    period: 'week', month: new Date(2026, 6, 1), vertical: false, selected: new Set(),
+    data: { entries: [], absences: [] },
+    visibleRange: () => ({
+        start: new Date(2026, 6, 6),
+        end: new Date(2026, 6, 13),
+        weeks: [new Date(2026, 6, 6)],
+    }),
+});
+const weekNodes = flattenNodes(monthContainer);
+if (weekNodes.filter(node => node.tagName === 'TH' && node.scope === 'row' && !node.className.includes('adc-person-heading')).length !== 7) {
+    throw new Error('Die gemeinsame Periodenmatrix verändert die siebentägige Wochenansicht.');
 }
 for (const contract of ["params.set('people'", "params.set('roles'", "params.set('areas'", "params.set('period', 'month')", 'this.data.defaultFilters ||', 'this.data.currentUserProfile?.roles', 'if (this.selected.size) return this.selected.has(employee.uid)', 'showLeadershipStaff: this.showLeadershipStaff', 'period: this.period']) {
     if (!stateSource.includes(contract)) throw new Error(`Kalenderzustandsvertrag fehlt: ${contract}`);
