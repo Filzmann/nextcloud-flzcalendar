@@ -20,7 +20,10 @@ function load(locale, translations = true) {
     }
     const context = {
         window,
-        document: { documentElement: { dataset: { locale }, lang: locale.split('-')[0] } },
+        document: { documentElement: {
+            dataset: locale === undefined ? {} : { locale },
+            lang: locale === undefined ? '' : locale.split(/[-_]/)[0],
+        } },
         Intl,
         Date,
     };
@@ -37,6 +40,12 @@ if (german.l10n.time(new Date('2026-03-29T01:30:00Z'), { timeZone: 'Europe/Berli
     throw new Error('Localezeit berücksichtigt Zeitzone oder Zeitumstellung nicht.');
 }
 if (german.l10n.lower('ÄPFEL') !== 'äpfel') throw new Error('Localeabhängige Suchnormalisierung fehlt.');
+
+const nextcloudGerman = load('de_DE', false).l10n;
+if (nextcloudGerman.locale !== 'de-DE'
+    || nextcloudGerman.date(new Date('2026-12-31T12:00:00Z'), { day: '2-digit', month: '2-digit', year: 'numeric', timeZone: 'UTC' }) !== '31.12.2026') {
+    throw new Error('Nextcloud-Locale de_DE wird nicht als deutsches Datumsformat normalisiert.');
+}
 const translated = german.l10n.t('Calendar week from {date}', { date: '<31.07.>' });
 if (translated !== 'de-DE:Calendar week from <31.07.>' || german.calls[0][1] !== 'adcalendar' || german.calls[0][3].date !== '<31.07.>') {
     throw new Error('Übersetzung delegiert App-ID oder typisierte Platzhalter nicht unverändert an Nextcloud.');
@@ -51,9 +60,15 @@ if (english.l10n.date(new Date('2026-12-31T12:00:00Z'), { day: '2-digit', month:
 }
 
 const fallback = load('invalid_locale', false).l10n;
-if (fallback.locale !== 'en' || fallback.t('Hello {name}', { name: '<Team>' }) !== 'Hello <Team>' || fallback.n('One', '{count} items', 3, { count: 3 }) !== '3 items') {
-    throw new Error('Ungültige Locale oder fehlender Katalog besitzt keinen sicheren englischen Textfallback.');
+if (fallback.locale !== 'de-DE'
+    || fallback.date(new Date('2026-12-31T12:00:00Z'), { day: '2-digit', month: '2-digit', year: 'numeric', timeZone: 'UTC' }) !== '31.12.2026'
+    || fallback.t('Hello {name}', { name: '<Team>' }) !== 'Hello <Team>'
+    || fallback.n('One', '{count} items', 3, { count: 3 }) !== '3 items') {
+    throw new Error('Ungültige Locale besitzt keinen sicheren deutschen Datumsfallback.');
 }
+
+const missingLocale = load(undefined, false).l10n;
+if (missingLocale.locale !== 'de-DE') throw new Error('Ohne Locale ist Deutsch nicht der Standard.');
 
 for (const locale of ['de', 'en_GB']) {
     const catalog = JSON.parse(readFileSync(new URL(`../../l10n/${locale}.json`, import.meta.url), 'utf8'));

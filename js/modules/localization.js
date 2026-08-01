@@ -3,10 +3,11 @@
 
     const appId = 'adcalendar';
     const root = document.documentElement;
-    const requestedLocale = root.dataset?.locale || root.lang || 'en';
-    let locale = requestedLocale;
+    const defaultLocale = 'de-DE';
+    const requestedLocale = root.dataset?.locale || root.lang || defaultLocale;
+    let locale = String(requestedLocale).replace(/^([a-z]{2,3})_([A-Z]{2})$/, '$1-$2');
     try { new Intl.DateTimeFormat(locale); }
-    catch (error) { locale = 'en'; }
+    catch (error) { locale = defaultLocale; }
 
     const interpolate = (message, parameters) => {
         let result = message;
