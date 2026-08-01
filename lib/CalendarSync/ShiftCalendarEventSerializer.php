@@ -8,9 +8,12 @@ use DateTimeImmutable;
 use DateTimeZone;
 use InvalidArgumentException;
 use OCA\AdCalendar\Model\CalendarEntry;
+use OCP\IL10N;
 
 /** Zweck: Serialisiert genau einen persistierten AD-Dienst als privaten, stabil identifizierbaren VEVENT. */
 final class ShiftCalendarEventSerializer {
+    public function __construct(private IL10N $l10n) {}
+
     public function objectUri(CalendarEntry $shift): string {
         $this->assertPublishable($shift);
         return 'adcalendar-shift-' . $shift->id() . '.ics';
@@ -21,7 +24,7 @@ final class ShiftCalendarEventSerializer {
         $dateStamp ??= (new DateTimeImmutable('now', new DateTimeZone('UTC')))->format('Ymd\THis\Z');
         if (preg_match('/^\d{8}T\d{6}Z$/', $dateStamp) !== 1) throw new InvalidArgumentException('Der ICS-Zeitstempel ist ungültig.');
 
-        $title = $shift->title() !== '' ? $shift->title() : 'Dienst';
+        $title = $shift->title() !== '' ? $shift->title() : $this->l10n->t('Shift');
         $lines = [
             'BEGIN:VCALENDAR',
             'VERSION:2.0',
@@ -33,7 +36,7 @@ final class ShiftCalendarEventSerializer {
             'DTSTART:' . $this->utc($shift->start()),
             'DTEND:' . $this->utc($shift->end()),
             'SUMMARY:' . $this->text($title),
-            'DESCRIPTION:' . $this->text('Automatisch aus AD Kalender synchronisiert. Änderungen bitte dort vornehmen.'),
+            'DESCRIPTION:' . $this->text($this->l10n->t('Automatically synchronised from AD Calendar. Please make changes there.')),
             'CLASS:PRIVATE',
             'TRANSP:OPAQUE',
             'X-AD-CALENDAR-SOURCE:adcalendar',

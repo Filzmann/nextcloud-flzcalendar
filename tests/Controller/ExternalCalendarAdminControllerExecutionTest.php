@@ -7,6 +7,7 @@ namespace OCP {
     interface IUser { public function getUID(): string; }
     interface IUserSession { public function getUser(): ?IUser; }
     interface IGroupManager { public function isAdmin(string $uid): bool; }
+    interface IL10N { public function t(string $text, array $parameters = []): string; }
 }
 namespace OCP\AppFramework {
     class Controller { public function __construct(string $appName, \OCP\IRequest $request) {} }
@@ -35,11 +36,14 @@ namespace OCA\AdCalendar\Service {
 }
 
 namespace {
+    require_once __DIR__ . '/../../lib/Http/LocalizedErrorResponseFactory.php';
     require_once __DIR__ . '/../../lib/Controller/ExternalCalendarAdminController.php';
 
     use OCA\AdCalendar\Controller\ExternalCalendarAdminController;
+    use OCA\AdCalendar\Http\LocalizedErrorResponseFactory;
     use OCA\AdCalendar\Service\ExternalCalendarService;
     use OCP\IGroupManager;
+    use OCP\IL10N;
     use OCP\IRequest;
     use OCP\IUser;
     use OCP\IUserSession;
@@ -50,19 +54,22 @@ namespace {
     $groups = new class implements IGroupManager { public bool $admin = false; public function isAdmin(string $uid): bool { return $this->admin; } };
     $calendars = new ExternalCalendarService();
     $logger = new class implements LoggerInterface { public array $entries = []; public function error(string|\Stringable $message, array $context = []): void { $this->entries[] = [(string)$message, $context]; } };
-    $controller = new ExternalCalendarAdminController(new class implements IRequest {}, $session, $groups, $calendars, $logger);
+    $l10n = new class implements IL10N { public function t(string $text, array $parameters = []): string { return strtr($text, $parameters); } };
+    $controller = new ExternalCalendarAdminController(new class implements IRequest {}, $session, $groups, $calendars, $logger, new LocalizedErrorResponseFactory($l10n), $l10n);
 
     if ($controller->testCalDav('https://calendar.example.test', 'person-a', 'secret')->getStatus() !== 403 || $calendars->calls !== []) {
         throw new RuntimeException('Nicht-Admins können externe CalDAV-Zugangsdaten testen.');
     }
     $groups->admin = true;
     $result = $controller->testCalDav('https://calendar.example.test', 'person-a', 'secret');
-    if ($result->getStatus() !== 200 || ($result->getData()['message'] ?? '') !== 'Kopano-CalDAV-Verbindung erfolgreich geprüft (HTTP 207).' || $calendars->calls !== [['kopano', 'https://calendar.example.test', 'person-a', 'secret']] || str_contains(json_encode($result->getData()), 'secret')) {
+    if ($result->getStatus() !== 200 || ($result->getData()['message'] ?? '') !== 'Kopano CalDAV connection successfully tested (HTTP 207).' || $calendars->calls !== [['kopano', 'https://calendar.example.test', 'person-a', 'secret']] || str_contains(json_encode($result->getData()), 'secret')) {
         throw new RuntimeException('Administrativer Kopano-Test ist fehlerhaft oder gibt Zugangsdaten zurück.');
     }
     $calendars->blocked = true;
     $blocked = $controller->testCalDav('https://calendar.example.test', 'person-a', 'secret');
-    if ($blocked->getStatus() !== 400 || ($blocked->getData()['error'] ?? '') !== 'Der Kopano-Betreiber erlaubt an dieser Adresse keine CalDAV-Verbindung (HTTP 405). Bitte wende dich an dessen Administration.') {
+    if ($blocked->getStatus() !== 400
+        || ($blocked->getData()['code'] ?? '') !== 'caldav_provider_rejected'
+        || ($blocked->getData()['error'] ?? '') !== 'The calendar provider rejected the CalDAV connection (HTTP 405). Please contact its administration.') {
         throw new RuntimeException('Administrativer Kopano-Test erklärt HTTP 405 nicht sicher.');
     }
     if (($logger->entries[0][1] ?? null) !== ['provider' => 'kopano', 'status' => 405]) {

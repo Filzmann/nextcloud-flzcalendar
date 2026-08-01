@@ -1,5 +1,6 @@
 (function () {
     'use strict';
+    const l10n = window.AdCalendar.l10n;
     const apiClient = new window.LocalBase.api.ApiClient({
         appId: 'adcalendar',
         errorMessage: (data, status) => data?.error || data?.message || `HTTP ${status}`,
@@ -37,7 +38,7 @@
     const meetingFinder = new window.AdCalendar.components.MeetingFinder({
         repository,
         onError: error => show(error, true),
-        onBlocked: async () => { await load(); show('Meeting wurde für alle ausgewählten Personen blockiert.'); },
+        onBlocked: async () => { await load(); show(l10n.t('The meeting was blocked for all selected people.')); },
     });
     const shiftDefaults = new window.AdCalendar.components.ShiftDefaults({ onSave: saveShiftDefaults });
     const shiftCalendarSync = new window.AdCalendar.components.ShiftCalendarSync({ onSave: saveCalendarSync });
@@ -72,7 +73,7 @@
         shiftCalendarSync.set(state.data.calendarSync || {});
         const meetingButton = document.getElementById('adc-open-meeting-finder');
         meetingButton.disabled = state.period === 'month';
-        meetingButton.title = state.period === 'month' ? 'Die Meetinglückensuche ist in der Wochenansicht verfügbar.' : '';
+        meetingButton.title = state.period === 'month' ? l10n.t('Meeting gap search is available in the weekly view.') : '';
     }
 
     async function saveShiftDefaults(defaults) {
@@ -81,7 +82,7 @@
             state.data.shiftDefaults = response.shiftDefaults;
             shiftDefaults.set(response.shiftDefaults);
             await load();
-            show('Persönliche Standard-Dienstzeiten gespeichert.');
+            show(l10n.t('Personal default shift times saved.'));
         } catch (error) { show(error, true); }
     }
 
@@ -90,7 +91,9 @@
             const response = await repository.saveCalendarSync(enabled);
             state.data.calendarSync = response.calendarSync;
             shiftCalendarSync.set(response.calendarSync);
-            show(enabled ? 'Der private Kalender „AD Dienste“ ist aktiviert.' : 'Die private Dienstkalender-Synchronisation ist deaktiviert.');
+            show(enabled
+                ? l10n.t('The private calendar “{calendar}” is enabled.', { calendar: response.calendarSync.calendarName || 'AD Dienste' })
+                : l10n.t('Private shift calendar synchronisation is disabled.'));
         } catch (error) { show(error, true); }
     }
 
@@ -102,7 +105,9 @@
 
     function renderTable() {
         const employees = state.availableEmployees();
-        elements['filter-status'].textContent = state.selected.size ? `${employees.length} ausgewählt` : state.isUnfiltered() ? 'Alle Personen' : `${employees.length} gefiltert`;
+        elements['filter-status'].textContent = state.selected.size
+            ? l10n.n('{count} selected', '{count} selected', employees.length, { count: employees.length })
+            : state.isUnfiltered() ? l10n.t('All people') : l10n.n('{count} filtered', '{count} filtered', employees.length, { count: employees.length });
         weekTable.render(employees, state);
     }
 
@@ -111,6 +116,7 @@
         const visibleRange = state.visibleRange();
         const range = { start: CalendarDate.isoDay(visibleRange.start), end: CalendarDate.isoDay(visibleRange.end) };
         weekNavigation.render();
+        if (state.data) renderTable();
         try {
             const requestedPeriod = state.period;
             const data = state.period === 'month'
@@ -142,12 +148,12 @@
     document.getElementById('adc-save-default').addEventListener('click', async () => {
         try {
             await repository.savePreferences(state.toPreference());
-            show('Aktuelle Filter und Ansicht wurden zum persönlichen Standard gemacht.');
+            show(l10n.t('The current filters and view were made your personal default.'));
         } catch (error) { show(error, true); }
     });
     externalCalendars.load();
     const connectionResult = new URLSearchParams(window.location.search).get('calendarConnection');
-    if (connectionResult === 'google-connected') show('Google-Kalender wurde verbunden.');
-    else if (connectionResult === 'google-error') show('Die Google-Verbindung konnte nicht abgeschlossen werden.', true);
+    if (connectionResult === 'google-connected') show(l10n.t('Google Calendar was connected.'));
+    else if (connectionResult === 'google-error') show(l10n.t('The Google connection could not be completed.'), true);
     load();
 }());

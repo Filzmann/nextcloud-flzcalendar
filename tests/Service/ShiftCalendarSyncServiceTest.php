@@ -21,6 +21,7 @@ namespace OCA\AdCalendar\Service {
         public function shiftCalendarSyncEnabled(string $uid): bool { return $this->enabled[$uid] ?? true; }
         public function saveShiftCalendarSyncEnabled(string $uid, bool $enabled): bool { return $this->enabled[$uid] = $enabled; }
     }
+    final class CalendarTargetConfig { public function calendarName(): string { return 'Team & Dienst'; } }
 }
 namespace OCA\AdCalendar\CalendarSync {
     final class ExternalCalendarConnectionStore { public bool $connected = false; public function hasConnections(string $uid): bool { return $this->connected; } }
@@ -42,6 +43,7 @@ namespace {
     use OCA\AdCalendar\Model\CalendarEntry;
     use OCA\AdCalendar\Repository\CalendarEntryRepository;
     use OCA\AdCalendar\Service\CalendarPreferenceService;
+    use OCA\AdCalendar\Service\CalendarTargetConfig;
     use OCA\AdCalendar\Service\ShiftCalendarSyncService;
     use Psr\Log\LoggerInterface;
 
@@ -67,9 +69,9 @@ namespace {
     $preferences = new CalendarPreferenceService();
     $external = new ExternalShiftCalendarPublisher();
     $externalConnections = new ExternalCalendarConnectionStore();
-    $service = new ShiftCalendarSyncService($repository, $preferences, $publisher, $external, $externalConnections, $logger);
+    $service = new ShiftCalendarSyncService($repository, $preferences, $publisher, $external, $externalConnections, new CalendarTargetConfig(), $logger);
 
-    if ($service->status('sync-person') !== ['enabled' => true, 'calendarName' => 'AD Dienste']) throw new RuntimeException('Standardmäßig aktive Dienstkalendersynchronisation fehlt.');
+    if ($service->status('sync-person') !== ['enabled' => true, 'calendarName' => 'Team & Dienst']) throw new RuntimeException('Konfigurierter Zielkalendername fehlt im persönlichen Status.');
     $enabled = $service->configure('sync-person', true);
     if (!$enabled['enabled'] || count($publisher->replaced) !== 1 || !$preferences->enabled['sync-person']) throw new RuntimeException('Erneutes Aktivieren synchronisiert vorhandene Dienste nicht atomar vor dem Speichern.');
     if (!$service->publish($shift) || count($publisher->published) !== 1) throw new RuntimeException('Aktiver Dienst wurde nicht veröffentlicht.');

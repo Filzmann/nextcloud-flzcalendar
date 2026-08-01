@@ -2,10 +2,14 @@
 
 declare(strict_types=1);
 
+namespace OCP { interface IL10N { public function t(string $text, array $parameters = []): string; } }
 namespace OCP\Http\Client {
     interface IResponse { public function getBody(); public function getStatusCode(): int; public function getHeader(string $key): string; }
     interface IClient { public function request(string $method, string $uri, array $options = []): IResponse; public function getResponseFromThrowable(\Throwable $error): IResponse; }
     interface IClientService { public function newClient(): IClient; }
+}
+namespace OCA\AdCalendar\Service {
+    final class CalendarTargetConfig { public function calendarName(): string { return 'AD Dienste'; } }
 }
 
 namespace {
@@ -21,9 +25,13 @@ namespace {
     use OCA\AdCalendar\CalendarSync\ExternalCalendarUrlValidator;
     use OCA\AdCalendar\CalendarSync\ShiftCalendarEventSerializer;
     use OCA\AdCalendar\Model\CalendarEntry;
+    use OCA\AdCalendar\Service\CalendarTargetConfig;
     use OCP\Http\Client\IClient;
     use OCP\Http\Client\IClientService;
     use OCP\Http\Client\IResponse;
+    use OCP\IL10N;
+
+    $l10n = new class implements IL10N { public function t(string $text, array $parameters = []): string { return strtr($text, $parameters); } };
 
     $response = static fn(int $status, string $body = ''): IResponse => new class($status, $body) implements IResponse {
         public function __construct(private int $status, private string $body) {}
@@ -63,7 +71,8 @@ namespace {
         public function __construct(private IClient $client) {}
         public function newClient(): IClient { return $this->client; }
     };
-    $dav = new CalDavClient($clients, new ExternalCalendarUrlValidator(), new ShiftCalendarEventSerializer());
+    $targets = new CalendarTargetConfig();
+    $dav = new CalDavClient($clients, new ExternalCalendarUrlValidator(), new ShiftCalendarEventSerializer($l10n), $targets);
     $connection = [
         'serverUrl' => 'https://calendar.example.test/',
         'calendarUrl' => 'https://calendar.example.test/caldav/person/ad-dienste/',
@@ -93,7 +102,7 @@ namespace {
         public function __construct(private IClient $client) {}
         public function newClient(): IClient { return $this->client; }
     };
-    $probeStatus = (new CalDavClient($probeClients, new ExternalCalendarUrlValidator(), new ShiftCalendarEventSerializer()))->probe([
+    $probeStatus = (new CalDavClient($probeClients, new ExternalCalendarUrlValidator(), new ShiftCalendarEventSerializer($l10n), $targets))->probe([
         'serverUrl' => 'https://calendar.example.test/caldav/person/',
         'username' => 'person',
         'password' => 'secret',
@@ -112,7 +121,7 @@ namespace {
         public function newClient(): IClient { return $this->client; }
     };
     try {
-        (new CalDavClient($blockedClients, new ExternalCalendarUrlValidator(), new ShiftCalendarEventSerializer()))->connect([
+        (new CalDavClient($blockedClients, new ExternalCalendarUrlValidator(), new ShiftCalendarEventSerializer($l10n), $targets))->connect([
             'serverUrl' => 'https://calendar.example.test/caldav/person/',
             'username' => 'person',
             'password' => 'secret',

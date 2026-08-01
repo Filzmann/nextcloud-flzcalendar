@@ -7,6 +7,7 @@ namespace OCP {
     interface IUser { public function getUID(): string; }
     interface IUserSession { public function getUser(): ?IUser; }
     interface IGroupManager { public function isAdmin(string $uid): bool; }
+    interface IL10N { public function t(string $text, array $parameters = []): string; }
 }
 namespace OCP\AppFramework {
     class Controller { public function __construct(string $appName, \OCP\IRequest $request) {} }
@@ -27,11 +28,14 @@ namespace OCA\AdCalendar\CalendarSync {
 }
 
 namespace {
+    require_once __DIR__ . '/../../lib/Http/LocalizedErrorResponseFactory.php';
     require_once __DIR__ . '/../../lib/Controller/GoogleOAuthAdminController.php';
 
     use OCA\AdCalendar\CalendarSync\GoogleOAuthService;
     use OCA\AdCalendar\Controller\GoogleOAuthAdminController;
+    use OCA\AdCalendar\Http\LocalizedErrorResponseFactory;
     use OCP\IGroupManager;
+    use OCP\IL10N;
     use OCP\IRequest;
     use OCP\IUser;
     use OCP\IUserSession;
@@ -42,7 +46,8 @@ namespace {
     $groups = new class implements IGroupManager { public bool $admin = false; public function isAdmin(string $uid): bool { return $this->admin; } };
     $oauth = new GoogleOAuthService();
     $logger = new class implements LoggerInterface { public array $errors = []; public function error(string|\Stringable $message, array $context = []): void { $this->errors[] = [(string)$message, $context]; } };
-    $controller = new GoogleOAuthAdminController(new class implements IRequest {}, $session, $groups, $oauth, $logger);
+    $errors = new LocalizedErrorResponseFactory(new class implements IL10N { public function t(string $text, array $parameters = []): string { return strtr($text, $parameters); } });
+    $controller = new GoogleOAuthAdminController(new class implements IRequest {}, $session, $groups, $oauth, $logger, $errors);
 
     if ($controller->save('client-id', 'secret')->getStatus() !== 403 || $controller->remove()->getStatus() !== 403 || $oauth->calls !== []) {
         throw new RuntimeException('Nicht-Admins können die Google-OAuth-Konfiguration verändern.');
@@ -53,7 +58,8 @@ namespace {
         throw new RuntimeException('Adminspeicherung ist fehlerhaft oder gibt das Secret zurück.');
     }
     $oauth->fail = true;
-    if ($controller->save('', '')->getStatus() !== 400) throw new RuntimeException('Validierungsfehler wird nicht sicher behandelt.');
+    $invalid = $controller->save('', '');
+    if ($invalid->getStatus() !== 400 || ($invalid->getData()['code'] ?? '') !== 'invalid_google_oauth_configuration') throw new RuntimeException('Validierungsfehler wird nicht sicher und stabil codiert behandelt.');
     $oauth->fail = false;
     if ($controller->remove()->getStatus() !== 200 || $oauth->calls[array_key_last($oauth->calls)] !== ['remove']) throw new RuntimeException('Admin kann Google-Konfiguration nicht entfernen.');
 

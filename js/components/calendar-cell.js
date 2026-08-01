@@ -2,6 +2,7 @@
     'use strict';
 
     const { esc } = window.LocalBase.ui;
+    const l10n = window.AdCalendar.l10n;
 
     /**
      * Zweck: Rendert einen kompakten Mitarbeiter-Tag und ordnet Termine sichtbar ihrem Dienst zu.
@@ -37,28 +38,30 @@
         }
 
         actions(canManage) {
+            const addShift = l10n.t('Create shift');
+            const addAppointment = l10n.t('Create appointment');
             const buttons = canManage ? `
-                <button type="button" class="adc-quick-add adc-icon-button icon-add" data-action="add-entry" data-entry-type="shift" data-tooltip="Dienst anlegen" aria-label="Dienst anlegen" title="Dienst anlegen"></button>
-                <button type="button" class="adc-quick-add adc-icon-button icon-calendar-dark" data-action="add-entry" data-entry-type="appointment" data-tooltip="Termin anlegen" aria-label="Termin anlegen" title="Termin anlegen"></button>` : '';
+                <button type="button" class="adc-quick-add adc-icon-button icon-add" data-action="add-entry" data-entry-type="shift" data-tooltip="${esc(addShift)}" aria-label="${esc(addShift)}" title="${esc(addShift)}"></button>
+                <button type="button" class="adc-quick-add adc-icon-button icon-calendar-dark" data-action="add-entry" data-entry-type="appointment" data-tooltip="${esc(addAppointment)}" aria-label="${esc(addAppointment)}" title="${esc(addAppointment)}"></button>` : '';
 
-            return `<div class="adc-cell-actions" aria-label="Eintrag anlegen">${buttons}</div>`;
+            return `<div class="adc-cell-actions" aria-label="${esc(l10n.t('Create entry'))}">${buttons}</div>`;
         }
 
         absenceMarkers(absences) {
             return absences.map(absence => {
-                const label = absence.blocks ? 'Genehmigter Urlaub' : 'Urlaub geplant';
+                const label = absence.blocks ? l10n.t('Approved absence') : l10n.t('Planned absence');
                 const description = absence.blocks
-                    ? 'Genehmigter Urlaub – Einträge sind gesperrt'
-                    : 'Geplanter Urlaub – Hinweis ohne Sperre';
+                    ? l10n.t('Approved absence – entries are blocked')
+                    : l10n.t('Planned absence – information without blocking');
 
-                return `<div class="adc-absence adc-absence--${esc(absence.status)}" title="${description}"><strong>${esc(absence.marker)}</strong> ${label}</div>`;
+                return `<div class="adc-absence adc-absence--${esc(absence.status)}" title="${esc(description)}"><strong>${esc(absence.marker)}</strong> ${esc(label)}</div>`;
             }).join('');
         }
 
         shift(shift, entries, canManage, style = '') {
             const children = entries.filter(entry => entry.type === 'appointment' && entry.parentEntryId === shift.id);
             const childEntries = children.length
-                ? `<div class="adc-entry__children" aria-label="Termine innerhalb des Dienstes">${children.map(entry => this.entry(
+                ? `<div class="adc-entry__children" aria-label="${esc(l10n.t('Appointments within the shift'))}">${children.map(entry => this.entry(
                     entry,
                     'appointment',
                     canManage && (!entry.meetingUid || entry.canManageMeeting !== false),
@@ -66,15 +69,15 @@
                 : '';
 
             return `<article class="adc-entry adc-entry--shift" data-entry-id="${esc(shift.id)}"${style}>
-                ${this.header(shift, 'Dienst', canManage)}
+                ${this.header(shift, l10n.t('Shift'), canManage)}
                 ${childEntries}
             </article>`;
         }
 
         entry(entry, kind, canManage, style = '') {
-            const label = kind === 'blocked' ? 'Sperrtermin' : 'Termin';
+            const label = kind === 'blocked' ? l10n.t('Blocked time') : l10n.t('Appointment');
             const manageable = canManage && (!entry.meetingUid || entry.canManageMeeting !== false);
-            return `<article class="adc-entry adc-entry--${kind}" data-entry-id="${esc(entry.id)}"${style}>${this.header(entry, label, manageable)}</article>`;
+            return `<article class="adc-entry adc-entry--${kind}" data-entry-id="${esc(entry.id)}"${style}>${this.header(entry, label, manageable, kind === 'blocked')}</article>`;
         }
 
         rowStyle(layout, entry, day, timeline) {
@@ -82,14 +85,17 @@
             return ` style="grid-row:${timeline.gridRow(layout, entry, day)}"`;
         }
 
-        header(entry, label, canManage) {
+        header(entry, label, canManage, blocked = false) {
             const title = entry.title ? `<span class="adc-entry__title">${esc(entry.title)}</span>` : '';
-            const blockedMarker = label === 'Sperrtermin' ? '<span class="adc-entry__blocked-marker" aria-hidden="true">🔒</span>' : '';
-            const seriesMarker = entry.seriesUid ? '<span class="adc-entry__series-marker" title="Serientermin"><span aria-hidden="true">↻</span><span class="hidden-visually">Serientermin</span></span>' : '';
+            const blockedMarker = blocked ? '<span class="adc-entry__blocked-marker" aria-hidden="true">🔒</span>' : '';
+            const recurring = esc(l10n.t('Recurring appointment'));
+            const seriesMarker = entry.seriesUid ? `<span class="adc-entry__series-marker" title="${recurring}"><span aria-hidden="true">↻</span><span class="hidden-visually">${recurring}</span></span>` : '';
+            const editLabel = l10n.t('Edit {type}', { type: label });
+            const deleteLabel = l10n.t('Delete {type}', { type: label });
             const controls = canManage
                 ? `<span class="adc-entry__actions">
-                    <button type="button" class="adc-icon-button icon-rename" data-action="edit-entry" data-entry-id="${esc(entry.id)}" aria-label="${esc(label)} bearbeiten" title="Bearbeiten"></button>
-                    <button type="button" class="adc-icon-button icon-delete" data-action="delete-entry" data-entry-id="${esc(entry.id)}" aria-label="${esc(label)} löschen" title="Löschen"></button>
+                    <button type="button" class="adc-icon-button icon-rename" data-action="edit-entry" data-entry-id="${esc(entry.id)}" aria-label="${esc(editLabel)}" title="${esc(l10n.t('Edit'))}"></button>
+                    <button type="button" class="adc-icon-button icon-delete" data-action="delete-entry" data-entry-id="${esc(entry.id)}" aria-label="${esc(deleteLabel)}" title="${esc(l10n.t('Delete'))}"></button>
                 </span>`
                 : '';
 
@@ -97,7 +103,7 @@
         }
 
         time(value) {
-            return new Date(value).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
+            return l10n.time(new Date(value));
         }
     }
 

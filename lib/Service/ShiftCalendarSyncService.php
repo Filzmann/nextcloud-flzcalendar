@@ -20,13 +20,14 @@ final class ShiftCalendarSyncService {
         private ShiftCalendarPublisher $publisher,
         private ExternalShiftCalendarPublisher $externalPublisher,
         private ExternalCalendarConnectionStore $externalConnections,
+        private CalendarTargetConfig $calendarTargets,
         private LoggerInterface $logger,
     ) {}
 
     public function status(string $employeeUid): array {
         return [
             'enabled' => trim($employeeUid) !== '' && $this->preferences->shiftCalendarSyncEnabled($employeeUid),
-            'calendarName' => ShiftCalendarPublisher::CALENDAR_NAME,
+            'calendarName' => $this->calendarTargets->calendarName(),
         ];
     }
 

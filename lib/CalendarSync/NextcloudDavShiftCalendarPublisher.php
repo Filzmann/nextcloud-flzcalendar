@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace OCA\AdCalendar\CalendarSync;
 
 use OCA\AdCalendar\Model\CalendarEntry;
+use OCA\AdCalendar\Service\CalendarTargetConfig;
 use OCA\DAV\CalDAV\CalDavBackend;
 use RuntimeException;
 
@@ -17,7 +18,11 @@ final class NextcloudDavShiftCalendarPublisher implements ShiftCalendarPublisher
     private const CALENDAR_URI_PREFIX = 'adcalendar-dienste-';
     private const OBJECT_URI_PREFIX = 'adcalendar-shift-';
 
-    public function __construct(private CalDavBackend $backend, private ShiftCalendarEventSerializer $serializer) {}
+    public function __construct(
+        private CalDavBackend $backend,
+        private ShiftCalendarEventSerializer $serializer,
+        private CalendarTargetConfig $targets,
+    ) {}
 
     public function replaceAll(string $employeeUid, array $shifts): void {
         $calendarId = $this->calendarId($employeeUid, true);
@@ -80,16 +85,21 @@ final class NextcloudDavShiftCalendarPublisher implements ShiftCalendarPublisher
     private function calendarId(string $employeeUid, bool $create): ?int {
         $principal = 'principals/users/' . $employeeUid;
         $uri = self::CALENDAR_URI_PREFIX . substr(hash('sha256', $employeeUid), 0, 16);
+        $calendarName = $this->targets->calendarName();
         foreach ($this->backend->getCalendarsForUser($principal) as $calendar) {
             if (($calendar['principaluri'] ?? '') !== $principal || ($calendar['uri'] ?? '') !== $uri) continue;
-            if (($calendar['{DAV:}displayname'] ?? '') !== ShiftCalendarPublisher::CALENDAR_NAME) {
+            $displayName = (string)($calendar['{DAV:}displayname'] ?? '');
+            if (!in_array($displayName, $this->targets->acceptedCalendarNames(), true)) {
                 throw new RuntimeException('Die reservierte AD-Kalender-URI wird bereits von einem fremden Kalender verwendet.');
+            }
+            if ($displayName !== $calendarName) {
+                $this->backend->updateCalendar((int)$calendar['id'], ['{DAV:}displayname' => $calendarName]);
             }
             return (int)$calendar['id'];
         }
         if (!$create) return null;
         return (int)$this->backend->createCalendar($principal, $uri, [
-            '{DAV:}displayname' => ShiftCalendarPublisher::CALENDAR_NAME,
+            '{DAV:}displayname' => $calendarName,
             'components' => 'VEVENT',
         ]);
     }

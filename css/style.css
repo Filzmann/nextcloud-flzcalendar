@@ -7,8 +7,9 @@
 .adc-overview-header { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 6px 20px; }
 .adc-overview-header h2 { margin: 14px 0 8px; }
 .adc-navigation { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; }
+.adc-navigation button { max-width: 100%; height: auto; white-space: normal; overflow-wrap: anywhere; }
 .adc-navigation output { min-width: 13rem; text-align: center; font-weight: 600; }
-.adc-period-toggle { display: inline-flex; gap: 2px; padding: 2px; border: 1px solid var(--color-border); border-radius: var(--border-radius); }
+.adc-period-toggle { display: inline-flex; flex-wrap: wrap; max-width: 100%; gap: 2px; padding: 2px; border: 1px solid var(--color-border); border-radius: var(--border-radius); }
 .adc-period-toggle button { margin: 0; }
 .adc-period-toggle button[aria-pressed="true"] { background: var(--color-primary-element); color: var(--color-primary-element-text); font-weight: 700; }
 .adc-tabs { display: flex; gap: 4px; margin-top: 8px; border-bottom: 1px solid var(--color-border); }

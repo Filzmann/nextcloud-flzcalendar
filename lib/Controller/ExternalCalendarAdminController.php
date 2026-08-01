@@ -6,11 +6,13 @@ namespace OCA\AdCalendar\Controller;
 
 use OCA\AdCalendar\AppInfo\Application;
 use OCA\AdCalendar\CalendarSync\ExternalCalendarConnectionException;
+use OCA\AdCalendar\Http\LocalizedErrorResponseFactory;
 use OCA\AdCalendar\Service\ExternalCalendarService;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\JSONResponse;
 use OCP\IGroupManager;
+use OCP\IL10N;
 use OCP\IRequest;
 use OCP\IUserSession;
 use Psr\Log\LoggerInterface;
@@ -23,6 +25,8 @@ final class ExternalCalendarAdminController extends Controller {
         private IGroupManager $groups,
         private ExternalCalendarService $calendars,
         private LoggerInterface $logger,
+        private LocalizedErrorResponseFactory $errors,
+        private IL10N $l10n,
     ) {
         parent::__construct(Application::APP_ID, $request);
     }
@@ -31,15 +35,15 @@ final class ExternalCalendarAdminController extends Controller {
         if (!$this->isAdmin()) return $this->denied();
         try {
             $status = $this->calendars->testCalDavConnection('kopano', $serverUrl, $username, $password);
-            return new JSONResponse(['message' => "Kopano-CalDAV-Verbindung erfolgreich geprüft (HTTP {$status})."]);
-        } catch (\InvalidArgumentException $error) {
-            return new JSONResponse(['error' => $error->getMessage()], Http::STATUS_BAD_REQUEST);
+            return new JSONResponse(['message' => $this->l10n->t('Kopano CalDAV connection successfully tested (HTTP {status}).', ['{status}' => (string)$status])]);
+        } catch (\InvalidArgumentException) {
+            return $this->errors->create('invalid_caldav_connection', 'The CalDAV connection details are invalid.', Http::STATUS_BAD_REQUEST);
         } catch (ExternalCalendarConnectionException $error) {
             $this->logger->error('Administrativer Kopano-CalDAV-Test wurde vom Anbieter abgewiesen.', ['provider' => 'kopano', 'status' => $error->getCode()]);
-            return new JSONResponse(['error' => $error->userMessage('kopano')], Http::STATUS_BAD_REQUEST);
+            return $this->errors->create('caldav_provider_rejected', 'The calendar provider rejected the CalDAV connection (HTTP {status}). Please contact its administration.', Http::STATUS_BAD_REQUEST, ['{status}' => (string)$error->getCode()]);
         } catch (\Throwable $error) {
             $this->logger->error('Administrativer Kopano-CalDAV-Test ist fehlgeschlagen.', ['provider' => 'kopano', 'exceptionClass' => $error::class]);
-            return new JSONResponse(['error' => 'Die Kopano-CalDAV-Verbindung konnte nicht geprüft werden. Bitte Adresse und Serverkonfiguration prüfen.'], Http::STATUS_BAD_REQUEST);
+            return $this->errors->create('caldav_test_failed', 'The Kopano CalDAV connection could not be tested. Please check the address and server configuration.', Http::STATUS_BAD_REQUEST);
         }
     }
 
@@ -49,6 +53,6 @@ final class ExternalCalendarAdminController extends Controller {
     }
 
     private function denied(): JSONResponse {
-        return new JSONResponse(['error' => 'Keine Berechtigung.'], Http::STATUS_FORBIDDEN);
+        return $this->errors->create('forbidden', 'You are not allowed to perform this action.', Http::STATUS_FORBIDDEN);
     }
 }

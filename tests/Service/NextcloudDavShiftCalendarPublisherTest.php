@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+namespace OCP { interface IL10N { public function t(string $text, array $parameters = []): string; } }
 namespace OCA\DAV\CalDAV {
     final class CalDavBackend {
         public const CALENDAR_TYPE_CALENDAR = 0;
@@ -11,6 +12,7 @@ namespace OCA\DAV\CalDAV {
         public array $updatedObjects = [];
         public array $deletedObjects = [];
         public array $deletedCalendars = [];
+        public array $updatedCalendars = [];
         private int $nextId = 1;
 
         public function getCalendarsForUser(string $principal): array {
@@ -40,6 +42,18 @@ namespace OCA\DAV\CalDAV {
             $this->deletedCalendars[] = [$calendarId, $force];
             unset($this->calendars[$calendarId], $this->objects[$calendarId]);
         }
+        public function updateCalendar(int $calendarId, array $mutations): void {
+            $this->updatedCalendars[] = [$calendarId, $mutations];
+            foreach ($mutations as $property => $value) $this->calendars[$calendarId][$property] = $value;
+        }
+    }
+}
+
+namespace OCA\AdCalendar\Service {
+    final class CalendarTargetConfig {
+        public function __construct(private string $name = 'Team & Dienst') {}
+        public function calendarName(): string { return $this->name; }
+        public function acceptedCalendarNames(): array { return ['AD Dienste', $this->name]; }
     }
 }
 
@@ -52,7 +66,11 @@ namespace {
     use OCA\AdCalendar\CalendarSync\NextcloudDavShiftCalendarPublisher;
     use OCA\AdCalendar\CalendarSync\ShiftCalendarEventSerializer;
     use OCA\AdCalendar\Model\CalendarEntry;
+    use OCA\AdCalendar\Service\CalendarTargetConfig;
     use OCA\DAV\CalDAV\CalDavBackend;
+    use OCP\IL10N;
+
+    $l10n = new class implements IL10N { public function t(string $text, array $parameters = []): string { return strtr($text, $parameters); } };
 
     $shift = static fn(int $id, string $title = ''): CalendarEntry => CalendarEntry::get([
         'id' => $id,
@@ -64,11 +82,12 @@ namespace {
     ]);
 
     $backend = new CalDavBackend();
-    $publisher = new NextcloudDavShiftCalendarPublisher($backend, new ShiftCalendarEventSerializer());
+    $targets = new CalendarTargetConfig();
+    $publisher = new NextcloudDavShiftCalendarPublisher($backend, new ShiftCalendarEventSerializer($l10n), $targets);
     $publisher->replaceAll('sync-person', [$shift(7), $shift(8)]);
     if (count($backend->calendars) !== 1 || count($backend->createdObjects) !== 2) throw new RuntimeException('Vollständiger Abgleich legt Kalender und vorhandene Dienste nicht an.');
     $calendarId = (int)array_key_first($backend->calendars);
-    if (($backend->calendars[$calendarId]['{DAV:}displayname'] ?? '') !== 'AD Dienste') throw new RuntimeException('Dedizierter Kalendername fehlt.');
+    if (($backend->calendars[$calendarId]['{DAV:}displayname'] ?? '') !== 'Team & Dienst') throw new RuntimeException('Konfigurierter Kalendername fehlt.');
 
     $publisher->publish($shift(7, 'Geändert'));
     if (($backend->updatedObjects[0][1] ?? '') !== 'adcalendar-shift-7.ics') throw new RuntimeException('Bestehender Dienst wurde nicht idempotent aktualisiert.');
@@ -108,10 +127,20 @@ namespace {
     $collisionBackend->calendars[42] = ['id' => 42, 'uri' => $uri, 'principaluri' => 'principals/users/sync-person', '{DAV:}displayname' => 'Privat'];
     $collisionBackend->objects[42] = [];
     try {
-        (new NextcloudDavShiftCalendarPublisher($collisionBackend, new ShiftCalendarEventSerializer()))->publish($shift(7));
+        (new NextcloudDavShiftCalendarPublisher($collisionBackend, new ShiftCalendarEventSerializer($l10n), $targets))->publish($shift(7));
         throw new RuntimeException('Fremder Kalender mit kollidierender URI wurde übernommen.');
     } catch (RuntimeException $error) {
         if ($error->getMessage() === 'Fremder Kalender mit kollidierender URI wurde übernommen.') throw $error;
+    }
+
+    $legacyBackend = new CalDavBackend();
+    $legacyBackend->calendars[71] = ['id' => 71, 'uri' => $uri, 'principaluri' => 'principals/users/sync-person', '{DAV:}displayname' => 'AD Dienste'];
+    $legacyBackend->objects[71] = [];
+    (new NextcloudDavShiftCalendarPublisher($legacyBackend, new ShiftCalendarEventSerializer($l10n), $targets))->replaceAll('sync-person', [$shift(7)]);
+    if (($legacyBackend->calendars[71]['{DAV:}displayname'] ?? '') !== 'Team & Dienst'
+        || ($legacyBackend->updatedCalendars[0] ?? null) !== [71, ['{DAV:}displayname' => 'Team & Dienst']]
+        || ($legacyBackend->calendars[71]['uri'] ?? '') !== $uri) {
+        throw new RuntimeException('Vorhandener app-eigener Kalender wird nicht idempotent bei stabiler URI umbenannt.');
     }
 
     echo "NextcloudDavShiftCalendarPublisherTest: OK\n";

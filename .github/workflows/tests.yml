@@ -63,7 +63,7 @@ jobs:
           PHP_COVERAGE_COMMAND="$GITHUB_WORKSPACE/localbase/tests/coverage/vendor/bin/phpcov" \
           PHP_COVERAGE_OUTPUT_DIR="$RUNNER_TEMP/php-coverage" \
           php tests/run.php
-          php "$GITHUB_WORKSPACE/localbase/tests/coverage/merge-clover.php" adcalendar "$RUNNER_TEMP/php-coverage" 58.06
+          php "$GITHUB_WORKSPACE/localbase/tests/coverage/merge-clover.php" adcalendar "$RUNNER_TEMP/php-coverage" 85
 
   javascript:
     name: JavaScript
@@ -104,5 +104,5 @@ jobs:
             --all \
             '--include=js/**/*.js' \
             --check-coverage \
-            --lines=53.84 \
+            --lines=90 \
             node tests/run-js.mjs

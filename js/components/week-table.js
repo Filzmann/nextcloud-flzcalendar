@@ -1,6 +1,7 @@
 (function() {
     'use strict';
     const CalendarDate = window.AdCalendar.modules.CalendarDate;
+    const l10n = window.AdCalendar.l10n;
 
     /**
      * Zweck: Rendert die Wochen- oder Monatsmatrix in beiden Ausrichtungen inklusive Fachgruppen- und Hierarchiesortierung.
@@ -31,7 +32,7 @@
             wrap.className = 'adc-table-wrap';
             const table = document.createElement('table');
             table.className = 'adc-calendar';
-            const caption = this.node('caption', 'Geplante Dienste und Termine je Mitarbeiter*in');
+            const caption = this.node('caption', l10n.t('Scheduled shifts and appointments per employee'));
             const head = document.createElement('thead');
             const body = document.createElement('tbody');
             table.append(caption, head, body);
@@ -47,7 +48,7 @@
         }
 
         vertical(employees, state, days, head, body, activeMonth = null, compactDays = new Set()) {
-            const header = document.createElement('tr'); header.append(this.node('th', 'Mitarbeiter*in'));
+            const header = document.createElement('tr'); header.append(this.node('th', l10n.t('Employee')));
             for (const day of days) {
                 const compact = compactDays.has(CalendarDate.isoDay(day));
                 const dayHeading = this.node('th', this.dayLabel(day, { weekday: 'short', day: '2-digit', month: '2-digit' }), this.dayClasses(day, activeMonth, compact));
@@ -78,7 +79,7 @@
         }
 
         horizontal(employees, state, days, head, body, activeMonth = null, compactDays = new Set()) {
-            const header = document.createElement('tr'); header.append(this.node('th', 'Tag'));
+            const header = document.createElement('tr'); header.append(this.node('th', l10n.t('Day')));
             for (const employee of employees) {
                 const name = this.node('th', employee.displayName, this.classes('adc-person-heading', state.selected.has(employee.uid) ? 'adc-selected' : ''));
                 name.scope = 'col'; header.append(name);
@@ -119,7 +120,7 @@
         }
 
         dayLabel(day, options) {
-            const label = day.toLocaleDateString('de-DE', options);
+            const label = l10n.date(day, options);
             return [label, this.holidays.name(day)].filter(Boolean).join(' · ');
         }
 
@@ -158,7 +159,7 @@
             const roleNames = employee.roles.slice()
                 .sort((a, b) => organization.roleOrder(a) - organization.roleOrder(b))
                 .map(value => organization.roleLabel(value));
-            const roles = roleNames.length > 1 ? `${roleNames[0]} (${roleNames.slice(1).join(', ')})` : roleNames[0] || 'Ohne Fachrolle';
+            const roles = roleNames.length > 1 ? `${roleNames[0]} (${roleNames.slice(1).join(', ')})` : roleNames[0] || l10n.t('Without specialist role');
             const areas = employee.areas.slice()
                 .sort((a, b) => organization.areaOrder(a) - organization.areaOrder(b))
                 .map(value => organization.areaLabel(value)).join(' / ');
@@ -174,10 +175,10 @@
             if (roleComparison !== 0) return roleComparison;
             const areaComparison = this.groupAreaRank(a) - this.groupAreaRank(b);
             if (areaComparison !== 0) return areaComparison;
-            const clusterComparison = this.clusterLabel(a).localeCompare(this.clusterLabel(b), 'de');
+            const clusterComparison = this.clusterLabel(a).localeCompare(this.clusterLabel(b), l10n.locale);
             if (clusterComparison !== 0) return clusterComparison;
             const hierarchyComparison = this.staffRank(a) - this.staffRank(b);
-            return hierarchyComparison || a.displayName.localeCompare(b.displayName, 'de');
+            return hierarchyComparison || a.displayName.localeCompare(b.displayName, l10n.locale);
         }
 
         groupRoleRank(employee) {

@@ -71,8 +71,10 @@ Erhalt als Sperrtermine gewählt.
 
 AD Kalender ist zunächst alleinige Quelle der Wahrheit. Der standardmäßig
 aktive persönliche Abgleich veröffentlicht ausschließlich Dienste der
-jeweiligen Person in einem privaten Nextcloud-Kalender „AD Dienste“. Termine
-und Urlaube werden nicht übertragen. Ein bewusstes Opt-out entfernt nur die
+jeweiligen Person in einem privaten Nextcloud-Kalender mit dem administrativ
+konfigurierten sichtbaren Namen. Ohne gesetzten AppConfig-Wert bleibt
+„AD Dienste“ der Bestandsdefault. Termine und Urlaube werden nicht übertragen.
+Ein bewusstes Opt-out entfernt nur die
 von AD Kalender erzeugten Objekte; fremde Objekte bleiben unangetastet und der
 Kalender wird nur gelöscht, wenn er danach leer ist.
 
@@ -87,12 +89,29 @@ Der interne DAV-Zugriff ist hinter `ShiftCalendarPublisher` gekapselt. Der
 interne Nextcloud-DAV-Vertrag bleibt auf
 `NextcloudDavShiftCalendarPublisher` begrenzt.
 
+Die Kopano-/CalDAV-Vorgabe und der sichtbare Kalendername stammen aus einer
+zentralen, validierten Nextcloud-AppConfig-Quelle. Nur bestätigte
+Nextcloud-Admins dürfen sie mit normalem CSRF-Schutz ändern. Eine
+Namensänderung benennt beim nächsten ausgehenden Abgleich ausschließlich
+Kalender um, deren App-Eigentum über die deterministische interne URI oder die
+gespeicherte externe Kalender-URL beziehungsweise Provider-ID zusammen mit
+dem bekannten bisherigen Namen belegt ist. Technische Kennungen bleiben
+stabil; bei unklarem Eigentum wird abgebrochen.
+
 ## Externe Kalender
 
 Kopano, Google, Apple und generisches CalDAV können parallel verbunden werden.
-Sie erhalten einen sichtbaren, app-eigenen Kalender „AD Dienste“ und
+Sie erhalten einen sichtbaren, app-eigenen Kalender mit dem administrativ
+konfigurierten Namen und
 exportieren ebenfalls ausschließlich Dienste. Providerinhalte werden nicht in
 AD Kalender eingeblendet oder zurückimportiert.
+
+Die administrativ konfigurierte Kopano-Adresse ist nur die Vorgabe für neue
+persönliche Verbindungen. Bereits gespeicherte persönliche Server- und
+Kalenderadressen werden durch eine spätere Defaultänderung nicht ersetzt.
+Fehlschläge bei einer fälligen Bestandsumbenennung verändern weder den
+globalen Default noch führende AD-Daten und blockieren keine anderen Provider;
+der nächste ausgehende Abgleich versucht sie erneut.
 
 Persönliche CalDAV-Zugangsdaten und Google-Tokens werden mit Nextclouds
 Kryptodienst verschlüsselt als sensible Benutzerkonfiguration gespeichert.

@@ -7,6 +7,7 @@ namespace OCA\AdCalendar\Controller;
 use DateTimeImmutable;
 use InvalidArgumentException;
 use OCA\AdCalendar\AppInfo\Application;
+use OCA\AdCalendar\Http\LocalizedErrorResponseFactory;
 use OCA\AdCalendar\Service\CalendarAccessService;
 use OCA\AdCalendar\Service\CalendarService;
 use OCA\AdCalendar\Service\CalendarSettingsService;
@@ -33,6 +34,7 @@ final class ApiController extends Controller {
         private ShiftCalendarSyncService $shiftSync,
         private HolidayCalendarService $holidays,
         private LoggerInterface $logger,
+        private LocalizedErrorResponseFactory $errors,
     ) {
         parent::__construct(Application::APP_ID, $request);
     }
@@ -48,7 +50,7 @@ final class ApiController extends Controller {
             return new JSONResponse($response);
         } catch (\Throwable $error) {
             $this->logger->error('Wochenansicht konnte nicht aufgebaut werden.', ['exception' => $error]);
-            return new JSONResponse(['error' => 'Die Wochenansicht konnte nicht geladen werden.'], Http::STATUS_BAD_REQUEST);
+            return $this->errors->create('week_load_failed', 'The weekly schedule could not be loaded.', Http::STATUS_BAD_REQUEST);
         }
     }
 
@@ -64,7 +66,7 @@ final class ApiController extends Controller {
             return new JSONResponse($response);
         } catch (\Throwable $error) {
             $this->logger->error('Kalenderbereich konnte nicht aufgebaut werden.', ['exception' => $error]);
-            return new JSONResponse(['error' => 'Die Monatsansicht konnte nicht geladen werden.'], Http::STATUS_BAD_REQUEST);
+            return $this->errors->create('range_load_failed', 'The monthly schedule could not be loaded.', Http::STATUS_BAD_REQUEST);
         }
     }
 
@@ -93,11 +95,11 @@ final class ApiController extends Controller {
                 'timezone' => $recurrenceTimezone,
             ], $this->access->currentUser()?->getUID() ?? '');
             return new JSONResponse(['id' => $ids[0], 'ids' => $ids, 'seriesCount' => count($ids)]);
-        } catch (InvalidArgumentException $error) {
-            return new JSONResponse(['error' => $error->getMessage()], Http::STATUS_BAD_REQUEST);
+        } catch (InvalidArgumentException) {
+            return $this->errors->create('invalid_recurrence', 'The recurring appointment is invalid.', Http::STATUS_BAD_REQUEST);
         } catch (\Throwable $error) {
             $this->logger->error('Terminserie konnte nicht angelegt werden.', ['exception' => $error]);
-            return new JSONResponse(['error' => 'Die Terminserie konnte nicht gespeichert werden.'], Http::STATUS_BAD_REQUEST);
+            return $this->errors->create('recurrence_save_failed', 'The recurring appointment could not be saved.', Http::STATUS_BAD_REQUEST);
         }
     }
 
@@ -108,23 +110,23 @@ final class ApiController extends Controller {
             return $this->denied();
         }
         if ($existing->meetingUid() !== null) {
-            return new JSONResponse(['error' => 'Gemeinsame Meetings werden zusammen bearbeitet.'], Http::STATUS_CONFLICT);
+            return $this->errors->create('meeting_managed_together', 'Shared meetings are edited together.', Http::STATUS_CONFLICT);
         }
         if ($seriesScope === 'series') {
-            if ($existing->seriesUid() === null) return new JSONResponse(['error' => 'Der Termin gehört zu keiner Serie.'], Http::STATUS_BAD_REQUEST);
+            if ($existing->seriesUid() === null) return $this->errors->create('entry_not_recurring', 'The appointment is not part of a series.', Http::STATUS_BAD_REQUEST);
             $seriesEntries = $this->recurrences->seriesEntries($existing->seriesUid());
             foreach ($seriesEntries as $seriesEntry) if (!$this->access->canManage($seriesEntry->employeeUid())) return $this->denied();
             try {
                 $ids = $this->recurrences->updateSeries($existing, compact('employeeUid', 'start', 'end', 'type', 'title'), $this->access->currentUser()?->getUID() ?? '');
                 return new JSONResponse(['id' => $id, 'ids' => $ids, 'seriesCount' => count($ids)]);
-            } catch (InvalidArgumentException $error) {
-                return new JSONResponse(['error' => $error->getMessage()], Http::STATUS_BAD_REQUEST);
+            } catch (InvalidArgumentException) {
+                return $this->errors->create('invalid_recurrence', 'The recurring appointment is invalid.', Http::STATUS_BAD_REQUEST);
             } catch (\Throwable $error) {
                 $this->logger->error('Terminserie konnte nicht geändert werden.', ['exception' => $error]);
-                return new JSONResponse(['error' => 'Die Terminserie konnte nicht gespeichert werden.'], Http::STATUS_BAD_REQUEST);
+                return $this->errors->create('recurrence_save_failed', 'The recurring appointment could not be saved.', Http::STATUS_BAD_REQUEST);
             }
         }
-        if ($seriesScope !== 'occurrence') return new JSONResponse(['error' => 'Ungültiger Serienumfang.'], Http::STATUS_BAD_REQUEST);
+        if ($seriesScope !== 'occurrence') return $this->errors->create('invalid_series_scope', 'The series scope is invalid.', Http::STATUS_BAD_REQUEST);
         return $this->save($id, compact('employeeUid', 'start', 'end', 'type', 'title'));
     }
 
@@ -133,14 +135,14 @@ final class ApiController extends Controller {
         try {
             $entry = $this->calendar->existing($id);
         } catch (\Throwable) {
-            return new JSONResponse(['error' => 'Nicht gefunden.'], Http::STATUS_NOT_FOUND);
+            return $this->errors->create('entry_not_found', 'The calendar entry was not found.', Http::STATUS_NOT_FOUND);
         }
         if (!$this->access->canManage($entry->employeeUid())) return $this->denied();
         if ($entry->meetingUid() !== null) {
-            return new JSONResponse(['error' => 'Gemeinsame Meetings werden zusammen gelöscht.'], Http::STATUS_CONFLICT);
+            return $this->errors->create('meeting_deleted_together', 'Shared meetings are deleted together.', Http::STATUS_CONFLICT);
         }
         if ($seriesScope === 'series') {
-            if ($entry->seriesUid() === null) return new JSONResponse(['error' => 'Der Termin gehört zu keiner Serie.'], Http::STATUS_BAD_REQUEST);
+            if ($entry->seriesUid() === null) return $this->errors->create('entry_not_recurring', 'The appointment is not part of a series.', Http::STATUS_BAD_REQUEST);
             $seriesEntries = $this->recurrences->seriesEntries($entry->seriesUid());
             foreach ($seriesEntries as $seriesEntry) if (!$this->access->canManage($seriesEntry->employeeUid())) return $this->denied();
             try {
@@ -148,10 +150,10 @@ final class ApiController extends Controller {
                 return new JSONResponse(['deleted' => true, 'seriesScope' => 'series']);
             } catch (\Throwable $error) {
                 $this->logger->error('Terminserie konnte nicht gelöscht werden.', ['exception' => $error]);
-                return new JSONResponse(['error' => 'Die Terminserie konnte nicht gelöscht werden.'], Http::STATUS_BAD_REQUEST);
+                return $this->errors->create('recurrence_delete_failed', 'The recurring appointment could not be deleted.', Http::STATUS_BAD_REQUEST);
             }
         }
-        if ($seriesScope !== 'occurrence') return new JSONResponse(['error' => 'Ungültiger Serienumfang.'], Http::STATUS_BAD_REQUEST);
+        if ($seriesScope !== 'occurrence') return $this->errors->create('invalid_series_scope', 'The series scope is invalid.', Http::STATUS_BAD_REQUEST);
         try {
             $preview = $this->calendar->deletionPreview($id);
             if ($entry->type() === 'shift' && $preview['children'] !== [] && $childMode === '') {
@@ -160,7 +162,7 @@ final class ApiController extends Controller {
             $this->calendar->delete($id, $childMode);
             return new JSONResponse(['deleted' => true, 'childMode' => $childMode]);
         } catch (\Throwable) {
-            return new JSONResponse(['error' => 'Der Eintrag konnte nicht gelöscht werden.'], Http::STATUS_BAD_REQUEST);
+            return $this->errors->create('entry_delete_failed', 'The calendar entry could not be deleted.', Http::STATUS_BAD_REQUEST);
         }
     }
 
@@ -199,7 +201,7 @@ final class ApiController extends Controller {
             return new JSONResponse(['calendarSync' => $this->shiftSync->configure($user->getUID(), $enabled)]);
         } catch (\Throwable $error) {
             $this->logger->error('Persönliche Kalendersynchronisation konnte nicht geändert werden.', ['exception' => $error]);
-            return new JSONResponse(['error' => 'Die persönliche Kalendersynchronisation konnte nicht geändert werden.'], Http::STATUS_BAD_REQUEST);
+            return $this->errors->create('calendar_sync_failed', 'Personal calendar synchronisation could not be changed.', Http::STATUS_BAD_REQUEST);
         }
     }
 
@@ -210,15 +212,15 @@ final class ApiController extends Controller {
         try {
             $user = $this->access->currentUser();
             return new JSONResponse(['id' => $this->calendar->save($payload, $id, $user?->getUID() ?? '')]);
-        } catch (InvalidArgumentException $error) {
-            return new JSONResponse(['error' => $error->getMessage()], Http::STATUS_BAD_REQUEST);
+        } catch (InvalidArgumentException) {
+            return $this->errors->create('invalid_calendar_entry', 'The calendar entry is invalid.', Http::STATUS_BAD_REQUEST);
         } catch (\Throwable) {
-            return new JSONResponse(['error' => 'Der Kalendereintrag ist ungültig.'], Http::STATUS_BAD_REQUEST);
+            return $this->errors->create('invalid_calendar_entry', 'The calendar entry is invalid.', Http::STATUS_BAD_REQUEST);
         }
     }
 
     private function denied(): JSONResponse {
-        return new JSONResponse(['error' => 'Keine Berechtigung.'], Http::STATUS_FORBIDDEN);
+        return $this->errors->create('forbidden', 'You are not allowed to perform this action.', Http::STATUS_FORBIDDEN);
     }
 
     private function date(string $value): DateTimeImmutable {

@@ -2,9 +2,20 @@ import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { runInNewContext } from 'node:vm';
 
-const execute = (relativePath, source, context) => runInNewContext(source, context, {
-    filename: fileURLToPath(new URL(relativePath, import.meta.url)),
-});
+const execute = (relativePath, source, context) => {
+    context.window.AdCalendar ||= {};
+    context.window.AdCalendar.l10n ||= {
+        locale: 'de-DE',
+        date: (value, options = {}) => new Intl.DateTimeFormat('de-DE', options).format(value),
+        time: (value, options = {}) => new Intl.DateTimeFormat('de-DE', { hour: '2-digit', minute: '2-digit', timeZone: 'UTC', ...options }).format(value),
+        lower: value => String(value).toLocaleLowerCase('de-DE'),
+        t: (message, parameters = {}) => Object.entries(parameters).reduce((text, [key, value]) => text.replaceAll(`{${key}}`, String(value)), message),
+        n: (singular, plural, count) => (count === 1 ? singular : plural).replaceAll('{count}', String(count)),
+    };
+    return runInNewContext(source, context, {
+        filename: fileURLToPath(new URL(relativePath, import.meta.url)),
+    });
+};
 
 const source = readFileSync(new URL('../../js/main.js', import.meta.url), 'utf8');
 const repository = readFileSync(new URL('../../js/repositories/calendar-repository.js', import.meta.url), 'utf8');
@@ -43,14 +54,14 @@ for (const contract of [
     "state.period === 'month'",
     'meetingCapabilities.apply(data.entries, data.employees)',
     'weekTable.setHolidays(data.holidayCalendars || [])',
-    "state.isUnfiltered() ? 'Alle Personen'",
+    "state.isUnfiltered() ? l10n.t('All people')",
     'const sequence = ++loadSequence',
     'if (sequence !== loadSequence) return;',
     'if (sequence === loadSequence) show(error, true)',
 ]) {
     if (!source.includes(contract)) throw new Error(`Frontend-Vertrag fehlt: ${contract}`);
 }
-for (const contract of ['class EntryWorkflow', "['delete', 'Dienst und Termine löschen']", "['detach', 'Nur Dienst löschen; Termine als Sperrtermine behalten']", "dialog.addEventListener('cancel'", 'this.dialog.open({ employee', 'this.repository.updateMeeting(existing.meetingUid', 'this.repository.removeMeeting(entry.meetingUid)', 'existing?.seriesUid', "['occurrence', 'Nur dieses Vorkommen']", "['series', 'Gesamte Serie']", 'if (!employee?.canManage) return;', 'this.show(error, true)']) {
+for (const contract of ['class EntryWorkflow', "['delete', l10n.t('Delete shift and appointments')]", "['detach', l10n.t('Delete only the shift; keep appointments as blocked times')]", "dialog.addEventListener('cancel'", 'this.dialog.open({ employee', 'this.repository.updateMeeting(existing.meetingUid', 'this.repository.removeMeeting(entry.meetingUid)', 'existing?.seriesUid', "['occurrence', l10n.t('Only this occurrence')]", "['series', l10n.t('Entire series')]", 'if (!employee?.canManage) return;', 'this.show(error, true)']) {
     if (!entryWorkflow.includes(contract)) throw new Error(`Eintragsworkflow-Vertrag fehlt: ${contract}`);
 }
 const workflowContext = { window: { confirm: () => true }, document: {}, Element: class {}, Date, Number, Promise };
@@ -71,7 +82,7 @@ if (mixedMeeting.some(entry => entry.canManageMeeting !== false)) throw new Erro
 const manageableMeeting = [{ employeeUid: 'a', meetingUid: 'meeting-2' }, { employeeUid: 'b', meetingUid: 'meeting-2' }];
 capabilities.apply(manageableMeeting, [{ uid: 'a', canManage: true }, { uid: 'b', canManage: true }]);
 if (manageableMeeting.some(entry => entry.canManageMeeting !== true)) throw new Error('Vollständig bearbeitbares Meeting wurde in der UI gesperrt.');
-for (const contract of ['class CalendarFilters', 'this.renderLeadershipStaffCheckbox()', 'this.state.selected.clear()', 'this.state.persist()', 'this.onChange()', 'Keine explizite Auswahl – Gruppenfilter gelten.', 'this.organization().staffBlockLabel', 'organization.areaOrder(a) - organization.areaOrder(b)']) {
+for (const contract of ['class CalendarFilters', 'this.renderLeadershipStaffCheckbox()', 'this.state.selected.clear()', 'this.state.persist()', 'this.onChange()', "l10n.t('No explicit selection – group filters apply.')", 'this.organization().staffBlockLabel', 'organization.areaOrder(a) - organization.areaOrder(b)']) {
     if (!calendarFilters.includes(contract)) throw new Error(`Kalenderfilter-Komponentenvertrag fehlt: ${contract}`);
 }
 for (const contract of ['class TabNavigation', "addEventListener('click'", "this.show('settings')", "this.onChange(active)"]) {
@@ -93,7 +104,7 @@ const calendarLayout = calendarTimeline.layout(timelineEntries, [timelineDay]);
 if (calendarTimeline.gridRow(calendarLayout, timelineEntries[0], timelineDay) !== '2 / 5' || !calendarLayout.rows.includes('48px')) {
     throw new Error('Kalendereinträge werden nicht auf das gemeinsame kompakte Zeitraster abgebildet.');
 }
-for (const contract of ['class WeekNavigation', "this.setPeriod('week')", "this.setPeriod('month')", 'this.move(-7)', 'this.moveMonth(', 'this.state.persist()', 'this.onWeekChange', 'this.onViewChange', 'CalendarDate.isoWeekValue', 'CalendarDate.monthValue', 'Tage als Zeilen', 'Personen als Zeilen']) {
+for (const contract of ['class WeekNavigation', "this.setPeriod('week')", "this.setPeriod('month')", 'this.move(-7)', 'this.moveMonth(', 'this.state.persist()', 'this.onWeekChange', 'this.onViewChange', 'CalendarDate.isoWeekValue', 'CalendarDate.monthValue', "l10n.t('Days as rows')", "l10n.t('People as rows')"]) {
     if (!weekNavigation.includes(contract)) throw new Error(`Wochennavigations-Komponentenvertrag fehlt: ${contract}`);
 }
 const navigationContext = { window: {}, document: {}, Date, Number, String };
@@ -126,7 +137,7 @@ const monthNavigation = Object.create(navigationContext.window.AdCalendar.compon
 monthNavigation.state = { monday: new Date(2026, 6, 13), month: new Date(2026, 6, 1), period: 'month', vertical: false };
 for (const property of ['label', 'weekNumber', 'monthNumber', 'weekPicker', 'monthPicker', 'previous', 'next', 'weekButton', 'monthButton', 'toggleView', 'heading']) monthNavigation[property] = navigationElement();
 monthNavigation.render();
-if (monthNavigation.toggleView.hidden !== false || monthNavigation.toggleView.textContent !== 'Personen als Zeilen' || monthNavigation.toggleView.attributes['aria-pressed'] !== 'true') {
+if (monthNavigation.toggleView.hidden !== false || monthNavigation.toggleView.textContent !== 'People as rows' || monthNavigation.toggleView.attributes['aria-pressed'] !== 'true') {
     throw new Error('Ausrichtungsumschalter bleibt in der Monatsansicht nicht sichtbar oder verliert seinen Zustand.');
 }
 class FakeNode {
@@ -298,31 +309,31 @@ if (sortableOrganization.roleOrder('ad-Buero') !== 20 || sortableOrganization.ar
 for (const contract of ['window.LocalBase.models.Model', 'extends BaseModel', 'toArray()', 'this.defaultDate', 'this.defaultModified', 'this.defaultDeleted', 'this.meetingUid', 'this.seriesUid', 'this.seriesTimezone', 'this.canManageMeeting']) {
     if (!model.includes(contract)) throw new Error(`Modell-Vertrag fehlt: ${contract}`);
 }
-for (const contract of ['class CalendarCell', 'adc-cell-actions', 'adc-entry__children', 'grid-template-rows:', 'grid-row:', 'entry.parentEntryId === shift.id', 'entry.canManageMeeting !== false', 'adc-entry__blocked-marker', 'adc-entry__series-marker', 'aria-hidden="true">🔒', "data-action=\"add-entry\"", 'data-tooltip="Dienst anlegen"', 'icon-calendar-dark']) {
+for (const contract of ['class CalendarCell', 'adc-cell-actions', 'adc-entry__children', 'grid-template-rows:', 'grid-row:', 'entry.parentEntryId === shift.id', 'entry.canManageMeeting !== false', 'adc-entry__blocked-marker', 'adc-entry__series-marker', 'aria-hidden="true">🔒', "data-action=\"add-entry\"", "l10n.t('Create shift')", 'icon-calendar-dark']) {
     if (!calendarCell.includes(contract)) throw new Error(`Kalenderzellen-Vertrag fehlt: ${contract}`);
 }
-for (const contract of ['class MeetingFinder', 'this.selected = new Set(selected)', 'employeeUids.length < 2', 'this.repository.meetingGaps', 'renderResults(gaps, canBlockAll)', 'In der nächsten Woche suchen', 'abwählen', 'this.repository.blockMeeting', 'Number(this.duration.value)']) {
+for (const contract of ['class MeetingFinder', 'this.selected = new Set(selected)', 'employeeUids.length < 2', 'this.repository.meetingGaps', 'renderResults(gaps, canBlockAll)', "l10n.t('Search in the next week')", "l10n.t('Deselect {employee}'", 'this.repository.blockMeeting', 'Number(this.duration.value)']) {
     if (!meetingFinder.includes(contract)) throw new Error(`Meeting-Finder-Vertrag fehlt: ${contract}`);
 }
 for (const contract of ['class ShiftDefaults', 'Array.from({ length: 7 }', 'data-field="enabled"', 'this.onSave(this.collect())']) {
     if (!shiftDefaults.includes(contract)) throw new Error(`Dienstzeiten-Komponentenvertrag fehlt: ${contract}`);
 }
-for (const contract of ['class ShiftCalendarSync', 'this.onSave(this.input.checked)', 'status.calendarName', 'Kalender ist aktiv']) {
+for (const contract of ['class ShiftCalendarSync', 'this.onSave(this.input.checked)', 'status.calendarName', "l10n.t('Calendar is active: {calendar}.'"]) {
     if (!shiftCalendarSync.includes(contract)) throw new Error(`Dienstkalender-Komponentenvertrag fehlt: ${contract}`);
 }
-for (const contract of ['class ExternalCalendars', "provider === 'google'", 'window.location.assign(response.authorizationUrl)', 'this.dialog.showModal()', 'this.repository.connectCalDav', 'this.repository.disconnectExternalCalendar', 'window.confirm(', 'this.password.value = \'\'', 'https://mail.adberlin.org', 'Der Kopano-Betreiber muss CalDAV']) {
+for (const contract of ['class ExternalCalendars', "provider === 'google'", 'window.location.assign(response.authorizationUrl)', 'this.dialog.showModal()', 'this.repository.connectCalDav', 'this.repository.disconnectExternalCalendar', 'window.confirm(', 'this.password.value = \'\'', 'https://mail.adberlin.org', 'the Kopano provider must allow CalDAV']) {
     if (!externalCalendars.includes(contract)) throw new Error(`Externe-Kalender-Komponentenvertrag fehlt: ${contract}`);
 }
 const externalElements = {};
 const externalElement = id => externalElements[id] ||= { id, value: '', textContent: '', hidden: false, disabled: false, listeners: {}, addEventListener(type, listener) { this.listeners[type] = listener; }, focus() { this.focused = true; } };
 const providerButtons = ['kopano', 'google', 'apple', 'manual'].map(provider => ({ ...externalElement(`connect-${provider}`), dataset: { externalConnect: provider } }));
 const disconnectButtons = ['kopano', 'google', 'apple', 'manual'].map(provider => ({ ...externalElement(`disconnect-${provider}`), dataset: { externalDisconnect: provider } }));
-const externalDialog = externalElement('adc-external-calendar-dialog'); externalDialog.showModal = () => { externalDialog.open = true; }; externalDialog.close = () => { externalDialog.open = false; };
+const externalDialog = externalElement('adc-external-calendar-dialog'); externalDialog.dataset = { kopanoDefault: 'https://default.example.test/', calendarName: 'Team & Dienst' }; externalDialog.showModal = () => { externalDialog.open = true; }; externalDialog.close = () => { externalDialog.open = false; };
 const externalForm = externalElement('adc-external-calendar-form'); externalForm.reportValidity = () => true; const externalSubmit = { disabled: false }; externalForm.querySelector = () => externalSubmit;
 const externalRepository = {
-    externalCalendars: async () => ({ externalCalendars: { kopano: { connected: false, available: true, calendarName: 'AD Dienste' } } }),
-    connectCalDav: async (...args) => { externalRepository.connected = args; return { externalCalendars: { kopano: { connected: true, available: true, calendarName: 'AD Dienste' } } }; },
-    disconnectExternalCalendar: async provider => ({ externalCalendars: { [provider]: { connected: false, available: true, calendarName: 'AD Dienste' } } }),
+    externalCalendars: async () => ({ externalCalendars: { kopano: { connected: false, available: true, calendarName: 'Team & Dienst' } } }),
+    connectCalDav: async (...args) => { externalRepository.connected = args; return { externalCalendars: { kopano: { connected: true, available: true, calendarName: 'Team & Dienst' } } }; },
+    disconnectExternalCalendar: async provider => ({ externalCalendars: { [provider]: { connected: false, available: true, calendarName: 'Team & Dienst' } } }),
     startGoogleCalendarConnection: async () => ({ authorizationUrl: 'https://accounts.google.test/oauth' }),
 };
 let assignedAuthorizationUrl = '';
@@ -342,10 +353,10 @@ execute('../../js/components/external-calendars.js', externalCalendars, external
 const externalComponent = new externalContext.window.AdCalendar.components.ExternalCalendars({ repository: externalRepository, onMessage() {} });
 await externalComponent.load();
 await externalComponent.connect('kopano');
-if (!externalDialog.open || externalElement('adc-external-server-url').value !== 'https://mail.adberlin.org' || !externalElement('adc-external-server-url').focused) throw new Error('Kopano-Dialog verwendet nicht die änderbare Vorgabe oder setzt keinen Fokus.');
+if (!externalDialog.open || externalElement('adc-external-server-url').value !== 'https://default.example.test/' || !externalElement('adc-external-server-url').focused) throw new Error('Kopano-Dialog verwendet nicht die administrierte Vorgabe oder setzt keinen Fokus.');
 externalElement('adc-external-username').value = 'person-a'; externalElement('adc-external-password').value = 'secret';
 await externalComponent.submit({ preventDefault() {} });
-if (externalRepository.connected?.[0] !== 'kopano' || externalElement('adc-external-password').value !== '' || !externalElement('adc-external-kopano-status').textContent.includes('Verbunden')) throw new Error('CalDAV-Verbindung aktualisiert Status nicht oder behält das Passwort im DOM.');
+if (externalRepository.connected?.[0] !== 'kopano' || externalElement('adc-external-password').value !== '' || !externalElement('adc-external-kopano-status').textContent.includes('Team & Dienst')) throw new Error('CalDAV-Verbindung zeigt den administrierten Zielnamen nicht oder behält das Passwort im DOM.');
 await externalComponent.connect('google');
 if (assignedAuthorizationUrl !== 'https://accounts.google.test/oauth') throw new Error('Google-Verbindung startet keinen Top-Level-OAuth-Redirect.');
 const syncInput = { checked: false };
@@ -385,11 +396,39 @@ if (!timedCellHtml.includes('grid-template-rows:') || !timedCellHtml.includes('g
 const blockedHtml = cell.render([
     { id: 3, type: 'appointment', start: '2026-07-06T18:00:00Z', end: '2026-07-06T19:00:00Z', title: 'Blockiert', parentEntryId: null },
 ], { canManage: true });
-if (!blockedHtml.includes('adc-entry--blocked') || !blockedHtml.includes('adc-entry__blocked-marker') || !blockedHtml.includes('Sperrtermin')) throw new Error('Sperrtermin wird nicht kräftig und textlich als Sperre gekennzeichnet.');
+if (!blockedHtml.includes('adc-entry--blocked') || !blockedHtml.includes('adc-entry__blocked-marker') || !blockedHtml.includes('Blocked time')) throw new Error('Sperrtermin wird nicht kräftig und textlich als Sperre gekennzeichnet.');
 const seriesHtml = cell.render([
     { id: 4, type: 'appointment', start: '2026-07-06T10:00:00Z', end: '2026-07-06T11:00:00Z', title: 'Serie', parentEntryId: null, seriesUid: 'series-demo' },
 ], { canManage: true });
-if (!seriesHtml.includes('adc-entry__series-marker') || !seriesHtml.includes('Serientermin')) throw new Error('Serientermin wird nicht zusätzlich zur visuellen Markierung textlich gekennzeichnet.');
+if (!seriesHtml.includes('adc-entry__series-marker') || !seriesHtml.includes('Recurring appointment')) throw new Error('Serientermin wird nicht zusätzlich zur visuellen Markierung textlich gekennzeichnet.');
+
+const maliciousTranslation = '<img src=x onerror=alert(1)>';
+const escapingContext = {
+    window: {
+        AdCalendar: {
+            l10n: {
+                time: () => '10:00',
+                t: () => maliciousTranslation,
+            },
+        },
+        LocalBase: {
+            ui: {
+                esc: value => String(value ?? '')
+                    .replaceAll('&', '&amp;')
+                    .replaceAll('<', '&lt;')
+                    .replaceAll('>', '&gt;')
+                    .replaceAll('"', '&quot;'),
+            },
+        },
+    },
+    Date,
+};
+execute('../../js/components/calendar-cell.js', calendarCell, escapingContext);
+const escapingCell = new escapingContext.window.AdCalendar.components.CalendarCell();
+const escapedTranslationHtml = escapingCell.render([], { canManage: true });
+if (escapedTranslationHtml.includes(maliciousTranslation) || !escapedTranslationHtml.includes('&lt;img')) {
+    throw new Error('Übersetzungstexte werden in der HTML-erzeugenden Kalenderzelle nicht sicher escaped.');
+}
 
 const tabContext = { window: {} };
 execute('../../js/components/tab-navigation.js', tabNavigation, tabContext);

@@ -2,13 +2,26 @@
 
 declare(strict_types=1);
 
+namespace OCP { interface IL10N { public function t(string $text, array $parameters = []): string; } }
+
+namespace {
 require_once __DIR__ . '/../../lib/Model/CalendarEntry.php';
 require_once __DIR__ . '/../../lib/CalendarSync/ShiftCalendarEventSerializer.php';
 
 use OCA\AdCalendar\CalendarSync\ShiftCalendarEventSerializer;
 use OCA\AdCalendar\Model\CalendarEntry;
+use OCP\IL10N;
 
-$serializer = new ShiftCalendarEventSerializer();
+$l10n = new class implements IL10N {
+    public function t(string $text, array $parameters = []): string {
+        return match ($text) {
+            'Shift' => 'Übersetzter Dienst',
+            'Automatically synchronised from AD Calendar. Please make changes there.' => 'Übersetzte Kalenderbeschreibung.',
+            default => strtr($text, $parameters),
+        };
+    }
+};
+$serializer = new ShiftCalendarEventSerializer($l10n);
 $shift = CalendarEntry::get([
     'id' => 17,
     'employeeUid' => 'sync-person',
@@ -35,7 +48,8 @@ foreach ([
 if ($serializer->objectUri($shift) !== 'adcalendar-shift-17.ics') throw new RuntimeException('Deterministische Objekt-URI fehlt.');
 
 $untitled = CalendarEntry::get(array_replace($shift->toArray(), ['title' => '']));
-if (!str_contains($serializer->serialize($untitled, '20260718T090000Z'), "SUMMARY:Dienst\r\n")) {
+if (!str_contains($serializer->serialize($untitled, '20260718T090000Z'), "SUMMARY:Übersetzter Dienst\r\n")
+    || !str_contains($serializer->serialize($untitled, '20260718T090000Z'), "DESCRIPTION:Übersetzte Kalenderbeschreibung.\r\n")) {
     throw new RuntimeException('Titelloser Dienst hat keinen verständlichen Kalendernamen.');
 }
 
@@ -51,3 +65,4 @@ try {
 }
 
 echo "ShiftCalendarEventSerializerTest: OK\n";
+}

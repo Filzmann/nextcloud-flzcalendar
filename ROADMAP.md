@@ -2,11 +2,13 @@
 
 Diese Datei bündelt geplante Erweiterungen und offene Produktentscheidungen. Verbindliche Fach-, Sicherheits- und Architekturregeln stehen in `AGENTS.md`.
 
-## Freigegebene Umsetzungsaufgaben
+## Umgesetzte Aufgaben mit offener manueller Abnahme
 
 ### ADC-ADMIN-DEFAULTS – Kalenderdefaults administrierbar machen
 
-Status: freigegeben; als nächste Entwicklungsaufgabe nach Abschluss des aktuellen Monatsplaner- und Abnahmeblocks umzusetzen
+Status: technisch umgesetzt am 31. Juli 2026; lokale Regressionen und die
+reale Nextcloud-DAV-Schnittstelle sind grün, die fachliche Staging-Abnahme
+folgt mit `docs/manual-acceptance.md`
 
 - Kopano-/CalDAV-Vorgabe und sichtbaren Zielkalendernamen aus je einer
   validierten serverseitigen AppConfig-Quelle liefern und in
@@ -46,9 +48,13 @@ Status: freigegeben; als nächste Entwicklungsaufgabe nach Abschluss des aktuell
   interne und externe Bestandsumbenennung, fremder Kalender sowie
   isolierter Providerfehler mit erfolgreichem Wiederholungsversuch.
 
+## Freigegebene Umsetzungsaufgaben
+
 ### ADC-L10N – AD Kalender vollständig lokalisieren
 
-Status: freigegeben; AD Kalender ist die Pilot-App und wird nach ADC-ADMIN-DEFAULTS vollständig lokalisiert
+Status: automatische Umsetzung am 31. Juli 2026 abgeschlossen; manuelle
+Browserabnahme offen. Die manuelle Abnahme von ADC-ADMIN-DEFAULTS bleibt nach
+bewusster Entscheidung ebenfalls offen.
 
 - Feste `de-DE`-Formatierung, Wochentagslisten sowie sichtbare UI-, Admin-,
   Provider- und Fehlermeldungen auf aktive Nextcloud-Locale und
@@ -61,18 +67,34 @@ Status: freigegeben; AD Kalender ist die Pilot-App und wird nach ADC-ADMIN-DEFAU
   Nextcloud-l10n-Vertrag verwenden. Übersetzungen werden nicht als
   unkontrolliertes HTML eingesetzt; variable Werte laufen über typisierte
   Platzhalter und die bestehende kontextgerechte Ausgabe.
+- Maschinenlesbare Status-, Fehler- und Rechteentscheidungen bleiben über
+  sprachunabhängige Codes stabil. Weder Server noch Client leiten Rechte,
+  Providerklassifikation oder Sicherheitsentscheidungen aus übersetzten
+  Texten ab; Geheimnisse, URLs und technische Kennungen werden nicht als
+  Übersetzungsparameter verwendet.
 - Zuerst ein vollständiges Inventar der sichtbaren PHP-/Template-/JavaScript-
   Texte und Datumsformatierungen erstellen. Danach Server, Client und
   Formatierung in kleinen testgetriebenen Schritten migrieren; technische
   Werte, Rechteentscheidungen und Fehlerklassifikation bleiben unabhängig von
   der gewählten Sprache.
+- Das vollständige Datei-, Maschinenvertrags- und Testinventar steht in
+  [`docs/l10n-inventory.md`](docs/l10n-inventory.md) und wird bis zum
+  abschließenden Rohtext-Gate schrittweise abgearbeitet.
+- Umsetzungsstand 31. Juli 2026: Locale-Adapter und deutsche/englische
+  Kataloge sind aktiv; öffentliche JSON-Fehler liefern stabile Codes und
+  lokalisierte sichere Meldungen. Hauptoberfläche, persönliche Einstellungen,
+  Adminbereich, Dialoge, JavaScript-Komponenten, Navigation, CLI sowie
+  sichtbare Nextcloud-DAV-/Google-Ereignistexte verwenden englische
+  L10N-Quellschlüssel. Server- und Clientkataloge sowie feste deutsche
+  UI-Rohtexte werden automatisiert geprüft.
 - Tests: Deutsch, Englisch als zweite Locale, unbekannte Locale/Fallback,
   Singular/Plural, fehlender Schlüssel, typisierte Platzhalter,
   HTML-/Script-Sonderzeichen, server- und clientseitig identische
   Schlüsselverwendung, DST/Jahresgrenze sowie Tastatur- und Layout-Smokes mit
   längeren übersetzten Beschriftungen.
-- Erst nach vollständiger Migration einen Rohtext-Check für AD Kalender
-  verbindlich schalten.
+- Der Rohtext- und Katalogcheck ist nach vollständiger Migration verbindlich.
+  Offen bleibt die bewusst verschobene Sichtprüfung in realen deutschen und
+  englischen Nextcloud-Sitzungen.
 
 ## Sicherheits- und Test-Gate für die nächsten Umsetzungen
 
@@ -102,21 +124,29 @@ Status: freigegeben; AD Kalender ist die Pilot-App und wird nach ADC-ADMIN-DEFAU
 
 - Die manuellen Prüfungen werden im ausfüllbaren
   [`docs/manual-acceptance.md`](docs/manual-acceptance.md) dokumentiert.
+- Die deutsche und englische Kalender-/Adminoberfläche einschließlich langer
+  Beschriftungen, Pluralen und veröffentlichter DAV-/Google-Ereignistexte
+  anhand des Abnahmeformulars prüfen.
 - Wochen- und Monatsplanung, Meeting-Lückensuche, persönliche Standards und optionale Urlaubsmarkierungen auf einem realitätsnahen Staging fachlich abnehmen.
 - Rollen-, Bereichs- und Personenfilter einschließlich bereichsübergreifender Leitungen in der sichtbaren Oberfläche prüfen.
 - Die ergänzten globalen Gruppen Stv. PDL, Büroorganisation Pflege, Fahrzeugverwaltung und Empfang mit ihrer Backend-Reihenfolge und Hierarchie im Kalender abnehmen.
-- Den einseitigen Abgleich persönlicher Dienste in den privaten Nextcloud-Kalender „AD Dienste“ fachlich abnehmen.
+- Den einseitigen Abgleich persönlicher Dienste in den privaten Nextcloud-Kalender mit dem konfigurierten Zielnamen fachlich abnehmen.
 - Persönliche Kopano- und manuelle CalDAV-Verbindungen mit realen Testkonten auf Staging fachlich abnehmen.
+- Administrative Kopano-/CalDAV-Vorgabe und Zielkalendername einschließlich interner und externer Bestandsumbenennung mit Abschnitt G des Abnahmeformulars prüfen.
+- Die aggregierte Adminanzeige des letzten Hintergrundabgleichs für Erfolg und
+  Teilfehler prüfen; sie darf keine Konten, Kalender, Provider, URLs oder
+  Fehlerdetails offenlegen.
 - Die fachliche Abnahme der Google- und Apple-Verbindungen ist auf Mitte bis Ende August 2026 verschoben.
 
 ## Geplante Erweiterungen
 
-- Für den Produktivbetrieb ist noch festzulegen, wie fehlgeschlagene
-  Hintergrundläufe überwacht und administrativ sichtbar gemacht werden.
-  Eine spätere Lösung bleibt admin-only und aggregiert, besitzt eine begrenzte
-  Aufbewahrung und verrät weder Konten, Kalender, Provider, URLs noch
-  Zugangsdaten. Tests müssen Erfolg, Teilfehler, Wiederholung,
-  Nichtadmin-/Anonym-Deny und fehlende Kennungs-/Secret-Ausgabe abdecken.
+- Die aggregierte Anzeige des letzten Hintergrundlaufs ist umgesetzt. Eine
+  Historie, Benachrichtigung oder längere Aufbewahrung wird erst bei konkretem
+  Betriebsbedarf erweitert und muss weiterhin admin-only, mengenbegrenzt und
+  frei von Konten, Kalendern, Providern, URLs, Zugangsdaten und Fehlerdetails
+  bleiben. Vor einer Erweiterung sind Aufbewahrungsdauer, Quittierung,
+  Wiederholungsstrategie und Löschweg ausdrücklich festzulegen und mit
+  Erfolg, Teilfehler, Wiederholung sowie Nichtadmin-/Anonym-Deny zu testen.
 - Weitere Auswertungszeiträume über Woche und Monat hinaus werden erst nach
   einem konkreten Fachbedarf festgelegt. Jeder neue Bereich ist serverseitig
   begrenzt, validiert Zeitzone und Datumsgrenzen, erweitert keine Leserechte

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace OCP {
     interface IRequest {}
     interface IUser { public function getUID(): string; }
+    interface IL10N { public function t(string $text, array $parameters = []): string; }
 }
 namespace OCP\AppFramework {
     class Controller { public function __construct(string $appName, \OCP\IRequest $request) {} }
@@ -46,9 +47,11 @@ namespace OCA\AdCalendar\Service {
 }
 
 namespace {
+    require_once __DIR__ . '/../../lib/Http/LocalizedErrorResponseFactory.php';
     require_once __DIR__ . '/../../lib/Controller/ApiController.php';
 
     use OCA\AdCalendar\Controller\ApiController;
+    use OCA\AdCalendar\Http\LocalizedErrorResponseFactory;
     use OCA\AdCalendar\Service\CalendarAccessService;
     use OCA\AdCalendar\Service\CalendarPreferenceService;
     use OCA\AdCalendar\Service\CalendarService;
@@ -57,6 +60,7 @@ namespace {
     use OCA\AdCalendar\Service\ShiftCalendarSyncService;
     use OCA\LocalBase\Calendar\HolidayCalendarService;
     use OCP\IRequest;
+    use OCP\IL10N;
     use OCP\IUser;
     use Psr\Log\LoggerInterface;
 
@@ -67,7 +71,8 @@ namespace {
         public array $errors = [];
         public function error(string|\Stringable $message, array $context = []): void { $this->errors[] = [(string)$message, $context]; }
     };
-    $controller = new ApiController($request, $access, new CalendarService(), new CalendarSettingsService(), new CalendarPreferenceService(), new RecurringAppointmentService(), $sync, new HolidayCalendarService(), $logger);
+    $errors = new LocalizedErrorResponseFactory(new class implements IL10N { public function t(string $text, array $parameters = []): string { return strtr($text, $parameters); } });
+    $controller = new ApiController($request, $access, new CalendarService(), new CalendarSettingsService(), new CalendarPreferenceService(), new RecurringAppointmentService(), $sync, new HolidayCalendarService(), $logger, $errors);
 
     if ($controller->saveCalendarSync(true)->getStatus() !== 403) throw new RuntimeException('Nicht angemeldete Person kann die Synchronisation aktivieren.');
     $access->user = new class implements IUser { public function getUID(): string { return 'sync-person'; } };

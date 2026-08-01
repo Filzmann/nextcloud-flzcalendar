@@ -1,6 +1,7 @@
 (function() {
     'use strict';
     const CalendarDate = window.AdCalendar.modules.CalendarDate;
+    const l10n = window.AdCalendar.l10n;
 
     /**
      * Zweck: Kapselt Personenauswahl, wochenweise Lückensuche und gemeinsame Terminblockierung.
@@ -44,12 +45,12 @@
         close() { this.dialog.close(); }
 
         renderWeek() {
-            this.week.textContent = `Kalenderwoche ab ${new Date(`${this.start}T12:00:00`).toLocaleDateString('de-DE')}`;
+            this.week.textContent = l10n.t('Calendar week from {date}', { date: l10n.date(new Date(`${this.start}T12:00:00`)) });
         }
 
         renderPeople() {
-            const query = this.search.value.trim().toLocaleLowerCase('de-DE');
-            this.people.replaceChildren(...this.employees.filter(employee => !query || employee.displayName.toLocaleLowerCase('de-DE').includes(query)).map(employee => {
+            const query = l10n.lower(this.search.value.trim());
+            this.people.replaceChildren(...this.employees.filter(employee => !query || l10n.lower(employee.displayName).includes(query)).map(employee => {
                 const label = document.createElement('label');
                 const input = document.createElement('input');
                 input.type = 'checkbox'; input.value = employee.uid; input.checked = this.selected.has(employee.uid);
@@ -71,11 +72,11 @@
             const employeeUids = [...this.selected];
             const durationMinutes = Number(this.duration.value);
             if (employeeUids.length < 2) {
-                this.results.textContent = 'Bitte mindestens zwei Personen auswählen.';
+                this.results.textContent = l10n.t('Please select at least two people.');
                 return;
             }
             if (!Number.isInteger(durationMinutes) || durationMinutes < 15 || durationMinutes > 480) {
-                this.results.textContent = 'Bitte eine Dauer zwischen 15 und 480 Minuten auswählen.';
+                this.results.textContent = l10n.t('Please select a duration between 15 and 480 minutes.');
                 return;
             }
             try {
@@ -91,7 +92,7 @@
                 this.renderNoResults();
                 return;
             }
-            const heading = document.createElement('h3'); heading.textContent = 'Passende Lücken';
+            const heading = document.createElement('h3'); heading.textContent = l10n.n('{count} matching gap', '{count} matching gaps', gaps.length, { count: gaps.length });
             const list = document.createElement('ul');
             list.className = 'adc-meeting-gap-list';
             for (const gap of gaps) {
@@ -99,11 +100,11 @@
                 const end = new Date(start.getTime() + Number(this.duration.value) * 60000);
                 const item = document.createElement('li');
                 const label = document.createElement('span');
-                label.textContent = `${start.toLocaleDateString('de-DE', { weekday: 'short', day: '2-digit', month: '2-digit' })}, ${this.time(start)}–${this.time(end)}`;
+                label.textContent = `${l10n.date(start, { weekday: 'short', day: '2-digit', month: '2-digit' })}, ${this.time(start)}–${this.time(end)}`;
                 item.append(label);
                 if (canBlockAll) {
                     const block = document.createElement('button');
-                    block.type = 'button'; block.textContent = 'Für alle blocken';
+                    block.type = 'button'; block.textContent = l10n.t('Block for everyone');
                     block.addEventListener('click', () => this.block(start, end, block));
                     item.append(block);
                 }
@@ -112,7 +113,7 @@
             const nodes = [heading, list];
             if (!canBlockAll) {
                 const note = document.createElement('p');
-                note.textContent = 'Direktes Blockieren ist nur möglich, wenn du alle ausgewählten Kalender bearbeiten darfst.';
+                note.textContent = l10n.t('Direct blocking is only possible if you may edit every selected calendar.');
                 nodes.push(note);
             }
             this.results.replaceChildren(...nodes);
@@ -120,11 +121,11 @@
 
         renderNoResults() {
             const message = document.createElement('p');
-            message.textContent = 'In dieser Kalenderwoche wurde keine passende gemeinsame Lücke gefunden.';
+            message.textContent = l10n.t('No matching common gap was found in this calendar week.');
             const actions = document.createElement('div');
             actions.className = 'adc-meeting-result-actions';
             const nextWeek = document.createElement('button');
-            nextWeek.type = 'button'; nextWeek.textContent = 'In der nächsten Woche suchen';
+            nextWeek.type = 'button'; nextWeek.textContent = l10n.t('Search in the next week');
             nextWeek.addEventListener('click', async () => {
                 const date = new Date(`${this.start}T12:00:00`); date.setDate(date.getDate() + 7);
                 this.start = CalendarDate.isoDay(date); this.renderWeek(); await this.searchWeek();
@@ -134,11 +135,11 @@
                 const employee = this.employees.find(item => item.uid === uid);
                 if (!employee) continue;
                 const remove = document.createElement('button');
-                remove.type = 'button'; remove.textContent = `${employee.displayName} abwählen`;
+                remove.type = 'button'; remove.textContent = l10n.t('Deselect {employee}', { employee: employee.displayName });
                 remove.addEventListener('click', async () => {
                     this.selected.delete(uid); this.renderPeople();
                     if (this.selected.size >= 2) await this.searchWeek();
-                    else this.results.textContent = 'Bitte mindestens zwei Personen auswählen.';
+                    else this.results.textContent = l10n.t('Please select at least two people.');
                 });
                 actions.append(remove);
             }
@@ -148,7 +149,7 @@
         async block(start, end, button) {
             const title = this.title.value.trim();
             if (!title) {
-                this.title.setCustomValidity('Bitte einen Titel für die Blockierung eingeben.');
+                this.title.setCustomValidity(l10n.t('Please enter a title for the block.'));
                 this.title.reportValidity();
                 return;
             }
@@ -156,7 +157,7 @@
             button.disabled = true;
             try {
                 await this.repository.blockMeeting(start.toISOString(), end.toISOString(), [...this.selected], title);
-                this.results.textContent = 'Der Termin wurde für alle ausgewählten Personen blockiert.';
+                this.results.textContent = l10n.t('The appointment was blocked for all selected people.');
                 await this.onBlocked();
             } catch (error) {
                 button.disabled = false;
@@ -164,7 +165,7 @@
             }
         }
 
-        time(date) { return date.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' }); }
+        time(date) { return l10n.time(date); }
     }
 
     window.AdCalendar = window.AdCalendar || {};

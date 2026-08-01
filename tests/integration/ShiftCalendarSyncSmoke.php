@@ -7,6 +7,7 @@ require dirname(__DIR__, 4) . '/lib/base.php';
 use OCA\AdCalendar\CalendarSync\ShiftCalendarPublisher;
 use OCA\AdCalendar\Repository\CalendarEntryRepository;
 use OCA\AdCalendar\Service\CalendarService;
+use OCA\AdCalendar\Service\CalendarTargetConfig;
 use OCA\AdCalendar\Service\ShiftCalendarReconciliationService;
 use OCA\AdCalendar\Service\ShiftCalendarSyncService;
 use OCA\DAV\CalDAV\CalDavBackend;
@@ -30,6 +31,7 @@ $sync = \OCP\Server::get(ShiftCalendarSyncService::class);
 $reconciliation = \OCP\Server::get(ShiftCalendarReconciliationService::class);
 $publisher = \OCP\Server::get(ShiftCalendarPublisher::class);
 $backend = \OCP\Server::get(CalDavBackend::class);
+$targets = \OCP\Server::get(CalendarTargetConfig::class);
 
 $uid = 'adc-dav-smoke-' . bin2hex(random_bytes(5));
 $user = $users->createUser($uid, bin2hex(random_bytes(24)));
@@ -41,9 +43,10 @@ $entryId = null;
 $start = new DateTimeImmutable('tomorrow 09:00:00', new DateTimeZone('UTC'));
 $end = $start->modify('+8 hours');
 
-$findCalendar = static function () use ($backend, $principal): ?array {
+$calendarName = $targets->calendarName();
+$findCalendar = static function () use ($backend, $principal, $calendarName): ?array {
     foreach ($backend->getCalendarsForUser($principal) as $candidate) {
-        if (($candidate['{DAV:}displayname'] ?? '') === ShiftCalendarPublisher::CALENDAR_NAME) return $candidate;
+        if (($candidate['{DAV:}displayname'] ?? '') === $calendarName) return $candidate;
     }
     return null;
 };
@@ -60,7 +63,7 @@ try {
     $status = $sync->status($uid);
     $assert(($status['enabled'] ?? false) === true, 'Der persönliche DAV-Abgleich ist nicht standardmäßig aktiv.');
     $createdCalendar = $findCalendar();
-    $assert($createdCalendar !== null, 'Der standardmäßig aktive private Kalender „AD Dienste“ wurde nicht angelegt.');
+    $assert($createdCalendar !== null, 'Der standardmäßig aktive private Kalender mit dem konfigurierten Namen wurde nicht angelegt.');
     $calendarId = (int)$createdCalendar['id'];
 
     $uri = 'adcalendar-shift-' . $entryId . '.ics';
