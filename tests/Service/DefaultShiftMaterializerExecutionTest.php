@@ -102,7 +102,7 @@ namespace {
     };
     $absence = new class {
         public function employeeUid(): string { return 'person-a'; }
-        public function approved(): bool { return true; }
+        public function approved(): bool { return false; }
         public function overlaps(\DateTimeImmutable $start, \DateTimeImmutable $end): bool { return $start->format('Y-m-d') === '2026-07-09'; }
     };
     $irrelevantAbsence = new class {
@@ -115,7 +115,7 @@ namespace {
     $materializer->syncWeek(new DateTimeImmutable('2026-07-06T00:00:00Z'), ['person-a', 'person-a', 'no-defaults'], [$irrelevantAbsence, $absence]);
 
     if ($entries->removed !== [3, 4] || $sync->removed !== [3, 4]) {
-        throw new RuntimeException('Deaktivierte oder durch Urlaub blockierte Standarddienste werden nicht konsistent entfernt.');
+        throw new RuntimeException('Deaktivierte oder bereits durch geplanten Urlaub blockierte Standarddienste werden nicht konsistent entfernt.');
     }
     if (count($entries->saved) !== 1 || $entries->saved[0][1] !== 'person-a'
         || $entries->saved[0][0]->defaultDate() !== '2026-07-12'

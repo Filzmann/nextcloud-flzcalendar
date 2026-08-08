@@ -21,10 +21,10 @@ final class AbsenceService {
         return $event->absences();
     }
 
-    public function assertWritable(string $employeeUid, DateTimeImmutable $start, DateTimeImmutable $end): void {
+    public function assertShiftWritable(string $employeeUid, DateTimeImmutable $start, DateTimeImmutable $end): void {
         foreach ($this->query($start, $end, [$employeeUid]) as $absence) {
-            if ($absence->approved() && $absence->overlaps($start, $end)) {
-                throw new \InvalidArgumentException('Genehmigter Urlaub (U) blockiert diesen Zeitraum.');
+            if ($absence->overlaps($start, $end)) {
+                throw new \InvalidArgumentException('Urlaub blockiert Dienste in diesem Zeitraum.');
             }
         }
     }

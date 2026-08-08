@@ -73,7 +73,9 @@ final class CalendarService {
             $payload['id'] = $id;
         }
         $entry = CalendarEntry::get($payload);
-        $this->absences->assertWritable($entry->employeeUid(), $entry->start(), $entry->end());
+        if ($entry->type() === CalendarEntry::TYPE_SHIFT) {
+            $this->absences->assertShiftWritable($entry->employeeUid(), $entry->start(), $entry->end());
+        }
         $this->assertTypeUnchanged($entry, $id);
         $this->assertShiftDoesNotOverlap($entry);
         $entry = $this->assignContainingShift($entry);

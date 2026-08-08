@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.14.0-rc.1
+
+- Präzisierte Urlaubslogik umgesetzt: geplanter und genehmigter Urlaub blockieren Dienste und Standardmaterialisierung, während Sperrtermine möglich und bearbeitbar bleiben.
+- Urlaubsmarker auf kompakte, schreibgeschützte `U?`-/`U`-Hinweise reduziert und ihre Wirkung gegen die reale AD-Urlaub-Integration geprüft.
+- Fokus-, Kontrast-, Sticky-, Scrollpositions-, Feiertags- und Eintragshöhen-Verträge für die Kalenderoberfläche nachgeschärft; den redundanten Typwähler entfernt.
+- Gemeinsamen Leitungs-/Stabsfilter von IT, Sekretariat sowie Finanzen/Lohn getrennt.
+- Direkten serverseitigen Mehrfachrollen-Deny und den administrativen Speicherweg mit selbstbereinigenden DDEV-Smokes abgesichert.
+
 ## 0.12.0-rc.11
 
 - Kopano-/CalDAV-Fehlerdiagnose mit verständlicher HTTP-405-Meldung im persönlichen Connector und einem rein lesenden administrativen Verbindungstest ergänzt.

@@ -7,7 +7,7 @@
         <input id="adc-entry-id" type="hidden">
         <div class="adc-dialog__fields">
             <label><?php p($l->t('Employee')); ?> <select id="adc-employee" required></select></label>
-            <label><?php p($l->t('Type')); ?> <select id="adc-type"><option value="shift"><?php p($l->t('Shift')); ?></option><option value="appointment"><?php p($l->t('Appointment / blocked time')); ?></option></select></label>
+            <input id="adc-type" type="hidden" value="shift">
             <label><?php p($l->t('Start')); ?> <input id="adc-start" type="datetime-local" required aria-describedby="adc-time-help"></label>
             <label><?php p($l->t('End')); ?> <input id="adc-end" type="datetime-local" required aria-describedby="adc-time-help"></label>
             <label id="adc-title-field"><span id="adc-title-label"><?php p($l->t('Title')); ?></span><input id="adc-title" maxlength="255" aria-describedby="adc-title-help"></label>

@@ -53,6 +53,10 @@ foreach (['.adc-navigation button { max-width: 100%; height: auto; white-space: 
 foreach (['.adc-calendar-tables { display: flex; overflow: hidden;', '.adc-period-matrix { display: flex; min-width: 0; overflow: hidden;', '.adc-table-wrap { flex: 1 1 auto; width: 100%; max-width: 100%; min-width: 0; height: auto; max-height: none; overflow: auto;'] as $contract) {
     if (!str_contains($css, $contract)) throw new RuntimeException("Viewport-fester horizontaler Scrollvertrag fehlt: {$contract}");
 }
+foreach (['.adc-app input:focus-visible', '.adc-app select:focus-visible', '.adc-app summary:focus-visible', 'outline: 3px solid var(--color-primary-element)', '.adc-dialog__hint {', 'background: var(--color-error)', '.adc-entry__title { display: block; overflow: visible', '.adc-calendar thead th { position: sticky; top: 0; z-index: 20', '.adc-group-heading { position: sticky; inset-inline-start: 0;'] as $contract) {
+    if (!str_contains($css, $contract)) throw new RuntimeException("Abnahmefähiger Fokus-/Kontrast-/Sticky-Vertrag fehlt: {$contract}");
+}
+if (!str_contains($template, 'id="adc-type" type="hidden"')) throw new RuntimeException('Der durch die Aktion festgelegte Eintragstyp wird weiterhin redundant ausgewählt.');
 if (!str_contains($css, 'max-height: calc(100dvh - var(--header-height, 50px))')) {
     throw new RuntimeException('Der App-Root wächst über den sichtbaren Nextcloud-Inhaltsbereich hinaus.');
 }

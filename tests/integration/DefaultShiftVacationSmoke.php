@@ -6,6 +6,7 @@ require dirname(__DIR__, 4) . '/lib/base.php';
 
 use OCA\AdCalendar\Repository\CalendarEntryRepository;
 use OCA\AdCalendar\Service\AbsenceService;
+use OCA\AdCalendar\Service\CalendarService;
 use OCA\AdCalendar\Service\CalendarPreferenceService;
 use OCA\AdCalendar\Service\DefaultShiftMaterializer;
 use OCA\AdUrlaub\Model\Vacation;
@@ -28,6 +29,7 @@ $preferences = \OCP\Server::get(CalendarPreferenceService::class);
 $materializer = \OCP\Server::get(DefaultShiftMaterializer::class);
 $entries = \OCP\Server::get(CalendarEntryRepository::class);
 $absences = \OCP\Server::get(AbsenceService::class);
+$calendar = \OCP\Server::get(CalendarService::class);
 $vacations = \OCP\Server::get(VacationService::class);
 $vacationRepository = \OCP\Server::get(VacationRepository::class);
 
@@ -40,6 +42,7 @@ $weekStart = new DateTimeImmutable('monday this week 00:00:00', $timezone);
 $weekEnd = $weekStart->modify('+7 days');
 $date = $weekStart->format('Y-m-d');
 $vacationId = null;
+$appointmentId = null;
 
 try {
     $defaults = [];
@@ -76,9 +79,22 @@ try {
     $plannedAbsences = $absences->query($weekStart, $weekEnd, [$uid]);
     $assert(count($plannedAbsences) === 1 && !$plannedAbsences[0]->approved(), 'Geplanter Urlaub wurde nicht über den Eventvertrag geliefert.');
     $materializer->syncWeek($weekStart, [$uid], $plannedAbsences);
-    $occurrence = $entries->findDefaultOccurrence($uid, $date);
-    $assert($occurrence !== null && !$occurrence->defaultDeleted(), 'Geplanter Urlaub blockiert fälschlich den Standarddienst.');
-    $entries->delete((int)$occurrence->id());
+    $assert($entries->findDefaultOccurrence($uid, $date) === null, 'Geplanter Urlaub blockiert den Standarddienst nicht.');
+    try {
+        $absences->assertShiftWritable($uid, $weekStart->setTime(8, 0), $weekStart->setTime(16, 30));
+        throw new RuntimeException('Geplanter Urlaub blockiert einen manuellen Dienst nicht.');
+    } catch (InvalidArgumentException) {
+    }
+    $appointmentId = $calendar->save([
+        'employeeUid' => $uid,
+        'start' => $weekStart->setTime(10, 0),
+        'end' => $weekStart->setTime(11, 0),
+        'type' => 'appointment',
+        'title' => 'Neutraler Sperrtermin',
+    ], null, $uid);
+    $assert($appointmentId > 0, 'Sperrtermin wurde während geplantem Urlaub blockiert.');
+    $entries->delete($appointmentId);
+    $appointmentId = null;
     $vacationRepository->delete($vacationId);
     $vacationId = null;
 
@@ -96,6 +112,7 @@ try {
 
     echo "AD Kalender/Urlaub DDEV-Integration: OK\n";
 } finally {
+    if ($appointmentId !== null) $entries->delete($appointmentId);
     $remaining = $entries->findDefaultOccurrence($uid, $date);
     if ($remaining !== null) $entries->delete((int)$remaining->id());
     if ($vacationId !== null) $vacationRepository->delete($vacationId);

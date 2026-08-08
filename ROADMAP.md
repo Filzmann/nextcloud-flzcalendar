@@ -122,6 +122,7 @@ bewusster Entscheidung ebenfalls offen.
 
 ## Aktueller Fokus
 
+- Den persönlichen Nextcloud-Kalender vom bisherigen Dienstabgleich auf eigene Dienste, Termine und Urlaube erweitern. Vor der Umsetzung ist der bounded Discovery-/Zeitraumvertrag für Urlaube über die öffentliche LocalBase-Grenze festzulegen; direkte Zugriffe auf AD-Urlaub-Daten bleiben ausgeschlossen.
 - Die manuellen Prüfungen werden im ausfüllbaren
   [`docs/manual-acceptance.md`](docs/manual-acceptance.md) dokumentiert.
 - Die deutsche und englische Kalender-/Adminoberfläche einschließlich langer

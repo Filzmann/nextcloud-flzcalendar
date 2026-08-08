@@ -12,16 +12,16 @@
         render(entries, employee, absences = [], layout = null, day = null, timeline = null) {
             const shifts = entries.filter(entry => entry.type === 'shift');
             const standalone = entries.filter(entry => entry.type === 'appointment' && entry.parentEntryId === null);
-            const approved = absences.some(absence => absence.blocks);
-            const actions = this.actions(employee.canManage && !approved);
+            const hasAbsence = absences.length > 0;
+            const actions = this.actions(employee.canManage, employee.canManage && !hasAbsence);
             const markers = this.absenceMarkers(absences);
             const gridStyle = layout ? ` style="grid-template-rows:${layout.rows}"` : '';
-            const manageable = employee.canManage && !approved;
+            const shiftManageable = employee.canManage && !hasAbsence;
             const shiftEntries = shifts
                 .map(shift => this.shift(
                     shift,
                     entries,
-                    manageable,
+                    shiftManageable,
                     this.rowStyle(layout, shift, day, timeline),
                 ))
                 .join('');
@@ -29,7 +29,7 @@
                 .map(entry => this.entry(
                     entry,
                     'blocked',
-                    manageable,
+                    employee.canManage,
                     this.rowStyle(layout, entry, day, timeline),
                 ))
                 .join('');
@@ -37,11 +37,11 @@
             return `${markers}${actions}<div class="adc-cell-entries"${gridStyle}>${shiftEntries}${blockedEntries}</div>`;
         }
 
-        actions(canManage) {
+        actions(canManage, canCreateShift) {
             const addShift = l10n.t('Create shift');
             const addAppointment = l10n.t('Create appointment');
             const buttons = canManage ? `
-                <button type="button" class="adc-quick-add adc-icon-button icon-add" data-action="add-entry" data-entry-type="shift" data-tooltip="${esc(addShift)}" aria-label="${esc(addShift)}" title="${esc(addShift)}"></button>
+                ${canCreateShift ? `<button type="button" class="adc-quick-add adc-icon-button icon-add" data-action="add-entry" data-entry-type="shift" data-tooltip="${esc(addShift)}" aria-label="${esc(addShift)}" title="${esc(addShift)}"></button>` : ''}
                 <button type="button" class="adc-quick-add adc-icon-button icon-calendar-dark" data-action="add-entry" data-entry-type="appointment" data-tooltip="${esc(addAppointment)}" aria-label="${esc(addAppointment)}" title="${esc(addAppointment)}"></button>` : '';
 
             return `<div class="adc-cell-actions" aria-label="${esc(l10n.t('Create entry'))}">${buttons}</div>`;
@@ -49,12 +49,11 @@
 
         absenceMarkers(absences) {
             return absences.map(absence => {
-                const label = absence.blocks ? l10n.t('Approved absence') : l10n.t('Planned absence');
                 const description = absence.blocks
-                    ? l10n.t('Approved absence – entries are blocked')
-                    : l10n.t('Planned absence – information without blocking');
+                    ? l10n.t('Approved absence – shifts are blocked, appointments remain possible')
+                    : l10n.t('Planned absence – shifts are blocked, appointments remain possible');
 
-                return `<div class="adc-absence adc-absence--${esc(absence.status)}" title="${esc(description)}"><strong>${esc(absence.marker)}</strong> ${esc(label)}</div>`;
+                return `<span class="adc-absence adc-absence--${esc(absence.status)}" title="${esc(description)}" aria-label="${esc(description)}">${esc(absence.marker)}</span>`;
             }).join('');
         }
 

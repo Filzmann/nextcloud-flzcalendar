@@ -37,7 +37,7 @@
                 const endIndex = points.indexOf(segment.end);
                 const indices = Array.from({ length: endIndex - startIndex }, (_, offset) => startIndex + offset);
                 const currentHeight = indices.reduce((sum, index) => sum + heights[index], 0);
-                if (currentHeight < 48 && indices.length) heights[indices[0]] += 48 - currentHeight;
+                if (currentHeight < 64 && indices.length) heights[indices[0]] += 64 - currentHeight;
             }
             return heights.map(height => `${height}px`).join(' ');
         }

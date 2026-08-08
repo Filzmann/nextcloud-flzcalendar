@@ -19,10 +19,16 @@
         setHolidays(calendars) { this.holidays.set(calendars); }
 
         render(employees, state) {
+            const previousWrap = this.container.querySelector?.('.adc-table-wrap');
+            const previousScroll = { left: previousWrap?.scrollLeft || 0, top: previousWrap?.scrollTop || 0 };
             const orderedEmployees = this.orderedEmployees(employees);
             const range = state.visibleRange();
             const days = this.daysInRange(range.start, range.end);
-            this.container.replaceChildren(this.periodMatrix(orderedEmployees, state, days));
+            const matrix = this.periodMatrix(orderedEmployees, state, days);
+            this.container.replaceChildren(matrix);
+            const wrap = matrix.children[0];
+            wrap.scrollLeft = previousScroll.left;
+            wrap.scrollTop = previousScroll.top;
         }
 
         periodMatrix(employees, state, days) {
@@ -52,6 +58,7 @@
             for (const day of days) {
                 const compact = compactDays.has(CalendarDate.isoDay(day));
                 const dayHeading = this.node('th', this.dayLabel(day, { weekday: 'short', day: '2-digit', month: '2-digit' }), this.dayClasses(day, activeMonth, compact));
+                dayHeading.title = this.holidays.name(day);
                 dayHeading.scope = 'col'; header.append(dayHeading);
             }
             head.replaceChildren(header);
@@ -89,6 +96,7 @@
                 const row = document.createElement('tr');
                 const compact = compactDays.has(CalendarDate.isoDay(day));
                 const label = this.node('th', this.dayLabel(day, { weekday: 'long', day: '2-digit', month: '2-digit' }), this.dayClasses(day, activeMonth, compact));
+                label.title = this.holidays.name(day);
                 label.scope = 'row'; row.append(label);
                 const dayEnd = new Date(day); dayEnd.setDate(dayEnd.getDate() + 1);
                 const visibleUids = new Set(employees.map(employee => employee.uid));
@@ -120,8 +128,7 @@
         }
 
         dayLabel(day, options) {
-            const label = l10n.date(day, options);
-            return [label, this.holidays.name(day)].filter(Boolean).join(' · ');
+            return l10n.date(day, options);
         }
 
         dayClasses(day, activeMonth, compact = false) {

@@ -54,7 +54,6 @@ final class DefaultShiftMaterializer {
         $occurrence = $this->factory->create($employeeUid, $date, $rule, $timezone, $existing?->id());
         foreach ($absences as $absence) {
             $blocksOccurrence = $absence->employeeUid() === $employeeUid
-                && $absence->approved()
                 && $absence->overlaps($occurrence->start(), $occurrence->end());
             if (!$blocksOccurrence) continue;
 

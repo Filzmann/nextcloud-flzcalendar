@@ -57,6 +57,7 @@ class Organization {
     static get(value) { calls.push(['organization', value]); return new Organization(value); }
     constructor(value) { this.value = value; }
     staffRoleGroups() { return this.value.staffRoleGroups || []; }
+    leadershipStaffRoleGroups() { return this.value.leadershipStaffRoleGroups || this.staffRoleGroups(); }
 }
 class CalendarState {
     static last;

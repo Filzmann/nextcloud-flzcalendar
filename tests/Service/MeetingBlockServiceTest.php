@@ -31,7 +31,7 @@ namespace OCA\AdCalendar\Service {
     class DefaultShiftMaterializer { public function syncWeek(DateTimeImmutable $start, array $uids, array $absences): void {} }
     class AbsenceService {
         public function query(DateTimeImmutable $start, DateTimeImmutable $end, array $uids): array { return []; }
-        public function assertWritable(string $uid, DateTimeImmutable $start, DateTimeImmutable $end): void {}
+        public function assertShiftWritable(string $uid, DateTimeImmutable $start, DateTimeImmutable $end): void { throw new \RuntimeException('Sperrtermine dürfen nicht durch Urlaub blockiert werden.'); }
     }
 }
 

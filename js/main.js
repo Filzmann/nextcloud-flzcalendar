@@ -100,7 +100,7 @@
     function applyOrganization(data) {
         organization = OrganizationModel.get(data);
         leadershipStaffRoles.clear();
-        for (const group of organization.staffRoleGroups()) leadershipStaffRoles.add(group);
+        for (const group of organization.leadershipStaffRoleGroups()) leadershipStaffRoles.add(group);
     }
 
     function renderTable() {
