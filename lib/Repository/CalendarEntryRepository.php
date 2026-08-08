@@ -92,9 +92,12 @@ final class CalendarEntryRepository {
     }
 
     public function save(CalendarEntry $entry, string $actorUid): int {
-        $now = new DateTimeImmutable('now', new DateTimeZone('UTC'));
+        $utc = new DateTimeZone('UTC');
+        $now = new DateTimeImmutable('now', $utc);
         $values = [
-            'employee_uid' => $entry->employeeUid(), 'start_at' => $entry->start(), 'end_at' => $entry->end(),
+            'employee_uid' => $entry->employeeUid(),
+            'start_at' => $entry->start()->setTimezone($utc),
+            'end_at' => $entry->end()->setTimezone($utc),
             'entry_type' => $entry->type(), 'title' => $entry->title(), 'parent_entry_id' => $entry->parentEntryId(),
             'meeting_uid' => $entry->meetingUid(), 'default_date' => $entry->defaultDate(), 'default_modified' => $entry->defaultModified(),
             'series_uid' => $entry->seriesUid(), 'series_timezone' => $entry->seriesTimezone(),
@@ -292,9 +295,12 @@ final class CalendarEntryRepository {
     }
 
     private function mapRow(array $row): array {
+        $utc = new DateTimeZone('UTC');
         return [
-            'id' => (int)$row['id'], 'employeeUid' => $row['employee_uid'], 'start' => (string)$row['start_at'],
-            'end' => (string)$row['end_at'], 'type' => $row['entry_type'], 'title' => $row['title'],
+            'id' => (int)$row['id'], 'employeeUid' => $row['employee_uid'],
+            'start' => new DateTimeImmutable((string)$row['start_at'], $utc),
+            'end' => new DateTimeImmutable((string)$row['end_at'], $utc),
+            'type' => $row['entry_type'], 'title' => $row['title'],
             'parentEntryId' => $row['parent_entry_id'] === null ? null : (int)$row['parent_entry_id'],
             'meetingUid' => $row['meeting_uid'] === null ? null : (string)$row['meeting_uid'],
             'seriesUid' => $row['series_uid'] === null ? null : (string)$row['series_uid'],

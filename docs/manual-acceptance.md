@@ -206,3 +206,20 @@ konfigurierte Eigennamen dürfen sich nicht ändern.
 | Gesamtentscheidung | [ ] abgenommen [ ] mit Auflagen abgenommen [x] nicht abgenommen |
 | Begründung der Gesamtentscheidung | Mehrere fachliche, administrative und barrierefreiheitsrelevante Fehler bestehen fort. Insbesondere funktionieren administratives Speichern/Testen, Opt-out-Bereinigung, die präzisierte Urlaubslogik, Urlaubssynchronisation und Tastaturfokus nicht vollständig. 25 weitere Fälle blieben wegen fehlender Testkonten, Provider, blockierender Vorfehler oder niedriger Priorität ungeprüft. |
 | Name / Datum | Simon / 02.08.2026 |
+
+## Automatisierter Nachweis nach der historischen Abnahme
+
+Die vorstehenden Markierungen und die Gesamtentscheidung bleiben als Ergebnis
+des manuellen Laufs vom 02.08.2026 unverändert. Für `0.14.0-rc.1` und
+`0.14.0-rc.2` wurden die technischen Korrekturen zu P-01, P-03, P-05 bis P-14
+und P-17 durch PHP-/JavaScript-, Layout-, API-, Berechtigungs- und reale
+DDEV-Smokes nachgewiesen. Der DDEV-Integrationslauf prüft zusätzlich
+Terminserien über eine Sommerzeitgrenze, Standarddienst-/Urlaubskonflikte und
+die DAV-Dienstsynchronisierung gegen eine echte Nextcloud-34-Installation.
+
+Dieser automatisierte Nachweis ersetzt keine erneute visuelle und fachliche
+Abnahme. P-04 bleibt ein RC-Blocker: Für die geforderte Synchronisierung
+eigener Urlaube in den persönlichen Nextcloud-Kalender fehlt weiterhin ein
+ausdrücklich freigegebener öffentlicher Abwesenheitsvertrag. Ebenfalls offen
+bleiben die manuellen beziehungsweise extern abhängigen Nachprüfungen P-02,
+P-15, P-16 und P-18 bis P-20.

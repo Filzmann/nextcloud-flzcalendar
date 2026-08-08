@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.14.0-rc.2
+
+- Kalenderzeiten beim Schreiben und Lesen explizit als UTC behandelt, damit reale Datenbankzugriffe die lokale Uhrzeit von Terminserien über Sommerzeitgrenzen hinweg stabil halten.
+- Bereits gespeicherte Serienvorkommen anhand ihrer Serienzeitzone einmalig und DST-sicher nach UTC korrigiert; ungültige Bestandszeilen werden sichtbar gemeldet und isoliert übersprungen.
+- Reale DDEV-Smokes für Terminserien, Urlaubsregeln und DAV-Dienstsynchronisierung in einem app-lokalen Integrationslauf gebündelt.
+
 ## 0.14.0-rc.1
 
 - Präzisierte Urlaubslogik umgesetzt: geplanter und genehmigter Urlaub blockieren Dienste und Standardmaterialisierung, während Sperrtermine möglich und bearbeitbar bleiben.

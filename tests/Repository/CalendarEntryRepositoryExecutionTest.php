@@ -124,7 +124,7 @@ namespace {
     if ($repository->findSeries('series-a')[0]->seriesUid() !== 'series-a') throw new RuntimeException('Serienbestand wird nicht gelesen.');
 
     $newShift = CalendarEntry::get([
-        'employeeUid' => 'person-a', 'start' => '2026-07-07T08:00:00Z', 'end' => '2026-07-07T16:00:00Z',
+        'employeeUid' => 'person-a', 'start' => '2026-07-07T09:00:00+02:00', 'end' => '2026-07-07T17:00:00+02:00',
         'type' => 'shift', 'defaultDate' => '2026-07-07',
     ]);
     if ($repository->save($newShift, 'planner') !== 501) throw new RuntimeException('Insert liefert nicht die neue Datenbank-ID.');
@@ -132,6 +132,10 @@ namespace {
     if (!in_array(['insert', ['adc_entries']], $insertCalls, true)
         || !array_filter($insertCalls, static fn(array $call): bool => $call[0] === 'setValue' && $call[1][0] === 'created_by_uid')) {
         throw new RuntimeException('Insert bindet Auditfelder nicht explizit.');
+    }
+    $startBinding = array_values(array_filter($insertCalls, static fn(array $call): bool => $call[0] === 'setValue' && $call[1][0] === 'start_at'))[0][1][1]['value'] ?? null;
+    if (!$startBinding instanceof DateTimeImmutable || $startBinding->getTimezone()->getName() !== 'UTC' || $startBinding->format('H:i') !== '07:00') {
+        throw new RuntimeException('Kalenderzeiten werden nicht vor der Datenbankbindung nach UTC normalisiert.');
     }
     $persistedShift = CalendarEntry::get(array_replace($newShift->toArray(), ['id' => 42]));
     if ($repository->save($persistedShift, 'planner') !== 42) throw new RuntimeException('Update verliert die vorhandene ID.');
