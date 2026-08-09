@@ -135,9 +135,9 @@ geprüft – planmäßig verschoben“ markiert.
 
 ## I. Lokalisierung
 
-Diese Prüfungen werden bis zur ausdrücklich gestarteten manuellen
-L10N-Abnahme als „nicht geprüft – planmäßig verschoben“ markiert. Für den
-Sprachwechsel nur neutrale Testdaten verwenden; technische IDs und
+Diese Prüfungen werden bis zur ausdrücklich gestarteten manuellen L10N-Abnahme
+als „nicht geprüft – nicht freigegeben und planmäßig verschoben“ markiert. Für
+den Sprachwechsel nur neutrale Testdaten verwenden; technische IDs und
 konfigurierte Eigennamen dürfen sich nicht ändern.
 
 | ID | Was wird geprüft? | Auszuführende Schritte | Erwartetes Ergebnis | Ergebnis | Warum/Beleg/Abweichung |
@@ -185,7 +185,7 @@ konfigurierte Eigennamen dürfen sich nicht ändern.
 | P-17 | C4 | Serverseitige Rechteprüfung durch direkten API-/Manipulationsversuch nachprüfen; reine UI-Ausblendung genügt nicht. |
 | P-18 | F1–F6, G5, G7–G9 | Neutrale externe Kopano-/CalDAV-Testprovider bereitstellen oder diese Funktionen bewusst aus dem aktuellen Freigabeumfang nehmen. Danach Export, Rückimportschutz, Trennung, parallele Fehlerisolation und Bestandsumbenennung prüfen. |
 | P-19 | E7 | Aggregierten Hintergrundstatus mit Erfolg und absichtlichem Teilfehler sowie Nichtadmin-Schutz nachprüfen. |
-| P-20 | H1, H2, I3–I6 | Niedrig priorisierte Provider- und Lokalisierungsprüfungen in einem späteren Abnahmelauf nachholen oder ausdrücklich aus dem Releaseumfang ausnehmen. |
+| P-20 | H1, H2, I3–I6 | Providerprüfungen in einem späteren Abnahmelauf nachholen oder ausdrücklich aus dem Releaseumfang ausnehmen; Lokalisierungsprüfungen erst nach separater Freigabe der L10N-Zukunftsplanung aufnehmen. |
 
 ### Präzisierte fachliche Sollvorgaben
 

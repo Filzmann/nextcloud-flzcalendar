@@ -48,13 +48,14 @@ folgt mit `docs/manual-acceptance.md`
   interne und externe Bestandsumbenennung, fremder Kalender sowie
   isolierter Providerfehler mit erfolgreichem Wiederholungsversuch.
 
-## Freigegebene Umsetzungsaufgaben
+## Dokumentierter L10n-Ist-Stand und nicht freigegebene Restarbeit
 
 ### ADC-L10N – AD Kalender vollständig lokalisieren
 
-Status: automatische Umsetzung am 31. Juli 2026 abgeschlossen; manuelle
-Browserabnahme offen. Die manuelle Abnahme von ADC-ADMIN-DEFAULTS bleibt nach
-bewusster Entscheidung ebenfalls offen.
+Status: automatische Umsetzung am 31. Juli 2026 abgeschlossen; jede weitere
+L10n-Arbeit einschließlich der offenen manuellen Browserabnahme ist später
+und nicht freigegeben. Die manuelle Abnahme von ADC-ADMIN-DEFAULTS bleibt
+davon getrennt nach bewusster Entscheidung offen.
 
 - Feste `de-DE`-Formatierung, Wochentagslisten sowie sichtbare UI-, Admin-,
   Provider- und Fehlermeldungen auf aktive Nextcloud-Locale und
@@ -95,6 +96,10 @@ bewusster Entscheidung ebenfalls offen.
 - Der Rohtext- und Katalogcheck ist nach vollständiger Migration verbindlich.
   Offen bleibt die bewusst verschobene Sichtprüfung in realen deutschen und
   englischen Nextcloud-Sitzungen.
+- Spätere, nicht freigegebene Restarbeit: die deutsche und englische
+  Kalender-/Adminoberfläche einschließlich langer Beschriftungen, Pluralen
+  und veröffentlichter DAV-/Google-Ereignistexte anhand des Abnahmeformulars
+  prüfen.
 
 ## Sicherheits- und Test-Gate für die nächsten Umsetzungen
 
@@ -125,9 +130,6 @@ bewusster Entscheidung ebenfalls offen.
 - Den persönlichen Nextcloud-Kalender vom bisherigen Dienstabgleich auf eigene Dienste, Termine und Urlaube erweitern. Vor der Umsetzung ist der bounded Discovery-/Zeitraumvertrag für Urlaube über die öffentliche LocalBase-Grenze festzulegen; direkte Zugriffe auf AD-Urlaub-Daten bleiben ausgeschlossen.
 - Die manuellen Prüfungen werden im ausfüllbaren
   [`docs/manual-acceptance.md`](docs/manual-acceptance.md) dokumentiert.
-- Die deutsche und englische Kalender-/Adminoberfläche einschließlich langer
-  Beschriftungen, Pluralen und veröffentlichter DAV-/Google-Ereignistexte
-  anhand des Abnahmeformulars prüfen.
 - Wochen- und Monatsplanung, Meeting-Lückensuche, persönliche Standards und optionale Urlaubsmarkierungen auf einem realitätsnahen Staging fachlich abnehmen.
 - Rollen-, Bereichs- und Personenfilter einschließlich bereichsübergreifender Leitungen in der sichtbaren Oberfläche prüfen.
 - Die ergänzten globalen Gruppen Stv. PDL, Büroorganisation Pflege, Fahrzeugverwaltung und Empfang mit ihrer Backend-Reihenfolge und Hierarchie im Kalender abnehmen.
