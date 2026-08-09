@@ -127,21 +127,42 @@ davon getrennt nach bewusster Entscheidung offen.
 
 ## Aktueller Fokus
 
-- Den persönlichen Nextcloud-Kalender vom bisherigen Dienstabgleich auf eigene Dienste, Termine und Urlaube erweitern. Vor der Umsetzung ist der bounded Discovery-/Zeitraumvertrag für Urlaube über die öffentliche LocalBase-Grenze festzulegen; direkte Zugriffe auf AD-Urlaub-Daten bleiben ausgeschlossen.
+- Der aktuelle Fokus bleibt auf Fehlerbehebung, Stabilisierung und dem
+  verbindlichen bestehenden Funktionsumfang. Neue Funktionen bleiben
+  zurückgestellt.
 - Die manuellen Prüfungen werden im ausfüllbaren
   [`docs/manual-acceptance.md`](docs/manual-acceptance.md) dokumentiert.
 - Wochen- und Monatsplanung, Meeting-Lückensuche, persönliche Standards und optionale Urlaubsmarkierungen auf einem realitätsnahen Staging fachlich abnehmen.
 - Rollen-, Bereichs- und Personenfilter einschließlich bereichsübergreifender Leitungen in der sichtbaren Oberfläche prüfen.
 - Die ergänzten globalen Gruppen Stv. PDL, Büroorganisation Pflege, Fahrzeugverwaltung und Empfang mit ihrer Backend-Reihenfolge und Hierarchie im Kalender abnehmen.
-- Den einseitigen Abgleich persönlicher Dienste in den privaten Nextcloud-Kalender mit dem konfigurierten Zielnamen fachlich abnehmen.
-- Persönliche Kopano- und manuelle CalDAV-Verbindungen mit realen Testkonten auf Staging fachlich abnehmen.
-- Administrative Kopano-/CalDAV-Vorgabe und Zielkalendername einschließlich interner und externer Bestandsumbenennung mit Abschnitt G des Abnahmeformulars prüfen.
+- Den einseitigen Abgleich eigener Dienste, Termine und bounded gelesener Urlaube in den privaten Nextcloud-Kalender mit dem konfigurierten Zielnamen fachlich abnehmen.
+- Den administrativen Zielkalendernamen einschließlich interner
+  Bestandsumbenennung mit Abschnitt G des Abnahmeformulars prüfen.
 - Die aggregierte Adminanzeige des letzten Hintergrundabgleichs für Erfolg und
   Teilfehler prüfen; sie darf keine Konten, Kalender, Provider, URLs oder
   Fehlerdetails offenlegen.
-- Die fachliche Abnahme der Google- und Apple-Verbindungen ist auf Mitte bis Ende August 2026 verschoben.
 
 ## Geplante Erweiterungen
+
+### Externe Kalenderprovider – für spätere Erweiterungsphase vorgemerkt
+
+Status: durch Produktentscheidung vom 9. August 2026 aus dem aktuellen
+Grundumfang und Freigabenachweis zurückgestellt. Der vorhandene Code für
+Kopano/CalDAV, Google, Apple und manuelle CalDAV-Verbindungen bleibt bestehen,
+erhält im aktuellen Stabilisierungslauf aber keine reale Providerfreigabe.
+
+- Wiederaufnahme nur nach ausdrücklicher Öffnung dieses Scopes.
+- Vor einer Freigabe neutrale reale Testprovider beziehungsweise Testkonten
+  bereitstellen; keine produktiven Zugangsdaten für Entwicklung oder Abnahme
+  verwenden.
+- Kopano/manuelles CalDAV: Export, Aktualisierung, Löschung, Trennung,
+  Rückimportschutz, parallele Fehlerisolation, Fremdkalenderschutz und
+  Bestandsumbenennung prüfen.
+- Google und Apple: Autorisierung, begrenzte Berechtigungen, Secret-Schutz und
+  denselben einseitigen Dienstexportvertrag prüfen.
+- Providerabhängige Lokalisierungs- und Sprachwechselprüfungen folgen in
+  diesem späteren Lauf. Der bereits geprüfte lokale Sprachvertrag bleibt Teil
+  des Grundumfangs.
 
 - Die aggregierte Anzeige des letzten Hintergrundlaufs ist umgesetzt. Eine
   Historie, Benachrichtigung oder längere Aufbewahrung wird erst bei konkretem

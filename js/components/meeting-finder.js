@@ -23,6 +23,7 @@
             this.employees = [];
             this.selected = new Set();
             this.start = '';
+            this.returnFocus = null;
             document.getElementById('adc-meeting-close').addEventListener('click', () => this.close());
             document.getElementById('adc-meeting-cancel').addEventListener('click', () => this.close());
             this.dialog.addEventListener('cancel', event => { event.preventDefault(); this.close(); });
@@ -31,6 +32,7 @@
         }
 
         open(start, employees, selected = []) {
+            this.returnFocus = document.activeElement;
             this.start = start;
             this.employees = employees;
             this.search.value = '';
@@ -42,7 +44,12 @@
             this.search.focus();
         }
 
-        close() { this.dialog.close(); }
+        close() {
+            this.dialog.close();
+            const returnFocus = this.returnFocus;
+            this.returnFocus = null;
+            if (returnFocus?.isConnected !== false && typeof returnFocus?.focus === 'function') returnFocus.focus();
+        }
 
         renderWeek() {
             this.week.textContent = l10n.t('Calendar week from {date}', { date: l10n.date(new Date(`${this.start}T12:00:00`)) });

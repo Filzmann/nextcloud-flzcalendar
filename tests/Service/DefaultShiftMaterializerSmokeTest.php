@@ -2,8 +2,6 @@
 
 declare(strict_types=1);
 
-require_once __DIR__ . '/../../lib/Model/CalendarEntry.php';
-require_once __DIR__ . '/../../lib/Service/DefaultShiftOccurrenceFactory.php';
 
 use OCA\AdCalendar\Service\DefaultShiftOccurrenceFactory;
 

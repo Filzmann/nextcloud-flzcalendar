@@ -20,7 +20,6 @@ namespace OCP {
     interface IDBConnection { public function getQueryBuilder(); }
 }
 namespace {
-    require_once __DIR__ . '/../../lib/Migration/Version000008Date202608080001.php';
 
     use OCA\AdCalendar\Migration\Version000008Date202608080001;
     use OCP\IDBConnection;

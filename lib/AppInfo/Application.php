@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace OCA\AdCalendar\AppInfo;
 
 use OCA\AdCalendar\CalendarSync\NextcloudDavShiftCalendarPublisher;
+use OCA\AdCalendar\CalendarSync\PersonalCalendarPublisher;
 use OCA\AdCalendar\CalendarSync\ShiftCalendarPublisher;
 use OCA\AdCalendar\Listener\IntegrationCapabilityQueryListener;
 use OCA\AdCalendar\Listener\ScheduleConflictQueryListener;
@@ -26,6 +27,7 @@ class Application extends App implements IBootstrap {
     }
     public function register(IRegistrationContext $context): void {
         $context->registerServiceAlias(ShiftCalendarPublisher::class, NextcloudDavShiftCalendarPublisher::class);
+        $context->registerServiceAlias(PersonalCalendarPublisher::class, NextcloudDavShiftCalendarPublisher::class);
         $context->registerEventListener(ScheduleConflictQueryEvent::class, ScheduleConflictQueryListener::class);
         $context->registerEventListener(IntegrationCapabilityQueryEvent::class, IntegrationCapabilityQueryListener::class);
         $context->registerEventListener(LoadAdditionalEntriesEvent::class, StandaloneNavigationListener::class);

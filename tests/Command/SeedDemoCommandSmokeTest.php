@@ -2,9 +2,6 @@
 
 declare(strict_types=1);
 
-require_once __DIR__ . '/../../../localbase/lib/Organization/AdOrganizationDefinition.php';
-require_once __DIR__ . '/../../../localbase/lib/Service/AdDemoFixtureCatalog.php';
-require_once __DIR__ . '/../../lib/Service/DemoFixtureCatalog.php';
 
 use OCA\AdCalendar\Service\DemoFixtureCatalog;
 use OCA\LocalBase\Organization\AdOrganizationDefinition;

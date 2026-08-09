@@ -32,8 +32,6 @@ namespace OCA\AdCalendar\Service {
 }
 
 namespace {
-    require_once __DIR__ . '/../../lib/Http/LocalizedErrorResponseFactory.php';
-    require_once __DIR__ . '/../../lib/Controller/CalendarDefaultsAdminController.php';
 
     use OCA\AdCalendar\Controller\CalendarDefaultsAdminController;
     use OCA\AdCalendar\Http\LocalizedErrorResponseFactory;

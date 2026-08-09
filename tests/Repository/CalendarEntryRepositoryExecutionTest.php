@@ -22,8 +22,6 @@ namespace OCP {
 }
 
 namespace {
-    require_once __DIR__ . '/../../lib/Model/CalendarEntry.php';
-    require_once __DIR__ . '/../../lib/Repository/CalendarEntryRepository.php';
 
     use OCA\AdCalendar\Model\CalendarEntry;
     use OCA\AdCalendar\Repository\CalendarEntryRepository;
@@ -115,8 +113,14 @@ namespace {
     if ($repository->findDefaultOccurrence('person-a', '2026-07-06')?->defaultDate() !== '2026-07-06') throw new RuntimeException('Standardvorkommen wird nicht gefunden.');
     $db->queue(new FakeResult(rows: [$row(7)]));
     if (array_column(array_map(static fn(CalendarEntry $entry): array => $entry->toArray(), $repository->findShiftsForEmployee('person-a')), 'id') !== [7]) throw new RuntimeException('Dienstbestand einer Person wird nicht gelesen.');
+    $db->queue(new FakeResult(rows: [$row(7), $row(8, 'appointment')]));
+    if (array_map(static fn(CalendarEntry $entry): string => $entry->type(), $repository->findEntriesForEmployee('person-a')) !== ['shift', 'appointment']) {
+        throw new RuntimeException('Der vollständige persönliche Bestand enthält nicht Dienste und Termine.');
+    }
     $db->queue(new FakeResult(column: ['person-b', 'person-a', 'person-a']));
     if ($repository->findEmployeeUidsWithShifts() !== ['person-b', 'person-a']) throw new RuntimeException('Dienstkonten werden nicht typisiert und dedupliziert.');
+    $db->queue(new FakeResult(column: ['person-c', 'person-a', 'person-c']));
+    if ($repository->findEmployeeUidsWithEntries() !== ['person-c', 'person-a']) throw new RuntimeException('Konten mit eigenen Terminen fehlen im persönlichen Abgleich.');
     $meetingRow = array_replace($row(8, 'appointment'), ['meeting_uid' => 'meeting-a', 'series_uid' => null, 'series_timezone' => null]);
     $db->queue(new FakeResult(rows: [$meetingRow]));
     if ($repository->findMeeting('meeting-a')[0]->meetingUid() !== 'meeting-a') throw new RuntimeException('Meetingbestand wird nicht gelesen.');

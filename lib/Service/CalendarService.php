@@ -82,10 +82,10 @@ final class CalendarService {
         $savedId = $this->entries->save($entry, $actorUid);
         $this->detachChildrenOutsideShift($entry, $savedId);
         $saved = CalendarEntry::get(array_replace($entry->toArray(), ['id' => $savedId]));
-        if ($previous?->type() === CalendarEntry::TYPE_SHIFT && $previous->employeeUid() !== $saved->employeeUid()) {
+        if ($previous !== null && $previous->employeeUid() !== $saved->employeeUid()) {
             $this->shiftSync->remove($previous);
         }
-        if ($saved->type() === CalendarEntry::TYPE_SHIFT) $this->shiftSync->publish($saved);
+        $this->shiftSync->publish($saved);
         return $savedId;
     }
 
@@ -107,6 +107,7 @@ final class CalendarService {
         $children = $entry->type() === CalendarEntry::TYPE_SHIFT ? $this->entries->children($id) : [];
         if ($entry->type() !== CalendarEntry::TYPE_SHIFT) {
             $this->entries->delete($id);
+            $this->shiftSync->remove($entry);
             return;
         }
         if ($children !== [] && !in_array($childMode, ['delete', 'detach'], true)) {
@@ -116,10 +117,12 @@ final class CalendarService {
         if ($entry->defaultDate() !== null) {
             $this->entries->deleteDefaultShift($id, $childMode);
             $this->shiftSync->remove($entry);
+            if ($childMode === 'delete') foreach ($children as $child) $this->shiftSync->remove($child);
             return;
         }
         $this->entries->deleteShift($id, $childMode);
         $this->shiftSync->remove($entry);
+        if ($childMode === 'delete') foreach ($children as $child) $this->shiftSync->remove($child);
     }
 
     private function serializeEntry(CalendarEntry $entry): array {

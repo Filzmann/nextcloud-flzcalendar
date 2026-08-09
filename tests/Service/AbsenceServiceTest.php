@@ -12,11 +12,9 @@ namespace OCP\EventDispatcher {
 }
 
 namespace {
-    require_once __DIR__ . '/../../../localbase/lib/Calendar/AbsenceInterval.php';
-    require_once __DIR__ . '/../../../localbase/lib/Calendar/AbsenceQueryEvent.php';
-    require_once __DIR__ . '/../../lib/Service/AbsenceService.php';
 
     use OCA\AdCalendar\Service\AbsenceService;
+    use OCA\LocalBase\Calendar\AbsenceEmployeeDiscoveryEvent;
     use OCA\LocalBase\Calendar\AbsenceInterval;
     use OCA\LocalBase\Calendar\AbsenceQueryEvent;
     use OCP\EventDispatcher\Event;
@@ -24,6 +22,10 @@ namespace {
 
     $events = new class implements IEventDispatcher {
         public function dispatchTyped(Event $event): Event {
+            if ($event instanceof AbsenceEmployeeDiscoveryEvent) {
+                $event->provide(['vacation-only', 'planned-person']);
+                return $event;
+            }
             if (!$event instanceof AbsenceQueryEvent) return $event;
             $status = $event->employeeUids()[0] === 'planned-person'
                 ? AbsenceInterval::STATUS_PLANNED
@@ -40,6 +42,10 @@ namespace {
     $service = new AbsenceService($events);
     $start = new DateTimeImmutable('2026-08-10T08:00:00Z');
     $end = new DateTimeImmutable('2026-08-10T16:00:00Z');
+
+    if ($service->discover($start, $end) !== ['planned-person', 'vacation-only']) {
+        throw new RuntimeException('Die Abwesenheits-Discovery wird nicht über den öffentlichen Vertrag dispatcht.');
+    }
 
     foreach (['planned-person', 'approved-person'] as $uid) {
         try {

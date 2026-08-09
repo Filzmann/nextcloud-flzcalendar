@@ -36,10 +36,6 @@ namespace OCA\AdCalendar\Service {
 }
 
 namespace {
-    require_once __DIR__ . '/../../lib/Model/CalendarEntry.php';
-    require_once __DIR__ . '/../../lib/Exception/MeetingSlotUnavailableException.php';
-    require_once __DIR__ . '/../../lib/Service/MeetingAvailabilityService.php';
-    require_once __DIR__ . '/../../lib/Service/MeetingService.php';
 
     use OCA\AdCalendar\Exception\MeetingSlotUnavailableException;
     use OCA\AdCalendar\Model\CalendarEntry;

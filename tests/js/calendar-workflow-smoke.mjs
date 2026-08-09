@@ -61,7 +61,7 @@ for (const contract of [
 ]) {
     if (!source.includes(contract)) throw new Error(`Frontend-Vertrag fehlt: ${contract}`);
 }
-for (const contract of ['class EntryWorkflow', "['delete', l10n.t('Delete shift and appointments')]", "['detach', l10n.t('Delete only the shift; keep appointments as blocked times')]", "dialog.addEventListener('cancel'", 'this.dialog.open({ employee', 'this.repository.updateMeeting(existing.meetingUid', 'this.repository.removeMeeting(entry.meetingUid)', 'existing?.seriesUid', "['occurrence', l10n.t('Only this occurrence')]", "['series', l10n.t('Entire series')]", 'if (!employee?.canManage) return;', 'this.show(error, true)']) {
+for (const contract of ['class EntryWorkflow', "['delete', l10n.t('Delete shift and appointments')]", "['detach', l10n.t('Delete only the shift; keep appointments as blocked times')]", "dialog.addEventListener('cancel'", 'document.activeElement', 'returnFocus.focus()', 'this.dialog.open({ employee', 'this.repository.updateMeeting(existing.meetingUid', 'this.repository.removeMeeting(entry.meetingUid)', 'existing?.seriesUid', "['occurrence', l10n.t('Only this occurrence')]", "['series', l10n.t('Entire series')]", 'if (!employee?.canManage) return;', 'this.show(error, true)']) {
     if (!entryWorkflow.includes(contract)) throw new Error(`Eintragsworkflow-Vertrag fehlt: ${contract}`);
 }
 const workflowContext = { window: { confirm: () => true }, document: {}, Element: class {}, Date, Number, Promise };
@@ -327,7 +327,7 @@ for (const contract of ['class CalendarCell', 'adc-cell-actions', 'adc-entry__ch
 for (const contract of ['const previousWrap = this.container.querySelector', 'previousWrap?.scrollLeft', 'wrap.scrollLeft = previousScroll.left', 'wrap.scrollTop = previousScroll.top']) {
     if (!weekTable.includes(contract)) throw new Error(`Scrollpositionsvertrag fehlt: ${contract}`);
 }
-for (const contract of ['class MeetingFinder', 'this.selected = new Set(selected)', 'employeeUids.length < 2', 'this.repository.meetingGaps', 'renderResults(gaps, canBlockAll)', "l10n.t('Search in the next week')", "l10n.t('Deselect {employee}'", 'this.repository.blockMeeting', 'Number(this.duration.value)']) {
+for (const contract of ['class MeetingFinder', 'this.returnFocus', 'this.selected = new Set(selected)', 'employeeUids.length < 2', 'this.repository.meetingGaps', 'renderResults(gaps, canBlockAll)', "l10n.t('Search in the next week')", "l10n.t('Deselect {employee}'", 'this.repository.blockMeeting', 'Number(this.duration.value)']) {
     if (!meetingFinder.includes(contract)) throw new Error(`Meeting-Finder-Vertrag fehlt: ${contract}`);
 }
 for (const contract of ['class ShiftDefaults', 'Array.from({ length: 7 }', 'data-field="enabled"', 'this.onSave(this.collect())']) {
@@ -336,7 +336,7 @@ for (const contract of ['class ShiftDefaults', 'Array.from({ length: 7 }', 'data
 for (const contract of ['class ShiftCalendarSync', 'this.onSave(this.input.checked)', 'status.calendarName', "l10n.t('Calendar is active: {calendar}.'"]) {
     if (!shiftCalendarSync.includes(contract)) throw new Error(`Dienstkalender-Komponentenvertrag fehlt: ${contract}`);
 }
-for (const contract of ['class ExternalCalendars', "provider === 'google'", 'window.location.assign(response.authorizationUrl)', 'this.dialog.showModal()', 'this.repository.connectCalDav', 'this.repository.disconnectExternalCalendar', 'window.confirm(', 'this.password.value = \'\'', 'https://mail.adberlin.org', 'the Kopano provider must allow CalDAV']) {
+for (const contract of ['class ExternalCalendars', 'this.returnFocus', "provider === 'google'", 'window.location.assign(response.authorizationUrl)', 'this.dialog.showModal()', 'this.repository.connectCalDav', 'this.repository.disconnectExternalCalendar', 'window.confirm(', 'this.password.value = \'\'', 'https://mail.adberlin.org', 'the Kopano provider must allow CalDAV']) {
     if (!externalCalendars.includes(contract)) throw new Error(`Externe-Kalender-Komponentenvertrag fehlt: ${contract}`);
 }
 const externalElements = {};
@@ -388,7 +388,7 @@ const syncComponent = new syncContext.window.AdCalendar.components.ShiftCalendar
 syncComponent.set({ enabled: true, calendarName: 'AD Dienste' });
 await syncForm.listener({ preventDefault() {} });
 if (!syncInput.checked || !syncStatus.textContent.includes('AD Dienste') || savedSync !== true) throw new Error('Persönliche Kalenderaktivierung ist nicht tastaturbedienbar oder zeigt ihren Zustand nicht an.');
-for (const contract of ['class EntryDialog', 'this.dialog.showModal()', 'this.updateType()', 'this.updateRecurrence()', 'recurrenceFrequency:', 'recurrenceWeekdays:', 'recurrenceTimezone: this.timezone()', "typeof configured === 'string'", 'this.nextFreeShift', 'setCustomValidity(message)', 'Boolean(entry?.meetingUid)', "entry.type === 'shift'", 'start < new Date(entry.end)', 'end > new Date(entry.start)']) {
+for (const contract of ['class EntryDialog', 'this.returnFocus', 'this.dialog.showModal()', 'this.updateType()', 'this.updateRecurrence()', 'recurrenceFrequency:', 'recurrenceWeekdays:', 'recurrenceTimezone: this.timezone()', "typeof configured === 'string'", 'this.nextFreeShift', 'setCustomValidity(message)', 'Boolean(entry?.meetingUid)', "entry.type === 'shift'", 'start < new Date(entry.end)', 'end > new Date(entry.start)']) {
     if (!entryDialog.includes(contract)) throw new Error(`Eintragsdialog-Vertrag fehlt: ${contract}`);
 }
 
@@ -474,7 +474,23 @@ const CalendarState = stateContext.window.AdCalendar.modules.CalendarState;
 const CalendarDate = stateContext.window.AdCalendar.modules.CalendarDate;
 const julyRange = CalendarDate.monthRange(new Date(2026, 6, 1));
 if (CalendarDate.isoDay(julyRange.start) !== '2026-06-29' || CalendarDate.isoDay(julyRange.end) !== '2026-08-03' || julyRange.weeks.length !== 5) {
-    throw new Error('Der sichtbare Monatsbereich umfasst nicht alle angefangenen Kalenderwochen.');
+    throw new Error('Der sichtbare Monatsbereich behält vorhandene Randtage innerhalb der Drei-Tage-Grenze bei.');
+}
+const augustRange = CalendarDate.monthRange(new Date(2026, 7, 1));
+if (CalendarDate.isoDay(augustRange.start) !== '2026-07-29' || CalendarDate.isoDay(augustRange.end) !== '2026-09-04') {
+    throw new Error('Der sichtbare Monatsbereich begrenzt Randtage nicht auf höchstens drei Tage je Monatsgrenze.');
+}
+for (let month = 0; month < 12; month += 1) {
+    const selectedMonth = new Date(2026, month, 1);
+    const range = CalendarDate.monthRange(selectedMonth);
+    const monthStart = CalendarDate.startOfMonth(selectedMonth);
+    const afterMonth = new Date(monthStart);
+    afterMonth.setMonth(afterMonth.getMonth() + 1);
+    const leadingDays = Math.round((monthStart - range.start) / 86400000);
+    const trailingDays = Math.round((range.end - afterMonth) / 86400000);
+    if (leadingDays < 0 || leadingDays > 3 || trailingDays < 0 || trailingDays > 3) {
+        throw new Error('Ein Monatsanfang oder Monatsende überschreitet die Randtage-Grenze.');
+    }
 }
 const monthHistoryCalls = [];
 const monthState = new CalendarState(new Set(), { search: '?period=month&month=2026-07', pathname: '/apps/adcalendar/' }, { replaceState: (...args) => monthHistoryCalls.push(args) }).restore();

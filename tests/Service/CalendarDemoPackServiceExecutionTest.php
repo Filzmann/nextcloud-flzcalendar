@@ -40,8 +40,6 @@ namespace OCA\AdCalendar\Service {
 }
 
 namespace {
-    require_once __DIR__ . '/../../lib/Model/CalendarEntry.php';
-    require_once __DIR__ . '/../../lib/Service/CalendarDemoPackService.php';
 
     use OCA\AdCalendar\Repository\CalendarEntryRepository;
     use OCA\AdCalendar\Service\CalendarDemoPackService;

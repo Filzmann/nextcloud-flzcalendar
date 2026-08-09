@@ -10,9 +10,6 @@ namespace OCA\AdCalendar\CalendarSync {
 }
 
 namespace {
-    require_once __DIR__ . '/../../lib/Model/CalendarEntry.php';
-    require_once __DIR__ . '/../../lib/CalendarSync/ShiftCalendarPublisher.php';
-    require_once __DIR__ . '/../../lib/CalendarSync/ExternalShiftCalendarPublisher.php';
 
     use OCA\AdCalendar\CalendarSync\CalDavClient;
     use OCA\AdCalendar\CalendarSync\ExternalCalendarConnectionStore;

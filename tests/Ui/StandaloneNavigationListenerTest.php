@@ -8,8 +8,6 @@ namespace OCP { interface IUser {} interface IUserSession { public function getU
 namespace OCP\App { interface IAppManager { public function isEnabledForUser($appId, $user = null); } }
 
 namespace {
-    require_once __DIR__ . '/../../../localbase/lib/Service/StandaloneAppNavigationService.php';
-    require_once __DIR__ . '/../../lib/Listener/StandaloneNavigationListener.php';
 
     use OCA\AdCalendar\Listener\StandaloneNavigationListener;
     use OCA\LocalBase\Service\StandaloneAppNavigationService;

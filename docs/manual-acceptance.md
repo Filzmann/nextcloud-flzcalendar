@@ -85,8 +85,8 @@ Begründung verpflichtend.
 | E2 | Ausschließlich eigene Dienste | Eigenen und fremden Dienst sowie eigenen Termin und Urlaub vergleichen. | Im persönlichen Zielkalender erscheinen ausschließlich die Dienste des Kontos. | [ ] erfolgreich [x] nicht erfolgreich [ ] nicht geprüft | Eigener Dienst und eigener Termin wurden synchronisiert, fremder Dienst nicht; eigener Urlaub fehlte. Geändertes Soll: Persönlicher Nextcloud-Kalender enthält eigene Dienste, Termine und Urlaube, aber keine fremden Einträge. |
 | E3 | Idempotente Aktualisierung | Einen Dienst ändern, den Abgleich abwarten und denselben Abgleich ohne weitere Änderung erneut abwarten. | Das vorhandene Kalenderobjekt wird aktualisiert; es entsteht kein Duplikat. | [x] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | Mit `admin` wurden Dienst und Termin aktualisiert; wiederholte Abgleiche erzeugten keine Duplikate. Urlaubsaktualisierung nicht separat geprüft. |
 | E4 | Löschung | Einen synchronisierten Dienst im AD Kalender löschen und den Abgleich abwarten. | Nur das zugehörige app-eigene Kalenderobjekt wird entfernt. | [x] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | Mit `admin` wurde das zugehörige app-eigene Objekt nach Dienstlöschung entfernt; andere app-eigene und manuell angelegte fremde Objekte blieben unverändert. |
-| E5 | Opt-out und fremdes Objekt | Im Zielkalender ein neutrales fremdes Objekt anlegen, Synchronisation deaktivieren und den Abgleich abwarten. | App-eigene Dienstobjekte verschwinden; das fremde Objekt bleibt. Der Kalender wird nur gelöscht, wenn er anschließend leer ist. | [ ] erfolgreich [x] nicht erfolgreich [ ] nicht geprüft | Nach Opt-out und nachweislich forciertem Hintergrundjob wurden app-eigene Dienste, Termine und Urlaube nicht entfernt. Fremdes Objekt und nicht leerer Kalender blieben korrekt erhalten. Löschung eines anschließend leeren Kalenders nicht geprüft. |
-| E6 | Erneute Aktivierung | Synchronisation wieder aktivieren und den Abgleich abwarten. | Der vollständige aktuelle Dienstbestand wird wiederhergestellt. | [ ] erfolgreich [ ] nicht erfolgreich [x] nicht geprüft | Wiederherstellung nicht prüfbar, da die app-eigenen Einträge in E5 nie entfernt wurden. Nach Behebung von E5 erneut prüfen. |
+| E5 | Opt-out und fremdes Objekt | Im Zielkalender ein neutrales fremdes Objekt anlegen, Synchronisation deaktivieren und den Abgleich abwarten. | App-eigene Dienst-, Termin- und Urlaubsobjekte verschwinden; das fremde Objekt bleibt. Der Kalender wird nur gelöscht, wenn er anschließend leer ist. | [ ] erfolgreich [x] nicht erfolgreich [ ] nicht geprüft | Nach Opt-out und nachweislich forciertem Hintergrundjob wurden app-eigene Dienste, Termine und Urlaube nicht entfernt. Fremdes Objekt und nicht leerer Kalender blieben korrekt erhalten. Löschung eines anschließend leeren Kalenders nicht geprüft. |
+| E6 | Erneute Aktivierung | Synchronisation wieder aktivieren und den Abgleich abwarten. | Der vollständige aktuelle Bestand eigener Dienste, Termine und bounded gelesener Urlaube wird wiederhergestellt. | [ ] erfolgreich [ ] nicht erfolgreich [x] nicht geprüft | Wiederherstellung nicht prüfbar, da die app-eigenen Einträge in E5 nie entfernt wurden. Nach Behebung von E5 erneut prüfen. |
 | E7 | Aggregierter Hintergrundstatus | Einen erfolgreichen Abgleich und anschließend mit einem neutralen absichtlich nicht erreichbaren Testprovider einen Teilfehler auslösen. Als Admin den AD-Kalender-Abschnitt öffnen; als Nichtadmin denselben Bereich versuchen. | Der Admin sieht Zeitpunkt und ausschließlich aggregierte Anzahlen sowie Erfolg/Warnung. Nichtadmin erhält keinen Adminbereich. Konten, Kalender, Provider, URLs, Kennungen, Zugangsdaten und Fehlerdetails erscheinen nicht. | [ ] erfolgreich [ ] nicht erfolgreich [x] nicht geprüft | Auf Wunsch übersprungen. |
 
 ## F. Kopano und manuelles CalDAV
@@ -175,7 +175,7 @@ konfigurierte Eigennamen dürfen sich nicht ändern.
 | P-12 | D3 | Redundante Auswahl „Typ“ aus Dienst- und Termindialog entfernen, sofern der öffnende Button den Typ eindeutig festlegt. |
 | P-13 | D5 | Höhe des Termineintrags so anpassen, dass der Titel nicht abgeschnitten wird. |
 | P-14 | D6 | Dienste über Mitternacht je Kalendertag mit Teilzeitraum darstellen, z. B. `20–24` und `0–8`, mit erkennbarer Fortsetzung. |
-| P-15 | A2 | Produktentscheidung treffen: Monatsansicht auf höchstens drei Randtage je Monatsgrenze begrenzen; Konflikt mit vollständigen Montag-bis-Sonntag-Wochen klären. |
+| P-15 | A2 | Umgesetzt: Monatsansicht zeigt höchstens drei Randtage je Monatsgrenze; unvollständige erste und letzte sichtbare Kalenderwochen sind ausdrücklich zulässig. |
 
 ### Testinfrastruktur und nachzuholende Abnahme
 
@@ -183,9 +183,9 @@ konfigurierte Eigennamen dürfen sich nicht ändern.
 |---|---|---|
 | P-16 | C1, C2 | Demo-Seeding vervollständigen: jede fachliche Gruppe mindestens einmal vertreten; zusätzlich geeignete Leitung-/Unterstellungs-, Bereichs- und Mehrfachrollenkonstellationen. Insbesondere Stv. PDL, BuS, Büroorganisation Pflege und Empfang nachrüsten. |
 | P-17 | C4 | Serverseitige Rechteprüfung durch direkten API-/Manipulationsversuch nachprüfen; reine UI-Ausblendung genügt nicht. |
-| P-18 | F1–F6, G5, G7–G9 | Neutrale externe Kopano-/CalDAV-Testprovider bereitstellen oder diese Funktionen bewusst aus dem aktuellen Freigabeumfang nehmen. Danach Export, Rückimportschutz, Trennung, parallele Fehlerisolation und Bestandsumbenennung prüfen. |
+| P-18 | F1–F6, G5, G7–G9 | Für spätere Erweiterungsphase vorgemerkt und aus dem aktuellen Grundumfang/Freigabenachweis genommen. Bei ausdrücklicher Wiederaufnahme neutrale externe Kopano-/CalDAV-Testprovider bereitstellen und Export, Rückimportschutz, Trennung, parallele Fehlerisolation und Bestandsumbenennung prüfen. |
 | P-19 | E7 | Aggregierten Hintergrundstatus mit Erfolg und absichtlichem Teilfehler sowie Nichtadmin-Schutz nachprüfen. |
-| P-20 | H1, H2, I3–I6 | Providerprüfungen in einem späteren Abnahmelauf nachholen oder ausdrücklich aus dem Releaseumfang ausnehmen; Lokalisierungsprüfungen erst nach separater Freigabe der L10N-Zukunftsplanung aufnehmen. |
+| P-20 | H1, H2, I3–I6 | Für spätere Erweiterungsphase vorgemerkt. Google-/Apple- sowie providerabhängige Lokalisierungsprüfungen erst nach ausdrücklicher Scope-Öffnung und mit neutralen Testkonten ausführen; der lokale Sprachvertrag bleibt im Grundumfang. |
 
 ### Präzisierte fachliche Sollvorgaben
 
@@ -211,15 +211,30 @@ konfigurierte Eigennamen dürfen sich nicht ändern.
 
 Die vorstehenden Markierungen und die Gesamtentscheidung bleiben als Ergebnis
 des manuellen Laufs vom 02.08.2026 unverändert. Für `0.14.0-rc.1` und
-`0.14.0-rc.2` wurden die technischen Korrekturen zu P-01, P-03, P-05 bis P-14
-und P-17 durch PHP-/JavaScript-, Layout-, API-, Berechtigungs- und reale
-DDEV-Smokes nachgewiesen. Der DDEV-Integrationslauf prüft zusätzlich
+`0.14.0-rc.2` wurden die technischen Korrekturen zu P-01, P-03, P-05 bis P-17
+und P-19 durch PHP-/JavaScript-, Layout-, API-, Berechtigungs- und
+reale DDEV-Smokes nachgewiesen. Für P-16 wurden 28 kanonische Kalenderfixtures
+einschließlich Anzeigenamen, Gruppenmitgliedschaften und aktueller neutraler
+Kalenderdaten gegen die reale Nextcloud-Installation geprüft; 24 überholte
+`adc-demo-*`-Konten und ihre 110 alten Kalendereinträge wurden nach
+ausdrücklicher Freigabe entfernt. P-02 und P-04 sind technisch belegt: Der
+private Nextcloud-Kalender übernimmt eigene Dienste und Termine sowie geplante
+und genehmigte Urlaube aus dem bounded LocalBase-Vertrag für das laufende und
+die zwei folgenden Kalenderjahre. Urlaubsnotizen werden nicht exportiert; der
+Statuswechsel aktualisiert dieselbe stabile Objekt-ID. Fremdobjekte und ein
+dadurch nicht leerer Kalender bleiben beim Opt-out erhalten, alle app-eigenen
+Objekte werden entfernt, der leere app-eigene Kalender wird real über DAV
+gelöscht und eine Reaktivierung stellt den vollständigen Bestand idempotent
+wieder her. Der selbstaufräumende P-19-Smoke prüft einen
+erfolgreichen und einen teilweise fehlgeschlagenen aggregierten Status über
+die reale Nextcloud-AppConfig und Adminseite sowie den verweigerten
+Nichtadminzugriff. Der DDEV-Integrationslauf prüft zusätzlich
 Terminserien über eine Sommerzeitgrenze, Standarddienst-/Urlaubskonflikte und
 die DAV-Dienstsynchronisierung gegen eine echte Nextcloud-34-Installation.
 
 Dieser automatisierte Nachweis ersetzt keine erneute visuelle und fachliche
-Abnahme. P-04 bleibt ein RC-Blocker: Für die geforderte Synchronisierung
-eigener Urlaube in den persönlichen Nextcloud-Kalender fehlt weiterhin ein
-ausdrücklich freigegebener öffentlicher Abwesenheitsvertrag. Ebenfalls offen
-bleiben die manuellen beziehungsweise extern abhängigen Nachprüfungen P-02,
-P-15, P-16 und P-18 bis P-20.
+Abnahme. P-04 ist technisch umgesetzt und benötigt noch die erneute manuelle
+Abnahme von E2, E5 und E6. P-18 und P-20 sind für eine spätere ausdrücklich
+freizugebende Erweiterungsphase vorgemerkt und gehören nicht zum aktuellen
+Grundumfang oder Freigabenachweis. Offen bleibt die visuelle Browserabnahme
+von P-15, P-16 und P-19.

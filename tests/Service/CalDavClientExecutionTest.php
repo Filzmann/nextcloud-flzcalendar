@@ -11,12 +11,6 @@ namespace OCP\Http\Client {
 namespace OCA\AdCalendar\Service { final class CalendarTargetConfig { public function calendarName(): string { return 'AD & Team'; } } }
 
 namespace {
-    require_once __DIR__ . '/../../lib/Model/CalendarEntry.php';
-    require_once __DIR__ . '/../../lib/CalendarSync/ShiftCalendarPublisher.php';
-    require_once __DIR__ . '/../../lib/CalendarSync/ShiftCalendarEventSerializer.php';
-    require_once __DIR__ . '/../../lib/CalendarSync/ExternalCalendarUrlValidator.php';
-    require_once __DIR__ . '/../../lib/CalendarSync/ExternalCalendarConnectionException.php';
-    require_once __DIR__ . '/../../lib/CalendarSync/CalDavClient.php';
 
     use OCA\AdCalendar\CalendarSync\CalDavClient;
     use OCA\AdCalendar\CalendarSync\ExternalCalendarUrlValidator;

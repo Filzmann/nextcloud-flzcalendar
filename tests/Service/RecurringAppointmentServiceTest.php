@@ -26,9 +26,6 @@ namespace OCA\AdCalendar\Service {
 }
 
 namespace {
-    require_once __DIR__ . '/../../lib/Model/CalendarEntry.php';
-    require_once __DIR__ . '/../../lib/Model/RecurrenceRule.php';
-    require_once __DIR__ . '/../../lib/Service/RecurringAppointmentService.php';
 
     use OCA\AdCalendar\Model\CalendarEntry;
     use OCA\AdCalendar\Repository\CalendarEntryRepository;

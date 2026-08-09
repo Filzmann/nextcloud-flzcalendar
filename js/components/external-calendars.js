@@ -41,11 +41,12 @@
             this.password = document.getElementById('adc-external-password');
             this.usernameLabel = document.getElementById('adc-external-username-label');
             this.passwordLabel = document.getElementById('adc-external-password-label');
+            this.returnFocus = null;
             this.calendarName = this.dialog.dataset?.calendarName || 'AD Dienste';
             providers.kopano.serverUrl = this.dialog.dataset?.kopanoDefault || providers.kopano.serverUrl;
             providers.manual.instruction = l10n.t('Enter your provider’s HTTPS CalDAV address. AD Calendar discovers the calendar path and creates the visible calendar “{calendar}”.', { calendar: this.calendarName });
             this.form.addEventListener('submit', event => this.submit(event));
-            this.dialog.addEventListener('cancel', () => this.clearSecret());
+            this.dialog.addEventListener('cancel', event => { event.preventDefault(); this.close(); });
             document.getElementById('adc-external-dialog-close').addEventListener('click', () => this.close());
             document.getElementById('adc-external-dialog-cancel').addEventListener('click', () => this.close());
             for (const button of document.querySelectorAll('[data-external-connect]')) button.addEventListener('click', () => this.connect(button.dataset.externalConnect));
@@ -88,6 +89,7 @@
             }
             const settings = providers[provider];
             if (!settings) return;
+            this.returnFocus = document.activeElement;
             this.provider.value = provider;
             this.heading.textContent = settings.title;
             this.instruction.textContent = settings.instruction;
@@ -126,6 +128,9 @@
         close() {
             this.clearSecret();
             this.dialog.close();
+            const returnFocus = this.returnFocus;
+            this.returnFocus = null;
+            if (returnFocus?.isConnected !== false && typeof returnFocus?.focus === 'function') returnFocus.focus();
         }
 
         clearSecret() {

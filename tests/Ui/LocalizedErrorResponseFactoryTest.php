@@ -14,7 +14,6 @@ namespace OCP\AppFramework\Http {
 }
 
 namespace {
-    require_once __DIR__ . '/../../lib/Http/LocalizedErrorResponseFactory.php';
 
     use OCA\AdCalendar\Http\LocalizedErrorResponseFactory;
     use OCP\IL10N;

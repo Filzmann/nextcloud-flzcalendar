@@ -211,7 +211,10 @@ const meetingRepository = {
     async blockMeeting(...args) { blockCalls.push(args); if (args[3] === 'fail') throw new Error('block failed'); },
 };
 const calendarDate = { isoDay: date => new Date(date).toISOString().slice(0, 10) };
-const meetingContext = { window: { AdCalendar: { l10n, modules: { CalendarDate: calendarDate } } }, document: documentFor(meetingElements), Date, Number, Set };
+const meetingDocument = documentFor(meetingElements);
+const meetingOpener = Object.assign(new FakeNode('button'), { isConnected: true });
+meetingDocument.activeElement = meetingOpener;
+const meetingContext = { window: { AdCalendar: { l10n, modules: { CalendarDate: calendarDate } } }, document: meetingDocument, Date, Number, Set };
 load('../../js/components/meeting-finder.js', meetingContext);
 let blocked = 0;
 const finder = new meetingContext.window.AdCalendar.components.MeetingFinder({
@@ -257,7 +260,7 @@ if (!meetingErrors.includes('gap failed') || !meetingErrors.includes('block fail
     throw new Error('Meeting-Suche oder -Blockierung meldet Providerfehler nicht bedienbar zurück.');
 }
 await meetingElements['adc-meeting-close'].fire('click');
-if (meetingElements['adc-meeting-dialog'].open) throw new Error('Meetingdialog lässt sich nicht schließen.');
+if (meetingElements['adc-meeting-dialog'].open || !meetingOpener.focused) throw new Error('Meetingdialog schließt nicht oder gibt den Fokus nicht an den Auslöser zurück.');
 
 // EntryWorkflow: save/delete variants, meeting permissions, delegated clicks and choice dialogs.
 const workflowDocument = documentFor({});
@@ -365,10 +368,12 @@ await workflowBody.fire('click', { target: editButton });
 if (workflowDialog.opened.at(-1).entry.id !== 20) throw new Error('Delegierte Bearbeitung findet den Eintrag nicht.');
 
 delete workflow.deletionChoice;
+const workflowOpener = Object.assign(new FakeNode('button'), { isConnected: true });
+workflowDocument.activeElement = workflowOpener;
 const deletionPromise = workflow.deletionChoice(2);
 const deletionDialog = workflowDocument.body.children.at(-1);
 await deletionDialog.children[3].fire('click');
-if (await deletionPromise !== 'detach' || !deletionDialog.removed) throw new Error('Dienstlöschdialog liefert die gewählte Kindbehandlung nicht zurück.');
+if (await deletionPromise !== 'detach' || !deletionDialog.removed || !workflowOpener.focused) throw new Error('Dienstlöschdialog liefert die Wahl nicht zurück oder verliert den Fokusauslöser.');
 delete workflow.seriesChoice;
 const seriesPromise = workflow.seriesChoice('edit');
 const seriesDialog = workflowDocument.body.children.at(-1);

@@ -31,7 +31,6 @@ namespace OCA\AdCalendar\Service {
 }
 
 namespace {
-    require_once __DIR__ . '/../../lib/Service/CalendarService.php';
 
     use OCA\AdCalendar\Repository\CalendarEntryRepository;
     use OCA\AdCalendar\Service\AbsenceService;

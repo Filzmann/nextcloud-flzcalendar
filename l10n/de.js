@@ -35,6 +35,8 @@ OC.L10N.register(
     "Employee" : "Mitarbeiter*in",
     "Type" : "Typ",
     "Shift" : "Dienst",
+    "Vacation" : "Urlaub",
+    "Planned vacation" : "Geplanter Urlaub",
     "Automatically synchronised from AD Calendar. Please make changes there." : "Automatisch aus AD Kalender synchronisiert. Änderungen bitte dort vornehmen.",
     "Appointment / blocked time" : "Termin / Sperrtermin",
     "Start" : "Beginn",

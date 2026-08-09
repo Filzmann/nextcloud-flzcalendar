@@ -12,7 +12,6 @@ namespace OCP\Settings {
 namespace OCA\AdCalendar\AppInfo { final class Application { public const APP_ID = 'adcalendar'; } }
 
 namespace {
-    require_once __DIR__ . '/../../lib/Settings/AdminSection.php';
 
     use OCA\AdCalendar\Settings\AdminSection;
     use OCP\IL10N;

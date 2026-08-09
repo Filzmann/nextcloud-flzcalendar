@@ -15,8 +15,10 @@ Titel. Termine innerhalb eines Dienstes referenzieren ihn über
 Die Wochenansicht und die durchgehende Monatsmatrix unterstützen „Tage als
 Zeilen“ und „Personen als Zeilen“. Die Monatsansicht wiederholt keine
 Wochenblöcke: Ihr vollständiger sichtbarer Tagesbereich bildet je nach
-Ausrichtung eine gemeinsame Zeilen- oder Spaltenachse. Personenachsen bleiben
-beim Scrollen sichtbar, Randtage werden gedimmt und Wochenenden ausschließlich
+Ausrichtung eine gemeinsame Zeilen- oder Spaltenachse. Je Monatsgrenze werden
+höchstens drei Randtage ergänzt; unvollständige erste und letzte sichtbare
+Kalenderwochen sind dafür zulässig. Personenachsen bleiben beim Scrollen
+sichtbar, Randtage werden gedimmt und Wochenenden ausschließlich
 über ihren Wochentagsnamen gekennzeichnet. Leere Wochenend- und Feiertagstage
 verwenden eine kompakte Tagesachse und in der Tages-Spalten-Ausrichtung eine
 feste schmale Breite; vorhandene Dienste oder Termine stellen den betroffenen
@@ -69,11 +71,14 @@ Erhalt als Sperrtermine gewählt.
 
 ## Persönlicher Kalenderabgleich
 
-AD Kalender ist zunächst alleinige Quelle der Wahrheit. Der standardmäßig
-aktive persönliche Abgleich veröffentlicht ausschließlich Dienste der
-jeweiligen Person in einem privaten Nextcloud-Kalender mit dem administrativ
+AD Kalender ist alleinige Quelle der Wahrheit. Der standardmäßig aktive
+persönliche Abgleich veröffentlicht ausschließlich eigene Dienste, Termine und
+Urlaube in einem privaten Nextcloud-Kalender mit dem administrativ
 konfigurierten sichtbaren Namen. Ohne gesetzten AppConfig-Wert bleibt
-„AD Dienste“ der Bestandsdefault. Termine und Urlaube werden nicht übertragen.
+„AD Dienste“ der Bestandsdefault. Urlaube kommen read-only und ohne Notizen
+über LocalBase aus einem optionalen Provider. Ihr halboffener Horizont reicht
+vom Beginn des laufenden fachlichen Kalenderjahres bis zum Beginn des dritten
+Folgejahres. Ohne Provider bleibt der Urlaubsbestand leer.
 Ein bewusstes Opt-out entfernt nur die
 von AD Kalender erzeugten Objekte; fremde Objekte bleiben unangetastet und der
 Kalender wird nur gelöscht, wenn er danach leer ist.
@@ -85,7 +90,7 @@ fällig, gleicht vorhandene Dienste vollständig ab, respektiert Opt-outs und
 isoliert Fehler je Konto. Sein Adminstatus enthält nur Zeitpunkt, Richtung und
 aggregierte Anzahlen.
 
-Der interne DAV-Zugriff ist hinter `ShiftCalendarPublisher` gekapselt. Der
+Der interne DAV-Zugriff ist hinter `PersonalCalendarPublisher` gekapselt. Der
 interne Nextcloud-DAV-Vertrag bleibt auf
 `NextcloudDavShiftCalendarPublisher` begrenzt.
 

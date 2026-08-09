@@ -13,6 +13,7 @@
             this.entries = options.entries;
             this.shiftDefaults = options.shiftDefaults;
             this.onSubmit = options.onSubmit;
+            this.returnFocus = null;
             this.fields = Object.fromEntries(['entry-id', 'employee', 'type', 'start', 'end', 'title', 'title-field', 'title-label', 'title-help', 'time-help', 'entry-dialog-title', 'recurrence-fields', 'recurrence-frequency', 'recurrence-options', 'recurrence-interval', 'recurrence-until', 'recurrence-weekdays'].map(id => [id, document.getElementById(`adc-${id}`)]));
             this.weekdays = Array.from(document.querySelectorAll('input[name="adc-recurrence-weekday"]'));
             document.getElementById('adc-cancel-edit').addEventListener('click', () => this.close());
@@ -37,6 +38,7 @@
         }
 
         open({ employee, day, type, entry = null }) {
+            this.returnFocus = document.activeElement;
             this.form.reset();
             this.fields.employee.disabled = false;
             this.fields['entry-id'].value = entry?.id || '';
@@ -66,6 +68,9 @@
             this.fields.type.disabled = false;
             this.fields.employee.disabled = false;
             this.fields['recurrence-fields'].hidden = true;
+            const returnFocus = this.returnFocus;
+            this.returnFocus = null;
+            if (returnFocus?.isConnected !== false && typeof returnFocus?.focus === 'function') returnFocus.focus();
         }
 
         updateType() {

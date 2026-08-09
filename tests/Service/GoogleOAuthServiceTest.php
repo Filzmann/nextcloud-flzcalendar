@@ -28,7 +28,6 @@ namespace OCA\AdCalendar\CalendarSync {
 }
 
 namespace {
-    require_once __DIR__ . '/../../lib/CalendarSync/GoogleOAuthService.php';
 
     use OCA\AdCalendar\CalendarSync\ExternalCalendarConnectionStore;
     use OCA\AdCalendar\CalendarSync\GoogleOAuthService;

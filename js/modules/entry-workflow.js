@@ -119,6 +119,7 @@
 
         deletionChoice(count) {
             return new Promise(resolve => {
+                const returnFocus = document.activeElement;
                 const dialog = document.createElement('dialog');
                 dialog.className = 'adc-dialog adc-delete-dialog';
                 dialog.setAttribute('aria-labelledby', 'adc-delete-title');
@@ -128,6 +129,7 @@
                     settled = true;
                     dialog.close();
                     dialog.remove();
+                    if (returnFocus?.isConnected !== false && typeof returnFocus?.focus === 'function') returnFocus.focus();
                     resolve(value);
                 };
                 const title = this.node('h2', l10n.t('Delete shift with appointments'));
@@ -148,6 +150,7 @@
 
         seriesChoice(action) {
             return new Promise(resolve => {
+                const returnFocus = document.activeElement;
                 const dialog = document.createElement('dialog');
                 dialog.className = 'adc-dialog adc-delete-dialog';
                 dialog.setAttribute('aria-labelledby', 'adc-series-scope-title');
@@ -157,6 +160,7 @@
                     settled = true;
                     dialog.close();
                     dialog.remove();
+                    if (returnFocus?.isConnected !== false && typeof returnFocus?.focus === 'function') returnFocus.focus();
                     resolve(value);
                 };
                 const title = this.node('h2', action === 'edit' ? l10n.t('Edit recurring appointment') : l10n.t('Delete recurring appointment'));

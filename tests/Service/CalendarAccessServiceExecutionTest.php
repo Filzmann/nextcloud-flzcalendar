@@ -47,7 +47,6 @@ namespace OCA\AdCalendar\Service {
 }
 
 namespace {
-    require_once __DIR__ . '/../../lib/Service/CalendarAccessService.php';
 
     use OCA\AdCalendar\Service\CalendarAccessService;
     use OCA\AdCalendar\Service\CalendarGroupProfile;

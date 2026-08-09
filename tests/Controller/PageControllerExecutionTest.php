@@ -17,7 +17,6 @@ namespace OCA\AdCalendar\Service {
 }
 
 namespace {
-    require_once __DIR__ . '/../../lib/Controller/PageController.php';
 
     use OCA\AdCalendar\Controller\PageController;
     use OCA\AdCalendar\Service\CalendarTargetConfig;

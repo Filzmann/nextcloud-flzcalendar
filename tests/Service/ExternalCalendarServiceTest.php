@@ -22,7 +22,6 @@ namespace OCA\AdCalendar\Service {
 }
 
 namespace {
-    require_once __DIR__ . '/../../lib/Service/ExternalCalendarService.php';
 
     use OCA\AdCalendar\CalendarSync\CalDavClient;
     use OCA\AdCalendar\CalendarSync\ExternalCalendarConnectionStore;

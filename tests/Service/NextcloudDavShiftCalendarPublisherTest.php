@@ -13,6 +13,7 @@ namespace OCA\DAV\CalDAV {
         public array $deletedObjects = [];
         public array $deletedCalendars = [];
         public array $updatedCalendars = [];
+        public bool $metadataOnly = false;
         private int $nextId = 1;
 
         public function getCalendarsForUser(string $principal): array {
@@ -24,7 +25,10 @@ namespace OCA\DAV\CalDAV {
             $this->objects[$id] = [];
             return $id;
         }
-        public function getCalendarObjects(int $calendarId): array { return array_values($this->objects[$calendarId] ?? []); }
+        public function getCalendarObjects(int $calendarId): array {
+            $objects = array_values($this->objects[$calendarId] ?? []);
+            return $this->metadataOnly ? array_map(static fn(array $object): array => ['uri' => $object['uri']], $objects) : $objects;
+        }
         public function getCalendarObject(int $calendarId, string $uri): ?array { return $this->objects[$calendarId][$uri] ?? null; }
         public function createCalendarObject(int $calendarId, string $uri, string $data): void {
             $this->createdObjects[] = [$calendarId, $uri];
@@ -58,15 +62,12 @@ namespace OCA\AdCalendar\Service {
 }
 
 namespace {
-    require_once __DIR__ . '/../../lib/Model/CalendarEntry.php';
-    require_once __DIR__ . '/../../lib/CalendarSync/ShiftCalendarPublisher.php';
-    require_once __DIR__ . '/../../lib/CalendarSync/ShiftCalendarEventSerializer.php';
-    require_once __DIR__ . '/../../lib/CalendarSync/NextcloudDavShiftCalendarPublisher.php';
 
     use OCA\AdCalendar\CalendarSync\NextcloudDavShiftCalendarPublisher;
     use OCA\AdCalendar\CalendarSync\ShiftCalendarEventSerializer;
     use OCA\AdCalendar\Model\CalendarEntry;
     use OCA\AdCalendar\Service\CalendarTargetConfig;
+    use OCA\LocalBase\Calendar\AbsenceInterval;
     use OCA\DAV\CalDAV\CalDavBackend;
     use OCP\IL10N;
 
@@ -89,13 +90,36 @@ namespace {
     $calendarId = (int)array_key_first($backend->calendars);
     if (($backend->calendars[$calendarId]['{DAV:}displayname'] ?? '') !== 'Team & Dienst') throw new RuntimeException('Konfigurierter Kalendername fehlt.');
 
+    $appointment = CalendarEntry::get([
+        'id' => 9,
+        'employeeUid' => 'sync-person',
+        'start' => '2026-07-21T10:00:00+02:00',
+        'end' => '2026-07-21T11:00:00+02:00',
+        'type' => CalendarEntry::TYPE_APPOINTMENT,
+        'title' => 'Eigener Termin',
+    ]);
+    $absence = new AbsenceInterval(
+        'sync-person',
+        new DateTimeImmutable('2026-07-22T00:00:00Z'),
+        new DateTimeImmutable('2026-07-24T00:00:00Z'),
+        AbsenceInterval::STATUS_APPROVED,
+    );
+    $publisher->replaceAllContent('sync-person', [$shift(7), $appointment], [$absence]);
+    $absenceUri = (new ShiftCalendarEventSerializer($l10n))->absenceObjectUri($absence);
+    if (isset($backend->objects[$calendarId]['adcalendar-shift-8.ics'])
+        || !isset($backend->objects[$calendarId]['adcalendar-appointment-9.ics'], $backend->objects[$calendarId][$absenceUri])) {
+        throw new RuntimeException('Vollständiger persönlicher Abgleich enthält nicht exakt Dienste, Termine und Urlaube.');
+    }
+
     $publisher->publish($shift(7, 'Geändert'));
     if (($backend->updatedObjects[0][1] ?? '') !== 'adcalendar-shift-7.ics') throw new RuntimeException('Bestehender Dienst wurde nicht idempotent aktualisiert.');
 
     $backend->objects[$calendarId]['privat.ics'] = ['uri' => 'privat.ics', 'calendardata' => 'privat'];
     $backend->objects[$calendarId]['adcalendar-shift-99.ics'] = ['uri' => 'adcalendar-shift-99.ics', 'calendardata' => 'fremd'];
-    $publisher->replaceAll('sync-person', [$shift(7)]);
+    $backend->metadataOnly = true;
+    $publisher->replaceAllContent('sync-person', [$shift(7)], []);
     if (isset($backend->objects[$calendarId]['adcalendar-shift-8.ics'])
+        || isset($backend->objects[$calendarId]['adcalendar-appointment-9.ics'], $backend->objects[$calendarId][$absenceUri])
         || !isset($backend->objects[$calendarId]['privat.ics'])
         || !isset($backend->objects[$calendarId]['adcalendar-shift-99.ics'])) {
         throw new RuntimeException('Abgleich entfernt fremde Einträge oder bewahrt veraltete AD-Dienste.');

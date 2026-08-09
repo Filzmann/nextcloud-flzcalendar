@@ -46,8 +46,6 @@ namespace OCA\AdCalendar\CalendarSync {
 }
 
 namespace {
-    require_once __DIR__ . '/../../lib/Http/LocalizedErrorResponseFactory.php';
-    require_once __DIR__ . '/../../lib/Controller/ExternalCalendarController.php';
 
     use OCA\AdCalendar\CalendarSync\GoogleOAuthService;
     use OCA\AdCalendar\Controller\ExternalCalendarController;

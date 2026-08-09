@@ -18,9 +18,6 @@ namespace OCA\AdCalendar\CalendarSync {
 namespace OCA\AdCalendar\Service { final class CalendarTargetConfig { public function calendarName(): string { return 'AD Teamdienste'; } } }
 
 namespace {
-    require_once __DIR__ . '/../../lib/Model/CalendarEntry.php';
-    require_once __DIR__ . '/../../lib/CalendarSync/ShiftCalendarPublisher.php';
-    require_once __DIR__ . '/../../lib/CalendarSync/GoogleCalendarClient.php';
 
     use OCA\AdCalendar\CalendarSync\ExternalCalendarConnectionStore;
     use OCA\AdCalendar\CalendarSync\GoogleCalendarClient;

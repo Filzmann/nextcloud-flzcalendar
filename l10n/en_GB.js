@@ -35,6 +35,8 @@ OC.L10N.register(
     "Employee" : "Employee",
     "Type" : "Type",
     "Shift" : "Shift",
+    "Vacation" : "Vacation",
+    "Planned vacation" : "Planned vacation",
     "Automatically synchronised from AD Calendar. Please make changes there." : "Automatically synchronised from AD Calendar. Please make changes there.",
     "Appointment / blocked time" : "Appointment / blocked time",
     "Start" : "Start",

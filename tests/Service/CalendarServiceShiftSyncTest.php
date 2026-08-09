@@ -41,8 +41,6 @@ namespace OCA\AdCalendar\Service {
 }
 
 namespace {
-    require_once __DIR__ . '/../../lib/Model/CalendarEntry.php';
-    require_once __DIR__ . '/../../lib/Service/CalendarService.php';
 
     use OCA\AdCalendar\Model\CalendarEntry;
     use OCA\AdCalendar\Repository\CalendarEntryRepository;
@@ -76,7 +74,15 @@ namespace {
 
     $repository->found = null;
     $service->save(['employeeUid' => 'person-a', 'start' => '2026-07-20T10:00:00+02:00', 'end' => '2026-07-20T11:00:00+02:00', 'type' => CalendarEntry::TYPE_APPOINTMENT, 'title' => 'Termin'], null, 'planner');
-    if (count($sync->published) !== 2 || count($sync->removed) !== 2) throw new RuntimeException('Termin wurde unzulässig an die Dienstsynchronisation übergeben.');
+    if (count($sync->published) !== 3 || $sync->published[2]->type() !== CalendarEntry::TYPE_APPOINTMENT) throw new RuntimeException('Eigener Termin wurde nicht an den privaten Kalender übergeben.');
+    $repository->found = CalendarEntry::get([
+        'id' => 43, 'employeeUid' => 'person-a', 'start' => '2026-07-20T10:00:00+02:00', 'end' => '2026-07-20T11:00:00+02:00',
+        'type' => CalendarEntry::TYPE_APPOINTMENT, 'title' => 'Termin',
+    ]);
+    $service->delete(43, '');
+    if (($sync->removed[2]->id() ?? null) !== 43 || ($repository->deleted[1] ?? null) !== ['entry', 43]) {
+        throw new RuntimeException('Gelöschter eigener Termin bleibt im privaten Kalender.');
+    }
     if ($absences->shiftChecks !== ['person-a', 'person-b']) throw new RuntimeException('Urlaub wird nicht ausschließlich für Dienstmutationen geprüft.');
 
     $repository->found = CalendarEntry::get([
