@@ -144,6 +144,29 @@ davon getrennt nach bewusster Entscheidung offen.
 
 ## Geplante Erweiterungen
 
+### ADC-MOBILE – smartphone-taugliche Kalenderansicht und kompakte Menüs
+
+Status: technisch umgesetzt am 12. August 2026; automatische JavaScript-,
+Layout-, Accessibility- und Rechteprojektionstests sind grün. Die reale
+Smartphone-/Browserabnahme bleibt bis zum gebündelten manuellen Abnahmelauf
+offen.
+
+- Wochen- und Monatsplanung, persönliche Einträge und die wichtigsten
+  Kalenderaktionen erhalten eine auf kleinen Smartphone-Viewports vollständig
+  nutzbare responsive Darstellung. Eine lediglich horizontal verschiebbare
+  Desktop-Matrix reicht nicht aus; Zeitbezug, Person, Eintragstyp, Status und
+  erlaubte Aktionen müssen im mobilen Nutzungspfad verständlich bleiben.
+- Filter, Ansichtsumschaltung und Aktionsmenüs werden kompakter gruppiert.
+  Häufige Aktionen bleiben direkt auffindbar; Beschriftungen, aktiver Zustand,
+  Tastaturbedienung, sichtbarer Fokus und ausreichend große Touch-Ziele werden
+  nicht zugunsten geringerer Höhe oder Breite entfernt.
+- Vor der Umsetzung werden mobile Kernabläufe und die nötige alternative
+  Darstellung für breite Planungsmatrizen festgelegt. Tests decken mindestens
+  kleine Viewports, beide Matrixausrichtungen, Filter und Menübedienung,
+  Anlegen/Bearbeiten eigener Einträge, berechtigte Fremdbearbeitung,
+  Fokusreihenfolge, Zoom, lange Beschriftungen, Sticky-Kontext sowie vertikales
+  und gegebenenfalls lokal begrenztes horizontales Scrollen ab.
+
 ### Externe Kalenderprovider – für spätere Erweiterungsphase vorgemerkt
 
 Status: durch Produktentscheidung vom 9. August 2026 aus dem aktuellen

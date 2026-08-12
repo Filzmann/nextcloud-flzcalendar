@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- Für Viewports bis 700 Pixel eine semantische, einklappbare Tagesliste aus denselben gefilterten Kalenderdaten wie die Desktopmatrix ergänzt.
+- Person, Organisationskontext, Datum, Feiertag, Eintragstyp und Urlaubsstatus mobil ohne horizontal verschobene Desktopmatrix sichtbar gemacht.
+- Mobile Eintragsaktionen an den unveränderten `canManage`-Vertrag gebunden und mit mindestens 44 Pixel großen Touch-Zielen versehen.
+
 ## 0.14.0-rc.2
 
 - Kalenderzeiten beim Schreiben und Lesen explizit als UTC behandelt, damit reale Datenbankzugriffe die lokale Uhrzeit von Terminserien über Sommerzeitgrenzen hinweg stabil halten.

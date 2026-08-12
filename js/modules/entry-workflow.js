@@ -103,7 +103,7 @@
         handleClick(event) {
             const button = event.target instanceof Element ? event.target.closest('button[data-action]') : null;
             if (!button) return;
-            const cell = button.closest('td[data-employee-uid][data-day]');
+            const cell = button.closest('[data-employee-uid][data-day]');
             if (!cell) return;
             const employee = this.state.data.employees.find(item => item.uid === cell.dataset.employeeUid);
             if (!employee?.canManage) return;

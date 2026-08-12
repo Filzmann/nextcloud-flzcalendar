@@ -32,6 +32,13 @@ foreach (['IAppConfig', 'ExternalCalendarUrlValidator', 'calendar_default_name_h
     if (!str_contains($calendarTargets, $contract)) throw new RuntimeException("Validierter AppConfig-Kalendervertrag fehlt: {$contract}");
 }
 foreach (['id="adc-demo-confirm"', 'id="adc-demo-install"', 'not installed automatically', 'Shift calendar synchronisation', 'calendarSyncStatus', 'No account or calendar identifiers'] as $contract) if (!str_contains($template, $contract)) throw new RuntimeException("Demo- oder DAV-Adminoberfläche fehlt: {$contract}");
+$localizationScript = "\\OCP\\Util::addScript('adcalendar', 'modules/localization');";
+$adminScript = "\\OCP\\Util::addScript('adcalendar', 'admin');";
+$localizationPosition = strpos($template, $localizationScript);
+$adminPosition = strpos($template, $adminScript);
+if ($localizationPosition === false || $adminPosition === false || $localizationPosition > $adminPosition) {
+    throw new RuntimeException('Die Adminoberfläche lädt ihre Lokalisierung nicht vor der Demo-Interaktion.');
+}
 foreach (['id="adc-kopano-caldav-heading"', 'Kopano and CalDAV', 'The Kopano provider must provide CalDAV', 'HTTP 405', 'HTTP 207'] as $contract) if (!str_contains($template, $contract)) throw new RuntimeException("Kopano-CalDAV-Adminhinweis fehlt: {$contract}");
 foreach (['id="adc-kopano-test-form"', 'id="adc-kopano-test-url"', 'id="adc-kopano-test-username"', 'id="adc-kopano-test-password"', 'id="adc-kopano-test-status"', 'Test connection', 'Credentials are not stored'] as $contract) if (!str_contains($template, $contract)) throw new RuntimeException("Administratives Kopano-Testformular fehlt: {$contract}");
 foreach (['id="adc-calendar-defaults-form"', 'id="adc-calendar-default-kopano-url"', 'id="adc-calendar-default-name"', 'id="adc-calendar-defaults-status"', 'Existing app-owned calendars'] as $contract) if (!str_contains($template, $contract)) throw new RuntimeException("Kalenderdefault-Adminformular fehlt: {$contract}");

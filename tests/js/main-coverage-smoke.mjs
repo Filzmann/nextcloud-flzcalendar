@@ -148,7 +148,16 @@ const context = {
             l10n,
             repositories: { CalendarRepository }, models: { CalendarEntry, Organization },
             modules: {
-                CalendarDate: { isoDay: value => new Date(value).toISOString().slice(0, 10) },
+                CalendarDate: {
+                    isoDay: value => new Date(value).toISOString().slice(0, 10),
+                    completeWeekRange(start, end) {
+                        const completeStart = new Date(start);
+                        completeStart.setUTCDate(completeStart.getUTCDate() - ((completeStart.getUTCDay() || 7) - 1));
+                        const completeEnd = new Date(end);
+                        completeEnd.setUTCDate(completeEnd.getUTCDate() + ((8 - (completeEnd.getUTCDay() || 7)) % 7));
+                        return { start: completeStart, end: completeEnd };
+                    },
+                },
                 CalendarState, MeetingCapabilities, EntryWorkflow,
             },
             components: {
@@ -208,6 +217,9 @@ if (WeekTable.last.renders.at(-1)?.[1] !== 'month' || WeekTable.last.renders.at(
     throw new Error('Die Übersichtstabelle wechselt beim Navigieren nicht unmittelbar auf den neuen Monatszeitraum.');
 }
 await pendingNextMonthLoad;
+if (!calls.some(call => call[0] === 'range' && call[1] === '2026-07-27' && call[2] === '2026-09-07')) {
+    throw new Error('Der Monatsaufruf verwendet nicht die vollständigen umschließenden Kalenderwochen.');
+}
 state.month = new Date('2026-07-01T12:00:00Z');
 const pendingPreviousMonthLoad = WeekNavigation.last.options.onWeekChange();
 if (WeekTable.last.renders.at(-1)?.[2] !== '2026-07-01') {

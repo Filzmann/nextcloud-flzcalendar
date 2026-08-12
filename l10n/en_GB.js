@@ -243,6 +243,7 @@ OC.L10N.register(
     "Search in the next week" : "Search in the next week",
     "Deselect {employee}" : "Deselect {employee}",
     "Please enter a title for the block." : "Please enter a title for the block.",
-    "The appointment was blocked for all selected people." : "The appointment was blocked for all selected people."
+    "The appointment was blocked for all selected people." : "The appointment was blocked for all selected people.",
+    "No people match the current filters." : "No people match the current filters."
 },
 "nplurals=2; plural=(n != 1);");

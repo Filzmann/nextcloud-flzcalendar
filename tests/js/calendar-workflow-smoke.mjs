@@ -64,6 +64,9 @@ for (const contract of [
 for (const contract of ['class EntryWorkflow', "['delete', l10n.t('Delete shift and appointments')]", "['detach', l10n.t('Delete only the shift; keep appointments as blocked times')]", "dialog.addEventListener('cancel'", 'document.activeElement', 'returnFocus.focus()', 'this.dialog.open({ employee', 'this.repository.updateMeeting(existing.meetingUid', 'this.repository.removeMeeting(entry.meetingUid)', 'existing?.seriesUid', "['occurrence', l10n.t('Only this occurrence')]", "['series', l10n.t('Entire series')]", 'if (!employee?.canManage) return;', 'this.show(error, true)']) {
     if (!entryWorkflow.includes(contract)) throw new Error(`Eintragsworkflow-Vertrag fehlt: ${contract}`);
 }
+if (!entryWorkflow.includes("button.closest('[data-employee-uid][data-day]')")) {
+    throw new Error('Eintragsaktionen sind weiterhin ausschließlich an Tabellenzellen statt an den gemeinsamen Desktop-/Mobilvertrag gebunden.');
+}
 const workflowContext = { window: { confirm: () => true }, document: {}, Element: class {}, Date, Number, Promise };
 execute('../../js/modules/entry-workflow.js', entryWorkflow, workflowContext);
 const workflow = Object.create(workflowContext.window.AdCalendar.modules.EntryWorkflow.prototype);
@@ -88,7 +91,7 @@ for (const contract of ['class CalendarFilters', 'this.renderLeadershipStaffChec
 for (const contract of ['class TabNavigation', "addEventListener('click'", "this.show('settings')", "this.onChange(active)"]) {
     if (!tabNavigation.includes(contract)) throw new Error(`Tab-Komponentenvertrag fehlt: ${contract}`);
 }
-for (const contract of ['class WeekTable', 'adc-group-heading', 'adc-period-matrix', 'adc-outside-month', 'this.calendarCell.render(entries, employee, absences, layout, day, this.timeline)', 'this.timeline.layout(employeeEntries, days)', 'this.timeline.layout(dayEntries, [day])', 'organization.staffBlockLabel', 'organization.roleLabel(value)', 'organization.areaLabel(value)', 'this.daysInRange(range.start, range.end)', 'groupCell.colSpan = days.length + 1', 'this.orderedEmployees(employees)', 'this.staffRank(a) - this.staffRank(b)', 'roleNames.slice(1)', "join(' / ')"]) {
+for (const contract of ['class WeekTable', 'adc-group-heading', 'adc-period-matrix', 'adc-mobile-calendar', 'adc-mobile-day', 'adc-mobile-person', 'adc-outside-month', 'this.calendarCell.render(entries, employee, absences, layout, day, this.timeline)', 'this.calendarCell.render(entries, employee, absences)', 'this.timeline.layout(employeeEntries, days)', 'this.timeline.layout(dayEntries, [day])', 'organization.staffBlockLabel', 'organization.roleLabel(value)', 'organization.areaLabel(value)', 'this.daysInRange(range.start, range.end)', 'groupCell.colSpan = days.length + 1', 'this.orderedEmployees(employees)', 'this.staffRank(a) - this.staffRank(b)', 'roleNames.slice(1)', "join(' / ')"]) {
     if (!weekTable.includes(contract)) throw new Error(`Wochenmatrix-Komponentenvertrag fehlt: ${contract}`);
 }
 const timelineContext = { window: {}, Date, Set, Math };
@@ -195,7 +198,7 @@ if (backendOrderedEmployees.map(employee => employee.uid).join(',') !== 'eb-west
 const monthContainer = new FakeNode();
 const monthTable = new tableContext.window.AdCalendar.components.WeekTable({
     container: monthContainer,
-    calendarCell: { render: () => '' },
+    calendarCell: { render: (entries, employee) => employee.canManage ? '<button data-action="add-entry">Add</button>' : '<span>read-only</span>' },
     organization: clusterTable.organization,
 });
 monthTable.setHolidays([{
@@ -215,8 +218,19 @@ const flattenNodes = node => [node, ...node.children.flatMap(flattenNodes)];
 const renderedNodes = flattenNodes(monthContainer);
 if (monthContainer.children.length !== 1
     || renderedNodes.filter(node => node.tagName === 'TABLE').length !== 1
-    || renderedNodes.some(node => node.tagName === 'H3')) {
+    || renderedNodes.filter(node => node.className.includes('adc-mobile-day')).length !== 35) {
     throw new Error('Monatsansicht wird nicht als eine durchgehende Planungsmatrix gerendert.');
+}
+const mobilePeople = renderedNodes.filter(node => node.className.split(' ').includes('adc-mobile-person'));
+const julyMobileCell = renderedNodes.find(node => node.className.includes('adc-mobile-cell') && node.dataset.employeeUid === 'person-a' && node.dataset.day === '2026-07-01');
+if (mobilePeople.length !== 35 || !julyMobileCell) {
+    throw new Error(`Mobile Monatsansicht ordnet nicht jeden sichtbaren Tag verständlich einer Person zu (${mobilePeople.length} Personentage, Juli-Zelle: ${Boolean(julyMobileCell)}).`);
+}
+if (julyMobileCell.innerHTML.includes('data-action') || !julyMobileCell.innerHTML.includes('read-only')) {
+    throw new Error('Mobile Darstellung erteilt einer nicht berechtigten Person eigene Eintragsaktionen.');
+}
+if (!renderedNodes.some(node => node.className.includes('adc-mobile-holiday') && node.textContent === 'Beispieltag')) {
+    throw new Error('Feiertagsname ist mobil weiterhin nur per Hover statt sichtbar zugänglich.');
 }
 if (renderedNodes.filter(node => node.tagName === 'TH' && node.scope === 'row' && !node.className.includes('adc-person-heading')).length !== 35) {
     throw new Error('Tage-als-Zeilen-Monatsansicht bildet den sichtbaren Zeitraum nicht als fortlaufende Tageszeilen ab.');
@@ -480,9 +494,14 @@ const augustRange = CalendarDate.monthRange(new Date(2026, 7, 1));
 if (CalendarDate.isoDay(augustRange.start) !== '2026-07-29' || CalendarDate.isoDay(augustRange.end) !== '2026-09-04') {
     throw new Error('Der sichtbare Monatsbereich begrenzt Randtage nicht auf höchstens drei Tage je Monatsgrenze.');
 }
+const augustApiRange = CalendarDate.completeWeekRange(augustRange.start, augustRange.end);
+if (CalendarDate.isoDay(augustApiRange.start) !== '2026-07-27' || CalendarDate.isoDay(augustApiRange.end) !== '2026-09-07') {
+    throw new Error('Der August-API-Bereich umfasst nicht die vollständigen Kalenderwochen des sichtbaren Monatsbereichs.');
+}
 for (let month = 0; month < 12; month += 1) {
     const selectedMonth = new Date(2026, month, 1);
     const range = CalendarDate.monthRange(selectedMonth);
+    const apiRange = CalendarDate.completeWeekRange(range.start, range.end);
     const monthStart = CalendarDate.startOfMonth(selectedMonth);
     const afterMonth = new Date(monthStart);
     afterMonth.setMonth(afterMonth.getMonth() + 1);
@@ -490,6 +509,11 @@ for (let month = 0; month < 12; month += 1) {
     const trailingDays = Math.round((range.end - afterMonth) / 86400000);
     if (leadingDays < 0 || leadingDays > 3 || trailingDays < 0 || trailingDays > 3) {
         throw new Error('Ein Monatsanfang oder Monatsende überschreitet die Randtage-Grenze.');
+    }
+    const apiDays = Math.round((apiRange.end - apiRange.start) / 86400000);
+    if (apiRange.start.getDay() !== 1 || apiRange.end.getDay() !== 1 || apiDays < 28 || apiDays > 42 || apiDays % 7 !== 0
+        || apiRange.start > range.start || apiRange.end < range.end) {
+        throw new Error('Ein Monats-API-Bereich verletzt den vollständigen, begrenzten Wochenvertrag.');
     }
 }
 const monthHistoryCalls = [];

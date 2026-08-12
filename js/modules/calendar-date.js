@@ -44,6 +44,15 @@
             return { start, end, weeks };
         }
 
+        static completeWeekRange(startValue, endValue) {
+            const start = this.startOfWeek(startValue);
+            const end = new Date(endValue);
+            const weekday = end.getDay() || 7;
+            if (weekday !== 1) end.setDate(end.getDate() + 8 - weekday);
+            end.setHours(0, 0, 0, 0);
+            return { start, end };
+        }
+
         static isoWeekValue(date) {
             const value = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
             const day = value.getUTCDay() || 7;

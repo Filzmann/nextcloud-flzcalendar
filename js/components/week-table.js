@@ -50,7 +50,55 @@
                 .map(day => CalendarDate.isoDay(day)));
             if (state.vertical) this.vertical(employees, state, days, head, body, activeMonth, compactDays);
             else this.horizontal(employees, state, days, head, body, activeMonth, compactDays);
+            block.append(this.mobileCalendar(employees, state, days, activeMonth));
             return block;
+        }
+
+        mobileCalendar(employees, state, days, activeMonth = null) {
+            const list = document.createElement('div');
+            list.className = 'adc-mobile-calendar';
+            if (employees.length === 0) {
+                list.append(this.node('p', l10n.t('No people match the current filters.'), 'adc-mobile-empty'));
+                return list;
+            }
+            for (const day of days) {
+                const section = document.createElement('details');
+                section.className = this.classes('adc-mobile-day', this.dayClasses(day, activeMonth));
+                section.open = state.period === 'week'
+                    || (activeMonth !== null && day.getDate() === 1 && !this.outsideMonth(day, activeMonth));
+                const summary = this.node('summary', this.dayLabel(day, { weekday: 'long', day: '2-digit', month: 'long' }));
+                const holiday = this.holidays.name(day);
+                if (holiday) {
+                    summary.title = holiday;
+                    summary.append(this.node('span', holiday, 'adc-mobile-holiday'));
+                }
+                section.append(summary);
+                for (const employee of employees) section.append(this.mobilePerson(employee, day, state));
+                list.append(section);
+            }
+            return list;
+        }
+
+        mobilePerson(employee, day, state) {
+            const article = document.createElement('article');
+            article.className = 'adc-mobile-person';
+            article.append(
+                this.node('h3', employee.displayName),
+                this.node('p', this.clusterLabel(employee), 'adc-mobile-person-context'),
+            );
+            const dayEnd = new Date(day); dayEnd.setDate(dayEnd.getDate() + 1);
+            const overlaps = value => value.employeeUid === employee.uid
+                && new Date(value.start) < dayEnd
+                && new Date(value.end) > day;
+            const entries = state.data.entries.filter(overlaps);
+            const absences = (state.data.absences || []).filter(overlaps);
+            const cell = document.createElement('div');
+            cell.className = 'adc-mobile-cell';
+            cell.dataset.employeeUid = employee.uid;
+            cell.dataset.day = CalendarDate.isoDay(day);
+            cell.innerHTML = this.calendarCell.render(entries, employee, absences);
+            article.append(cell);
+            return article;
         }
 
         vertical(employees, state, days, head, body, activeMonth = null, compactDays = new Set()) {

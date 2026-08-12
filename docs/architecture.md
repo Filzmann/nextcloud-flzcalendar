@@ -94,6 +94,19 @@ Der interne DAV-Zugriff ist hinter `PersonalCalendarPublisher` gekapselt. Der
 interne Nextcloud-DAV-Vertrag bleibt auf
 `NextcloudDavShiftCalendarPublisher` begrenzt.
 
+## Responsive Kalenderdarstellung
+
+Die Desktopdarstellung bleibt die durchgehende Wochen- beziehungsweise
+Monatsmatrix. Bis einschließlich 700 Pixel Viewportbreite wird sie ausgeblendet
+und aus denselben bereits gefilterten Kalenderdaten eine semantische Tagesliste
+abgeleitet. Jede Tagesgruppe nennt Datum und gegebenenfalls Feiertag sichtbar;
+Personenkarten nennen Person und Organisationskontext und verwenden für
+Einträge, Urlaubsstatus und Aktionen denselben `CalendarCell`- und
+`canManage`-Vertrag wie die Matrix. Die mobile Projektion ist keine zweite
+Daten- oder Rechtequelle. Monatsgruppen sind einklappbar, Touch-Ziele
+mindestens 44 Pixel groß und die mobile Ansicht erzeugt keinen horizontalen
+Seiten-Scrollbar.
+
 Die Kopano-/CalDAV-Vorgabe und der sichtbare Kalendername stammen aus einer
 zentralen, validierten Nextcloud-AppConfig-Quelle. Nur bestätigte
 Nextcloud-Admins dürfen sie mit normalem CSRF-Schutz ändern. Eine
@@ -145,11 +158,13 @@ Assistenzteam-Konventionen und Hierarchiekanten stammen aus
 Eine Änderung technischer Gruppen-IDs verschiebt keine bestehenden
 Nextcloud-Mitgliedschaften.
 
-Ist AD Urlaub aktiv, erscheinen geplante Urlaube als read-only `U?` ohne
-Blockade. Genehmigte Urlaube erscheinen als `U`, blockieren neue Dienste und
-Termine, verhindern Standarddienst-Materialisierung und werden aus
-Meetinglücken entfernt. Ohne AD Urlaub bleiben manuelle Sperrtermine der
-gültige Standalone-Weg.
+Ist AD Urlaub aktiv, erscheinen geplante Urlaube als read-only `U?` und
+genehmigte Urlaube als `U`. Beide Status blockieren neue und materialisierte
+Standarddienste, lassen Sperrtermine zu und sind ausschließlich im AD Urlaub
+bearbeitbar. Nur genehmigter Urlaub wird aus Meetinglücken entfernt. Im
+persönlichen DAV-Kalender bleibt geplanter Urlaub davon unabhängig tentative
+und transparent, genehmigter Urlaub confirmed und opaque. Ohne AD Urlaub
+bleiben manuelle Sperrtermine der gültige Standalone-Weg.
 
 ## Demo- und Legacy-Grenzen
 

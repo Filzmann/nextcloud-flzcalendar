@@ -114,7 +114,10 @@
     async function load() {
         const sequence = ++loadSequence;
         const visibleRange = state.visibleRange();
-        const range = { start: CalendarDate.isoDay(visibleRange.start), end: CalendarDate.isoDay(visibleRange.end) };
+        const requestRange = state.period === 'month'
+            ? CalendarDate.completeWeekRange(visibleRange.start, visibleRange.end)
+            : visibleRange;
+        const range = { start: CalendarDate.isoDay(requestRange.start), end: CalendarDate.isoDay(requestRange.end) };
         weekNavigation.render();
         if (state.data) renderTable();
         try {

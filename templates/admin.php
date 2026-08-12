@@ -1,6 +1,7 @@
 <?php
 translation('adcalendar');
 \OCP\Util::addScript('localbase', 'api/api-client');
+\OCP\Util::addScript('adcalendar', 'modules/localization');
 \OCP\Util::addScript('adcalendar', 'admin');
 \OCP\Util::addStyle('adcalendar', 'admin');
 $calendarSyncStatus = $_['calendarSyncStatus'] ?? ['hasRun' => false, 'lastRunAt' => 0, 'lastRunLabel' => $l->t('No background run recorded'), 'attempted' => 0, 'succeeded' => 0, 'failed' => 0, 'state' => 'pending'];

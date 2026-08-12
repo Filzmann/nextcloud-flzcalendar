@@ -53,6 +53,12 @@ foreach (['.adc-navigation button { max-width: 100%; height: auto; white-space: 
 foreach (['.adc-calendar-tables { display: flex; overflow: hidden;', '.adc-period-matrix { display: flex; min-width: 0; overflow: hidden;', '.adc-table-wrap { flex: 1 1 auto; width: 100%; max-width: 100%; min-width: 0; height: auto; max-height: none; overflow: auto;'] as $contract) {
     if (!str_contains($css, $contract)) throw new RuntimeException("Viewport-fester horizontaler Scrollvertrag fehlt: {$contract}");
 }
+foreach (['.adc-mobile-calendar { display: none;', '@media (max-width: 700px)', '.adc-table-wrap { display: none;', '.adc-mobile-calendar { display: grid;', '.adc-mobile-day > summary', '.adc-mobile-holiday', '.adc-mobile-person', '.adc-mobile-cell .adc-icon-button', '.adc-navigation #adc-toggle-view { display: none;', 'min-height: 44px', 'min-width: 44px !important'] as $contract) {
+    if (!str_contains($css, $contract)) throw new RuntimeException("Echte mobile Kalenderdarstellung fehlt: {$contract}");
+}
+foreach (['grid-template-areas:', '"period period"', '"previous next"', '#adc-previous-period { grid-area: previous;', '#adc-next-period { grid-area: next;', '.adc-tabs button,', '.adc-filter-grid button,', '.adc-dialog__actions button { min-height: 44px;'] as $contract) {
+    if (!str_contains($css, $contract)) throw new RuntimeException("Mobile Navigation oder Touch-Ziele sind nicht stabil: {$contract}");
+}
 foreach (['.adc-app input:focus-visible', '.adc-app select:focus-visible', '.adc-app summary:focus-visible', 'outline: 3px solid var(--color-primary-element)', '.adc-dialog__hint {', 'background: var(--color-error)', '.adc-entry__title { display: block; overflow: visible', '.adc-calendar thead th { position: sticky; top: 0; z-index: 20', '.adc-group-heading { position: sticky; inset-inline-start: 0;'] as $contract) {
     if (!str_contains($css, $contract)) throw new RuntimeException("Abnahmefähiger Fokus-/Kontrast-/Sticky-Vertrag fehlt: {$contract}");
 }

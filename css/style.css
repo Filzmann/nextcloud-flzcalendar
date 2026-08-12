@@ -19,6 +19,7 @@
 .adc-calendar-tables, .adc-period-matrix { flex: 1 1 auto; min-height: 0; }
 .adc-calendar-tables { display: flex; overflow: hidden; }
 .adc-period-matrix { display: flex; min-width: 0; overflow: hidden; }
+.adc-mobile-calendar { display: none; }
 .adc-filters { margin: 8px 0 10px; border: 1px solid var(--color-border); border-radius: var(--border-radius-large); background: var(--color-main-background); }
 .adc-filters > summary { min-height: 34px; box-sizing: border-box; padding: 6px 10px; cursor: pointer; font-weight: 700; }
 .adc-filter-status { margin-inline-start: 8px; color: var(--color-text-maxcontrast); font-size: var(--font-size-small); font-weight: 400; }
@@ -142,4 +143,50 @@
 .adc-meeting-gap-list button { flex: 0 0 auto; margin: 0; }
 .adc-meeting-result-actions { display: flex; flex-wrap: wrap; gap: 5px; }
 .adc-meeting-result-actions button { margin: 0; }
-@media (max-width: 700px) { .adc-app { padding: 12px 12px 32px; } .adc-navigation { width: 100%; justify-content: space-between; flex-wrap: wrap; } .adc-filter-grid { grid-template-columns: 1fr; } .adc-person-filter, .adc-selection-filter { grid-template-columns: 1fr; } .adc-selection-actions { grid-column: 1; } .adc-shift-default-row, .adc-recurrence, .adc-recurrence__options { grid-template-columns: 1fr; } }
+@media (max-width: 700px) {
+    .adc-app { padding: 10px 8px 28px; }
+    .adc-overview-header { align-items: stretch; }
+    .adc-navigation {
+        display: grid;
+        width: 100%;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        grid-template-areas:
+            "period period"
+            "label label"
+            "picker picker"
+            "previous next";
+        gap: 6px;
+    }
+    .adc-navigation > * { min-width: 0; }
+    .adc-navigation output { grid-area: label; min-width: 0; }
+    .adc-period-toggle { display: grid; grid-area: period; grid-template-columns: 1fr 1fr; }
+    #adc-week-picker, #adc-month-picker { grid-area: picker; }
+    #adc-previous-period { grid-area: previous; }
+    #adc-next-period { grid-area: next; }
+    .adc-navigation button, .adc-period-toggle button { min-height: 44px; margin: 0; }
+    .adc-navigation #adc-toggle-view { display: none; }
+    .adc-tabs button,
+    .adc-filter-grid button,
+    .adc-dialog__actions button { min-height: 44px; }
+    .adc-filter-grid { grid-template-columns: 1fr; }
+    .adc-person-filter, .adc-selection-filter { grid-template-columns: 1fr; }
+    .adc-selection-actions { grid-column: 1; }
+    .adc-shift-default-row, .adc-recurrence, .adc-recurrence__options { grid-template-columns: 1fr; }
+    .adc-table-wrap { display: none; }
+    .adc-mobile-calendar { display: grid; width: 100%; gap: 8px; overflow: visible; }
+    .adc-mobile-day { border: 1px solid var(--color-border); border-radius: var(--border-radius-large); background: var(--color-main-background); }
+    .adc-mobile-day > summary { min-height: 44px; box-sizing: border-box; padding: 10px 12px; cursor: pointer; font-weight: 700; }
+    .adc-mobile-holiday { display: block; margin-top: 2px; font-size: var(--font-size-small); font-weight: 400; }
+    .adc-mobile-day.adc-weekend > summary { background: var(--color-background-dark); }
+    .adc-mobile-day.adc-holiday > summary { box-shadow: inset 4px 0 0 var(--color-warning); }
+    .adc-mobile-day.adc-outside-month { opacity: .72; }
+    .adc-mobile-person { min-width: 0; margin: 0 8px 8px; padding: 10px; border: 1px solid var(--color-border); border-radius: var(--border-radius); background: var(--color-background-hover); }
+    .adc-mobile-person h3 { margin: 0; font-size: 1rem; }
+    .adc-mobile-person-context { margin: 2px 0 8px; color: var(--color-text-maxcontrast); font-size: var(--font-size-small); }
+    .adc-mobile-cell { min-width: 0; }
+    .adc-mobile-cell .adc-cell-actions { position: static; justify-content: flex-start; margin-bottom: 6px; }
+    .adc-mobile-cell .adc-icon-button { width: 44px; min-width: 44px !important; height: 44px; min-height: 44px !important; }
+    .adc-mobile-cell .adc-cell-entries { display: grid; gap: 6px; background: none; }
+    .adc-mobile-cell .adc-entry { min-height: 44px; box-sizing: border-box; }
+    .adc-mobile-empty { margin: 12px; }
+}
