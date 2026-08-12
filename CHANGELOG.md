@@ -8,6 +8,8 @@
 - Die mobile Tagesliste auf einen einzigen vertikalen App-Scroller umgestellt und einen Floating-Button für die Rückkehr zum Anfang ergänzt.
 - Nachtdienste je Tageszelle mit gekapptem Teilzeitraum und Fortsetzungskennzeichnung dargestellt.
 - Leere Dialogfehlermeldungen ausgeblendet, statt eine bedeutungslose Fehlerfläche anzuzeigen.
+- Mitarbeiter*innen-Auswahl im Eintragsdialog durch eine feste Anzeige ersetzt und nachträgliche API-Umzuordnungen serverseitig gesperrt.
+- Kalendergruppen in der Übersicht auf die zentralen Betriebskürzel wie `BO-NO`, `EB-W`, `PFK`, `BO-Pflege` und `IT` umgestellt.
 
 ## 0.14.0-rc.2
 

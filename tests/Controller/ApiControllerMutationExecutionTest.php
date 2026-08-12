@@ -203,6 +203,12 @@ namespace {
     $calendar->entry = $entry();
     $access->manageable = [];
     $assertResponse($controller->update(41, ...$createArguments), 403, 'forbidden');
+    $access->manageable = ['person-a', 'person-b'];
+    $savedBeforeOwnerChange = count($calendar->saved);
+    $assertResponse($controller->update(41, 'person-b', '2026-07-06T08:00:00+02:00', '2026-07-06T16:00:00+02:00', 'shift'), 409, 'entry_owner_immutable');
+    if (count($calendar->saved) !== $savedBeforeOwnerChange) {
+        throw new RuntimeException('Manipulierte Mitarbeiter*innen-Zuordnung erreicht trotz unveränderlicher Eigentümerschaft den Kalenderdienst.');
+    }
     $access->manageable = ['person-a'];
     $meeting = $entry(['type' => 'appointment', 'title' => 'Meeting', 'meetingUid' => 'meeting-a']);
     $calendar->entry = $meeting;

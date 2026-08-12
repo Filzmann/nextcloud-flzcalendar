@@ -209,16 +209,16 @@
 
         clusterLabel(employee) {
             const organization = this.organization();
-            const staffRoles = new Set(organization.staffRoleGroups());
+            const staffRoles = new Set(organization.leadershipStaffRoleGroups());
             if (employee.roles.some(role => staffRoles.has(role))) return organization.staffBlockLabel;
             const roleNames = employee.roles.slice()
                 .sort((a, b) => organization.roleOrder(a) - organization.roleOrder(b))
-                .map(value => organization.roleLabel(value));
+                .map(value => organization.roleShortLabel(value));
             const roles = roleNames.length > 1 ? `${roleNames[0]} (${roleNames.slice(1).join(', ')})` : roleNames[0] || l10n.t('Without specialist role');
             const areas = employee.areas.slice()
                 .sort((a, b) => organization.areaOrder(a) - organization.areaOrder(b))
-                .map(value => organization.areaLabel(value)).join(' / ');
-            return areas ? `${roles} · ${areas}` : roles;
+                .map(value => organization.areaShortLabel(value)).join('/');
+            return areas ? `${roles}-${areas}` : roles;
         }
 
         orderedEmployees(employees) {

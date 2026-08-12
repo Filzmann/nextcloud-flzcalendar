@@ -91,7 +91,7 @@ for (const contract of ['class CalendarFilters', 'this.renderLeadershipStaffChec
 for (const contract of ['class TabNavigation', "addEventListener('click'", "this.show('settings')", "this.onChange(active)"]) {
     if (!tabNavigation.includes(contract)) throw new Error(`Tab-Komponentenvertrag fehlt: ${contract}`);
 }
-for (const contract of ['class WeekTable', 'adc-group-heading', 'adc-period-matrix', 'adc-mobile-calendar', 'adc-mobile-day', 'adc-mobile-person', 'adc-outside-month', 'this.calendarCell.render(entries, employee, absences, layout, day, this.timeline)', 'this.calendarCell.render(entries, employee, absences, null, day)', 'this.timeline.layout(employeeEntries, days)', 'this.timeline.layout(dayEntries, [day])', 'organization.staffBlockLabel', 'organization.roleLabel(value)', 'organization.areaLabel(value)', 'this.daysInRange(range.start, range.end)', 'groupCell.colSpan = days.length + 1', 'this.orderedEmployees(employees)', 'this.staffRank(a) - this.staffRank(b)', 'roleNames.slice(1)', "join(' / ')"]) {
+for (const contract of ['class WeekTable', 'adc-group-heading', 'adc-period-matrix', 'adc-mobile-calendar', 'adc-mobile-day', 'adc-mobile-person', 'adc-outside-month', 'this.calendarCell.render(entries, employee, absences, layout, day, this.timeline)', 'this.calendarCell.render(entries, employee, absences, null, day)', 'this.timeline.layout(employeeEntries, days)', 'this.timeline.layout(dayEntries, [day])', 'organization.staffBlockLabel', 'organization.roleShortLabel(value)', 'organization.areaShortLabel(value)', 'this.daysInRange(range.start, range.end)', 'groupCell.colSpan = days.length + 1', 'this.orderedEmployees(employees)', 'this.staffRank(a) - this.staffRank(b)', 'roleNames.slice(1)', "join('/')"]) {
     if (!weekTable.includes(contract)) throw new Error(`Wochenmatrix-Komponentenvertrag fehlt: ${contract}`);
 }
 const timelineContext = { window: {}, Date, Set, Math };
@@ -178,14 +178,25 @@ if (publicHolidays.name(new Date(2026, 4, 1)) !== 'Tag der Arbeit'
 }
 const clusterTable = Object.create(tableContext.window.AdCalendar.components.WeekTable.prototype);
 clusterTable.organization = () => ({
-    staffRoleGroups: () => [], staffBlockLabel: 'Leitungen',
+    staffRoleGroups: () => ['ad-IT'], leadershipStaffRoleGroups: () => [], staffBlockLabel: 'Leitungen',
     roleLabel: value => ({'ad-EB':'Einsatzbegleitung','ad-StvBL':'Stellvertretende Büroleitung','ad-Buero':'Büroorganisation'}[value] || value),
     areaLabel: value => ({'ad-Bereich-Nordost':'Nordost','ad-Bereich-West':'West'}[value] || value),
+    roleShortLabel: value => ({'ad-EB':'EB','ad-StvBL':'Stellvertretende Büroleitung','ad-Buero':'BO','ad-PFK':'PFK','ad-Bueroorganisation-Pflege':'BO-Pflege','ad-IT':'IT'}[value] || value),
+    areaShortLabel: value => ({'ad-Bereich-Nordost':'NO','ad-Bereich-West':'W'}[value] || value),
     roleOrder: value => ({'ad-EB':10,'ad-Buero':20,'ad-StvBL':30}[value] ?? 999),
     areaOrder: value => ({'ad-Bereich-West':10,'ad-Bereich-Nordost':20}[value] ?? 999),
 });
-if (clusterTable.clusterLabel({ roles: ['ad-StvBL', 'ad-EB'], areas: ['ad-Bereich-Nordost', 'ad-Bereich-West'] }) !== 'Einsatzbegleitung (Stellvertretende Büroleitung) · West / Nordost') {
+if (clusterTable.clusterLabel({ roles: ['ad-StvBL', 'ad-EB'], areas: ['ad-Bereich-Nordost', 'ad-Bereich-West'] }) !== 'EB (Stellvertretende Büroleitung)-W/NO') {
     throw new Error('Mehrfachrollen und -bereiche folgen im Gruppentitel nicht der Backend-Reihenfolge.');
+}
+for (const [employee, expected] of [
+    [{ roles: ['ad-Buero'], areas: ['ad-Bereich-Nordost'] }, 'BO-NO'],
+    [{ roles: ['ad-EB'], areas: ['ad-Bereich-West'] }, 'EB-W'],
+    [{ roles: ['ad-PFK'], areas: [] }, 'PFK'],
+    [{ roles: ['ad-Bueroorganisation-Pflege'], areas: [] }, 'BO-Pflege'],
+    [{ roles: ['ad-IT'], areas: [] }, 'IT'],
+]) {
+    if (clusterTable.clusterLabel(employee) !== expected) throw new Error(`Kalenderkürzel ${expected} fehlt in der Übersicht.`);
 }
 const backendOrderedEmployees = clusterTable.orderedEmployees([
     { uid: 'office-ne', displayName: 'Büro Nordost', roles: ['ad-Buero'], areas: ['ad-Bereich-Nordost'] },
@@ -309,7 +320,7 @@ if (source.includes('state.data.summaries')) throw new Error('Entfernter Gesamt-
 for (const contract of ['extends BaseRepository', 'range(start, end)', 'savePreferences(filters)', 'saveShiftDefaults(shiftDefaults)', 'saveCalendarSync(enabled)', 'meetingGaps(start, employeeUids, durationMinutes)', 'blockMeeting(start, end, employeeUids, title)', 'updateMeeting(meetingUid, start, end, title)', 'removeMeeting(meetingUid)', "method: id == null ? 'POST' : 'PUT'", "seriesScope = 'occurrence'", '{ childMode, seriesScope }']) {
     if (!repository.includes(contract)) throw new Error(`Repository-Vertrag fehlt: ${contract}`);
 }
-for (const contract of ['class Organization extends BaseModel', 'roleLabel(groupId)', 'areaLabel(groupId)', 'staffRoleGroups()', 'leadershipStaffRoleGroups()', 'roleOrder(groupId)', 'areaOrder(groupId)', 'toArray()']) {
+for (const contract of ['class Organization extends BaseModel', 'roleLabel(groupId)', 'areaLabel(groupId)', 'roleShortLabel(groupId)', 'areaShortLabel(groupId)', 'staffRoleGroups()', 'leadershipStaffRoleGroups()', 'roleOrder(groupId)', 'areaOrder(groupId)', 'toArray()']) {
     if (!organizationModel.includes(contract)) throw new Error(`Organisationsmodell-Vertrag fehlt: ${contract}`);
 }
 const organizationContext = { window: { LocalBase: { models: { Model: class {} } } }, Number, String, JSON };
@@ -322,12 +333,22 @@ const sortableOrganization = new organizationContext.window.AdCalendar.models.Or
         payroll: { groupId: 'ad-Lohn', label: 'Lohn', sortOrder: 40, staffBlock: true },
         it: { groupId: 'ad-IT', label: 'IT', sortOrder: 50, staffBlock: true },
         secretariat: { groupId: 'ad-Sekretariat', label: 'Sekretariat', sortOrder: 60, staffBlock: true },
-        office: { groupId: 'ad-Buero', label: 'Büro', sortOrder: 70 },
+        office: { groupId: 'ad-Buero', label: 'Büro', shortLabel: 'BO', sortOrder: 70 },
     },
-    areas: { northeast: { groupId: 'ad-Bereich-Nordost', label: 'Nordost', sortOrder: 30 } },
+    areas: { northeast: { groupId: 'ad-Bereich-Nordost', label: 'Nordost', shortLabel: 'NO', sortOrder: 30 } },
 });
 if (sortableOrganization.roleOrder('ad-Buero') !== 70 || sortableOrganization.areaOrder('ad-Bereich-Nordost') !== 30) {
     throw new Error('Das Kalender-Organisationsmodell übernimmt die Backend-Reihenfolge nicht.');
+}
+if (sortableOrganization.roleShortLabel('ad-Buero') !== 'BO' || sortableOrganization.areaShortLabel('ad-Bereich-Nordost') !== 'NO') {
+    throw new Error('Das Kalender-Organisationsmodell übernimmt die zentralen Kürzel nicht.');
+}
+const legacyOrganization = new organizationContext.window.AdCalendar.models.Organization({
+    roles: { office: { groupId: 'legacy-office', label: 'Altes Büro' } },
+    areas: { north: { groupId: 'legacy-north', label: 'Alter Norden' } },
+});
+if (legacyOrganization.roleShortLabel('legacy-office') !== 'Altes Büro' || legacyOrganization.areaShortLabel('legacy-north') !== 'Alter Norden') {
+    throw new Error('Ältere Organisationsdefinitionen ohne Kürzelfelder fallen nicht auf ihre Langnamen zurück.');
 }
 if (sortableOrganization.leadershipStaffRoleGroups().join(',') !== 'ad-PDL,ad-Stab-HR') {
     throw new Error('IT, Sekretariat und Finanzen/Lohn bleiben ungewollt Teil des gemeinsamen Leitungs-/Stabsfilters.');
@@ -402,7 +423,7 @@ const syncComponent = new syncContext.window.AdCalendar.components.ShiftCalendar
 syncComponent.set({ enabled: true, calendarName: 'AD Dienste' });
 await syncForm.listener({ preventDefault() {} });
 if (!syncInput.checked || !syncStatus.textContent.includes('AD Dienste') || savedSync !== true) throw new Error('Persönliche Kalenderaktivierung ist nicht tastaturbedienbar oder zeigt ihren Zustand nicht an.');
-for (const contract of ['class EntryDialog', 'this.returnFocus', 'this.dialog.showModal()', 'this.updateType()', 'this.updateRecurrence()', 'recurrenceFrequency:', 'recurrenceWeekdays:', 'recurrenceTimezone: this.timezone()', "typeof configured === 'string'", 'this.nextFreeShift', 'setCustomValidity(message)', 'Boolean(entry?.meetingUid)', "entry.type === 'shift'", 'start < new Date(entry.end)', 'end > new Date(entry.start)']) {
+for (const contract of ['class EntryDialog', 'this.returnFocus', 'this.dialog.showModal()', 'this.showEmployee(', 'this.updateType()', 'this.updateRecurrence()', 'recurrenceFrequency:', 'recurrenceWeekdays:', 'recurrenceTimezone: this.timezone()', "typeof configured === 'string'", 'this.nextFreeShift', 'setCustomValidity(message)', "entry.type === 'shift'", 'start < new Date(entry.end)', 'end > new Date(entry.start)']) {
     if (!entryDialog.includes(contract)) throw new Error(`Eintragsdialog-Vertrag fehlt: ${contract}`);
 }
 
@@ -633,6 +654,12 @@ if (emptyFilterState.toPreference().period !== 'month') throw new Error('Der Ans
 const dialogContext = { window: {}, document: {}, Date };
 execute('../../js/components/entry-dialog.js', entryDialog, dialogContext);
 const dialog = Object.create(dialogContext.window.AdCalendar.components.EntryDialog.prototype);
+dialog.fields = { employee: { value: '' }, 'employee-name': { textContent: '' } };
+dialog.setEmployees([{ uid: 'demo', displayName: 'Demo Person' }, { uid: 'other', displayName: 'Other Person' }]);
+dialog.showEmployee('demo');
+if (dialog.fields.employee.value !== 'demo' || dialog.fields['employee-name'].textContent !== 'Demo Person') {
+    throw new Error('Der Eintragsdialog bindet die Zielperson nicht unveränderlich aus der Kalenderzelle.');
+}
 let startValidity = '';
 let endValidity = '';
 dialog.entries = () => [{ id: 7, employeeUid: 'demo', type: 'shift', start: '2026-07-06T10:00:00Z', end: '2026-07-06T18:00:00Z' }];

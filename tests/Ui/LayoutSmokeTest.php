@@ -72,6 +72,12 @@ if (!str_contains($css, '.adc-dialog__hint:empty { display: none; }')) {
     throw new RuntimeException('Leere Dialogfehlermeldungen bleiben als bedeutungsloser rosa Balken sichtbar.');
 }
 if (!str_contains($template, 'id="adc-type" type="hidden"')) throw new RuntimeException('Der durch die Aktion festgelegte Eintragstyp wird weiterhin redundant ausgewählt.');
+if (!str_contains($template, 'id="adc-employee" type="hidden"') || !str_contains($template, 'id="adc-employee-name"') || str_contains($template, '<select id="adc-employee"')) {
+    throw new RuntimeException('Die bereits durch die Kalenderzelle festgelegte Person bleibt im Eintragsdialog auswählbar.');
+}
+if (!str_contains($css, '.adc-readonly-field { display: grid; grid-column: 1 / -1;') || !str_contains($css, '.adc-readonly-field output { display: block;')) {
+    throw new RuntimeException('Die feste Personendarstellung besitzt keinen stabilen, dialogbreiten Feldrahmen.');
+}
 if (!str_contains($css, 'max-height: calc(100dvh - var(--header-height, 50px))')) {
     throw new RuntimeException('Der App-Root wächst über den sichtbaren Nextcloud-Inhaltsbereich hinaus.');
 }

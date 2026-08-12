@@ -34,6 +34,7 @@ OC.L10N.register(
     "Close dialog" : "Close dialog",
     "Close" : "Close",
     "Employee" : "Employee",
+    "Calendar entries cannot be reassigned to another person." : "Calendar entries cannot be reassigned to another person.",
     "Type" : "Type",
     "Shift" : "Shift",
     "Continued from previous day" : "Continued from previous day",

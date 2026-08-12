@@ -14,7 +14,8 @@
             this.shiftDefaults = options.shiftDefaults;
             this.onSubmit = options.onSubmit;
             this.returnFocus = null;
-            this.fields = Object.fromEntries(['entry-id', 'employee', 'type', 'start', 'end', 'title', 'title-field', 'title-label', 'title-help', 'time-help', 'entry-dialog-title', 'recurrence-fields', 'recurrence-frequency', 'recurrence-options', 'recurrence-interval', 'recurrence-until', 'recurrence-weekdays'].map(id => [id, document.getElementById(`adc-${id}`)]));
+            this.fields = Object.fromEntries(['entry-id', 'employee', 'employee-name', 'type', 'start', 'end', 'title', 'title-field', 'title-label', 'title-help', 'time-help', 'entry-dialog-title', 'recurrence-fields', 'recurrence-frequency', 'recurrence-options', 'recurrence-interval', 'recurrence-until', 'recurrence-weekdays'].map(id => [id, document.getElementById(`adc-${id}`)]));
+            this.employeeNames = new Map();
             this.weekdays = Array.from(document.querySelectorAll('input[name="adc-recurrence-weekday"]'));
             document.getElementById('adc-cancel-edit').addEventListener('click', () => this.close());
             document.getElementById('adc-dialog-cancel').addEventListener('click', () => this.close());
@@ -22,30 +23,27 @@
             this.fields.type.addEventListener('change', () => { this.updateType(); this.validate(); });
             this.fields['recurrence-frequency'].addEventListener('change', () => this.updateRecurrence());
             this.fields.start.addEventListener('change', () => this.updateRecurrenceDate());
-            this.fields.employee.addEventListener('change', () => this.validate());
             this.fields.start.addEventListener('input', () => this.validate());
             this.fields.end.addEventListener('input', () => this.validate());
             this.form.addEventListener('submit', event => this.submit(event));
         }
 
         setEmployees(employees) {
-            this.fields.employee.replaceChildren(...employees.map(employee => {
-                const option = document.createElement('option');
-                option.value = employee.uid;
-                option.textContent = employee.displayName;
-                return option;
-            }));
+            this.employeeNames = new Map(employees.map(employee => [employee.uid, employee.displayName]));
+        }
+
+        showEmployee(employeeUid) {
+            this.fields.employee.value = employeeUid;
+            this.fields['employee-name'].textContent = this.employeeNames.get(employeeUid) || employeeUid;
         }
 
         open({ employee, day, type, entry = null }) {
             this.returnFocus = document.activeElement;
             this.form.reset();
-            this.fields.employee.disabled = false;
             this.fields['entry-id'].value = entry?.id || '';
-            this.fields.employee.value = entry?.employeeUid || employee.uid;
+            this.showEmployee(entry?.employeeUid || employee.uid);
             this.fields.type.value = entry?.type || type;
             this.fields.type.disabled = Boolean(entry);
-            this.fields.employee.disabled = Boolean(entry?.meetingUid);
             if (entry) {
                 this.fields.start.value = this.localDateTime(entry.start);
                 this.fields.end.value = this.localDateTime(entry.end);
@@ -66,7 +64,6 @@
             this.form.reset();
             this.fields['entry-id'].value = '';
             this.fields.type.disabled = false;
-            this.fields.employee.disabled = false;
             this.fields['recurrence-fields'].hidden = true;
             const returnFocus = this.returnFocus;
             this.returnFocus = null;

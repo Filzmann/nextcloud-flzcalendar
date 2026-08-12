@@ -106,8 +106,9 @@ final class ApiController extends Controller {
     #[NoAdminRequired]
     public function update(int $id, string $employeeUid, string $start, string $end, string $type, string $title = '', string $seriesScope = 'occurrence'): JSONResponse {
         $existing = $this->calendar->existing($id);
-        if (!$this->access->canManage($existing->employeeUid()) || !$this->access->canManage($employeeUid)) {
-            return $this->denied();
+        if (!$this->access->canManage($existing->employeeUid())) return $this->denied();
+        if ($employeeUid !== $existing->employeeUid()) {
+            return $this->errors->create('entry_owner_immutable', 'Calendar entries cannot be reassigned to another person.', Http::STATUS_CONFLICT);
         }
         if ($existing->meetingUid() !== null) {
             return $this->errors->create('meeting_managed_together', 'Shared meetings are edited together.', Http::STATUS_CONFLICT);

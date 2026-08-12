@@ -29,6 +29,16 @@
             return Object.values(this.areas).find(area => area.groupId === groupId)?.label || groupId;
         }
 
+        roleShortLabel(groupId) {
+            const role = Object.values(this.roles).find(item => item.groupId === groupId);
+            return role?.shortLabel || role?.label || groupId;
+        }
+
+        areaShortLabel(groupId) {
+            const area = Object.values(this.areas).find(item => item.groupId === groupId);
+            return area?.shortLabel || area?.label || groupId;
+        }
+
         staffRoleGroups() {
             return Object.values(this.roles).filter(role => role.staffBlock).sort((a, b) => Number(a.sortOrder) - Number(b.sortOrder)).map(role => role.groupId);
         }

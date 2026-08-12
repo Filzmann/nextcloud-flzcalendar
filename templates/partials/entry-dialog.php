@@ -6,7 +6,11 @@
         </header>
         <input id="adc-entry-id" type="hidden">
         <div class="adc-dialog__fields">
-            <label><?php p($l->t('Employee')); ?> <select id="adc-employee" required></select></label>
+            <div class="adc-readonly-field">
+                <span id="adc-employee-label"><?php p($l->t('Employee')); ?></span>
+                <output id="adc-employee-name" aria-labelledby="adc-employee-label"></output>
+                <input id="adc-employee" type="hidden">
+            </div>
             <input id="adc-type" type="hidden" value="shift">
             <label><?php p($l->t('Start')); ?> <input id="adc-start" type="datetime-local" required aria-describedby="adc-time-help"></label>
             <label><?php p($l->t('End')); ?> <input id="adc-end" type="datetime-local" required aria-describedby="adc-time-help"></label>

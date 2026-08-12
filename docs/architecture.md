@@ -12,6 +12,11 @@ Beginn und Ende; ihr Titel ist optional. Termine besitzen einen sprechenden
 Titel. Termine innerhalb eines Dienstes referenzieren ihn über
 `parent_entry_id`; Termine ohne Parent sind Sperrtermine.
 
+Die angeklickte Kalenderzelle bestimmt die Mitarbeiter*innen-Zuordnung. Sie
+wird im Dialog nur angezeigt und bleibt nach dem Anlegen unveränderlich; auch
+ein grundsätzlich für beide Kalender berechtigter API-Akteur darf einen
+Eintrag nicht durch Änderung der `employeeUid` verschieben.
+
 Die Wochenansicht und die durchgehende Monatsmatrix unterstützen „Tage als
 Zeilen“ und „Personen als Zeilen“. Die Monatsansicht wiederholt keine
 Wochenblöcke: Ihr vollständiger sichtbarer Tagesbereich bildet je nach
@@ -43,6 +48,12 @@ miteinander als Schnittmenge ausgewertet. Die im Organisationsvertrag erste
 passende Rolle ist die vorrangige Kalenderrolle. Persönliche Filter-,
 Zeitraum- und Ausrichtungskonfigurationen werden nur durch „Zum Standard
 machen“ als Nextcloud-Benutzerwert gespeichert.
+
+Gruppenüberschriften und der mobile Organisationskontext verwenden die vom
+LocalBase-Organisationsvertrag gelieferten Kürzel. Bereichsrollen verbinden
+Rollen- und Bereichskürzel mit einem Bindestrich, beispielsweise `BO-NO` oder
+`EB-W`; globale Rollen erscheinen beispielsweise als `PFK`, `BO-Pflege` oder
+`IT`. Filter und Organisationsverwaltung verwenden weiterhin die Langnamen.
 
 ## Standarddienste, Meetings und Serien
 

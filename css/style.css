@@ -115,6 +115,8 @@
 .adc-dialog__header h2 { margin: 0; font-size: 1.2rem; }
 .adc-dialog__fields { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .adc-dialog__fields label { display: grid; gap: 2px; }
+.adc-readonly-field { display: grid; grid-column: 1 / -1; gap: 2px; }
+.adc-readonly-field output { display: block; min-height: 34px; box-sizing: border-box; padding: 7px 9px; border: 1px solid var(--color-border); border-radius: var(--border-radius); background: var(--color-background-dark); font-weight: 600; }
 .adc-dialog__fields label:first-child, .adc-dialog__fields label:last-child { grid-column: 1 / -1; }
 .adc-dialog__fields input, .adc-dialog__fields select { width: 100%; margin: 0; }
 .adc-recurrence { display: grid; grid-template-columns: minmax(8rem, auto) 1fr; gap: 6px 8px; margin: 9px 0 0; padding: 7px 9px; border: 1px solid var(--color-border); border-radius: var(--border-radius); }
