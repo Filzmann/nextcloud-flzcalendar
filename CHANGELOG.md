@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 0.15.0-rc.1
+
+- Subjectgebundene persönliche Datenauskunft für eigene Dienste und Termine ergänzt; bei gemeinsamen Terminen werden weitere Beteiligte nur abstrakt erwähnt.
+- Menschenlesbare Tabellenfelder, deutsche Kurzdatumswerte und ehrliche Aufbewahrungshinweise ohne erfundene Löschfrist bereitgestellt.
 - Für Viewports bis 700 Pixel eine semantische, einklappbare Tagesliste aus denselben gefilterten Kalenderdaten wie die Desktopmatrix ergänzt.
 - Person, Organisationskontext, Datum, Feiertag, Eintragstyp und Urlaubsstatus mobil ohne horizontal verschobene Desktopmatrix sichtbar gemacht.
 - Mobile Eintragsaktionen an den unveränderten `canManage`-Vertrag gebunden und mit mindestens 44 Pixel großen Touch-Zielen versehen.

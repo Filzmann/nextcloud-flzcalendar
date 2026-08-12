@@ -71,6 +71,29 @@ final class CalendarEntryRepository {
         return CalendarEntry::get_all(array_map([$this, 'mapRow'], $qb->executeQuery()->fetchAllAssociative()));
     }
 
+    /** @return list<CalendarEntry> */
+    public function findByEmployeeUid(string $employeeUid, int $limit): array {
+        $qb = $this->db->getQueryBuilder();
+        $qb->select(...self::COLUMNS)->from('adc_entries')
+            ->where($qb->expr()->eq('employee_uid', $qb->createNamedParameter($employeeUid, IQueryBuilder::PARAM_STR)))
+            ->andWhere($qb->expr()->eq('default_deleted', $qb->createNamedParameter(false, IQueryBuilder::PARAM_BOOL)))
+            ->orderBy('start_at', 'ASC')
+            ->setMaxResults($limit);
+        return CalendarEntry::get_all(array_map([$this, 'mapRow'], $qb->executeQuery()->fetchAllAssociative()));
+    }
+
+    /** @param list<string> $meetingUids @return list<string> */
+    public function findMeetingUidsWithOtherParticipants(string $subjectUid, array $meetingUids): array {
+        if ($meetingUids === []) return [];
+        $qb = $this->db->getQueryBuilder();
+        $qb->select('meeting_uid')->from('adc_entries')
+            ->where($qb->expr()->in('meeting_uid', $qb->createNamedParameter($meetingUids, IQueryBuilder::PARAM_STR_ARRAY)))
+            ->andWhere($qb->expr()->neq('employee_uid', $qb->createNamedParameter($subjectUid, IQueryBuilder::PARAM_STR)))
+            ->andWhere($qb->expr()->eq('default_deleted', $qb->createNamedParameter(false, IQueryBuilder::PARAM_BOOL)))
+            ->orderBy('meeting_uid', 'ASC');
+        return array_values(array_unique(array_map('strval', $qb->executeQuery()->fetchFirstColumn())));
+    }
+
     /** @return list<string> */
     public function findEmployeeUidsWithShifts(): array {
         $qb = $this->db->getQueryBuilder();

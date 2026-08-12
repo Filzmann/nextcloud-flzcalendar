@@ -123,6 +123,13 @@ Urlaubsansichten sind dynamisch ergänzbare Rollen-/Bereichsschnitte. Die Standa
 
 ## Architektur
 
+- AD Kalender registriert einen subjectgebundenen PersonalDataProvider über
+  den öffentlichen LocalBase-Registry-Event. Er liefert ausschließlich eigene
+  Dienste und Termine. Bei einem gemeinsamen Meeting fragt das Repository nur
+  ab, ob weitere Beteiligte existieren; deren UIDs, Namen und fremde Einträge
+  gelangen nicht in den Bericht. Zeiten verwenden die gemeinsame fachliche
+  Organisationszeitzone. Solange keine Kalender-Retention-Policy freigegeben
+  ist, wird ehrlich „keine feste Löschfrist“ ausgewiesen.
 - Controller bleiben duenn.
 - `CalendarAccessService` buendelt Sicht-, Erstell-, Aenderungs- und Loeschrechte.
 - Repository-/Store-Klassen kapseln Datenzugriffe und QueryBuilder-Parameter.
