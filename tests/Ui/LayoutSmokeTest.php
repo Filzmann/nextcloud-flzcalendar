@@ -68,6 +68,9 @@ foreach (['grid-template-areas:', '"period period"', '"previous next"', '#adc-pr
 foreach (['.adc-app input:focus-visible', '.adc-app select:focus-visible', '.adc-app summary:focus-visible', 'outline: 3px solid var(--color-primary-element)', '.adc-dialog__hint {', 'background: var(--color-error)', '.adc-entry__title { display: block; overflow: visible', '.adc-calendar thead th { position: sticky; top: 0; z-index: 20', '.adc-group-heading { position: sticky; inset-inline-start: 0;'] as $contract) {
     if (!str_contains($css, $contract)) throw new RuntimeException("Abnahmefähiger Fokus-/Kontrast-/Sticky-Vertrag fehlt: {$contract}");
 }
+if (!str_contains($css, '.adc-dialog__hint:empty { display: none; }')) {
+    throw new RuntimeException('Leere Dialogfehlermeldungen bleiben als bedeutungsloser rosa Balken sichtbar.');
+}
 if (!str_contains($template, 'id="adc-type" type="hidden"')) throw new RuntimeException('Der durch die Aktion festgelegte Eintragstyp wird weiterhin redundant ausgewählt.');
 if (!str_contains($css, 'max-height: calc(100dvh - var(--header-height, 50px))')) {
     throw new RuntimeException('Der App-Root wächst über den sichtbaren Nextcloud-Inhaltsbereich hinaus.');

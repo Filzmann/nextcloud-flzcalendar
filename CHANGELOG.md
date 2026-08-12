@@ -7,6 +7,7 @@
 - Mobile Eintragsaktionen an den unveränderten `canManage`-Vertrag gebunden und mit mindestens 44 Pixel großen Touch-Zielen versehen.
 - Die mobile Tagesliste auf einen einzigen vertikalen App-Scroller umgestellt und einen Floating-Button für die Rückkehr zum Anfang ergänzt.
 - Nachtdienste je Tageszelle mit gekapptem Teilzeitraum und Fortsetzungskennzeichnung dargestellt.
+- Leere Dialogfehlermeldungen ausgeblendet, statt eine bedeutungslose Fehlerfläche anzuzeigen.
 
 ## 0.14.0-rc.2
 
