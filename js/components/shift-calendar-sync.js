@@ -1,5 +1,6 @@
 (function() {
     'use strict';
+    const l10n = window.AdCalendar.l10n;
 
     /** Zweck: Bedient den standardmäßig aktiven persönlichen Abgleich und dessen Opt-out für „AD Dienste“. */
     class ShiftCalendarSync {
@@ -14,7 +15,9 @@
         set(status) {
             this.input.checked = Boolean(status.enabled);
             const name = status.calendarName || 'AD Dienste';
-            this.status.textContent = status.enabled ? `Kalender ist aktiv: ${name}.` : `Kalender ist nicht aktiv: ${name}.`;
+            this.status.textContent = status.enabled
+                ? l10n.t('Calendar is active: {calendar}.', { calendar: name })
+                : l10n.t('Calendar is not active: {calendar}.', { calendar: name });
         }
 
         async submit(event) {

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace OCP {
     interface IRequest {}
     interface IUser { public function getUID(): string; }
+    interface IL10N { public function t(string $text, array $parameters = []): string; }
 }
 namespace OCP\AppFramework {
     class Controller { public function __construct(string $appName, \OCP\IRequest $request) {} }
@@ -56,9 +57,9 @@ namespace OCA\AdCalendar\Service {
 }
 
 namespace {
-    require_once __DIR__ . '/../../lib/Controller/ApiController.php';
 
     use OCA\AdCalendar\Controller\ApiController;
+    use OCA\AdCalendar\Http\LocalizedErrorResponseFactory;
     use OCA\AdCalendar\Service\CalendarAccessService;
     use OCA\AdCalendar\Service\CalendarPreferenceService;
     use OCA\AdCalendar\Service\CalendarService;
@@ -67,6 +68,7 @@ namespace {
     use OCA\AdCalendar\Service\ShiftCalendarSyncService;
     use OCA\LocalBase\Calendar\HolidayCalendarService;
     use OCP\IRequest;
+    use OCP\IL10N;
     use Psr\Log\LoggerInterface;
 
     $access = new CalendarAccessService();
@@ -76,9 +78,10 @@ namespace {
         public array $errors = [];
         public function error(string|\Stringable $message, array $context = []): void { $this->errors[] = (string)$message; }
     };
+    $errors = new LocalizedErrorResponseFactory(new class implements IL10N { public function t(string $text, array $parameters = []): string { return strtr($text, $parameters); } });
     $controller = new ApiController(
         new class implements IRequest {}, $access, $calendar, new CalendarSettingsService(),
-        new CalendarPreferenceService(), new RecurringAppointmentService(), new ShiftCalendarSyncService(), $holidays, $logger,
+        new CalendarPreferenceService(), new RecurringAppointmentService(), new ShiftCalendarSyncService(), $holidays, $logger, $errors,
     );
 
     if ($controller->range('2026-06-29', '2026-08-03')->getStatus() !== 403 || $calendar->calls !== []) {

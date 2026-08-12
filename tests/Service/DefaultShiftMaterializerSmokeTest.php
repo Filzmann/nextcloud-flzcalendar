@@ -2,8 +2,6 @@
 
 declare(strict_types=1);
 
-require_once __DIR__ . '/../../lib/Model/CalendarEntry.php';
-require_once __DIR__ . '/../../lib/Service/DefaultShiftOccurrenceFactory.php';
 
 use OCA\AdCalendar\Service\DefaultShiftOccurrenceFactory;
 
@@ -29,7 +27,8 @@ foreach ([$materializer, $repository, $calendar, $meetings, $migration] as $sour
 foreach (['storedShiftDefaults', 'findDefaultOccurrence', 'defaultDeleted()', 'defaultModified()', 'removeGeneratedDefault', 'attachContainedAppointments', 'ShiftCalendarSyncService'] as $contract) {
     if (!str_contains($materializer, $contract)) throw new RuntimeException("Materialisierungsvertrag fehlt: {$contract}");
 }
-foreach (['absence->approved()', 'absence->overlaps'] as $contract) if (!str_contains($materializer, $contract)) throw new RuntimeException("Urlaubsblockade fehlt: {$contract}");
+if (!str_contains($materializer, 'absence->overlaps')) throw new RuntimeException('Urlaubsblockade fehlt.');
+if (str_contains($materializer, 'absence->approved()')) throw new RuntimeException('Geplanter Urlaub blockiert Standarddienste noch nicht.');
 foreach (['OCP\\Config\\IUserConfig', 'userConfig->getValueString'] as $contract) if (!str_contains($materializer, $contract)) throw new RuntimeException("Moderner Benutzerkonfigurationsvertrag fehlt: {$contract}");
 if (str_contains($materializer, 'config->getUserValue')) throw new RuntimeException('Materialisierung verwendet noch den veralteten IConfig-Benutzerwertzugriff.');
 foreach (['deleteDefaultShift', "set('default_deleted'", 'default_date', 'default_modified'] as $contract) {

@@ -9,6 +9,7 @@ use DOMElement;
 use DOMXPath;
 use InvalidArgumentException;
 use OCA\AdCalendar\Model\CalendarEntry;
+use OCA\AdCalendar\Service\CalendarTargetConfig;
 use OCP\Http\Client\IClient;
 use OCP\Http\Client\IClientService;
 use RuntimeException;
@@ -21,7 +22,33 @@ final class CalDavClient {
         private IClientService $clients,
         private ExternalCalendarUrlValidator $urls,
         private ShiftCalendarEventSerializer $serializer,
+        private CalendarTargetConfig $targets,
     ) {}
+
+    /** Benennt ausschließlich den über die gespeicherte URL und den letzten Namen belegten App-Kalender um. */
+    public function renameCalendar(array $connection): array {
+        $this->assertCredentials($connection);
+        $calendarUrl = trim((string)($connection['calendarUrl'] ?? ''));
+        if ($calendarUrl === '') throw new RuntimeException('Die gespeicherte CalDAV-Kalenderadresse fehlt.');
+        $calendarUrl = $this->urls->sameOrigin((string)$connection['serverUrl'], $calendarUrl);
+        $targetName = $this->targets->calendarName();
+        $storedName = trim((string)($connection['calendarName'] ?? '')) ?: ShiftCalendarPublisher::CALENDAR_NAME;
+        $actualName = $this->calendarName($calendarUrl, $connection);
+        if ($actualName !== $storedName && $actualName !== $targetName) {
+            throw new RuntimeException('Der gespeicherte CalDAV-Kalender kann nicht sicher als App-Kalender bestätigt werden.');
+        }
+        if ($actualName !== $targetName) {
+            $body = '<?xml version="1.0" encoding="utf-8" ?><d:propertyupdate xmlns:d="DAV:"><d:set><d:prop><d:displayname>'
+                . $this->xml($targetName) . '</d:displayname></d:prop></d:set></d:propertyupdate>';
+            $this->expect($this->request('PROPPATCH', $calendarUrl, $connection, $body, ['Content-Type' => 'application/xml; charset=utf-8']), [200, 204, 207]);
+            if ($this->calendarName($calendarUrl, $connection) !== $targetName) {
+                throw new RuntimeException('Der CalDAV-Kalendername wurde nicht übernommen.');
+            }
+        }
+        $connection['calendarUrl'] = $calendarUrl;
+        $connection['calendarName'] = $targetName;
+        return $connection;
+    }
 
     /** Prüft Zugang und liefert die konkrete URL des sichtbaren Zielkalenders. */
     public function connect(array $connection): string {
@@ -107,21 +134,21 @@ final class CalDavClient {
         $listing = $this->request('PROPFIND', $homeUrl, $connection, $this->properties(['displayname', 'resourcetype']), ['Depth' => '1']);
         $this->expect($listing, [200, 207]);
         foreach ($this->resources($listing['body']) as $resource) {
-            if ($resource['calendar'] && $resource['displayName'] === ShiftCalendarPublisher::CALENDAR_NAME) {
+            if ($resource['calendar'] && $resource['displayName'] === $this->targets->calendarName()) {
                 return $this->sameOriginHref($baseUrl, $homeUrl, $resource['href']);
             }
         }
         $calendarUrl = $this->sameOriginHref($baseUrl, $homeUrl, 'ad-dienste/');
         $created = $this->request('MKCALENDAR', $calendarUrl, $connection, '<?xml version="1.0" encoding="utf-8" ?>'
             . '<c:mkcalendar xmlns:d="DAV:" xmlns:c="urn:ietf:params:xml:ns:caldav"><d:set><d:prop>'
-            . '<d:displayname>' . ShiftCalendarPublisher::CALENDAR_NAME . '</d:displayname><c:supported-calendar-component-set>'
+            . '<d:displayname>' . $this->xml($this->targets->calendarName()) . '</d:displayname><c:supported-calendar-component-set>'
             . '<c:comp name="VEVENT"/></c:supported-calendar-component-set></d:prop></d:set></c:mkcalendar>',
             ['Content-Type' => 'application/xml; charset=utf-8'], [405]);
         $this->expect($created, [201, 204, 405]);
         $verified = $this->request('PROPFIND', $calendarUrl, $connection, $this->properties(['displayname', 'resourcetype']), ['Depth' => '0']);
         $this->expect($verified, [200, 207]);
         $resources = $this->resources($verified['body']);
-        if ($resources === [] || !$resources[0]['calendar'] || $resources[0]['displayName'] !== ShiftCalendarPublisher::CALENDAR_NAME) {
+        if ($resources === [] || !$resources[0]['calendar'] || $resources[0]['displayName'] !== $this->targets->calendarName()) {
             throw new RuntimeException('Die reservierte CalDAV-Kalenderadresse ist bereits fremd belegt.');
         }
         return $calendarUrl;
@@ -225,6 +252,18 @@ final class CalDavClient {
             $properties .= '<' . $namespace . ':' . $name . '/>';
         }
         return '<?xml version="1.0" encoding="utf-8" ?><d:propfind xmlns:d="DAV:" xmlns:c="urn:ietf:params:xml:ns:caldav"><d:prop>' . $properties . '</d:prop></d:propfind>';
+    }
+
+    private function calendarName(string $calendarUrl, array $connection): string {
+        $response = $this->request('PROPFIND', $calendarUrl, $connection, $this->properties(['displayname', 'resourcetype']), ['Depth' => '0']);
+        $this->expect($response, [200, 207]);
+        $resources = $this->resources($response['body']);
+        if ($resources === [] || !$resources[0]['calendar']) throw new RuntimeException('Die gespeicherte CalDAV-Adresse ist kein Kalender.');
+        return $resources[0]['displayName'];
+    }
+
+    private function xml(string $value): string {
+        return htmlspecialchars($value, ENT_XML1 | ENT_QUOTES, 'UTF-8');
     }
 
     private function propertyHref(string $xml, string $property): ?string {

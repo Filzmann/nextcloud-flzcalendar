@@ -61,12 +61,54 @@ final class CalendarEntryRepository {
         return CalendarEntry::get_all(array_map([$this, 'mapRow'], $qb->executeQuery()->fetchAllAssociative()));
     }
 
+    /** @return list<CalendarEntry> */
+    public function findEntriesForEmployee(string $employeeUid): array {
+        $qb = $this->db->getQueryBuilder();
+        $qb->select(...self::COLUMNS)->from('adc_entries')
+            ->where($qb->expr()->eq('employee_uid', $qb->createNamedParameter($employeeUid)))
+            ->andWhere($qb->expr()->eq('default_deleted', $qb->createNamedParameter(false, IQueryBuilder::PARAM_BOOL)))
+            ->orderBy('id', 'ASC');
+        return CalendarEntry::get_all(array_map([$this, 'mapRow'], $qb->executeQuery()->fetchAllAssociative()));
+    }
+
+    /** @return list<CalendarEntry> */
+    public function findByEmployeeUid(string $employeeUid, int $limit): array {
+        $qb = $this->db->getQueryBuilder();
+        $qb->select(...self::COLUMNS)->from('adc_entries')
+            ->where($qb->expr()->eq('employee_uid', $qb->createNamedParameter($employeeUid, IQueryBuilder::PARAM_STR)))
+            ->andWhere($qb->expr()->eq('default_deleted', $qb->createNamedParameter(false, IQueryBuilder::PARAM_BOOL)))
+            ->orderBy('start_at', 'ASC')
+            ->setMaxResults($limit);
+        return CalendarEntry::get_all(array_map([$this, 'mapRow'], $qb->executeQuery()->fetchAllAssociative()));
+    }
+
+    /** @param list<string> $meetingUids @return list<string> */
+    public function findMeetingUidsWithOtherParticipants(string $subjectUid, array $meetingUids): array {
+        if ($meetingUids === []) return [];
+        $qb = $this->db->getQueryBuilder();
+        $qb->select('meeting_uid')->from('adc_entries')
+            ->where($qb->expr()->in('meeting_uid', $qb->createNamedParameter($meetingUids, IQueryBuilder::PARAM_STR_ARRAY)))
+            ->andWhere($qb->expr()->neq('employee_uid', $qb->createNamedParameter($subjectUid, IQueryBuilder::PARAM_STR)))
+            ->andWhere($qb->expr()->eq('default_deleted', $qb->createNamedParameter(false, IQueryBuilder::PARAM_BOOL)))
+            ->orderBy('meeting_uid', 'ASC');
+        return array_values(array_unique(array_map('strval', $qb->executeQuery()->fetchFirstColumn())));
+    }
+
     /** @return list<string> */
     public function findEmployeeUidsWithShifts(): array {
         $qb = $this->db->getQueryBuilder();
         $qb->select('employee_uid')->from('adc_entries')
             ->where($qb->expr()->eq('entry_type', $qb->createNamedParameter(CalendarEntry::TYPE_SHIFT)))
             ->andWhere($qb->expr()->eq('default_deleted', $qb->createNamedParameter(false, IQueryBuilder::PARAM_BOOL)))
+            ->orderBy('employee_uid', 'ASC');
+        return array_values(array_unique(array_map('strval', $qb->executeQuery()->fetchFirstColumn())));
+    }
+
+    /** @return list<string> */
+    public function findEmployeeUidsWithEntries(): array {
+        $qb = $this->db->getQueryBuilder();
+        $qb->select('employee_uid')->from('adc_entries')
+            ->where($qb->expr()->eq('default_deleted', $qb->createNamedParameter(false, IQueryBuilder::PARAM_BOOL)))
             ->orderBy('employee_uid', 'ASC');
         return array_values(array_unique(array_map('strval', $qb->executeQuery()->fetchFirstColumn())));
     }
@@ -92,9 +134,12 @@ final class CalendarEntryRepository {
     }
 
     public function save(CalendarEntry $entry, string $actorUid): int {
-        $now = new DateTimeImmutable('now', new DateTimeZone('UTC'));
+        $utc = new DateTimeZone('UTC');
+        $now = new DateTimeImmutable('now', $utc);
         $values = [
-            'employee_uid' => $entry->employeeUid(), 'start_at' => $entry->start(), 'end_at' => $entry->end(),
+            'employee_uid' => $entry->employeeUid(),
+            'start_at' => $entry->start()->setTimezone($utc),
+            'end_at' => $entry->end()->setTimezone($utc),
             'entry_type' => $entry->type(), 'title' => $entry->title(), 'parent_entry_id' => $entry->parentEntryId(),
             'meeting_uid' => $entry->meetingUid(), 'default_date' => $entry->defaultDate(), 'default_modified' => $entry->defaultModified(),
             'series_uid' => $entry->seriesUid(), 'series_timezone' => $entry->seriesTimezone(),
@@ -292,9 +337,12 @@ final class CalendarEntryRepository {
     }
 
     private function mapRow(array $row): array {
+        $utc = new DateTimeZone('UTC');
         return [
-            'id' => (int)$row['id'], 'employeeUid' => $row['employee_uid'], 'start' => (string)$row['start_at'],
-            'end' => (string)$row['end_at'], 'type' => $row['entry_type'], 'title' => $row['title'],
+            'id' => (int)$row['id'], 'employeeUid' => $row['employee_uid'],
+            'start' => new DateTimeImmutable((string)$row['start_at'], $utc),
+            'end' => new DateTimeImmutable((string)$row['end_at'], $utc),
+            'type' => $row['entry_type'], 'title' => $row['title'],
             'parentEntryId' => $row['parent_entry_id'] === null ? null : (int)$row['parent_entry_id'],
             'meetingUid' => $row['meeting_uid'] === null ? null : (string)$row['meeting_uid'],
             'seriesUid' => $row['series_uid'] === null ? null : (string)$row['series_uid'],

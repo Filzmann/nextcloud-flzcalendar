@@ -17,7 +17,6 @@ namespace OCP\Security {
 namespace OCA\AdCalendar\AppInfo { final class Application { public const APP_ID = 'adcalendar'; } }
 
 namespace {
-    require_once __DIR__ . '/../../lib/CalendarSync/ExternalCalendarConnectionStore.php';
 
     use OCA\AdCalendar\CalendarSync\ExternalCalendarConnectionStore;
     use OCP\Config\IUserConfig;
@@ -47,9 +46,12 @@ namespace {
         throw new RuntimeException('CalDAV-Zugangsdaten sind nicht verschlüsselt und als sensibel gespeichert.');
     }
     if (($store->connection('person-a', 'kopano')['password'] ?? '') !== 'nicht-ausgeben') throw new RuntimeException('Verschlüsselte Verbindung ist intern nicht lesbar.');
-    $public = $store->statuses('person-a', false);
-    if (($public['kopano']['connected'] ?? false) !== true || str_contains(json_encode($public), 'nicht-ausgeben') || str_contains(json_encode($public), 'person-a')) {
-        throw new RuntimeException('Öffentlicher Verbindungsstatus fehlt oder gibt Zugangsdaten preis.');
+    $public = $store->statuses('person-a', false, 'Team & Dienst');
+    if (($public['kopano']['connected'] ?? false) !== true
+        || ($public['kopano']['calendarName'] ?? '') !== 'Team & Dienst'
+        || str_contains(json_encode($public), 'default.example.test')
+        || str_contains(json_encode($public), 'nicht-ausgeben') || str_contains(json_encode($public), 'person-a')) {
+        throw new RuntimeException('Öffentlicher Verbindungsstatus fehlt oder gibt Adressen beziehungsweise Zugangsdaten preis.');
     }
     $store->save('person-b', 'manual', ['serverUrl' => 'https://calendar.example.test/', 'username' => 'b', 'password' => 'secret']);
     if ($store->connectedEmployeeUids() !== ['person-a', 'person-b']) throw new RuntimeException('Hintergrundabgleich findet verbundene Konten nicht stabil.');

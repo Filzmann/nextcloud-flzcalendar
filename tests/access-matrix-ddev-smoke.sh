@@ -34,7 +34,8 @@ create_user() {
 assert_access() {
     local uid="$1"
     local expected="$2"
-    ADC_BASE_URL="$base_url" ADC_USER="$uid" ADC_PASSWORD="$password" ADC_EXPECTED="$expected" \
+    local denied_target="${3:-}"
+    ADC_BASE_URL="$base_url" ADC_USER="$uid" ADC_PASSWORD="$password" ADC_EXPECTED="$expected" ADC_DENIED_TARGET="$denied_target" \
         "$(dirname "$0")/access-http-smoke.sh"
 }
 
@@ -50,6 +51,8 @@ bo_west="${prefix}-bo-west"
 bo_south="${prefix}-bo-south"
 pdl_target="${prefix}-pdl-target"
 bl_target="${prefix}-bl-target"
+eb_south="${prefix}-eb-south"
+deputy_bl_eb_south="${prefix}-stvbl-eb-south"
 
 create_user "$pdl" ad-PDL
 create_user "$bl_now" ad-BL ad-Bereich-Nordost ad-Bereich-West
@@ -62,10 +65,13 @@ create_user "$bo_west" ad-Buero ad-Bereich-West
 create_user "$bo_south" ad-Buero ad-Bereich-Sued
 create_user "$pdl_target" ad-PDL
 create_user "$bl_target" ad-BL ad-Bereich-Nordost ad-Bereich-West
+create_user "$eb_south" ad-EB ad-Bereich-Sued
+create_user "$deputy_bl_eb_south" ad-StvBL ad-EB ad-Bereich-Sued
 
 assert_access "$pdl" "$pdl=true,$pfk_target=true,$eb_west=false"
 assert_access "$bl_now" "$bl_now=true,$bo_no=true,$bo_west=true,$bo_south=false,$pfk_target=false"
 assert_access "$bo_actor" "$bo_actor=true,$bl_target=false,$pdl_target=false"
 assert_access "$pfk_actor" "$pfk_actor=true,$pdl_target=false,$bl_target=false"
+assert_access "$eb_south" "$eb_south=true,$deputy_bl_eb_south=false" "$deputy_bl_eb_south"
 
 echo "AD Calendar DDEV access matrix smoke: OK"

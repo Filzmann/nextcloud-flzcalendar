@@ -22,27 +22,18 @@ namespace OCA\AdCalendar\Repository {
 namespace OCA\AdCalendar\Service {
     use OCA\AdCalendar\Model\CalendarEntry;
 
-    final class AbsenceService {
-        public array $checked = [];
-        public function assertWritable(string $uid, \DateTimeImmutable $start, \DateTimeImmutable $end): void { $this->checked[] = $start; }
-    }
     final class ContainingShiftAssignment { public function assign(CalendarEntry $entry, array $parents): CalendarEntry { return $entry; } }
 }
 
 namespace {
-    require_once __DIR__ . '/../../lib/Model/CalendarEntry.php';
-    require_once __DIR__ . '/../../lib/Model/RecurrenceRule.php';
-    require_once __DIR__ . '/../../lib/Service/RecurringAppointmentService.php';
 
     use OCA\AdCalendar\Model\CalendarEntry;
     use OCA\AdCalendar\Repository\CalendarEntryRepository;
-    use OCA\AdCalendar\Service\AbsenceService;
     use OCA\AdCalendar\Service\ContainingShiftAssignment;
     use OCA\AdCalendar\Service\RecurringAppointmentService;
 
     $repository = new CalendarEntryRepository();
-    $absences = new AbsenceService();
-    $service = new RecurringAppointmentService($repository, $absences, new ContainingShiftAssignment());
+    $service = new RecurringAppointmentService($repository, new ContainingShiftAssignment());
     $payload = [
         'employeeUid' => 'person-a',
         'start' => '2026-03-23T08:00:00Z',
@@ -53,8 +44,8 @@ namespace {
     $ids = $service->create($payload, [
         'frequency' => 'weekly', 'interval' => 1, 'until' => '2026-04-06', 'weekdays' => [1], 'timezone' => 'Europe/Berlin',
     ], 'planner');
-    if ($ids !== [100, 101, 102] || count($repository->saved) !== 3 || count($absences->checked) !== 3) {
-        throw new RuntimeException('Serienvorkommen werden nicht vollständig geprüft und atomar gespeichert.');
+    if ($ids !== [100, 101, 102] || count($repository->saved) !== 3) {
+        throw new RuntimeException('Serienvorkommen werden nicht vollständig und atomar gespeichert.');
     }
     $seriesUid = $repository->saved[0]->seriesUid();
     if ($seriesUid === null || array_filter($repository->saved, static fn(CalendarEntry $entry): bool => $entry->seriesUid() !== $seriesUid) !== []) {

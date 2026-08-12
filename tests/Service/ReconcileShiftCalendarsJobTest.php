@@ -29,7 +29,6 @@ namespace OCA\AdCalendar\Service {
 }
 
 namespace {
-    require_once __DIR__ . '/../../lib/BackgroundJob/ReconcileShiftCalendarsJob.php';
 
     use OCA\AdCalendar\BackgroundJob\ReconcileShiftCalendarsJob;
     use OCA\AdCalendar\Service\ShiftCalendarReconciliationService;

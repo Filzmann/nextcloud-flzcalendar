@@ -16,7 +16,6 @@ final class ExternalCalendarConnectionStore {
     public const CALDAV_PROVIDERS = ['kopano', 'apple', 'manual'];
     private const KEY_PREFIX = 'external_calendar_';
     private const OAUTH_STATE_KEY = 'external_calendar_google_oauth_state';
-    private const CALENDAR_NAME = 'AD Dienste';
 
     public function __construct(private IUserConfig $config, private ICrypto $crypto) {}
 
@@ -62,7 +61,7 @@ final class ExternalCalendarConnectionStore {
     }
 
     /** Öffentlicher Statusvertrag; enthält bewusst weder Kennungen, Adressen noch Geheimnisse. */
-    public function statuses(string $uid, bool $googleConfigured): array {
+    public function statuses(string $uid, bool $googleConfigured, string $calendarName): array {
         $labels = ['kopano' => 'Kopano', 'google' => 'Google', 'apple' => 'Apple', 'manual' => 'Manuelles CalDAV'];
         $result = [];
         foreach (self::PROVIDERS as $provider) {
@@ -72,7 +71,7 @@ final class ExternalCalendarConnectionStore {
                 'label' => $labels[$provider],
                 'connected' => $connection !== null,
                 'available' => $provider !== 'google' || $googleConfigured,
-                'calendarName' => self::CALENDAR_NAME,
+                'calendarName' => $calendarName,
             ];
         }
         return $result;

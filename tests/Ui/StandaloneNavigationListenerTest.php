@@ -4,17 +4,16 @@ declare(strict_types=1);
 
 namespace OCP\EventDispatcher { class Event {} interface IEventListener { public function handle(Event $event): void; } }
 namespace OCP\Navigation\Events { class LoadAdditionalEntriesEvent extends \OCP\EventDispatcher\Event {} }
-namespace OCP { interface IUser {} interface IUserSession { public function getUser(): ?IUser; } interface IURLGenerator { public function linkToRoute(string $routeName, array $arguments = []): string; public function imagePath(string $appName, string $file): string; } interface INavigationManager { public const TYPE_APPS = 'link'; public function add(callable $entry): void; } }
+namespace OCP { interface IUser {} interface IUserSession { public function getUser(): ?IUser; } interface IURLGenerator { public function linkToRoute(string $routeName, array $arguments = []): string; public function imagePath(string $appName, string $file): string; } interface INavigationManager { public const TYPE_APPS = 'link'; public function add(callable $entry): void; } interface IL10N { public function t(string $text, array $parameters = []): string; } }
 namespace OCP\App { interface IAppManager { public function isEnabledForUser($appId, $user = null); } }
 
 namespace {
-    require_once __DIR__ . '/../../../localbase/lib/Service/StandaloneAppNavigationService.php';
-    require_once __DIR__ . '/../../lib/Listener/StandaloneNavigationListener.php';
 
     use OCA\AdCalendar\Listener\StandaloneNavigationListener;
     use OCA\LocalBase\Service\StandaloneAppNavigationService;
     use OCP\App\IAppManager;
     use OCP\INavigationManager;
+    use OCP\IL10N;
     use OCP\IURLGenerator;
     use OCP\IUser;
     use OCP\IUserSession;
@@ -25,9 +24,10 @@ namespace {
     $apps = new class implements IAppManager { public function isEnabledForUser($appId, $user = null): bool { return false; } };
     $nav = new class implements INavigationManager { public array $entries = []; public function add(callable $entry): void { $this->entries[] = $entry; } };
     $url = new class implements IURLGenerator { public function linkToRoute(string $routeName, array $arguments = []): string { return $routeName; } public function imagePath(string $appName, string $file): string { return "$appName/$file"; } };
-    $listener = new StandaloneNavigationListener(new StandaloneAppNavigationService($session, $apps, $nav, $url));
+    $l10n = new class implements IL10N { public array $calls = []; public function t(string $text, array $parameters = []): string { $this->calls[] = [$text, $parameters]; return "translated:{$text}"; } };
+    $listener = new StandaloneNavigationListener(new StandaloneAppNavigationService($session, $apps, $nav, $url), $l10n);
     $listener->handle(new LoadAdditionalEntriesEvent());
     $entry = ($nav->entries[0] ?? static fn(): array => [])();
-    if (($entry['id'] ?? '') !== 'adcalendar' || ($entry['name'] ?? '') !== 'Kalender' || ($entry['href'] ?? '') !== 'adcalendar.page.index') throw new RuntimeException('Standalone-Kalendernavigation fehlt.');
+    if (($entry['id'] ?? '') !== 'adcalendar' || ($entry['name'] ?? '') !== 'translated:Calendar' || ($entry['href'] ?? '') !== 'adcalendar.page.index' || $l10n->calls !== [['Calendar', []]]) throw new RuntimeException('Standalone-Kalendernavigation ist nicht lokalisiert oder technisch stabil.');
     echo "AD Kalender standalone navigation test passed\n";
 }

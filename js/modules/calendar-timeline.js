@@ -2,8 +2,8 @@
     'use strict';
 
     /**
-     * Zweck: Berechnet ein gemeinsames, komprimiertes Tagesraster für alle Zellen einer Wochenansicht.
-     * Zusammenspiel: WeekTable erzeugt einmal das Wochenlayout; CalendarCell positioniert Dienste und Sperrtermine darin.
+     * Zweck: Berechnet ein gemeinsames, komprimiertes Tagesraster für alle Zellen einer Kalenderansicht.
+     * Zusammenspiel: WeekTable erzeugt einmal das Zeitraumslayout; CalendarCell positioniert Dienste und Sperrtermine darin.
      * Vertrag: Jede Eintragsgrenze wird zur gemeinsamen Rasterlinie. Belegte Intervalle sind mindestens hoch genug für eine kompakte Karte.
      */
     class CalendarTimeline {
@@ -37,7 +37,7 @@
                 const endIndex = points.indexOf(segment.end);
                 const indices = Array.from({ length: endIndex - startIndex }, (_, offset) => startIndex + offset);
                 const currentHeight = indices.reduce((sum, index) => sum + heights[index], 0);
-                if (currentHeight < 48 && indices.length) heights[indices[0]] += 48 - currentHeight;
+                if (currentHeight < 64 && indices.length) heights[indices[0]] += 64 - currentHeight;
             }
             return heights.map(height => `${height}px`).join(' ');
         }

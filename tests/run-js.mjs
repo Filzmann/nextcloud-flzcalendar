@@ -10,6 +10,9 @@ function checkDirectory(directory) {
     }
 }
 checkDirectory(new URL('../js', import.meta.url).pathname);
+execFileSync(process.execPath, [new URL('./js/localization-smoke.mjs', import.meta.url).pathname], { stdio: 'inherit' });
 execFileSync(process.execPath, [new URL('./js/calendar-workflow-smoke.mjs', import.meta.url).pathname], { stdio: 'inherit' });
 execFileSync(process.execPath, [new URL('./js/admin-settings-smoke.mjs', import.meta.url).pathname], { stdio: 'inherit' });
+execFileSync(process.execPath, [new URL('./js/component-coverage-smoke.mjs', import.meta.url).pathname], { stdio: 'inherit' });
+execFileSync(process.execPath, [new URL('./js/main-coverage-smoke.mjs', import.meta.url).pathname], { stdio: 'inherit' });
 console.log('JavaScript syntax: OK');

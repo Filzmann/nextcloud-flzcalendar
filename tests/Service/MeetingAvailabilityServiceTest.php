@@ -2,9 +2,6 @@
 
 declare(strict_types=1);
 
-require_once __DIR__ . '/../../lib/Model/CalendarEntry.php';
-require_once __DIR__ . '/../../lib/Service/MeetingAvailabilityService.php';
-require_once __DIR__ . '/../../../localbase/lib/Calendar/AbsenceInterval.php';
 
 use OCA\AdCalendar\Model\CalendarEntry;
 use OCA\AdCalendar\Service\MeetingAvailabilityService;

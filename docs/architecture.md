@@ -12,12 +12,35 @@ Beginn und Ende; ihr Titel ist optional. Termine besitzen einen sprechenden
 Titel. Termine innerhalb eines Dienstes referenzieren ihn über
 `parent_entry_id`; Termine ohne Parent sind Sperrtermine.
 
-Die Wochenansicht und die aus Wochenblöcken zusammengesetzte Monatsansicht
-unterstützen „Tage als Zeilen“ und „Personen als Zeilen“. Personenachsen
-bleiben beim Scrollen sichtbar, Randtage werden gedimmt und Wochenenden
-zusätzlich textlich gekennzeichnet. Gesetzliche Feiertage werden über den
-gemeinsamen read-only LocalBase-Kalendervertrag geliefert und verändern weder
-Einträge, Verfügbarkeit noch Rechte.
+Die angeklickte Kalenderzelle bestimmt die Mitarbeiter*innen-Zuordnung. Sie
+wird im Dialog nur angezeigt und bleibt nach dem Anlegen unveränderlich; auch
+ein grundsätzlich für beide Kalender berechtigter API-Akteur darf einen
+Eintrag nicht durch Änderung der `employeeUid` verschieben.
+
+Die Wochenansicht und die durchgehende Monatsmatrix unterstützen „Tage als
+Zeilen“ und „Personen als Zeilen“. Die Monatsansicht wiederholt keine
+Wochenblöcke: Ihr vollständiger sichtbarer Tagesbereich bildet je nach
+Ausrichtung eine gemeinsame Zeilen- oder Spaltenachse. Je Monatsgrenze werden
+höchstens drei Randtage ergänzt; unvollständige erste und letzte sichtbare
+Kalenderwochen sind dafür zulässig. Personenachsen bleiben beim Scrollen
+sichtbar, Randtage werden gedimmt und Wochenenden ausschließlich
+über ihren Wochentagsnamen gekennzeichnet. Leere Wochenend- und Feiertagstage
+verwenden eine kompakte Tagesachse und in der Tages-Spalten-Ausrichtung eine
+feste schmale Breite; vorhandene Dienste oder Termine stellen den betroffenen
+Tag für alle sichtbaren Personen auf die normale Größe zurück. Ein Urlaubsmarker
+allein verhindert die kompakte Darstellung nicht.
+Ein über Mitternacht reichender Dienst bleibt ein einziges Fachobjekt. Seine
+Kalenderprojektion kappt die sichtbare Zeit je Tageszelle an `24:00`
+beziehungsweise `00:00` und kennzeichnet die Fortsetzung zugänglich; die
+gespeicherten Start- und Endzeitpunkte werden dabei nicht verändert.
+Der direkte App-Root füllt die verfügbare Fensterbreite; nur die innere
+Kalendermatrix scrollt innerhalb des verfügbaren sichtbaren Bereichs in beide
+Richtungen. Ihre horizontale Scrollleiste bleibt unabhängig von der Höhe des
+Tabelleninhalts am unteren Rand des sichtbaren Kalender-Viewports; beide
+Scrollrichtungen sind dort jederzeit erreichbar.
+Gesetzliche Feiertage werden über den gemeinsamen read-only
+LocalBase-Kalendervertrag geliefert und verändern weder Einträge, Verfügbarkeit
+noch Rechte.
 
 Filter nach Personen, Rollen und Bereichen verwenden den konfigurierten
 Organisationsvertrag. Rollen und Bereiche werden jeweils als ODER-Auswahl und
@@ -25,6 +48,12 @@ miteinander als Schnittmenge ausgewertet. Die im Organisationsvertrag erste
 passende Rolle ist die vorrangige Kalenderrolle. Persönliche Filter-,
 Zeitraum- und Ausrichtungskonfigurationen werden nur durch „Zum Standard
 machen“ als Nextcloud-Benutzerwert gespeichert.
+
+Gruppenüberschriften und der mobile Organisationskontext verwenden die vom
+LocalBase-Organisationsvertrag gelieferten Kürzel. Bereichsrollen verbinden
+Rollen- und Bereichskürzel mit einem Bindestrich, beispielsweise `BO-NO` oder
+`EB-W`; globale Rollen erscheinen beispielsweise als `PFK`, `BO-Pflege` oder
+`IT`. Filter und Organisationsverwaltung verwenden weiterhin die Langnamen.
 
 ## Standarddienste, Meetings und Serien
 
@@ -57,10 +86,15 @@ Erhalt als Sperrtermine gewählt.
 
 ## Persönlicher Kalenderabgleich
 
-AD Kalender ist zunächst alleinige Quelle der Wahrheit. Der standardmäßig
-aktive persönliche Abgleich veröffentlicht ausschließlich Dienste der
-jeweiligen Person in einem privaten Nextcloud-Kalender „AD Dienste“. Termine
-und Urlaube werden nicht übertragen. Ein bewusstes Opt-out entfernt nur die
+AD Kalender ist alleinige Quelle der Wahrheit. Der standardmäßig aktive
+persönliche Abgleich veröffentlicht ausschließlich eigene Dienste, Termine und
+Urlaube in einem privaten Nextcloud-Kalender mit dem administrativ
+konfigurierten sichtbaren Namen. Ohne gesetzten AppConfig-Wert bleibt
+„AD Dienste“ der Bestandsdefault. Urlaube kommen read-only und ohne Notizen
+über LocalBase aus einem optionalen Provider. Ihr halboffener Horizont reicht
+vom Beginn des laufenden fachlichen Kalenderjahres bis zum Beginn des dritten
+Folgejahres. Ohne Provider bleibt der Urlaubsbestand leer.
+Ein bewusstes Opt-out entfernt nur die
 von AD Kalender erzeugten Objekte; fremde Objekte bleiben unangetastet und der
 Kalender wird nur gelöscht, wenn er danach leer ist.
 
@@ -71,16 +105,49 @@ fällig, gleicht vorhandene Dienste vollständig ab, respektiert Opt-outs und
 isoliert Fehler je Konto. Sein Adminstatus enthält nur Zeitpunkt, Richtung und
 aggregierte Anzahlen.
 
-Der interne DAV-Zugriff ist hinter `ShiftCalendarPublisher` gekapselt. Der
+Der interne DAV-Zugriff ist hinter `PersonalCalendarPublisher` gekapselt. Der
 interne Nextcloud-DAV-Vertrag bleibt auf
 `NextcloudDavShiftCalendarPublisher` begrenzt.
+
+## Responsive Kalenderdarstellung
+
+Die Desktopdarstellung bleibt die durchgehende Wochen- beziehungsweise
+Monatsmatrix. Bis einschließlich 700 Pixel Viewportbreite wird sie ausgeblendet
+und aus denselben bereits gefilterten Kalenderdaten eine semantische Tagesliste
+abgeleitet. Jede Tagesgruppe nennt Datum und gegebenenfalls Feiertag sichtbar;
+Personenkarten nennen Person und Organisationskontext und verwenden für
+Einträge, Urlaubsstatus und Aktionen denselben `CalendarCell`- und
+`canManage`-Vertrag wie die Matrix. Die mobile Projektion ist keine zweite
+Daten- oder Rechtequelle. Monatsgruppen sind einklappbar, Touch-Ziele
+mindestens 44 Pixel groß und die mobile Ansicht erzeugt keinen horizontalen
+Seiten-Scrollbar. Vertikal scrollt die gesamte mobile Oberfläche ausschließlich
+am App-Root; die Kalender-Zwischencontainer wachsen mit der Tagesliste und
+schneiden sie nicht ab. Ein tastaturbedienbarer Floating-Button scrollt diesen
+App-Root zum Seitenanfang zurück.
+
+Die Kopano-/CalDAV-Vorgabe und der sichtbare Kalendername stammen aus einer
+zentralen, validierten Nextcloud-AppConfig-Quelle. Nur bestätigte
+Nextcloud-Admins dürfen sie mit normalem CSRF-Schutz ändern. Eine
+Namensänderung benennt beim nächsten ausgehenden Abgleich ausschließlich
+Kalender um, deren App-Eigentum über die deterministische interne URI oder die
+gespeicherte externe Kalender-URL beziehungsweise Provider-ID zusammen mit
+dem bekannten bisherigen Namen belegt ist. Technische Kennungen bleiben
+stabil; bei unklarem Eigentum wird abgebrochen.
 
 ## Externe Kalender
 
 Kopano, Google, Apple und generisches CalDAV können parallel verbunden werden.
-Sie erhalten einen sichtbaren, app-eigenen Kalender „AD Dienste“ und
+Sie erhalten einen sichtbaren, app-eigenen Kalender mit dem administrativ
+konfigurierten Namen und
 exportieren ebenfalls ausschließlich Dienste. Providerinhalte werden nicht in
 AD Kalender eingeblendet oder zurückimportiert.
+
+Die administrativ konfigurierte Kopano-Adresse ist nur die Vorgabe für neue
+persönliche Verbindungen. Bereits gespeicherte persönliche Server- und
+Kalenderadressen werden durch eine spätere Defaultänderung nicht ersetzt.
+Fehlschläge bei einer fälligen Bestandsumbenennung verändern weder den
+globalen Default noch führende AD-Daten und blockieren keine anderen Provider;
+der nächste ausgehende Abgleich versucht sie erneut.
 
 Persönliche CalDAV-Zugangsdaten und Google-Tokens werden mit Nextclouds
 Kryptodienst verschlüsselt als sensible Benutzerkonfiguration gespeichert.
@@ -109,11 +176,13 @@ Assistenzteam-Konventionen und Hierarchiekanten stammen aus
 Eine Änderung technischer Gruppen-IDs verschiebt keine bestehenden
 Nextcloud-Mitgliedschaften.
 
-Ist AD Urlaub aktiv, erscheinen geplante Urlaube als read-only `U?` ohne
-Blockade. Genehmigte Urlaube erscheinen als `U`, blockieren neue Dienste und
-Termine, verhindern Standarddienst-Materialisierung und werden aus
-Meetinglücken entfernt. Ohne AD Urlaub bleiben manuelle Sperrtermine der
-gültige Standalone-Weg.
+Ist AD Urlaub aktiv, erscheinen geplante Urlaube als read-only `U?` und
+genehmigte Urlaube als `U`. Beide Status blockieren neue und materialisierte
+Standarddienste, lassen Sperrtermine zu und sind ausschließlich im AD Urlaub
+bearbeitbar. Nur genehmigter Urlaub wird aus Meetinglücken entfernt. Im
+persönlichen DAV-Kalender bleibt geplanter Urlaub davon unabhängig tentative
+und transparent, genehmigter Urlaub confirmed und opaque. Ohne AD Urlaub
+bleiben manuelle Sperrtermine der gültige Standalone-Weg.
 
 ## Demo- und Legacy-Grenzen
 

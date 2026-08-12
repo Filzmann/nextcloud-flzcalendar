@@ -18,13 +18,12 @@ namespace OCP\AppFramework\Utility {
 }
 
 namespace OCA\AdCalendar\AppInfo {
-    if (!class_exists(Application::class)) {
+    if (!class_exists(Application::class, false)) {
         final class Application { public const APP_ID = 'adcalendar'; }
     }
 }
 
 namespace {
-    require_once __DIR__ . '/../../lib/Service/ShiftCalendarReconciliationStatusService.php';
 
     $config = new class implements \OCP\IAppConfig {
         public array $values = [];

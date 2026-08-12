@@ -1,27 +1,28 @@
 (function() {
     'use strict';
+    const l10n = window.AdCalendar.l10n;
 
     const providers = {
         kopano: {
-            title: 'Kopano verbinden',
+            title: l10n.t('Connect Kopano'),
             serverUrl: 'https://mail.adberlin.org',
-            instruction: 'Melde dich mit deinem Kopano-Benutzernamen und Passwort an. Die vorbelegte Serveradresse kann geändert werden. Voraussetzung: Der Kopano-Betreiber muss CalDAV per HTTPS erlauben; die App kann diesen Serverzugang nicht selbst freischalten.',
-            usernameLabel: 'Kopano-Benutzername',
-            passwordLabel: 'Kopano-Passwort',
+            instruction: l10n.t('Sign in with your Kopano username and password. The prefilled server address can be changed. Requirement: the Kopano provider must allow CalDAV over HTTPS; the app cannot enable this server access itself.'),
+            usernameLabel: l10n.t('Kopano username'),
+            passwordLabel: l10n.t('Kopano password'),
         },
         apple: {
-            title: 'Apple verbinden',
+            title: l10n.t('Connect Apple'),
             serverUrl: 'https://caldav.icloud.com',
-            instruction: 'Verwende deine Apple-ID als Benutzername und ein zuvor im Apple-Account erzeugtes app-spezifisches Passwort.',
+            instruction: l10n.t('Use your Apple ID as the username and an app-specific password previously created in your Apple account.'),
             usernameLabel: 'Apple-ID',
-            passwordLabel: 'App-spezifisches Passwort',
+            passwordLabel: l10n.t('App-specific password'),
         },
         manual: {
-            title: 'CalDAV manuell verbinden',
+            title: l10n.t('Connect CalDAV manually'),
             serverUrl: '',
-            instruction: 'Trage die HTTPS-CalDAV-Adresse deines Anbieters ein. AD Calendar ermittelt den Kalenderpfad und legt den sichtbaren Kalender „AD Dienste“ an.',
-            usernameLabel: 'Benutzername',
-            passwordLabel: 'Passwort oder App-Passwort',
+            instruction: '',
+            usernameLabel: l10n.t('Username'),
+            passwordLabel: l10n.t('Password or app password'),
         },
     };
 
@@ -40,8 +41,12 @@
             this.password = document.getElementById('adc-external-password');
             this.usernameLabel = document.getElementById('adc-external-username-label');
             this.passwordLabel = document.getElementById('adc-external-password-label');
+            this.returnFocus = null;
+            this.calendarName = this.dialog.dataset?.calendarName || 'AD Dienste';
+            providers.kopano.serverUrl = this.dialog.dataset?.kopanoDefault || providers.kopano.serverUrl;
+            providers.manual.instruction = l10n.t('Enter your provider’s HTTPS CalDAV address. AD Calendar discovers the calendar path and creates the visible calendar “{calendar}”.', { calendar: this.calendarName });
             this.form.addEventListener('submit', event => this.submit(event));
-            this.dialog.addEventListener('cancel', () => this.clearSecret());
+            this.dialog.addEventListener('cancel', event => { event.preventDefault(); this.close(); });
             document.getElementById('adc-external-dialog-close').addEventListener('click', () => this.close());
             document.getElementById('adc-external-dialog-cancel').addEventListener('click', () => this.close());
             for (const button of document.querySelectorAll('[data-external-connect]')) button.addEventListener('click', () => this.connect(button.dataset.externalConnect));
@@ -57,14 +62,19 @@
 
         set(statuses) {
             for (const [provider, status] of Object.entries(statuses)) {
+                if (status.calendarName) this.calendarName = status.calendarName;
                 const text = document.getElementById(`adc-external-${provider}-status`);
                 const connect = document.querySelector(`[data-external-connect="${provider}"]`);
                 const disconnect = document.querySelector(`[data-external-disconnect="${provider}"]`);
                 if (!text || !connect || !disconnect) continue;
-                text.textContent = status.connected ? `Verbunden – Zielkalender „${status.calendarName || 'AD Dienste'}“` : status.available === false ? 'Noch nicht durch die Administration konfiguriert.' : 'Nicht verbunden.';
+                text.textContent = status.connected
+                    ? l10n.t('Connected – target calendar “{calendar}”', { calendar: status.calendarName || 'AD Dienste' })
+                    : status.available === false ? l10n.t('Not configured by an administrator yet.') : l10n.t('Not connected.');
                 connect.hidden = false;
                 connect.disabled = status.available === false;
-                connect.textContent = status.connected ? (provider === 'google' ? 'Neu autorisieren' : 'Verbindung ändern') : ({ kopano: 'Kopano verbinden', google: 'Mit Google verbinden', apple: 'Apple verbinden', manual: 'Manuell verbinden' }[provider] || 'Verbinden');
+                connect.textContent = status.connected
+                    ? (provider === 'google' ? l10n.t('Authorise again') : l10n.t('Change connection'))
+                    : ({ kopano: l10n.t('Connect Kopano'), google: l10n.t('Connect with Google'), apple: l10n.t('Connect Apple'), manual: l10n.t('Connect manually') }[provider] || l10n.t('Connect'));
                 disconnect.hidden = !status.connected;
             }
         }
@@ -79,6 +89,7 @@
             }
             const settings = providers[provider];
             if (!settings) return;
+            this.returnFocus = document.activeElement;
             this.provider.value = provider;
             this.heading.textContent = settings.title;
             this.instruction.textContent = settings.instruction;
@@ -100,23 +111,26 @@
                 const response = await this.repository.connectCalDav(this.provider.value, this.serverUrl.value, this.username.value, this.password.value);
                 this.set(response.externalCalendars || {});
                 this.close();
-                this.onMessage('Externer Kalender wurde verbunden.');
+                this.onMessage(l10n.t('The external calendar was connected.'));
             } catch (error) { this.onMessage(error, true); }
             finally { submit.disabled = false; }
         }
 
         async disconnect(provider) {
-            if (!window.confirm('Verbindung trennen und alle von AD Calendar erzeugten Dienste bei diesem Anbieter entfernen?')) return;
+            if (!window.confirm(l10n.t('Disconnect and remove all shifts created by AD Calendar from this provider?'))) return;
             try {
                 const response = await this.repository.disconnectExternalCalendar(provider);
                 this.set(response.externalCalendars || {});
-                this.onMessage('Externe Kalenderverbindung wurde getrennt.');
+                this.onMessage(l10n.t('The external calendar connection was disconnected.'));
             } catch (error) { this.onMessage(error, true); }
         }
 
         close() {
             this.clearSecret();
             this.dialog.close();
+            const returnFocus = this.returnFocus;
+            this.returnFocus = null;
+            if (returnFocus?.isConnected !== false && typeof returnFocus?.focus === 'function') returnFocus.focus();
         }
 
         clearSecret() {

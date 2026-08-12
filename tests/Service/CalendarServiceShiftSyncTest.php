@@ -27,8 +27,9 @@ namespace OCA\AdCalendar\Service {
 
     final class DefaultShiftMaterializer { public function syncWeek(\DateTimeImmutable $start, array $uids, array $absences = []): void {} }
     final class AbsenceService {
+        public array $shiftChecks = [];
         public function query(\DateTimeImmutable $start, \DateTimeImmutable $end, array $uids): array { return []; }
-        public function assertWritable(string $uid, \DateTimeImmutable $start, \DateTimeImmutable $end): void {}
+        public function assertShiftWritable(string $uid, \DateTimeImmutable $start, \DateTimeImmutable $end): void { $this->shiftChecks[] = $uid; }
     }
     final class ContainingShiftAssignment { public function assign(CalendarEntry $entry, array $parents): CalendarEntry { return $entry; } }
     final class ShiftCalendarSyncService {
@@ -40,8 +41,6 @@ namespace OCA\AdCalendar\Service {
 }
 
 namespace {
-    require_once __DIR__ . '/../../lib/Model/CalendarEntry.php';
-    require_once __DIR__ . '/../../lib/Service/CalendarService.php';
 
     use OCA\AdCalendar\Model\CalendarEntry;
     use OCA\AdCalendar\Repository\CalendarEntryRepository;
@@ -53,7 +52,8 @@ namespace {
 
     $repository = new CalendarEntryRepository();
     $sync = new ShiftCalendarSyncService();
-    $service = new CalendarService($repository, new DefaultShiftMaterializer(), new AbsenceService(), new ContainingShiftAssignment(), $sync);
+    $absences = new AbsenceService();
+    $service = new CalendarService($repository, new DefaultShiftMaterializer(), $absences, new ContainingShiftAssignment(), $sync);
     $payload = ['employeeUid' => 'person-a', 'start' => '2026-07-20T08:00:00+02:00', 'end' => '2026-07-20T16:00:00+02:00', 'type' => CalendarEntry::TYPE_SHIFT, 'title' => ''];
 
     $id = $service->save($payload, null, 'planner');
@@ -74,7 +74,16 @@ namespace {
 
     $repository->found = null;
     $service->save(['employeeUid' => 'person-a', 'start' => '2026-07-20T10:00:00+02:00', 'end' => '2026-07-20T11:00:00+02:00', 'type' => CalendarEntry::TYPE_APPOINTMENT, 'title' => 'Termin'], null, 'planner');
-    if (count($sync->published) !== 2 || count($sync->removed) !== 2) throw new RuntimeException('Termin wurde unzulässig an die Dienstsynchronisation übergeben.');
+    if (count($sync->published) !== 3 || $sync->published[2]->type() !== CalendarEntry::TYPE_APPOINTMENT) throw new RuntimeException('Eigener Termin wurde nicht an den privaten Kalender übergeben.');
+    $repository->found = CalendarEntry::get([
+        'id' => 43, 'employeeUid' => 'person-a', 'start' => '2026-07-20T10:00:00+02:00', 'end' => '2026-07-20T11:00:00+02:00',
+        'type' => CalendarEntry::TYPE_APPOINTMENT, 'title' => 'Termin',
+    ]);
+    $service->delete(43, '');
+    if (($sync->removed[2]->id() ?? null) !== 43 || ($repository->deleted[1] ?? null) !== ['entry', 43]) {
+        throw new RuntimeException('Gelöschter eigener Termin bleibt im privaten Kalender.');
+    }
+    if ($absences->shiftChecks !== ['person-a', 'person-b']) throw new RuntimeException('Urlaub wird nicht ausschließlich für Dienstmutationen geprüft.');
 
     $repository->found = CalendarEntry::get([
         'id' => 42, 'employeeUid' => 'person-a', 'start' => '2026-07-20T10:00:00+02:00', 'end' => '2026-07-20T11:00:00+02:00',

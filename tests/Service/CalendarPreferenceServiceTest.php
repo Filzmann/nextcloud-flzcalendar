@@ -5,10 +5,9 @@ declare(strict_types=1);
 if (!interface_exists('OCP\\Config\\IUserConfig')) {
     eval('namespace OCP\\Config; interface IUserConfig { public function getValueString(string $userId, string $app, string $key, string $default = "", bool $lazy = false): string; public function setValueString(string $userId, string $app, string $key, string $value, bool $lazy = false, int $flags = 0): bool; public function getValuesByUsers(string $app, string $key, mixed $typedAs = null, ?array $userIds = null): array; }');
 }
-if (!class_exists('OCA\\AdCalendar\\AppInfo\\Application')) {
+if (!class_exists('OCA\\AdCalendar\\AppInfo\\Application', false)) {
     eval('namespace OCA\\AdCalendar\\AppInfo; final class Application { public const APP_ID = "adcalendar"; }');
 }
-require_once __DIR__ . '/../../lib/Service/CalendarPreferenceService.php';
 
 use OCA\AdCalendar\Service\CalendarPreferenceService;
 use OCP\Config\IUserConfig;
