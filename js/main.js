@@ -148,6 +148,9 @@
     }
 
     document.getElementById('adc-open-meeting-finder').addEventListener('click', () => meetingFinder.open(CalendarDate.isoDay(state.monday), state.data.employees, [...state.selected]));
+    document.getElementById('adc-back-to-top').addEventListener('click', () => {
+        document.getElementById('adcalendar-app').scrollTo({ top: 0, behavior: 'smooth' });
+    });
     document.getElementById('adc-save-default').addEventListener('click', async () => {
         try {
             await repository.savePreferences(state.toPreference());

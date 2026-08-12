@@ -5,6 +5,8 @@
 - Für Viewports bis 700 Pixel eine semantische, einklappbare Tagesliste aus denselben gefilterten Kalenderdaten wie die Desktopmatrix ergänzt.
 - Person, Organisationskontext, Datum, Feiertag, Eintragstyp und Urlaubsstatus mobil ohne horizontal verschobene Desktopmatrix sichtbar gemacht.
 - Mobile Eintragsaktionen an den unveränderten `canManage`-Vertrag gebunden und mit mindestens 44 Pixel großen Touch-Zielen versehen.
+- Die mobile Tagesliste auf einen einzigen vertikalen App-Scroller umgestellt und einen Floating-Button für die Rückkehr zum Anfang ergänzt.
+- Nachtdienste je Tageszelle mit gekapptem Teilzeitraum und Fortsetzungskennzeichnung dargestellt.
 
 ## 0.14.0-rc.2
 

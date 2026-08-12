@@ -20,6 +20,9 @@ foreach (["\\OCP\\Util::addScript('localbase', 'api/api-client')", "\\OCP\\Util:
 foreach (['id="adc-period-week"', 'id="adc-period-month"', 'id="adc-month-number"', 'id="adc-calendar-tables"', "$l->t('View period')"] as $contract) {
     if (!str_contains($template, $contract)) throw new RuntimeException("Monatsansicht-Vertrag fehlt: {$contract}");
 }
+foreach (['id="adc-back-to-top"', 'class="adc-back-to-top"', "$l->t('Back to top')"] as $contract) {
+    if (!str_contains($template, $contract)) throw new RuntimeException("Mobiler Rücksprung fehlt: {$contract}");
+}
 if (!str_contains($template, "\\OCP\\Util::addScript('adcalendar', 'modules/calendar-timeline')")) throw new RuntimeException('Zeitachsenmodul fehlt im Template.');
 if (!str_contains($template, "\\OCP\\Util::addScript('adcalendar', 'modules/holiday-calendar')")) throw new RuntimeException('Datengetriebenes Feiertagsmodul wird nicht vor der Kalendermatrix geladen.');
 if (str_contains($template, 'berlin-public-holidays')) throw new RuntimeException('Manuelle Berliner Feiertagsberechnung wird weiterhin geladen.');
@@ -55,6 +58,9 @@ foreach (['.adc-calendar-tables { display: flex; overflow: hidden;', '.adc-perio
 }
 foreach (['.adc-mobile-calendar { display: none;', '@media (max-width: 700px)', '.adc-table-wrap { display: none;', '.adc-mobile-calendar { display: grid;', '.adc-mobile-day > summary', '.adc-mobile-holiday', '.adc-mobile-person', '.adc-mobile-cell .adc-icon-button', '.adc-navigation #adc-toggle-view { display: none;', 'min-height: 44px', 'min-width: 44px !important'] as $contract) {
     if (!str_contains($css, $contract)) throw new RuntimeException("Echte mobile Kalenderdarstellung fehlt: {$contract}");
+}
+foreach (['.adc-back-to-top { display: none;', '#adc-calendar-view, .adc-overview, .adc-calendar-tables, .adc-period-matrix { flex: none; min-height: auto; overflow: visible;', '.adc-back-to-top { display: inline-flex; position: fixed;', 'min-width: 44px;', 'min-height: 44px;'] as $contract) {
+    if (!str_contains($css, $contract)) throw new RuntimeException("Einzelner mobiler Vertikalscroller oder Rücksprung fehlt: {$contract}");
 }
 foreach (['grid-template-areas:', '"period period"', '"previous next"', '#adc-previous-period { grid-area: previous;', '#adc-next-period { grid-area: next;', '.adc-tabs button,', '.adc-filter-grid button,', '.adc-dialog__actions button { min-height: 44px;'] as $contract) {
     if (!str_contains($css, $contract)) throw new RuntimeException("Mobile Navigation oder Touch-Ziele sind nicht stabil: {$contract}");

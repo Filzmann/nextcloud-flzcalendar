@@ -20,6 +20,7 @@
 .adc-calendar-tables { display: flex; overflow: hidden; }
 .adc-period-matrix { display: flex; min-width: 0; overflow: hidden; }
 .adc-mobile-calendar { display: none; }
+.adc-back-to-top { display: none; }
 .adc-filters { margin: 8px 0 10px; border: 1px solid var(--color-border); border-radius: var(--border-radius-large); background: var(--color-main-background); }
 .adc-filters > summary { min-height: 34px; box-sizing: border-box; padding: 6px 10px; cursor: pointer; font-weight: 700; }
 .adc-filter-status { margin-inline-start: 8px; color: var(--color-text-maxcontrast); font-size: var(--font-size-small); font-weight: 400; }
@@ -125,6 +126,7 @@
 .adc-recurrence__weekdays label { display: inline-flex; align-items: center; gap: 3px; }
 .adc-recurrence__weekdays input { width: auto; }
 .adc-entry__series-marker { margin-inline-end: 3px; font-weight: 700; }
+.adc-entry__continuation { display: inline-flex; align-items: center; justify-content: center; min-width: 1.25rem; margin-inline-start: 2px; border: 1px solid currentColor; border-radius: 999px; font-weight: 700; }
 .adc-dialog__hint { min-height: 1.4em; margin: 6px 0 0; padding: 3px 6px; border-radius: var(--border-radius); background: var(--color-error); color: var(--color-error-text); font-size: var(--font-size-small); font-weight: 700; }
 .adc-dialog__actions { display: flex; justify-content: flex-end; gap: 6px; margin-top: 8px; }
 .adc-dialog__actions button { margin: 0; }
@@ -145,6 +147,7 @@
 .adc-meeting-result-actions button { margin: 0; }
 @media (max-width: 700px) {
     .adc-app { padding: 10px 8px 28px; }
+    #adc-calendar-view, .adc-overview, .adc-calendar-tables, .adc-period-matrix { flex: none; min-height: auto; overflow: visible; }
     .adc-overview-header { align-items: stretch; }
     .adc-navigation {
         display: grid;
@@ -189,4 +192,5 @@
     .adc-mobile-cell .adc-cell-entries { display: grid; gap: 6px; background: none; }
     .adc-mobile-cell .adc-entry { min-height: 44px; box-sizing: border-box; }
     .adc-mobile-empty { margin: 12px; }
+    .adc-back-to-top { display: inline-flex; position: fixed; inset-inline-end: 16px; bottom: max(16px, env(safe-area-inset-bottom)); z-index: 50; align-items: center; justify-content: center; gap: 6px; min-width: 44px; min-height: 44px; margin: 0; padding: 8px 12px; border-radius: 999px; box-shadow: 0 3px 12px rgba(0, 0, 0, .28); }
 }

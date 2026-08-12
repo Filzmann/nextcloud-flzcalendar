@@ -23,6 +23,7 @@
                     entries,
                     shiftManageable,
                     this.rowStyle(layout, shift, day, timeline),
+                    day,
                 ))
                 .join('');
             const blockedEntries = standalone
@@ -57,7 +58,7 @@
             }).join('');
         }
 
-        shift(shift, entries, canManage, style = '') {
+        shift(shift, entries, canManage, style = '', day = null) {
             const children = entries.filter(entry => entry.type === 'appointment' && entry.parentEntryId === shift.id);
             const childEntries = children.length
                 ? `<div class="adc-entry__children" aria-label="${esc(l10n.t('Appointments within the shift'))}">${children.map(entry => this.entry(
@@ -68,7 +69,7 @@
                 : '';
 
             return `<article class="adc-entry adc-entry--shift" data-entry-id="${esc(shift.id)}"${style}>
-                ${this.header(shift, l10n.t('Shift'), canManage)}
+                ${this.header(shift, l10n.t('Shift'), canManage, false, day)}
                 ${childEntries}
             </article>`;
         }
@@ -84,7 +85,7 @@
             return ` style="grid-row:${timeline.gridRow(layout, entry, day)}"`;
         }
 
-        header(entry, label, canManage, blocked = false) {
+        header(entry, label, canManage, blocked = false, day = null) {
             const title = entry.title ? `<span class="adc-entry__title">${esc(entry.title)}</span>` : '';
             const blockedMarker = blocked ? '<span class="adc-entry__blocked-marker" aria-hidden="true">🔒</span>' : '';
             const recurring = esc(l10n.t('Recurring appointment'));
@@ -98,7 +99,30 @@
                 </span>`
                 : '';
 
-            return `<header class="adc-entry__header"><span>${blockedMarker}${seriesMarker}<strong>${esc(label)}</strong> ${esc(this.time(entry.start))}–${esc(this.time(entry.end))}</span>${controls}</header>${title}`;
+            const period = this.dayPeriod(entry, day);
+            return `<header class="adc-entry__header"><span>${blockedMarker}${seriesMarker}<strong>${esc(label)}</strong> ${esc(period.start)}–${esc(period.end)}${period.continuation}</span>${controls}</header>${title}`;
+        }
+
+        dayPeriod(entry, day) {
+            if (!day) return { start: this.time(entry.start), end: this.time(entry.end), continuation: '' };
+            const dayStart = new Date(day);
+            dayStart.setHours(0, 0, 0, 0);
+            const dayEnd = new Date(dayStart);
+            dayEnd.setDate(dayEnd.getDate() + 1);
+            const startsBefore = new Date(entry.start) < dayStart;
+            const endsAfter = new Date(entry.end) >= dayEnd;
+            const markers = [];
+            if (startsBefore) markers.push(this.continuation('←', l10n.t('Continued from previous day')));
+            if (endsAfter) markers.push(this.continuation('→', l10n.t('Continues on next day')));
+            return {
+                start: startsBefore ? '00:00' : this.time(entry.start),
+                end: endsAfter ? '24:00' : this.time(entry.end),
+                continuation: markers.join(''),
+            };
+        }
+
+        continuation(marker, label) {
+            return ` <span class="adc-entry__continuation" title="${esc(label)}"><span aria-hidden="true">${marker}</span><span class="hidden-visually">${esc(label)}</span></span>`;
         }
 
         time(value) {

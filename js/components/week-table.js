@@ -96,7 +96,7 @@
             cell.className = 'adc-mobile-cell';
             cell.dataset.employeeUid = employee.uid;
             cell.dataset.day = CalendarDate.isoDay(day);
-            cell.innerHTML = this.calendarCell.render(entries, employee, absences);
+            cell.innerHTML = this.calendarCell.render(entries, employee, absences, null, day);
             article.append(cell);
             return article;
         }

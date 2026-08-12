@@ -91,7 +91,7 @@ for (const contract of ['class CalendarFilters', 'this.renderLeadershipStaffChec
 for (const contract of ['class TabNavigation', "addEventListener('click'", "this.show('settings')", "this.onChange(active)"]) {
     if (!tabNavigation.includes(contract)) throw new Error(`Tab-Komponentenvertrag fehlt: ${contract}`);
 }
-for (const contract of ['class WeekTable', 'adc-group-heading', 'adc-period-matrix', 'adc-mobile-calendar', 'adc-mobile-day', 'adc-mobile-person', 'adc-outside-month', 'this.calendarCell.render(entries, employee, absences, layout, day, this.timeline)', 'this.calendarCell.render(entries, employee, absences)', 'this.timeline.layout(employeeEntries, days)', 'this.timeline.layout(dayEntries, [day])', 'organization.staffBlockLabel', 'organization.roleLabel(value)', 'organization.areaLabel(value)', 'this.daysInRange(range.start, range.end)', 'groupCell.colSpan = days.length + 1', 'this.orderedEmployees(employees)', 'this.staffRank(a) - this.staffRank(b)', 'roleNames.slice(1)', "join(' / ')"]) {
+for (const contract of ['class WeekTable', 'adc-group-heading', 'adc-period-matrix', 'adc-mobile-calendar', 'adc-mobile-day', 'adc-mobile-person', 'adc-outside-month', 'this.calendarCell.render(entries, employee, absences, layout, day, this.timeline)', 'this.calendarCell.render(entries, employee, absences, null, day)', 'this.timeline.layout(employeeEntries, days)', 'this.timeline.layout(dayEntries, [day])', 'organization.staffBlockLabel', 'organization.roleLabel(value)', 'organization.areaLabel(value)', 'this.daysInRange(range.start, range.end)', 'groupCell.colSpan = days.length + 1', 'this.orderedEmployees(employees)', 'this.staffRank(a) - this.staffRank(b)', 'roleNames.slice(1)', "join(' / ')"]) {
     if (!weekTable.includes(contract)) throw new Error(`Wochenmatrix-Komponentenvertrag fehlt: ${contract}`);
 }
 const timelineContext = { window: {}, Date, Set, Math };
@@ -420,6 +420,26 @@ if (!cellHtml.includes('adc-entry__children') || cellHtml.indexOf('Teamtermin') 
     throw new Error('Termin wurde nicht sichtbar innerhalb des Dienstes gerendert.');
 }
 if ((cellHtml.match(/Teamtermin/g) || []).length !== 1) throw new Error('Enthaltener Termin wurde mehrfach gerendert.');
+const overnightShift = { id: 3, type: 'shift', start: '2026-07-06T20:00:00Z', end: '2026-07-07T08:00:00Z', title: '', parentEntryId: null };
+const overnightFirstDay = cell.render([overnightShift], { canManage: true }, [], null, new Date('2026-07-06T00:00:00Z'));
+const overnightSecondDay = cell.render([overnightShift], { canManage: true }, [], null, new Date('2026-07-07T00:00:00Z'));
+if (!overnightFirstDay.includes('20:00–24:00') || !overnightFirstDay.includes('Continues on next day')) {
+    throw new Error('Der erste Kalendertag eines Nachtdiensts zeigt keinen gekappten Zeitraum mit Fortsetzung.');
+}
+if (!overnightSecondDay.includes('00:00–08:00') || !overnightSecondDay.includes('Continued from previous day')) {
+    throw new Error('Der zweite Kalendertag eines Nachtdiensts zeigt keinen gekappten Zeitraum mit Fortsetzung.');
+}
+if (!cellHtml.includes('08:00–16:00') || cellHtml.includes('Continues on next day') || cellHtml.includes('Continued from previous day')) {
+    throw new Error('Ein taggleicher Dienst wird durch die Nachtdienstprojektion verändert.');
+}
+const midnightDay = new Date(2026, 6, 6);
+const midnightEnd = new Date(midnightDay); midnightEnd.setDate(midnightEnd.getDate() + 1);
+const midnightStart = new Date(midnightEnd.getTime() - 4 * 60 * 60 * 1000);
+const midnightEndingShift = { ...overnightShift, start: midnightStart.toISOString(), end: midnightEnd.toISOString() };
+const midnightEndingHtml = cell.render([midnightEndingShift], { canManage: true }, [], null, midnightDay);
+if (!midnightEndingHtml.includes('–24:00') || !midnightEndingHtml.includes('Continues on next day')) {
+    throw new Error('Ein exakt um Mitternacht endender Dienst wird am Starttag irreführend als 00:00 dargestellt.');
+}
 const timedCellHtml = cell.render(timelineEntries.map((entry, index) => ({ ...entry, id: index + 10, type: index === 0 ? 'shift' : 'appointment', parentEntryId: index === 0 ? null : 10, title: index === 0 ? '' : 'Zeitachsentermin' })), { canManage: true }, [], calendarLayout, timelineDay, calendarTimeline);
 if (!timedCellHtml.includes('grid-template-rows:') || !timedCellHtml.includes('grid-row:2 / 5')) throw new Error('Kalenderzelle verwendet das gemeinsame Zeitraster nicht.');
 const blockedHtml = cell.render([

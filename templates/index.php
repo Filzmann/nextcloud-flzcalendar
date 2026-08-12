@@ -85,6 +85,10 @@ translation('adcalendar');
         </div>
       </section>
     </section>
+    <button type="button" id="adc-back-to-top" class="adc-back-to-top">
+        <span aria-hidden="true">↑</span>
+        <span><?php p($l->t('Back to top')); ?></span>
+    </button>
     <?php echo $this->inc('partials/settings'); ?>
     <?php echo $this->inc('partials/entry-dialog'); ?>
     <?php echo $this->inc('partials/meeting-dialog'); ?>

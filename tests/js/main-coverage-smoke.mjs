@@ -8,9 +8,11 @@ class FakeElement {
         this.textContent = '';
         this.disabled = false;
         this.title = '';
+        this.scrollCalls = [];
     }
     addEventListener(type, listener) { (this.listeners[type] ||= []).push(listener); }
     async fire(type) { for (const listener of this.listeners[type] || []) await listener({ preventDefault() {}, target: this }); }
+    scrollTo(options) { this.scrollCalls.push(options); }
 }
 
 const elements = new Map();
@@ -191,6 +193,11 @@ if (ApiClient.last.options.errorMessage({ error: 'safe error' }, 400) !== 'safe 
 await elements.get('adc-open-meeting-finder').fire('click');
 if (MeetingFinder.last.opens[0][0] !== '2026-07-06' || MeetingFinder.last.opens[0][1].length !== 1) {
     throw new Error('Meeting-Suche erhält nicht Woche, Mitarbeitende und Auswahl aus dem Zustand.');
+}
+await elements.get('adc-back-to-top').fire('click');
+const backToTopCall = elements.get('adcalendar-app').scrollCalls[0];
+if (backToTopCall?.top !== 0 || backToTopCall?.behavior !== 'smooth') {
+    throw new Error('Der mobile Rücksprung scrollt nicht den einzigen App-Scroller an den Anfang.');
 }
 state.selected.add('a');
 CalendarFilters.last.options.onChange();

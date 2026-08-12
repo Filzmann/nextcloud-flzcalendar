@@ -24,6 +24,10 @@ verwenden eine kompakte Tagesachse und in der Tages-Spalten-Ausrichtung eine
 feste schmale Breite; vorhandene Dienste oder Termine stellen den betroffenen
 Tag für alle sichtbaren Personen auf die normale Größe zurück. Ein Urlaubsmarker
 allein verhindert die kompakte Darstellung nicht.
+Ein über Mitternacht reichender Dienst bleibt ein einziges Fachobjekt. Seine
+Kalenderprojektion kappt die sichtbare Zeit je Tageszelle an `24:00`
+beziehungsweise `00:00` und kennzeichnet die Fortsetzung zugänglich; die
+gespeicherten Start- und Endzeitpunkte werden dabei nicht verändert.
 Der direkte App-Root füllt die verfügbare Fensterbreite; nur die innere
 Kalendermatrix scrollt innerhalb des verfügbaren sichtbaren Bereichs in beide
 Richtungen. Ihre horizontale Scrollleiste bleibt unabhängig von der Höhe des
@@ -105,7 +109,10 @@ Einträge, Urlaubsstatus und Aktionen denselben `CalendarCell`- und
 `canManage`-Vertrag wie die Matrix. Die mobile Projektion ist keine zweite
 Daten- oder Rechtequelle. Monatsgruppen sind einklappbar, Touch-Ziele
 mindestens 44 Pixel groß und die mobile Ansicht erzeugt keinen horizontalen
-Seiten-Scrollbar.
+Seiten-Scrollbar. Vertikal scrollt die gesamte mobile Oberfläche ausschließlich
+am App-Root; die Kalender-Zwischencontainer wachsen mit der Tagesliste und
+schneiden sie nicht ab. Ein tastaturbedienbarer Floating-Button scrollt diesen
+App-Root zum Seitenanfang zurück.
 
 Die Kopano-/CalDAV-Vorgabe und der sichtbare Kalendername stammen aus einer
 zentralen, validierten Nextcloud-AppConfig-Quelle. Nur bestätigte
