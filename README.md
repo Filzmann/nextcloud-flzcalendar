@@ -1,8 +1,8 @@
 # AD Kalender
 
-Wochen- und monatsbasierte Dienst- und Terminplanung mit wiederkehrenden Terminen, Personensuche, Gruppenfiltern, Meetinglückensuche, Standarddienstzeiten, read-only Urlaubsmarkierungen und persönlichem Dienstexport in Nextcloud sowie externe Kalender.
+Wochen- und monatsbasierte Dienst- und Terminplanung mit wiederkehrenden Terminen, Personensuche, Gruppenfiltern, Meetinglückensuche, Standarddienstzeiten, read-only Urlaubsmarkierungen und persönlichem Export eigener Dienste, Termine und Urlaube nach Nextcloud sowie dienst-only externe Kalender.
 
-Die Monatsansicht stellt alle betroffenen Kalenderwochen untereinander dar und lässt sich wie die Wochenansicht zwischen „Tage als Zeilen“ und „Personen als Zeilen“ umschalten. Die zu den Personen gehörende erste Spalte beziehungsweise Kopfzeile bleibt beim Scrollen sichtbar. Tage außerhalb des gewählten Monats sind abgedunkelt; Samstag und Sonntag werden zusätzlich als „Wochenende“ beschriftet. Gesetzliche Feiertage der organisationsweit konfigurierten Kalenderregion werden über den gemeinsamen LocalBase-Kalendervertrag geliefert, namentlich gekennzeichnet und bleiben ohne Auswirkung auf Dienste, Termine oder Rechte. Berlin bleibt Bestandsdefault. Zeitraum und Ausrichtung können zusammen mit den Filtern als persönlicher Standard gespeichert werden.
+Die Monatsansicht stellt den vollständigen sichtbaren Monatszeitraum in einer einzigen durchgehenden Planungsmatrix dar und lässt sich wie die Wochenansicht zwischen „Tage als Zeilen“ und „Personen als Zeilen“ umschalten. Sie wiederholt keine Wochenblöcke: Die gemeinsame Tagesachse wächst je nach Ausrichtung um Zeilen oder Spalten. Vor und nach dem gewählten Monat erscheinen jeweils höchstens drei abgedunkelte Randtage; die erste und letzte sichtbare Woche dürfen dadurch unvollständig sein. Die zu den Personen gehörende erste Spalte beziehungsweise Kopfzeile bleibt beim Scrollen sichtbar. Samstag und Sonntag werden ausschließlich über ihren Wochentagsnamen gekennzeichnet. Leere Wochenend- und Feiertagstage erscheinen kompakt und erhalten bei „Tage als Spalten“ eine feste schmale Breite. Sie wechseln nur bei vorhandenen Diensten oder Terminen automatisch auf Normalgröße; ein Urlaubsmarker allein verhindert die kompakte Darstellung nicht. Die Kalendermatrix scrollt innerhalb des sichtbaren Tabellenbereichs in beide Richtungen; ihre horizontale Leiste bleibt unabhängig von der Inhaltshöhe am unteren Rand dieses Bereichs erreichbar. Gesetzliche Feiertage der organisationsweit konfigurierten Kalenderregion werden über den gemeinsamen LocalBase-Kalendervertrag geliefert, namentlich gekennzeichnet und bleiben ohne Auswirkung auf Dienste, Termine oder Rechte. Berlin bleibt Bestandsdefault. Zeitraum und Ausrichtung können zusammen mit den Filtern als persönlicher Standard gespeichert werden.
 
 ## Staging-Kompatibilität
 
@@ -21,9 +21,11 @@ Der Befehl `adcalendar:demo:seed` ist ausschließlich für synthetische Testdate
 
 ## Externe Kalender
 
-Jede angemeldete Person verwaltet Kopano-, Google-, Apple- und manuelle CalDAV-Verbindungen im eigenen Tab `Einstellungen`. AD Calendar erzeugt beim Anbieter einen sichtbaren Kalender `AD Dienste` und exportiert ausschließlich Dienste. Anbieterinhalte werden nicht in AD Calendar eingeblendet oder zurückimportiert.
+Jede angemeldete Person verwaltet Kopano-, Google-, Apple- und manuelle CalDAV-Verbindungen im eigenen Tab `Einstellungen`. AD Calendar erzeugt beim Anbieter einen sichtbaren Kalender mit dem administrativ konfigurierten Namen und exportiert ausschließlich Dienste. Ohne gesetzte Konfiguration bleibt `AD Dienste` der Bestandsdefault. Anbieterinhalte werden nicht in AD Calendar eingeblendet oder zurückimportiert.
 
-- Kopano ist mit `https://mail.adberlin.org` vorbelegt; die Adresse bleibt im Verbindungsdialog änderbar.
+- Nextcloud-Admins verwalten die Kopano-/CalDAV-Vorgabe und den sichtbaren Zielkalendernamen unter `Administrationseinstellungen` → `AD Kalender` → `Kopano und CalDAV`. Ohne gesetzte Konfiguration bleibt `https://mail.adberlin.org/` die Vorgabe.
+- Die Kopano-Adresse bleibt im persönlichen Verbindungsdialog änderbar. Bereits gespeicherte persönliche Serveradressen werden durch spätere Änderungen der administrativen Vorgabe nicht überschrieben.
+- Vorhandene sicher erkannte app-eigene Kalender werden beim nächsten ausgehenden Abgleich auf den neuen sichtbaren Namen umbenannt. Technische Kalender-, Provider-, Objekt- und Ereigniskennungen bleiben unverändert; fremde Kalender werden nicht umbenannt.
 - Der Kopano-Betreiber muss einen HTTPS-CalDAV-Endpunkt bereitstellen. HTTP 405 wird im Connector ausdrücklich als nicht freigegebener CalDAV-Zugriff erklärt; die notwendige Serverfreigabe kann nicht durch AD Kalender erfolgen.
 - Nextcloud-Admins können Adresse und Zugang im AD-Kalender-Adminabschnitt mit einer ausschließlich lesenden CalDAV-Anfrage prüfen. Das Passwort wird weder gespeichert noch zurückgegeben; der Test legt keinen Kalender an.
 - Apple und manuelles CalDAV verwenden ein Anbieter- beziehungsweise app-spezifisches Passwort.
@@ -43,5 +45,7 @@ Bei installationsweit aktivem Pretty-URL-Rewriting kann `index.php` entfallen. M
 ## Roadmap
 
 Geplante Erweiterungen und offene Produktentscheidungen stehen in der [Roadmap](ROADMAP.md).
+
+Für die fachliche Prüfung auf Staging steht ein ausfüllbares [manuelles Abnahmeformular](docs/manual-acceptance.md) bereit. Zugangsdaten, Tokens und personenbezogene Echtdaten werden darin nicht dokumentiert.
 
 Installations-, Betriebs- und Abnahmeunterlagen stehen im öffentlichen [AD-Suite-Projekt](https://github.com/Filzmann/ad-suite).

@@ -1,6 +1,7 @@
 (function() {
     'use strict';
     const CalendarDate = window.AdCalendar.modules.CalendarDate;
+    const l10n = window.AdCalendar.l10n;
 
     /**
      * Zweck: Steuert Woche, Monat und Orientierung der Kalendermatrix als zusammengehörige Navigation.
@@ -38,8 +39,8 @@
             const sunday = new Date(this.state.monday);
             sunday.setDate(sunday.getDate() + 6);
             this.label.textContent = isMonth
-                ? this.state.month.toLocaleDateString('de-DE', { month: 'long', year: 'numeric' })
-                : `${this.state.monday.toLocaleDateString('de-DE')} – ${sunday.toLocaleDateString('de-DE')}`;
+                ? l10n.date(this.state.month, { month: 'long', year: 'numeric' })
+                : `${l10n.date(this.state.monday)} – ${l10n.date(sunday)}`;
             this.weekNumber.value = CalendarDate.isoWeekValue(this.state.monday);
             this.monthNumber.value = CalendarDate.monthValue(this.state.month);
             this.weekPicker.hidden = isMonth;
@@ -47,10 +48,10 @@
             this.toggleView.hidden = false;
             this.weekButton.setAttribute('aria-pressed', String(!isMonth));
             this.monthButton.setAttribute('aria-pressed', String(isMonth));
-            this.previous.textContent = isMonth ? 'Vorheriger Monat' : 'Vorherige Woche';
-            this.next.textContent = isMonth ? 'Nächster Monat' : 'Nächste Woche';
-            this.heading.textContent = isMonth ? 'Monatsplan' : 'Wochenplan';
-            this.toggleView.textContent = this.state.vertical ? 'Tage als Zeilen' : 'Personen als Zeilen';
+            this.previous.textContent = isMonth ? l10n.t('Previous month') : l10n.t('Previous week');
+            this.next.textContent = isMonth ? l10n.t('Next month') : l10n.t('Next week');
+            this.heading.textContent = isMonth ? l10n.t('Monthly schedule') : l10n.t('Weekly schedule');
+            this.toggleView.textContent = this.state.vertical ? l10n.t('Days as rows') : l10n.t('People as rows');
             this.toggleView.setAttribute('aria-pressed', String(!this.state.vertical));
         }
 

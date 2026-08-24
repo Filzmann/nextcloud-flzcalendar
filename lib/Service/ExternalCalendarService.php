@@ -15,7 +15,6 @@ use OCA\AdCalendar\Repository\CalendarEntryRepository;
 /** Orchestriert persönliche Verbindungen; Zugangsdaten verlassen diese Backend-Grenze nie. */
 final class ExternalCalendarService {
     private const DEFAULTS = [
-        'kopano' => 'https://mail.adberlin.org/',
         'apple' => 'https://caldav.icloud.com/',
         'manual' => '',
     ];
@@ -23,6 +22,7 @@ final class ExternalCalendarService {
     public function __construct(
         private ExternalCalendarConnectionStore $connections,
         private ExternalCalendarUrlValidator $urls,
+        private CalendarTargetConfig $calendarTargets,
         private CalDavClient $calDav,
         private ExternalShiftCalendarPublisher $publisher,
         private CalendarEntryRepository $entries,
@@ -31,7 +31,11 @@ final class ExternalCalendarService {
 
     public function status(string $uid): array {
         if (trim($uid) === '') throw new InvalidArgumentException('Die angemeldete Person fehlt.');
-        return $this->connections->statuses($uid, $this->googleOAuth->configured());
+        return $this->connections->statuses(
+            $uid,
+            $this->googleOAuth->configured(),
+            $this->calendarTargets->calendarName(),
+        );
     }
 
     public function connectCalDav(string $uid, string $provider, string $serverUrl, string $username, string $password): array {
@@ -39,6 +43,7 @@ final class ExternalCalendarService {
         $connection = $this->calDavConnection($provider, $serverUrl, $username, $password);
         $previous = $this->connections->connection($uid, $provider);
         $connection['calendarUrl'] = $this->calDav->connect($connection);
+        $connection['calendarName'] = $this->calendarTargets->calendarName();
         if ($previous !== null && ($previous['calendarUrl'] ?? '') !== $connection['calendarUrl']) {
             $this->publisher->removeProviderCalendar($uid, $provider, $previous);
         }
@@ -63,7 +68,8 @@ final class ExternalCalendarService {
 
     private function calDavConnection(string $provider, string $serverUrl, string $username, string $password): array {
         if (!in_array($provider, ExternalCalendarConnectionStore::CALDAV_PROVIDERS, true)) throw new InvalidArgumentException('Unbekannter CalDAV-Anbieter.');
-        $serverUrl = trim($serverUrl) === '' ? self::DEFAULTS[$provider] : $serverUrl;
+        $defaultUrl = $provider === 'kopano' ? $this->calendarTargets->kopanoUrl() : self::DEFAULTS[$provider];
+        $serverUrl = trim($serverUrl) === '' ? $defaultUrl : $serverUrl;
         $serverUrl = $this->urls->normalize($serverUrl);
         $username = trim($username);
         if ($username === '' || $password === '') throw new InvalidArgumentException('Benutzername und Passwort sind erforderlich.');

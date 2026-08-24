@@ -1,5 +1,6 @@
 (function() {
     'use strict';
+    const l10n = window.AdCalendar.l10n;
 
     /**
      * Zweck: Rendert Rollen-, Bereichs- und Personenfilter und bindet deren Interaktionen.
@@ -28,10 +29,10 @@
             const roles = [...new Set(employees.flatMap(employee => employee.roles))]
                 .filter(role => !this.leadershipStaffRoles.has(role))
                 .sort((a, b) => organization.roleOrder(a) - organization.roleOrder(b)
-                    || organization.roleLabel(a).localeCompare(organization.roleLabel(b), 'de'));
+                    || organization.roleLabel(a).localeCompare(organization.roleLabel(b), l10n.locale));
             const areas = [...new Set(employees.flatMap(employee => employee.areas))]
                 .sort((a, b) => organization.areaOrder(a) - organization.areaOrder(b)
-                    || organization.areaLabel(a).localeCompare(organization.areaLabel(b), 'de'));
+                    || organization.areaLabel(a).localeCompare(organization.areaLabel(b), l10n.locale));
             this.renderCheckboxes(this.roles, roles, this.state.roles, value => organization.roleLabel(value));
             this.renderLeadershipStaffCheckbox();
             this.renderCheckboxes(this.areas, areas, this.state.areas, value => organization.areaLabel(value));
@@ -51,7 +52,7 @@
                 if (!input.checked) for (const role of this.leadershipStaffRoles) this.state.roles.delete(role);
                 this.changed(true);
             });
-            label.append(input, document.createTextNode(` ${this.organization().staffBlockLabel} anzeigen`));
+            label.append(input, document.createTextNode(` ${l10n.t('Show {label}', { label: this.organization().staffBlockLabel })}`));
             this.roles.append(label);
         }
 
@@ -75,12 +76,12 @@
             const people = (this.state.data?.employees || []).filter(employee => this.state.selected.has(employee.uid));
             this.reset.hidden = people.length === 0;
             if (!people.length) {
-                this.selectedPeople.replaceChildren(this.node('li', 'Keine explizite Auswahl – Gruppenfilter gelten.'));
+                this.selectedPeople.replaceChildren(this.node('li', l10n.t('No explicit selection – group filters apply.')));
                 return;
             }
             this.selectedPeople.replaceChildren(...people.map(employee => {
                 const item = this.node('li');
-                const button = this.node('button', `${employee.displayName} entfernen`);
+                const button = this.node('button', l10n.t('Remove {employee}', { employee: employee.displayName }));
                 button.type = 'button';
                 button.addEventListener('click', () => {
                     this.state.selected.delete(employee.uid);
@@ -92,13 +93,13 @@
         }
 
         renderSearch(value) {
-            const query = value.trim().toLocaleLowerCase('de-DE');
+            const query = l10n.lower(value.trim());
             const matches = query ? (this.state.data?.employees || [])
-                .filter(employee => employee.displayName.toLocaleLowerCase('de-DE').includes(query) && !this.state.selected.has(employee.uid))
+                .filter(employee => l10n.lower(employee.displayName).includes(query) && !this.state.selected.has(employee.uid))
                 .slice(0, 12) : [];
             this.searchResults.replaceChildren(...matches.map(employee => {
                 const item = this.node('li');
-                const button = this.node('button', `${employee.displayName} auswählen`);
+                const button = this.node('button', l10n.t('Select {employee}', { employee: employee.displayName }));
                 button.type = 'button';
                 button.addEventListener('click', () => {
                     this.state.leadershipStaffOnly = false;

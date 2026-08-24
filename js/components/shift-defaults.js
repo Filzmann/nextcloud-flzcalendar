@@ -1,5 +1,6 @@
 (function() {
     'use strict';
+    const l10n = window.AdCalendar.l10n;
 
     /** Zweck: Rendert und sammelt die persönlichen Standard-Dienstzeiten je Wochentag. */
     class ShiftDefaults {
@@ -7,7 +8,10 @@
             this.container = document.getElementById('adc-shift-defaults');
             this.form = document.getElementById('adc-shift-defaults-form');
             this.onSave = options.onSave;
-            this.weekdays = ['', 'Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag', 'Sonntag'];
+            this.weekdays = ['',
+                l10n.t('Monday'), l10n.t('Tuesday'), l10n.t('Wednesday'), l10n.t('Thursday'),
+                l10n.t('Friday'), l10n.t('Saturday'), l10n.t('Sunday'),
+            ];
             this.form.addEventListener('submit', event => this.submit(event));
         }
 

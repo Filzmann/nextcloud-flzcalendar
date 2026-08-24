@@ -3,6 +3,9 @@ import { fileURLToPath } from 'node:url';
 import { runInNewContext } from 'node:vm';
 
 const source = readFileSync(new URL('../../js/admin.js', import.meta.url), 'utf8');
+if (!source.includes('window.AdCalendar.l10n') || !source.includes("l10n.t('The calendar defaults were saved.")) {
+    throw new Error('Admininteraktionen verwenden nicht den zentralen L10N-Adapter.');
+}
 const element = (value = '') => ({
     value, textContent: '', hidden: false, disabled: false, dataset: {}, listeners: {},
     className: '', classList: { add() {}, remove() {} },
@@ -21,6 +24,11 @@ const calDavUsername = element('person-a');
 const calDavPassword = element('connection-secret');
 const calDavStatus = element();
 const calDavSubmit = element();
+const defaultsForm = element();
+const defaultsUrl = element('https://calendar.example.test/caldav/');
+const defaultsName = element('Team & Dienst');
+const defaultsStatus = element();
+const defaultsSubmit = element();
 const elements = {
     'adc-google-oauth-form': form,
     'adc-google-client-id': clientId,
@@ -35,6 +43,11 @@ const elements = {
     'adc-kopano-test-password': calDavPassword,
     'adc-kopano-test-status': calDavStatus,
     'adc-kopano-test-submit': calDavSubmit,
+    'adc-calendar-defaults-form': defaultsForm,
+    'adc-calendar-default-kopano-url': defaultsUrl,
+    'adc-calendar-default-name': defaultsName,
+    'adc-calendar-defaults-status': defaultsStatus,
+    'adc-calendar-defaults-submit': defaultsSubmit,
 };
 const calls = [];
 let failCalDav = false;
@@ -45,14 +58,23 @@ class ApiClient {
             if (failCalDav) throw new Error('Der Kopano-Betreiber erlaubt keine CalDAV-Verbindung.');
             return { message: 'Kopano-CalDAV-Verbindung erfolgreich geprüft (HTTP 207).' };
         }
+        if (path.includes('/calendar-defaults')) {
+            const body = JSON.parse(options.body);
+            return { calendarDefaults: { kopanoUrl: `${body.kopanoUrl.replace(/\/$/, '')}/`, calendarName: body.calendarName.trim() } };
+        }
         return { googleOAuth: options.method === 'DELETE'
             ? { configured: false, clientId: '', secretConfigured: false, redirectUri: redirect.value }
             : { configured: true, clientId: clientId.value, secretConfigured: true, redirectUri: redirect.value } };
     }
 }
 let copied = '';
+const translationCalls = [];
+const l10n = { t(key, parameters = {}) {
+    translationCalls.push([key, parameters]);
+    return `translated:${key}`.replace(/\{(\w+)\}/g, (_, name) => String(parameters[name] ?? `{${name}}`));
+} };
 const context = {
-    window: { LocalBase: { api: { ApiClient } }, confirm: () => true },
+    window: { LocalBase: { api: { ApiClient } }, AdCalendar: { l10n }, confirm: () => true },
     document: { getElementById: id => elements[id] || null },
     navigator: { clipboard: { writeText: async value => { copied = value; } } },
 };
@@ -60,7 +82,7 @@ runInNewContext(source, context, { filename: fileURLToPath(new URL('../../js/adm
 
 await form.listeners.submit({ preventDefault() {} });
 if (calls[0][0] !== '/api/admin/google-oauth' || calls[0][1].method !== 'PUT' || JSON.parse(calls[0][1].body).clientSecret !== 'new-secret') throw new Error('Google-OAuth-Adminformular speichert nicht über den geschützten API-Pfad.');
-if (secret.value !== '' || remove.disabled || !status.textContent.includes('konfiguriert')) throw new Error('Google-OAuth-Adminformular behält das Secret oder aktualisiert den Status nicht.');
+if (secret.value !== '' || remove.disabled || !status.textContent.includes('configured')) throw new Error('Google-OAuth-Adminformular behält das Secret oder aktualisiert den Status nicht.');
 await copy.listeners.click();
 if (copied !== redirect.value) throw new Error('Google-Redirect-URI kann nicht kopiert werden.');
 await remove.listeners.click();
@@ -72,5 +94,19 @@ if (calDavPassword.value !== '' || calDavSubmit.disabled || !calDavStatus.textCo
 failCalDav = true; calDavPassword.value = 'retry-secret';
 await calDavForm.listeners.submit({ preventDefault() {} });
 if (calDavPassword.value !== '' || calDavSubmit.disabled || !calDavStatus.textContent.includes('Kopano-Betreiber')) throw new Error('Fehlgeschlagener Kopano-Test räumt das Passwort nicht auf oder verschweigt die Providerdiagnose.');
+
+await defaultsForm.listeners.submit({ preventDefault() {} });
+const defaultsCall = calls[4];
+if (defaultsCall[0] !== '/api/admin/calendar-defaults' || defaultsCall[1].method !== 'PUT'
+    || JSON.parse(defaultsCall[1].body).calendarName !== 'Team & Dienst') {
+    throw new Error('Kalenderdefaults werden nicht über den geschützten Adminpfad gespeichert.');
+}
+if (defaultsUrl.value !== 'https://calendar.example.test/caldav/' || defaultsName.value !== 'Team & Dienst'
+    || defaultsSubmit.disabled || !defaultsStatus.textContent.includes('saved')) {
+    throw new Error('Kalenderdefaults aktualisieren Adminformular und Status nicht sicher.');
+}
+if (!translationCalls.some(([key]) => key === 'The calendar defaults were saved. Existing app-owned calendars will be renamed during the next synchronisation.')) {
+    throw new Error('Adminerfolg wird nicht als stabiler englischer L10N-Schlüssel delegiert.');
+}
 
 console.log('Admin settings smoke: OK');

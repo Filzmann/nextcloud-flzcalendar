@@ -17,7 +17,6 @@ use OCA\AdCalendar\Repository\CalendarEntryRepository;
 final class RecurringAppointmentService {
     public function __construct(
         private CalendarEntryRepository $entries,
-        private AbsenceService $absences,
         private ContainingShiftAssignment $shiftAssignment,
     ) {}
 
@@ -94,12 +93,6 @@ final class RecurringAppointmentService {
     }
 
     private function prepare(CalendarEntry $entry): CalendarEntry {
-        try {
-            $this->absences->assertWritable($entry->employeeUid(), $entry->start(), $entry->end());
-        } catch (InvalidArgumentException $error) {
-            $timezone = new \DateTimeZone($entry->seriesTimezone() ?? 'UTC');
-            throw new InvalidArgumentException($entry->start()->setTimezone($timezone)->format('d.m.Y') . ': ' . $error->getMessage());
-        }
         $parents = $this->entries->containingShifts($entry->employeeUid(), $entry->start(), $entry->end(), $entry->id());
         return $this->shiftAssignment->assign($entry, $parents);
     }

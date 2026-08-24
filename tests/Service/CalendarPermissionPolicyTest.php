@@ -2,12 +2,6 @@
 
 declare(strict_types=1);
 
-require_once __DIR__ . '/../../../localbase/lib/Organization/AdOrganizationDefinition.php';
-require_once __DIR__ . '/../../../localbase/lib/Organization/AdOrganizationHierarchy.php';
-require_once __DIR__ . '/../../../localbase/lib/Organization/AdOrganizationPermissionPolicy.php';
-require_once __DIR__ . '/../../lib/Service/CalendarAccessService.php';
-require_once __DIR__ . '/../../lib/Service/CalendarHierarchyPolicy.php';
-require_once __DIR__ . '/../../lib/Service/CalendarPermissionPolicy.php';
 
 use OCA\AdCalendar\Service\CalendarHierarchyPolicy;
 use OCA\AdCalendar\Service\CalendarPermissionPolicy;

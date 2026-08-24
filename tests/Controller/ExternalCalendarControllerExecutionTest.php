@@ -6,6 +6,7 @@ namespace OCP {
     interface IRequest {}
     interface IUser { public function getUID(): string; }
     interface IURLGenerator { public function linkToRoute(string $routeName, array $arguments = []): string; }
+    interface IL10N { public function t(string $text, array $parameters = []): string; }
 }
 namespace OCP\AppFramework {
     class Controller { public function __construct(string $appName, \OCP\IRequest $request) {} }
@@ -45,13 +46,14 @@ namespace OCA\AdCalendar\CalendarSync {
 }
 
 namespace {
-    require_once __DIR__ . '/../../lib/Controller/ExternalCalendarController.php';
 
     use OCA\AdCalendar\CalendarSync\GoogleOAuthService;
     use OCA\AdCalendar\Controller\ExternalCalendarController;
+    use OCA\AdCalendar\Http\LocalizedErrorResponseFactory;
     use OCA\AdCalendar\Service\CalendarAccessService;
     use OCA\AdCalendar\Service\ExternalCalendarService;
     use OCP\IRequest;
+    use OCP\IL10N;
     use OCP\IURLGenerator;
     use OCP\IUser;
     use Psr\Log\LoggerInterface;
@@ -63,6 +65,7 @@ namespace {
         public array $entries = [];
         public function error(string|\Stringable $message, array $context = []): void { $this->entries[] = [(string)$message, $context]; }
     };
+    $errors = new LocalizedErrorResponseFactory(new class implements IL10N { public function t(string $text, array $parameters = []): string { return strtr($text, $parameters); } });
     $controller = new ExternalCalendarController(
         new class implements IRequest {},
         $access,
@@ -70,6 +73,7 @@ namespace {
         $google,
         new class implements IURLGenerator { public function linkToRoute(string $routeName, array $arguments = []): string { return '/apps/adcalendar/'; } },
         $logger,
+        $errors,
     );
 
     if ($controller->connectCalDav('kopano', 'https://mail.adberlin.org', 'person-a', 'secret')->getStatus() !== 403 || $calendars->calls !== []) {
@@ -82,7 +86,9 @@ namespace {
     }
     $calendars->blocked = true;
     $blocked = $controller->connectCalDav('kopano', 'https://calendar.example.test', 'person-a', 'secret');
-    if ($blocked->getStatus() !== 400 || ($blocked->getData()['error'] ?? '') !== 'Der Kopano-Betreiber erlaubt an dieser Adresse keine CalDAV-Verbindung (HTTP 405). Bitte wende dich an dessen Administration.') {
+    if ($blocked->getStatus() !== 400
+        || ($blocked->getData()['code'] ?? '') !== 'external_calendar_provider_rejected'
+        || ($blocked->getData()['error'] ?? '') !== 'The calendar provider rejected the CalDAV connection (HTTP 405). Please contact its administration.') {
         throw new RuntimeException('Sichere HTTP-405-Diagnose erreicht den persönlichen Kopano-Connector nicht.');
     }
     if (($logger->entries[0][1] ?? null) !== ['provider' => 'kopano', 'status' => 405]) {

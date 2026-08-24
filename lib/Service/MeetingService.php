@@ -38,7 +38,6 @@ final class MeetingService {
         $entries = [];
         foreach ($employeeUids as $employeeUid) {
             $entry = CalendarEntry::get(['employeeUid' => $employeeUid, 'start' => $start, 'end' => $end, 'type' => CalendarEntry::TYPE_APPOINTMENT, 'title' => $title, 'meetingUid' => $meetingUid]);
-            $this->absences->assertWritable($entry->employeeUid(), $entry->start(), $entry->end());
             $entries[] = $this->assignContainingShift($entry);
         }
         return $this->entries->saveMany($entries, $actorUid);
@@ -70,7 +69,6 @@ final class MeetingService {
                 'title' => $title,
                 'meetingUid' => $meetingUid,
             ]);
-            $this->absences->assertWritable($next->employeeUid(), $next->start(), $next->end());
             $updated[] = $this->assignContainingShift($next);
         }
         return $this->entries->saveMany($updated, $actorUid);

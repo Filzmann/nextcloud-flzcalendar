@@ -1,5 +1,34 @@
 # Changelog
 
+## Unreleased
+
+## 0.15.0-rc.1
+
+- Subjectgebundene persönliche Datenauskunft für eigene Dienste und Termine ergänzt; bei gemeinsamen Terminen werden weitere Beteiligte nur abstrakt erwähnt.
+- Menschenlesbare Tabellenfelder, deutsche Kurzdatumswerte und ehrliche Aufbewahrungshinweise ohne erfundene Löschfrist bereitgestellt.
+- Für Viewports bis 700 Pixel eine semantische, einklappbare Tagesliste aus denselben gefilterten Kalenderdaten wie die Desktopmatrix ergänzt.
+- Person, Organisationskontext, Datum, Feiertag, Eintragstyp und Urlaubsstatus mobil ohne horizontal verschobene Desktopmatrix sichtbar gemacht.
+- Mobile Eintragsaktionen an den unveränderten `canManage`-Vertrag gebunden und mit mindestens 44 Pixel großen Touch-Zielen versehen.
+- Die mobile Tagesliste auf einen einzigen vertikalen App-Scroller umgestellt und einen Floating-Button für die Rückkehr zum Anfang ergänzt.
+- Nachtdienste je Tageszelle mit gekapptem Teilzeitraum und Fortsetzungskennzeichnung dargestellt.
+- Leere Dialogfehlermeldungen ausgeblendet, statt eine bedeutungslose Fehlerfläche anzuzeigen.
+- Mitarbeiter*innen-Auswahl im Eintragsdialog durch eine feste Anzeige ersetzt und nachträgliche API-Umzuordnungen serverseitig gesperrt.
+- Kalendergruppen in der Übersicht auf die zentralen Betriebskürzel wie `BO-NO`, `EB-W`, `PFK`, `BO-Pflege` und `IT` umgestellt.
+
+## 0.14.0-rc.2
+
+- Kalenderzeiten beim Schreiben und Lesen explizit als UTC behandelt, damit reale Datenbankzugriffe die lokale Uhrzeit von Terminserien über Sommerzeitgrenzen hinweg stabil halten.
+- Bereits gespeicherte Serienvorkommen anhand ihrer Serienzeitzone einmalig und DST-sicher nach UTC korrigiert; ungültige Bestandszeilen werden sichtbar gemeldet und isoliert übersprungen.
+- Reale DDEV-Smokes für Terminserien, Urlaubsregeln und DAV-Dienstsynchronisierung in einem app-lokalen Integrationslauf gebündelt.
+
+## 0.14.0-rc.1
+
+- Präzisierte Urlaubslogik umgesetzt: geplanter und genehmigter Urlaub blockieren Dienste und Standardmaterialisierung, während Sperrtermine möglich und bearbeitbar bleiben.
+- Urlaubsmarker auf kompakte, schreibgeschützte `U?`-/`U`-Hinweise reduziert und ihre Wirkung gegen die reale AD-Urlaub-Integration geprüft.
+- Fokus-, Kontrast-, Sticky-, Scrollpositions-, Feiertags- und Eintragshöhen-Verträge für die Kalenderoberfläche nachgeschärft; den redundanten Typwähler entfernt.
+- Gemeinsamen Leitungs-/Stabsfilter von IT, Sekretariat sowie Finanzen/Lohn getrennt.
+- Direkten serverseitigen Mehrfachrollen-Deny und den administrativen Speicherweg mit selbstbereinigenden DDEV-Smokes abgesichert.
+
 ## 0.12.0-rc.11
 
 - Kopano-/CalDAV-Fehlerdiagnose mit verständlicher HTTP-405-Meldung im persönlichen Connector und einem rein lesenden administrativen Verbindungstest ergänzt.

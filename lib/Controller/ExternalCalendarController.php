@@ -7,6 +7,7 @@ namespace OCA\AdCalendar\Controller;
 use OCA\AdCalendar\AppInfo\Application;
 use OCA\AdCalendar\CalendarSync\ExternalCalendarConnectionException;
 use OCA\AdCalendar\CalendarSync\GoogleOAuthService;
+use OCA\AdCalendar\Http\LocalizedErrorResponseFactory;
 use OCA\AdCalendar\Service\CalendarAccessService;
 use OCA\AdCalendar\Service\ExternalCalendarService;
 use OCP\AppFramework\Controller;
@@ -27,6 +28,7 @@ final class ExternalCalendarController extends Controller {
         private GoogleOAuthService $googleOAuth,
         private IURLGenerator $urls,
         private LoggerInterface $logger,
+        private LocalizedErrorResponseFactory $errors,
     ) {
         parent::__construct(Application::APP_ID, $request);
     }
@@ -44,14 +46,14 @@ final class ExternalCalendarController extends Controller {
         if ($uid === null) return $this->denied();
         try {
             return new JSONResponse(['externalCalendars' => $this->calendars->connectCalDav($uid, $provider, $serverUrl, $username, $password)]);
-        } catch (\InvalidArgumentException $error) {
-            return new JSONResponse(['error' => $error->getMessage()], Http::STATUS_BAD_REQUEST);
+        } catch (\InvalidArgumentException) {
+            return $this->errors->create('invalid_external_calendar', 'The external calendar connection details are invalid.', Http::STATUS_BAD_REQUEST);
         } catch (ExternalCalendarConnectionException $error) {
             $this->logger->error('Der externe Kalenderanbieter erlaubt keine CalDAV-Verbindung.', ['provider' => $provider, 'status' => $error->getCode()]);
-            return new JSONResponse(['error' => $error->userMessage($provider)], Http::STATUS_BAD_REQUEST);
+            return $this->errors->create('external_calendar_provider_rejected', 'The calendar provider rejected the CalDAV connection (HTTP {status}). Please contact its administration.', Http::STATUS_BAD_REQUEST, ['{status}' => (string)$error->getCode()]);
         } catch (\Throwable $error) {
             $this->logger->error('Externe CalDAV-Verbindung konnte nicht hergestellt werden.', ['provider' => $provider, 'exception' => $error]);
-            return new JSONResponse(['error' => 'Die Kalenderverbindung konnte nicht hergestellt werden. Bitte Adresse und Zugangsdaten prüfen.'], Http::STATUS_BAD_REQUEST);
+            return $this->errors->create('external_calendar_connect_failed', 'The calendar connection could not be established. Please check the address and credentials.', Http::STATUS_BAD_REQUEST);
         }
     }
 
@@ -63,7 +65,7 @@ final class ExternalCalendarController extends Controller {
             return new JSONResponse(['externalCalendars' => $this->calendars->disconnect($uid, $provider)]);
         } catch (\Throwable $error) {
             $this->logger->error('Externe Kalenderverbindung konnte nicht getrennt werden.', ['provider' => $provider, 'exception' => $error]);
-            return new JSONResponse(['error' => 'Die Verbindung konnte nicht sicher getrennt werden. Bitte später erneut versuchen.'], Http::STATUS_BAD_REQUEST);
+            return $this->errors->create('external_calendar_disconnect_failed', 'The connection could not be disconnected safely. Please try again later.', Http::STATUS_BAD_REQUEST);
         }
     }
 
@@ -75,7 +77,7 @@ final class ExternalCalendarController extends Controller {
             return new JSONResponse(['authorizationUrl' => $this->googleOAuth->authorizationUrl($uid)]);
         } catch (\Throwable $error) {
             $this->logger->error('Google-OAuth konnte nicht gestartet werden.', ['exception' => $error]);
-            return new JSONResponse(['error' => 'Google ist noch nicht durch die Administration konfiguriert.'], Http::STATUS_BAD_REQUEST);
+            return $this->errors->create('google_oauth_not_configured', 'Google has not yet been configured by an administrator.', Http::STATUS_BAD_REQUEST);
         }
     }
 
@@ -104,6 +106,6 @@ final class ExternalCalendarController extends Controller {
     }
 
     private function denied(): JSONResponse {
-        return new JSONResponse(['error' => 'Keine Berechtigung.'], Http::STATUS_FORBIDDEN);
+        return $this->errors->create('forbidden', 'You are not allowed to perform this action.', Http::STATUS_FORBIDDEN);
     }
 }

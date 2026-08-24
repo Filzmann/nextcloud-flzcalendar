@@ -6,9 +6,6 @@ namespace OCP\EventDispatcher { class Event { public function __construct() {} }
 namespace OCA\AdCalendar\AppInfo { final class Application { public const APP_ID = 'adcalendar'; } }
 
 namespace {
-    require_once __DIR__ . '/../../../localbase/lib/Integration/AdIntegrationCapabilities.php';
-    require_once __DIR__ . '/../../../localbase/lib/Integration/IntegrationCapabilityQueryEvent.php';
-    require_once __DIR__ . '/../../lib/Listener/IntegrationCapabilityQueryListener.php';
 
     use OCA\AdCalendar\Listener\IntegrationCapabilityQueryListener;
     use OCA\LocalBase\Integration\AdIntegrationCapabilities;

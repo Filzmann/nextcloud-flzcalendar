@@ -6,31 +6,41 @@ namespace OCA\AdCalendar\Service;
 
 use OCA\AdCalendar\CalendarSync\ExternalCalendarConnectionStore;
 use OCA\AdCalendar\CalendarSync\ExternalShiftCalendarPublisher;
-use OCA\AdCalendar\CalendarSync\ShiftCalendarPublisher;
+use OCA\AdCalendar\CalendarSync\PersonalCalendarPublisher;
 use OCA\AdCalendar\Repository\CalendarEntryRepository;
 use Psr\Log\LoggerInterface;
 
 /**
- * Zweck: Stellt den vollständigen führenden AD-Dienstbestand aller standardmäßig aktiven persönlichen Kalender periodisch wieder her.
+ * Zweck: Stellt den vollständigen führenden AD-Eintrags- und Urlaubsbestand aktiver persönlicher Nextcloud-Kalender periodisch wieder her.
  * Zukunftsvertrag: Bei bidirektionalem Ausbau bleibt dies der ausgehende Konsistenzschritt nach Import und Konfliktauflösung.
  */
 final class ShiftCalendarReconciliationService {
     public function __construct(
         private CalendarEntryRepository $entries,
         private CalendarPreferenceService $preferences,
-        private ShiftCalendarPublisher $publisher,
+        private PersonalCalendarPublisher $publisher,
         private ExternalShiftCalendarPublisher $externalPublisher,
         private ExternalCalendarConnectionStore $externalConnections,
+        private AbsenceService $absences,
+        private CalendarSyncHorizon $horizon,
         private LoggerInterface $logger,
     ) {}
 
     /** @return array{attempted: int, succeeded: int, failed: int} */
     public function reconcileAll(): array {
         $result = ['attempted' => 0, 'succeeded' => 0, 'failed' => 0];
+        [$start, $end] = $this->horizon->range();
+        try {
+            $absenceEmployeeUids = $this->absences->discover($start, $end);
+        } catch (\Throwable $error) {
+            $absenceEmployeeUids = [];
+            $this->logger->error('Periodische Urlaubs-Discovery ist fehlgeschlagen.', ['exception' => $error]);
+        }
         $employeeUids = array_values(array_unique(array_merge(
-            $this->entries->findEmployeeUidsWithShifts(),
+            $this->entries->findEmployeeUidsWithEntries(),
             $this->preferences->shiftCalendarSyncEmployeeUids(),
             $this->externalConnections->connectedEmployeeUids(),
+            $absenceEmployeeUids,
         )));
         sort($employeeUids, SORT_STRING);
         foreach ($employeeUids as $employeeUid) {
@@ -46,14 +56,28 @@ final class ShiftCalendarReconciliationService {
         $native = $this->preferences->shiftCalendarSyncEnabled($employeeUid);
         $external = $this->externalConnections->hasConnections($employeeUid);
         if (!$native && !$external) return false;
-        try {
-            $shifts = $this->entries->findShiftsForEmployee($employeeUid);
-            if ($native) $this->publisher->replaceAll($employeeUid, $shifts);
-            if ($external) $this->externalPublisher->replaceAll($employeeUid, $shifts);
-            return true;
-        } catch (\Throwable $error) {
-            $this->logger->error('Periodischer Dienstkalender-Abgleich ist für ein aktives Konto fehlgeschlagen.', ['exception' => $error]);
-            return false;
+        $succeeded = true;
+        if ($native) {
+            try {
+                [$start, $end] = $this->horizon->range();
+                $this->publisher->replaceAllContent(
+                    $employeeUid,
+                    $this->entries->findEntriesForEmployee($employeeUid),
+                    $this->absences->query($start, $end, [$employeeUid]),
+                );
+            } catch (\Throwable $error) {
+                $succeeded = false;
+                $this->logger->error('Periodischer persönlicher Nextcloud-Kalenderabgleich ist fehlgeschlagen.', ['exception' => $error]);
+            }
         }
+        if ($external) {
+            try {
+                $this->externalPublisher->replaceAll($employeeUid, $this->entries->findShiftsForEmployee($employeeUid));
+            } catch (\Throwable $error) {
+                $succeeded = false;
+                $this->logger->error('Periodischer externer Dienstkalenderabgleich ist fehlgeschlagen.', ['exception' => $error]);
+            }
+        }
+        return $succeeded;
     }
 }

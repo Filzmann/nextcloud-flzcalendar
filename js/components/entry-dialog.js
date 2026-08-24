@@ -1,5 +1,6 @@
 (function() {
     'use strict';
+    const l10n = window.AdCalendar.l10n;
 
     /**
      * Zweck: Kapselt den typabhängigen Eintragsdialog und verhindert erkennbare Dienstüberschneidungen bereits vor dem API-Aufruf.
@@ -12,7 +13,9 @@
             this.entries = options.entries;
             this.shiftDefaults = options.shiftDefaults;
             this.onSubmit = options.onSubmit;
-            this.fields = Object.fromEntries(['entry-id', 'employee', 'type', 'start', 'end', 'title', 'title-field', 'title-label', 'title-help', 'time-help', 'entry-dialog-title', 'recurrence-fields', 'recurrence-frequency', 'recurrence-options', 'recurrence-interval', 'recurrence-until', 'recurrence-weekdays'].map(id => [id, document.getElementById(`adc-${id}`)]));
+            this.returnFocus = null;
+            this.fields = Object.fromEntries(['entry-id', 'employee', 'employee-name', 'type', 'start', 'end', 'title', 'title-field', 'title-label', 'title-help', 'time-help', 'entry-dialog-title', 'recurrence-fields', 'recurrence-frequency', 'recurrence-options', 'recurrence-interval', 'recurrence-until', 'recurrence-weekdays'].map(id => [id, document.getElementById(`adc-${id}`)]));
+            this.employeeNames = new Map();
             this.weekdays = Array.from(document.querySelectorAll('input[name="adc-recurrence-weekday"]'));
             document.getElementById('adc-cancel-edit').addEventListener('click', () => this.close());
             document.getElementById('adc-dialog-cancel').addEventListener('click', () => this.close());
@@ -20,29 +23,27 @@
             this.fields.type.addEventListener('change', () => { this.updateType(); this.validate(); });
             this.fields['recurrence-frequency'].addEventListener('change', () => this.updateRecurrence());
             this.fields.start.addEventListener('change', () => this.updateRecurrenceDate());
-            this.fields.employee.addEventListener('change', () => this.validate());
             this.fields.start.addEventListener('input', () => this.validate());
             this.fields.end.addEventListener('input', () => this.validate());
             this.form.addEventListener('submit', event => this.submit(event));
         }
 
         setEmployees(employees) {
-            this.fields.employee.replaceChildren(...employees.map(employee => {
-                const option = document.createElement('option');
-                option.value = employee.uid;
-                option.textContent = employee.displayName;
-                return option;
-            }));
+            this.employeeNames = new Map(employees.map(employee => [employee.uid, employee.displayName]));
+        }
+
+        showEmployee(employeeUid) {
+            this.fields.employee.value = employeeUid;
+            this.fields['employee-name'].textContent = this.employeeNames.get(employeeUid) || employeeUid;
         }
 
         open({ employee, day, type, entry = null }) {
+            this.returnFocus = document.activeElement;
             this.form.reset();
-            this.fields.employee.disabled = false;
             this.fields['entry-id'].value = entry?.id || '';
-            this.fields.employee.value = entry?.employeeUid || employee.uid;
+            this.showEmployee(entry?.employeeUid || employee.uid);
             this.fields.type.value = entry?.type || type;
             this.fields.type.disabled = Boolean(entry);
-            this.fields.employee.disabled = Boolean(entry?.meetingUid);
             if (entry) {
                 this.fields.start.value = this.localDateTime(entry.start);
                 this.fields.end.value = this.localDateTime(entry.end);
@@ -63,18 +64,23 @@
             this.form.reset();
             this.fields['entry-id'].value = '';
             this.fields.type.disabled = false;
-            this.fields.employee.disabled = false;
             this.fields['recurrence-fields'].hidden = true;
+            const returnFocus = this.returnFocus;
+            this.returnFocus = null;
+            if (returnFocus?.isConnected !== false && typeof returnFocus?.focus === 'function') returnFocus.focus();
         }
 
         updateType() {
             const appointment = this.fields.type.value === 'appointment';
             const editing = this.fields['entry-id'].value !== '';
-            this.fields['entry-dialog-title'].textContent = `${editing ? 'Bearbeiten' : 'Anlegen'}: ${appointment ? 'Termin / Sperrtermin' : 'Dienst'}`;
-            this.fields['title-label'].textContent = appointment ? 'Titel (erforderlich)' : 'Titel (optional)';
+            this.fields['entry-dialog-title'].textContent = l10n.t('{action}: {type}', {
+                action: editing ? l10n.t('Edit') : l10n.t('Create'),
+                type: appointment ? l10n.t('Appointment / blocked time') : l10n.t('Shift'),
+            });
+            this.fields['title-label'].textContent = appointment ? l10n.t('Title (required)') : l10n.t('Title (optional)');
             this.fields['title-help'].textContent = appointment
-                ? 'Außerhalb eines Dienstes wird der Termin als Sperrtermin angezeigt.'
-                : 'Ein Dienst kann ohne Titel gespeichert werden.';
+                ? l10n.t('Outside a shift, the appointment is displayed as blocked time.')
+                : l10n.t('A shift can be saved without a title.');
             this.fields.title.required = appointment;
             const recurrenceAvailable = appointment && !editing;
             this.fields['recurrence-fields'].hidden = !recurrenceAvailable;
@@ -122,7 +128,7 @@
                 && start < new Date(entry.end)
                 && end > new Date(entry.start));
             if (!conflict) return true;
-            const message = `Überschneidung mit Dienst ${this.time(conflict.start)}–${this.time(conflict.end)}.`;
+            const message = l10n.t('Overlap with shift {start}–{end}.', { start: this.time(conflict.start), end: this.time(conflict.end) });
             this.fields.start.setCustomValidity(message);
             this.fields.end.setCustomValidity(message);
             this.fields['time-help'].textContent = message;
@@ -133,7 +139,7 @@
             event.preventDefault();
             const frequency = this.fields['recurrence-frequency'].value;
             if (frequency === 'weekly' && !this.weekdays.some(input => input.checked)) {
-                this.fields['recurrence-frequency'].setCustomValidity('Bitte mindestens einen Wochentag auswählen.');
+                this.fields['recurrence-frequency'].setCustomValidity(l10n.t('Please select at least one weekday.'));
             } else {
                 this.fields['recurrence-frequency'].setCustomValidity('');
             }
@@ -195,7 +201,7 @@
         }
 
         time(value) {
-            return new Date(value).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
+            return l10n.time(new Date(value));
         }
     }
 

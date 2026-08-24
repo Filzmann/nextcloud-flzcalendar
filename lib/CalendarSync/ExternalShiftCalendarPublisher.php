@@ -43,6 +43,7 @@ final class ExternalShiftCalendarPublisher implements ShiftCalendarPublisher {
     public function replaceProvider(string $employeeUid, string $provider, array $shifts): void {
         $connection = $this->connections->connection($employeeUid, $provider);
         if ($connection === null) throw new RuntimeException('Die externe Kalenderverbindung fehlt.');
+        $connection = $this->renamedConnection($employeeUid, $provider, $connection);
         $this->replace($employeeUid, $provider, $connection, $shifts);
     }
 
@@ -64,12 +65,21 @@ final class ExternalShiftCalendarPublisher implements ShiftCalendarPublisher {
         $failed = false;
         foreach ($this->connections->connections($employeeUid) as $provider => $connection) {
             try {
+                $connection = $this->renamedConnection($employeeUid, $provider, $connection);
                 $operation($provider, $connection);
             } catch (\Throwable $error) {
                 $failed = true;
-                $this->logger->error('Externer Dienstkalender konnte nicht abgeglichen werden.', ['provider' => $provider, 'exception' => $error]);
+                $this->logger->error('Externer Dienstkalender konnte nicht abgeglichen werden.', ['exceptionClass' => $error::class]);
             }
         }
         if ($failed) throw new RuntimeException('Mindestens ein externer Kalender konnte nicht abgeglichen werden.');
+    }
+
+    private function renamedConnection(string $employeeUid, string $provider, array $connection): array {
+        $renamed = $provider === 'google'
+            ? $this->google->renameCalendar($employeeUid, $connection)
+            : $this->calDav->renameCalendar($connection);
+        if ($renamed !== $connection) $this->connections->save($employeeUid, $provider, $renamed);
+        return $renamed;
     }
 }

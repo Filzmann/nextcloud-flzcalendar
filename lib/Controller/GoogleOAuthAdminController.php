@@ -6,6 +6,7 @@ namespace OCA\AdCalendar\Controller;
 
 use OCA\AdCalendar\AppInfo\Application;
 use OCA\AdCalendar\CalendarSync\GoogleOAuthService;
+use OCA\AdCalendar\Http\LocalizedErrorResponseFactory;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\JSONResponse;
@@ -22,6 +23,7 @@ final class GoogleOAuthAdminController extends Controller {
         private IGroupManager $groups,
         private GoogleOAuthService $oauth,
         private LoggerInterface $logger,
+        private LocalizedErrorResponseFactory $errors,
     ) {
         parent::__construct(Application::APP_ID, $request);
     }
@@ -30,11 +32,11 @@ final class GoogleOAuthAdminController extends Controller {
         if (!$this->isAdmin()) return $this->denied();
         try {
             return new JSONResponse(['googleOAuth' => $this->oauth->saveConfiguration($clientId, $clientSecret)]);
-        } catch (\InvalidArgumentException $error) {
-            return new JSONResponse(['error' => $error->getMessage()], Http::STATUS_BAD_REQUEST);
+        } catch (\InvalidArgumentException) {
+            return $this->errors->create('invalid_google_oauth_configuration', 'The Google OAuth configuration is invalid.', Http::STATUS_BAD_REQUEST);
         } catch (\Throwable $error) {
             $this->logger->error('Google-OAuth-Konfiguration konnte nicht gespeichert werden.', ['exception' => $error]);
-            return new JSONResponse(['error' => 'Die Google-OAuth-Konfiguration konnte nicht gespeichert werden.'], Http::STATUS_BAD_REQUEST);
+            return $this->errors->create('google_oauth_save_failed', 'The Google OAuth configuration could not be saved.', Http::STATUS_BAD_REQUEST);
         }
     }
 
@@ -44,7 +46,7 @@ final class GoogleOAuthAdminController extends Controller {
             return new JSONResponse(['googleOAuth' => $this->oauth->removeConfiguration()]);
         } catch (\Throwable $error) {
             $this->logger->error('Google-OAuth-Konfiguration konnte nicht entfernt werden.', ['exception' => $error]);
-            return new JSONResponse(['error' => 'Die Google-OAuth-Konfiguration konnte nicht entfernt werden.'], Http::STATUS_BAD_REQUEST);
+            return $this->errors->create('google_oauth_remove_failed', 'The Google OAuth configuration could not be removed.', Http::STATUS_BAD_REQUEST);
         }
     }
 
@@ -54,6 +56,6 @@ final class GoogleOAuthAdminController extends Controller {
     }
 
     private function denied(): JSONResponse {
-        return new JSONResponse(['error' => 'Keine Berechtigung.'], Http::STATUS_FORBIDDEN);
+        return $this->errors->create('forbidden', 'You are not allowed to perform this action.', Http::STATUS_FORBIDDEN);
     }
 }
