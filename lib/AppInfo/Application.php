@@ -11,7 +11,11 @@ use OCA\AdCalendar\Listener\IntegrationCapabilityQueryListener;
 use OCA\AdCalendar\Listener\ScheduleConflictQueryListener;
 use OCA\AdCalendar\Listener\StandaloneNavigationListener;
 use OCA\AdCalendar\Privacy\CalendarPrivacyProviderListener;
+use OCA\AdCalendar\Permission\CalendarPermissionProviderListener;
+use OCA\AdCalendar\Permission\CalendarPermissionSourceInterface;
+use OCA\AdCalendar\Permission\NextcloudCalendarPermissionSource;
 use OCA\FilzmannDataProtection\PublicApi\V1\RegisterPersonalDataProvidersEvent;
+use OCA\FilzmannPermissionMatrix\PublicApi\V1\RegisterPermissionProvidersEvent;
 use OCA\LocalBase\Calendar\ScheduleConflictQueryEvent;
 use OCA\LocalBase\Integration\IntegrationCapabilityQueryEvent;
 use OCP\AppFramework\App;
@@ -33,6 +37,8 @@ class Application extends App implements IBootstrap {
         $context->registerEventListener(ScheduleConflictQueryEvent::class, ScheduleConflictQueryListener::class);
         $context->registerEventListener(IntegrationCapabilityQueryEvent::class, IntegrationCapabilityQueryListener::class);
         $context->registerEventListener(RegisterPersonalDataProvidersEvent::class, CalendarPrivacyProviderListener::class);
+        $context->registerEventListener(RegisterPermissionProvidersEvent::class, CalendarPermissionProviderListener::class);
+        $context->registerServiceAlias(CalendarPermissionSourceInterface::class, NextcloudCalendarPermissionSource::class);
         $context->registerEventListener(LoadAdditionalEntriesEvent::class, StandaloneNavigationListener::class);
     }
     public function boot(IBootContext $context): void {}
