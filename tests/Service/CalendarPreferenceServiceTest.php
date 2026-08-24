@@ -60,4 +60,25 @@ if ($shiftDefaults['7'] !== ['enabled' => true, 'start' => '08:00', 'end' => '16
 if ($service->shiftDefaults('demo') !== $shiftDefaults) throw new RuntimeException('Gespeicherte Dienstzeiten sind nicht lesbar.');
 if ($service->storedShiftDefaults('demo') !== $shiftDefaults) throw new RuntimeException('Gespeicherte Dienstzeiten sind nicht als Serienregel lesbar.');
 
+$projection = $service->personalDataProjection('demo');
+if (($projection['filter']['selectedPeopleCount'] ?? null) !== 1
+    || ($projection['filter']['roles'] ?? null) !== ['ad-Buero']
+    || ($projection['filter']['areas'] ?? null) !== ['ad-Bereich-Sued']
+    || ($projection['filter']['period'] ?? null) !== 'month'
+    || ($projection['shiftDefaults']['1']['start'] ?? null) !== '07:30'
+    || ($projection['calendarSyncEnabled'] ?? null) !== false) {
+    throw new RuntimeException('Die subjectgebundene Projektion enthält die gespeicherten persönlichen Kalenderwerte nicht vollständig.');
+}
+if (str_contains(json_encode($projection, JSON_THROW_ON_ERROR), 'fremd')) {
+    throw new RuntimeException('Die persönliche Filterprojektion gibt keine ausgewählten Drittpersonen-IDs aus.');
+}
+$config->values['corrupt']['adcalendar']['filter_default'] = '{';
+$config->values['corrupt']['adcalendar']['shift_calendar_sync_enabled'] = 'unexpected';
+$corrupt = $service->personalDataProjection('corrupt');
+if (($corrupt['incomplete'] ?? false) !== true
+    || !array_key_exists('filter', $corrupt) || $corrupt['filter'] !== null
+    || !array_key_exists('calendarSyncEnabled', $corrupt) || $corrupt['calendarSyncEnabled'] !== null) {
+    throw new RuntimeException('Unlesbare persönliche Benutzerwerte werden nicht als unvollständig erkannt.');
+}
+
 echo "CalendarPreferenceServiceTest: OK\n";

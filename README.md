@@ -42,6 +42,23 @@ Die allgemeine Form der Weiterleitungsroute lautet:
 
 Bei installationsweit aktivem Pretty-URL-Rewriting kann `index.php` entfallen. Maßgeblich ist ausschließlich der in der Adminoberfläche angezeigte Wert.
 
+## Datenschutz-Auskunft
+
+Ist `filzmann_data_protection` kompatibel aktiv, registriert AD Kalender lazy
+einen Standalone-V1-Provider für Nextcloud-Konten. Er weist subjectgebunden
+eigene Dienste und Termine, bewusst gespeicherte Filterstandards,
+Standard-Dienstzeiten, den explizit gespeicherten Zustand des privaten
+Nextcloud-Kalenderabgleichs sowie vorhandene externe Kalenderanbieter aus.
+
+Bei gemeinsamen Terminen werden weitere Beteiligte nur abstrakt genannt.
+Ausgewählte Personen im persönlichen Filter werden ausschließlich gezählt.
+Serveradressen, Kontonamen, Kalender- und Providerkennungen, Passwörter,
+Tokens, OAuth-State und fremde Kalendereinträge werden weder entschlüsselt
+noch ausgegeben. Der private Nextcloud-DAV-Kalender und externe Zielkalender
+sind abgeleitete Kopien der führenden AD-Kalenderdaten; ihre Objekte werden
+nicht zusätzlich als zweite Datenquelle ausgelesen. AD Kalender speichert
+keine Daten in Files oder Team Folders.
+
 ## Roadmap
 
 Geplante Erweiterungen und offene Produktentscheidungen stehen in der [Roadmap](ROADMAP.md).

@@ -58,6 +58,62 @@ final class CalendarPreferenceService {
         return $enabled;
     }
 
+    /**
+     * Datensparsame subjectgebundene Projektion der tatsächlich gespeicherten
+     * Benutzerwerte. Ausgewählte Personen werden nur gezählt, weil ihre IDs
+     * Daten Dritter sind.
+     */
+    public function personalDataProjection(string $uid): array {
+        $incomplete = false;
+
+        $filter = null;
+        $rawFilter = $this->config->getValueString($uid, Application::APP_ID, self::FILTER_KEY);
+        if ($rawFilter !== '') {
+            $decoded = json_decode($rawFilter, true);
+            if (!is_array($decoded)) {
+                $incomplete = true;
+            } else {
+                $filter = [
+                    'selectedPeopleCount' => count($this->storedStringList($decoded['people'] ?? [])),
+                    'roles' => $this->storedStringList($decoded['roles'] ?? []),
+                    'areas' => $this->storedStringList($decoded['areas'] ?? []),
+                    'vertical' => filter_var($decoded['vertical'] ?? true, FILTER_VALIDATE_BOOL),
+                    'period' => ($decoded['period'] ?? 'week') === 'month' ? 'month' : 'week',
+                    'showLeadershipStaff' => filter_var($decoded['showLeadershipStaff'] ?? true, FILTER_VALIDATE_BOOL),
+                    'leadershipStaffOnly' => filter_var($decoded['leadershipStaffOnly'] ?? false, FILTER_VALIDATE_BOOL),
+                ];
+            }
+        }
+
+        $shiftDefaults = null;
+        $rawShiftDefaults = $this->config->getValueString($uid, Application::APP_ID, self::SHIFT_KEY);
+        if ($rawShiftDefaults !== '') {
+            $decoded = json_decode($rawShiftDefaults, true);
+            if (!is_array($decoded)) {
+                $incomplete = true;
+            } else {
+                $shiftDefaults = $this->normalizeShiftDefaults($decoded);
+            }
+        }
+
+        $calendarSyncEnabled = null;
+        $rawCalendarSync = $this->config->getValueString($uid, Application::APP_ID, self::SHIFT_CALENDAR_SYNC_KEY);
+        if ($rawCalendarSync !== '') {
+            if (!in_array($rawCalendarSync, ['0', '1'], true)) {
+                $incomplete = true;
+            } else {
+                $calendarSyncEnabled = $rawCalendarSync === '1';
+            }
+        }
+
+        return [
+            'filter' => $filter,
+            'shiftDefaults' => $shiftDefaults,
+            'calendarSyncEnabled' => $calendarSyncEnabled,
+            'incomplete' => $incomplete,
+        ];
+    }
+
     /** Liefert ausdrücklich aktivierte Konten; standardmäßig aktive Konten mit Diensten ergänzt der Abgleichservice. @return list<string> */
     public function shiftCalendarSyncEmployeeUids(): array {
         $uids = [];
@@ -92,6 +148,19 @@ final class CalendarPreferenceService {
         if (!is_array($values)) return [];
         $allowedMap = array_fill_keys(array_map('strval', $allowed), true);
         return array_values(array_unique(array_filter(array_map('strval', $values), static fn(string $value): bool => isset($allowedMap[$value]))));
+    }
+
+    private function storedStringList(mixed $values): array {
+        if (!is_array($values)) return [];
+        $result = [];
+        foreach ($values as $value) {
+            if (!is_string($value)) continue;
+            $value = trim($value);
+            if ($value === '' || strlen($value) > 128 || preg_match('/[\x00-\x1F\x7F]/', $value) === 1) continue;
+            $result[$value] = true;
+        }
+
+        return array_keys($result);
     }
 
     private function normalizeShiftDefaults(array $defaults): array {

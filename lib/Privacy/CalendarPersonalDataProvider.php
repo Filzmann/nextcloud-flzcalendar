@@ -8,8 +8,10 @@ use DateTimeImmutable;
 use DateTimeZone;
 use InvalidArgumentException;
 use OCA\AdCalendar\AppInfo\AppId;
+use OCA\AdCalendar\CalendarSync\ExternalCalendarConnectionStore;
 use OCA\AdCalendar\Model\CalendarEntry;
 use OCA\AdCalendar\Repository\CalendarEntryRepository;
+use OCA\AdCalendar\Service\CalendarPreferenceService;
 use OCA\LocalBase\Calendar\CalendarContextSettingsService;
 use OCA\FilzmannDataProtection\PublicApi\V1\PersonalDataEntry;
 use OCA\FilzmannDataProtection\PublicApi\V1\PersonalDataPage;
@@ -18,7 +20,12 @@ use OCA\FilzmannDataProtection\PublicApi\V1\PersonalDataRequest;
 use OCA\FilzmannDataProtection\PublicApi\V1\ProviderDescriptor;
 
 final class CalendarPersonalDataProvider implements PersonalDataProvider {
-    public function __construct(private CalendarEntryRepository $entries, private CalendarContextSettingsService $calendarContext) {}
+    public function __construct(
+        private CalendarEntryRepository $entries,
+        private CalendarContextSettingsService $calendarContext,
+        private CalendarPreferenceService $preferences,
+        private ExternalCalendarConnectionStore $externalConnections,
+    ) {}
 
     public function descriptor(): ProviderDescriptor {
         return new ProviderDescriptor(AppId::VALUE, 'AD Kalender', '1.0', ['nextcloud-user'], ['personal-data'], 500);
@@ -30,16 +37,132 @@ final class CalendarPersonalDataProvider implements PersonalDataProvider {
         $timezone = $this->calendarContext->context()->timezone();
         $subjectUid = $request->subject()->subjectId();
         $entries = $this->entries->findByEmployeeUid($subjectUid, $request->pageLimit() + 1);
-        $limited = count($entries) > $request->pageLimit();
-        if ($limited) $entries = array_slice($entries, 0, $request->pageLimit());
         $meetingUids = array_values(array_unique(array_filter(array_map(static fn(CalendarEntry $entry): ?string => $entry->meetingUid(), $entries))));
         $meetingsWithOthers = array_fill_keys($this->entries->findMeetingUidsWithOtherParticipants($subjectUid, $meetingUids), true);
         $items = array_map(
             fn(CalendarEntry $entry): PersonalDataEntry => $this->item($entry, $timezone, isset($meetingsWithOthers[$entry->meetingUid() ?? ''])),
             $entries,
         );
-        if ($items === []) return new PersonalDataPage('not_applicable');
-        return new PersonalDataPage($limited ? 'partial' : 'complete', $items, $limited ? ['Ausgabelimit erreicht; weitere Kalendereinträge können vorhanden sein.'] : []);
+
+        $preferenceProjection = $this->preferences->personalDataProjection($subjectUid);
+        $items = [...$items, ...$this->preferenceItems($preferenceProjection)];
+        $items = [...$items, ...$this->externalConnectionItems($subjectUid)];
+        $limited = count($items) > $request->pageLimit();
+        if ($limited) $items = array_slice($items, 0, $request->pageLimit());
+        $restrictions = [];
+        if ($limited) $restrictions[] = 'Ausgabelimit erreicht; weitere Kalenderdaten können vorhanden sein.';
+        if (($preferenceProjection['incomplete'] ?? false) === true) $restrictions[] = 'Mindestens ein persönlicher Kalenderwert war gespeichert, aber nicht sicher auswertbar.';
+        if ($items === [] && $restrictions === []) return new PersonalDataPage('not_applicable');
+
+        return new PersonalDataPage($restrictions === [] ? 'complete' : 'partial', $items, $restrictions);
+    }
+
+    private function preferenceItems(array $projection): array {
+        $items = [];
+        $filter = is_array($projection['filter'] ?? null) ? $projection['filter'] : null;
+        if ($filter !== null) {
+            $selectedPeopleCount = (int)($filter['selectedPeopleCount'] ?? 0);
+            $items[] = new PersonalDataEntry(
+                categoryId: 'calendar_filter_preference',
+                categoryLabel: 'Persönlicher Kalenderfilter',
+                reference: 'calendar-preference:filter-default',
+                summary: 'Bewusst gespeicherter Standard für die Kalenderansicht',
+                purpose: 'Persönliche Vorauswahl und Darstellung der Dienstplanung',
+                source: 'Persönliche Nextcloud-Benutzerkonfiguration der betroffenen Person',
+                recipientCategories: ['Die betroffene Person innerhalb der AD-Kalender-Oberfläche'],
+                retention: 'Bis zur Änderung des persönlichen Standards oder zur Bereinigung der Nextcloud-Benutzerkonfiguration.',
+                thirdCountryTransfer: 'Durch diese persönliche Filtereinstellung ist keine Drittlandübermittlung vorgesehen.',
+                automatedDecision: 'Die Einstellung steuert nur die Vorauswahl der Ansicht und trifft keine Entscheidung über Personen.',
+                thirdPartyContentNotice: $selectedPeopleCount > 0 ? 'Ausgewählte Personen werden nur gezählt; ihre Nextcloud-IDs werden als Angaben Dritter nicht ausgegeben.' : null,
+                attributes: [
+                    'Ausgewählte Personen' => $selectedPeopleCount,
+                    'Rollen' => self::listLabel($filter['roles'] ?? []),
+                    'Bereiche' => self::listLabel($filter['areas'] ?? []),
+                    'Zeitraum' => ($filter['period'] ?? 'week') === 'month' ? 'Monat' : 'Woche',
+                    'Ausrichtung' => ($filter['vertical'] ?? true) ? 'Tage als Zeilen' : 'Personen als Zeilen',
+                    'Leitung und Stab anzeigen' => ($filter['showLeadershipStaff'] ?? true) ? 'ja' : 'nein',
+                    'Nur Leitung und Stab' => ($filter['leadershipStaffOnly'] ?? false) ? 'ja' : 'nein',
+                ],
+            );
+        }
+
+        $defaults = is_array($projection['shiftDefaults'] ?? null) ? $projection['shiftDefaults'] : null;
+        if ($defaults !== null) {
+            $weekdayNames = ['1' => 'Montag', '2' => 'Dienstag', '3' => 'Mittwoch', '4' => 'Donnerstag', '5' => 'Freitag', '6' => 'Samstag', '7' => 'Sonntag'];
+            $attributes = [];
+            foreach ($weekdayNames as $weekday => $label) {
+                $value = is_array($defaults[$weekday] ?? null) ? $defaults[$weekday] : [];
+                $attributes[$label] = ($value['enabled'] ?? false)
+                    ? (string)($value['start'] ?? '') . ' bis ' . (string)($value['end'] ?? '') . ' Uhr'
+                    : 'deaktiviert';
+            }
+            $items[] = new PersonalDataEntry(
+                categoryId: 'shift_defaults',
+                categoryLabel: 'Persönliche Standard-Dienstzeiten',
+                reference: 'calendar-preference:shift-defaults',
+                summary: 'Bewusst gespeicherte Vorschlagszeiten für wiederkehrende Dienste',
+                purpose: 'Vorschlag und Materialisierung persönlicher Standarddienste',
+                source: 'Persönliche Nextcloud-Benutzerkonfiguration der betroffenen Person',
+                recipientCategories: ['Angemeldete Nutzer*innen der Instanz nach Materialisierung als normaler Dienst', 'Berechtigte planende Personen'],
+                retention: 'Bis zur Änderung der persönlichen Standard-Dienstzeiten oder zur Bereinigung der Nextcloud-Benutzerkonfiguration.',
+                thirdCountryTransfer: 'AD Kalender selbst sieht für diese Standardwerte keine Drittlandübermittlung vor.',
+                automatedDecision: 'Aktivierte Standardzeiten können Dienste vorschlagen oder materialisieren; Urlaubs- und Konfliktregeln bleiben wirksam.',
+                thirdPartyContentNotice: null,
+                attributes: $attributes,
+            );
+        }
+
+        if (is_bool($projection['calendarSyncEnabled'] ?? null)) {
+            $enabled = $projection['calendarSyncEnabled'];
+            $items[] = new PersonalDataEntry(
+                categoryId: 'calendar_sync_preference',
+                categoryLabel: 'Persönlicher Nextcloud-Kalenderabgleich',
+                reference: 'calendar-preference:native-sync',
+                summary: 'Bewusst gespeicherter ' . ($enabled ? 'Opt-in-Zustand' : 'Opt-out-Zustand') . ' des privaten Kalenderabgleichs',
+                purpose: 'Steuerung des abgeleiteten privaten Nextcloud-Kalenders für eigene Dienste, Termine und Urlaube',
+                source: 'Persönliche Nextcloud-Benutzerkonfiguration der betroffenen Person',
+                recipientCategories: ['Die betroffene Person im privaten Nextcloud-Kalender'],
+                retention: 'Bis zur Änderung der persönlichen Einstellung oder zur Bereinigung der Nextcloud-Benutzerkonfiguration.',
+                thirdCountryTransfer: 'Der interne Nextcloud-Kalenderabgleich sieht keine zusätzliche Drittlandübermittlung vor.',
+                automatedDecision: 'Der Abgleich erzeugt nur eine abgeleitete Kalenderdarstellung und verändert die führenden AD-Kalenderdaten nicht.',
+                thirdPartyContentNotice: 'Die abgeleiteten Kalenderobjekte werden nicht erneut ausgegeben; Dienste und Termine stammen aus den bereits aufgeführten AD-Kalendereinträgen, Urlaube aus der zuständigen Abwesenheits-App.',
+                attributes: ['Privater Nextcloud-Kalender' => $enabled ? 'aktiviert' : 'deaktiviert'],
+            );
+        }
+
+        return $items;
+    }
+
+    private function externalConnectionItems(string $subjectUid): array {
+        $providers = $this->externalConnections->privacyConnectedProviders($subjectUid);
+        $pendingOAuth = $this->externalConnections->hasPendingGoogleOAuthState($subjectUid);
+        if ($providers === [] && !$pendingOAuth) return [];
+        $labels = ['kopano' => 'Kopano', 'google' => 'Google', 'apple' => 'Apple', 'manual' => 'Manuelles CalDAV'];
+        $providerLabels = array_map(static fn(string $provider): string => $labels[$provider] ?? 'Unbekannter Anbieter', $providers);
+
+        return [new PersonalDataEntry(
+            categoryId: 'external_calendar_connections',
+            categoryLabel: 'Persönliche externe Kalenderverbindungen',
+            reference: 'calendar-preference:external-connections',
+            summary: 'Gespeicherte Verbindungsmetadaten ohne Adressen, Kontonamen, Kalenderkennungen oder Zugangsdaten',
+            purpose: 'Einseitige Veröffentlichung eigener Dienste in persönlich verbundenen Kalenderdiensten',
+            source: 'Verschlüsselte sensible Nextcloud-Benutzerkonfiguration der betroffenen Person',
+            recipientCategories: $providerLabels === [] ? ['Noch kein verbundener externer Kalenderdienst'] : $providerLabels,
+            retention: 'Bis zum Trennen der Verbindung, Verbrauch beziehungsweise Ablauf des OAuth-Vorgangs oder zur Bereinigung der Nextcloud-Benutzerkonfiguration.',
+            thirdCountryTransfer: 'Eine mögliche Drittlandübermittlung hängt vom persönlich gewählten Kalenderdienst und dessen Betreiber ab.',
+            automatedDecision: 'Der einseitige Abgleich veröffentlicht Dienste; er trifft keine Entscheidung mit rechtlicher oder vergleichbar erheblicher Wirkung.',
+            thirdPartyContentNotice: 'Serveradressen, Benutzernamen, Kalenderkennungen, Passwörter, OAuth-Tokens und OAuth-State werden nicht entschlüsselt oder ausgegeben.',
+            attributes: [
+                'Verbundene Anbieter' => $providerLabels === [] ? 'Keine abgeschlossene Verbindung' : implode(', ', $providerLabels),
+                'Google-OAuth' => $pendingOAuth ? 'Autorisierungsvorgang vorhanden' : 'Kein gespeicherter Autorisierungsvorgang',
+            ],
+        )];
+    }
+
+    private static function listLabel(mixed $values): string {
+        if (!is_array($values) || $values === []) return 'Keine Auswahl gespeichert';
+
+        return implode(', ', array_map('strval', $values));
     }
 
     private function item(CalendarEntry $entry, DateTimeZone $timezone, bool $hasOtherParticipants): PersonalDataEntry {

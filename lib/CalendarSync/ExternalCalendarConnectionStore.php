@@ -83,6 +83,15 @@ final class ExternalCalendarConnectionStore {
     }
 
     /** @return list<string> */
+    public function privacyConnectedProviders(string $uid): array {
+        return array_values(array_filter(self::PROVIDERS, fn(string $provider): bool => $this->hasStored($uid, $provider)));
+    }
+
+    public function hasPendingGoogleOAuthState(string $uid): bool {
+        return $this->config->getValueString($uid, Application::APP_ID, self::OAUTH_STATE_KEY, '', true) !== '';
+    }
+
+    /** @return list<string> */
     public function connectedEmployeeUids(): array {
         $uids = [];
         foreach (self::PROVIDERS as $provider) {

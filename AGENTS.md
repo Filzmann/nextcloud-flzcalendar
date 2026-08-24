@@ -125,12 +125,21 @@ Urlaubsansichten sind dynamisch ergänzbare Rollen-/Bereichsschnitte. Die Standa
 
 - AD Kalender registriert einen subjectgebundenen PersonalDataProvider lazy
   über den öffentlichen Standalone-V1-Vertrag von
-  `filzmann_data_protection`. Er liefert ausschließlich eigene
-  Dienste und Termine. Bei einem gemeinsamen Meeting fragt das Repository nur
-  ab, ob weitere Beteiligte existieren; deren UIDs, Namen und fremde Einträge
-  gelangen nicht in den Bericht. Zeiten verwenden die gemeinsame fachliche
-  Organisationszeitzone. Solange keine Kalender-Retention-Policy freigegeben
-  ist, wird ehrlich „keine feste Löschfrist“ ausgewiesen.
+  `filzmann_data_protection`. Er liefert eigene Dienste und Termine sowie
+  tatsächlich gespeicherte persönliche Filter-, Standarddienst- und
+  Kalendersynchronisationswerte. Externe Verbindungen werden ausschließlich
+  als Anbieter- und OAuth-Vorhandenseinsmetadaten ausgewiesen; Serveradressen,
+  Kontonamen, Kalenderkennungen, Passwörter, Tokens und OAuth-State werden
+  dafür nicht entschlüsselt oder ausgegeben. Bei einem gemeinsamen Meeting
+  fragt das Repository nur ab, ob weitere Beteiligte existieren; deren UIDs,
+  Namen und fremde Einträge gelangen nicht in den Bericht. Ausgewählte
+  Personen eines persönlichen Filters werden ebenfalls nur gezählt. Zeiten
+  verwenden die gemeinsame fachliche Organisationszeitzone. Der private
+  Nextcloud-DAV-Kalender und externe Kalender sind abgeleitete Darstellungen
+  der bereits ausgewiesenen führenden Daten und werden nicht als zweite
+  Datenwahrheit aus fremden Kalenderobjekten gelesen. Solange keine
+  Kalender-Retention-Policy freigegeben ist, wird ehrlich „keine feste
+  Löschfrist“ ausgewiesen.
 - Controller bleiben duenn.
 - `CalendarAccessService` buendelt Sicht-, Erstell-, Aenderungs- und Loeschrechte.
 - Repository-/Store-Klassen kapseln Datenzugriffe und QueryBuilder-Parameter.

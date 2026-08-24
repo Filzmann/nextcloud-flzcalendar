@@ -46,6 +46,7 @@ namespace {
         throw new RuntimeException('CalDAV-Zugangsdaten sind nicht verschlüsselt und als sensibel gespeichert.');
     }
     if (($store->connection('person-a', 'kopano')['password'] ?? '') !== 'nicht-ausgeben') throw new RuntimeException('Verschlüsselte Verbindung ist intern nicht lesbar.');
+    if ($store->privacyConnectedProviders('person-a') !== ['kopano']) throw new RuntimeException('Die Privacy-Projektion erkennt die gespeicherte Verbindung nicht ohne Geheimnisausgabe.');
     $public = $store->statuses('person-a', false, 'Team & Dienst');
     if (($public['kopano']['connected'] ?? false) !== true
         || ($public['kopano']['calendarName'] ?? '') !== 'Team & Dienst'
@@ -59,9 +60,11 @@ namespace {
     if ($store->connection('person-a', 'kopano') !== null) throw new RuntimeException('Trennen entfernt die persönliche Verbindung nicht.');
 
     $state = $store->createOAuthState('person-b');
+    if (!$store->hasPendingGoogleOAuthState('person-b')) throw new RuntimeException('Ein gespeicherter OAuth-Vorgang bleibt in der Privacy-Projektion unsichtbar.');
     if (!$store->consumeOAuthState('person-b', $state) || $store->consumeOAuthState('person-b', $state)) {
         throw new RuntimeException('OAuth-Status ist nicht nutzergebunden, einmalig oder replay-sicher.');
     }
+    if ($store->hasPendingGoogleOAuthState('person-b')) throw new RuntimeException('Ein verbrauchter OAuth-Vorgang wird weiterhin als gespeichert gemeldet.');
 
     echo "ExternalCalendarConnectionStoreTest: OK\n";
 }

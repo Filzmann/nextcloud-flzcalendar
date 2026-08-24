@@ -12,6 +12,30 @@ namespace OCP {
         public function setValueString(string $appId, string $key, string $value): void;
     }
 }
+namespace OCP\Config {
+    if (!interface_exists(IUserConfig::class)) {
+        interface IUserConfig {
+            public const FLAG_SENSITIVE = 1;
+            public function getValueString(string $userId, string $app, string $key, string $default = '', bool $lazy = false): string;
+            public function setValueString(string $userId, string $app, string $key, string $value, bool $lazy = false, int $flags = 0): bool;
+            public function getValuesByUsers(string $app, string $key, mixed $typedAs = null, ?array $userIds = null): array;
+            public function deleteUserConfig(string $userId, string $app, string $key): void;
+        }
+    }
+}
+namespace OCP\Security {
+    if (!interface_exists(ICrypto::class)) {
+        interface ICrypto {
+            public function encrypt(string $plaintext, string $password = ''): string;
+            public function decrypt(string $authenticatedCiphertext, string $password = ''): string;
+        }
+    }
+}
+namespace OCA\AdCalendar\AppInfo {
+    if (!class_exists(Application::class, false)) {
+        final class Application { public const APP_ID = 'adcalendar'; }
+    }
+}
 namespace OCA\AdCalendar\Repository {
     use OCA\AdCalendar\Model\CalendarEntry;
     class CalendarEntryRepository {
@@ -37,10 +61,14 @@ namespace {
     use OCA\AdCalendar\Privacy\CalendarPersonalDataProvider;
     use OCA\AdCalendar\Privacy\CalendarPrivacyProviderListener;
     use OCA\AdCalendar\Repository\CalendarEntryRepository;
+    use OCA\AdCalendar\CalendarSync\ExternalCalendarConnectionStore;
+    use OCA\AdCalendar\Service\CalendarPreferenceService;
     use OCA\LocalBase\Calendar\CalendarContextSettingsService;
     use OCA\FilzmannDataProtection\PublicApi\V1\DataSubjectRef;
     use OCA\FilzmannDataProtection\PublicApi\V1\PersonalDataRequest;
     use OCA\FilzmannDataProtection\PublicApi\V1\RegisterPersonalDataProvidersEvent;
+    use OCP\Config\IUserConfig;
+    use OCP\Security\ICrypto;
 
     $entries = new CalendarEntryRepository();
     $entries->items = [
@@ -52,12 +80,38 @@ namespace {
         public function getValueString(string $appId, string $key, string $default = ''): string { return $default; }
         public function setValueString(string $appId, string $key, string $value): void {}
     };
-    $provider = new CalendarPersonalDataProvider($entries, new CalendarContextSettingsService($config));
+    $userConfig = new class implements IUserConfig {
+        public array $values = [
+            'self' => ['adcalendar' => [
+                'filter_default' => '{"people":["other-person"],"roles":["ad-Buero"],"areas":["ad-Bereich-Sued"],"vertical":false,"period":"month","showLeadershipStaff":true,"leadershipStaffOnly":false}',
+                'shift_defaults' => '{"1":{"enabled":true,"start":"07:30","end":"15:30"}}',
+                'shift_calendar_sync_enabled' => '0',
+                'external_calendar_google' => 'cipher:access-token-secret',
+                'external_calendar_manual' => 'cipher:https://private.example.test/person/self',
+                'external_calendar_google_oauth_state' => 'cipher:oauth-secret',
+            ]],
+        ];
+        public function getValueString(string $userId, string $app, string $key, string $default = '', bool $lazy = false): string { return $this->values[$userId][$app][$key] ?? $default; }
+        public function setValueString(string $userId, string $app, string $key, string $value, bool $lazy = false, int $flags = 0): bool { $this->values[$userId][$app][$key] = $value; return true; }
+        public function getValuesByUsers(string $app, string $key, mixed $typedAs = null, ?array $userIds = null): array { return []; }
+        public function deleteUserConfig(string $userId, string $app, string $key): void { unset($this->values[$userId][$app][$key]); }
+    };
+    $crypto = new class implements ICrypto {
+        public int $decryptCalls = 0;
+        public function encrypt(string $plaintext, string $password = ''): string { return 'cipher'; }
+        public function decrypt(string $authenticatedCiphertext, string $password = ''): string { $this->decryptCalls++; throw new RuntimeException('Privacy provider must not decrypt stored secrets.'); }
+    };
+    $provider = new CalendarPersonalDataProvider(
+        $entries,
+        new CalendarContextSettingsService($config),
+        new CalendarPreferenceService($userConfig),
+        new ExternalCalendarConnectionStore($userConfig, $crypto),
+    );
     $descriptor = $provider->descriptor();
     if ($descriptor->appId() !== 'adcalendar' || $descriptor->contractVersion() !== '1.0' || !$descriptor->supportsSubjectType('nextcloud-user')) throw new RuntimeException('AD Kalender beschreibt den Standalone-V1-Vertrag nicht korrekt.');
     $subject = new DataSubjectRef('nextcloud-user', 'self');
     $report = $provider->collect(new PersonalDataRequest($subject, 'de', 'access-report', 50, []));
-    if (count($report->entries()) !== 2 || $report->status() !== 'complete') throw new RuntimeException('Kalenderauskunft liefert fremde Einträge, lässt eigene aus oder meldet einen falschen Status.');
+    if (count($report->entries()) !== 6 || $report->status() !== 'complete') throw new RuntimeException('Kalenderauskunft liefert fremde Einträge, lässt persönliche Einstellungen aus oder meldet einen falschen Status.');
     $items = array_map(static fn($item): array => [
         'categoryId'=>$item->categoryId(),'categoryLabel'=>$item->categoryLabel(),'reference'=>$item->reference(),
         'summary'=>$item->summary(),'purpose'=>$item->purpose(),'source'=>$item->source(),
@@ -67,6 +121,10 @@ namespace {
     ], $report->entries());
     $appointment = array_values(array_filter($items, static fn(array $item): bool => $item['categoryId'] === 'appointment'))[0] ?? null;
     $shift = array_values(array_filter($items, static fn(array $item): bool => $item['categoryId'] === 'shift'))[0] ?? null;
+    $filterPreference = array_values(array_filter($items, static fn(array $item): bool => $item['categoryId'] === 'calendar_filter_preference'))[0] ?? null;
+    $shiftDefaults = array_values(array_filter($items, static fn(array $item): bool => $item['categoryId'] === 'shift_defaults'))[0] ?? null;
+    $syncPreference = array_values(array_filter($items, static fn(array $item): bool => $item['categoryId'] === 'calendar_sync_preference'))[0] ?? null;
+    $externalConnections = array_values(array_filter($items, static fn(array $item): bool => $item['categoryId'] === 'external_calendar_connections'))[0] ?? null;
     if ($appointment === null || $shift === null) throw new RuntimeException('Termin und Dienst sind nicht getrennt ausgewiesen.');
     if (array_key_exists('Art', $appointment['attributes']) || array_key_exists('Art', $shift['attributes'])) throw new RuntimeException('Der bereits als Tabellenabschnitt ausgewiesene Datentyp wird redundant als Art-Spalte ausgegeben.');
     foreach (['Termin', 'Gemeinsamer Termin', '12.08.26, 10:00 bis 11:00 Uhr', 'Termin- und Verfügbarkeitsplanung', 'Keine feste Löschfrist'] as $expected) {
@@ -79,11 +137,27 @@ namespace {
         if (!str_contains(json_encode($shift, JSON_THROW_ON_ERROR|JSON_UNESCAPED_UNICODE), $expected)) throw new RuntimeException("Menschenlesbarer Dienstbestand fehlt: {$expected}");
     }
     if ($shift['thirdPartyContentNotice'] !== null) throw new RuntimeException('Ein eigener Dienst behauptet weitere Beteiligte.');
+    if ($filterPreference === null || ($filterPreference['attributes']['Ausgewählte Personen'] ?? null) !== 1 || str_contains(json_encode($filterPreference, JSON_THROW_ON_ERROR), 'other-person')) {
+        throw new RuntimeException('Der persönliche Filterstandard fehlt oder gibt eine ausgewählte Drittperson preis.');
+    }
+    if ($shiftDefaults === null || !str_contains(json_encode($shiftDefaults, JSON_THROW_ON_ERROR), '07:30 bis 15:30 Uhr')) throw new RuntimeException('Persönliche Standard-Dienstzeiten fehlen.');
+    if ($syncPreference === null || ($syncPreference['attributes']['Privater Nextcloud-Kalender'] ?? null) !== 'deaktiviert') throw new RuntimeException('Die persönliche DAV-Synchronisationseinstellung fehlt.');
+    $externalJson = json_encode($externalConnections, JSON_THROW_ON_ERROR|JSON_UNESCAPED_UNICODE);
+    foreach (['Google', 'Manuelles CalDAV', 'Autorisierungsvorgang vorhanden'] as $expected) if (!str_contains($externalJson, $expected)) throw new RuntimeException("Datensparsame externe Verbindungsmetadaten fehlen: {$expected}");
+    foreach (['access-token-secret', 'private.example.test', 'oauth-secret', 'other-person'] as $forbidden) if (str_contains(json_encode($items, JSON_THROW_ON_ERROR), $forbidden)) throw new RuntimeException("Privacy-Auskunft gibt geschützte Verbindungs- oder Drittpersonendaten preis: {$forbidden}");
+    if ($crypto->decryptCalls !== 0) throw new RuntimeException('Der Privacy-Provider entschlüsselt externe Zugangsdaten trotz reiner Metadatenauskunft.');
     if ($entries->participantQueries !== 1) throw new RuntimeException('Drittpersonenprüfung wird nicht gebündelt.');
     $limited = $provider->collect(new PersonalDataRequest($subject, 'de', 'access-report', 1, []));
-    if ($limited->status() !== 'partial' || !in_array('Ausgabelimit erreicht; weitere Kalendereinträge können vorhanden sein.', $limited->restrictions(), true)) throw new RuntimeException('Begrenzter Kalenderbericht behauptet Vollständigkeit.');
+    if ($limited->status() !== 'partial' || !in_array('Ausgabelimit erreicht; weitere Kalenderdaten können vorhanden sein.', $limited->restrictions(), true)) throw new RuntimeException('Begrenzter Kalenderbericht behauptet Vollständigkeit.');
     $unsupported = $provider->collect(new PersonalDataRequest(new DataSubjectRef('external-applicant', 'self'), 'de', 'access-report', 50, []));
     if ($unsupported->status() !== 'not_applicable' || $unsupported->entries() !== []) throw new RuntimeException('Ein nicht unterstützter Subject-Typ erhält Kalenderdaten.');
+    $userConfig->values['corrupt']['adcalendar']['filter_default'] = '{private-person-value';
+    $userConfig->values['corrupt']['adcalendar']['shift_calendar_sync_enabled'] = 'unexpected';
+    $corruptReport = $provider->collect(new PersonalDataRequest(new DataSubjectRef('nextcloud-user', 'corrupt'), 'de', 'access-report', 50, []));
+    if ($corruptReport->status() !== 'partial' || $corruptReport->entries() !== [] || !str_contains(implode(' ', $corruptReport->restrictions()), 'nicht sicher auswertbar')) {
+        throw new RuntimeException('Gespeicherte unlesbare persönliche Kalenderwerte werden fälschlich als nicht vorhanden behandelt.');
+    }
+    if (str_contains(json_encode($corruptReport->restrictions(), JSON_THROW_ON_ERROR), 'private-person-value')) throw new RuntimeException('Eine sichere Diagnose gibt den unlesbaren persönlichen Rohwert aus.');
     try {
         $provider->collect((new PersonalDataRequest($subject, 'de', 'access-report', 50, ['adcalendar'=>'opaque']))->forProvider('adcalendar', 50));
         throw new RuntimeException('Ein unbekannter Provider-Cursor wurde akzeptiert.');
