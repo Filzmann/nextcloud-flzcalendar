@@ -11,9 +11,9 @@ use OCA\AdCalendar\Listener\IntegrationCapabilityQueryListener;
 use OCA\AdCalendar\Listener\ScheduleConflictQueryListener;
 use OCA\AdCalendar\Listener\StandaloneNavigationListener;
 use OCA\AdCalendar\Privacy\CalendarPrivacyProviderListener;
+use OCA\FilzmannDataProtection\PublicApi\V1\RegisterPersonalDataProvidersEvent;
 use OCA\LocalBase\Calendar\ScheduleConflictQueryEvent;
 use OCA\LocalBase\Integration\IntegrationCapabilityQueryEvent;
-use OCA\LocalBase\Privacy\PersonalDataProviderRegistryEvent;
 use OCP\AppFramework\App;
 use OCP\AppFramework\Bootstrap\IBootContext;
 use OCP\AppFramework\Bootstrap\IBootstrap;
@@ -32,7 +32,7 @@ class Application extends App implements IBootstrap {
         $context->registerServiceAlias(PersonalCalendarPublisher::class, NextcloudDavShiftCalendarPublisher::class);
         $context->registerEventListener(ScheduleConflictQueryEvent::class, ScheduleConflictQueryListener::class);
         $context->registerEventListener(IntegrationCapabilityQueryEvent::class, IntegrationCapabilityQueryListener::class);
-        $context->registerEventListener(PersonalDataProviderRegistryEvent::class, CalendarPrivacyProviderListener::class);
+        $context->registerEventListener(RegisterPersonalDataProvidersEvent::class, CalendarPrivacyProviderListener::class);
         $context->registerEventListener(LoadAdditionalEntriesEvent::class, StandaloneNavigationListener::class);
     }
     public function boot(IBootContext $context): void {}

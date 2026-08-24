@@ -38,9 +38,9 @@ namespace {
     use OCA\AdCalendar\Privacy\CalendarPrivacyProviderListener;
     use OCA\AdCalendar\Repository\CalendarEntryRepository;
     use OCA\LocalBase\Calendar\CalendarContextSettingsService;
-    use OCA\LocalBase\Privacy\PersonalDataProviderRegistryEvent;
-    use OCA\LocalBase\Privacy\PersonalDataRequest;
-    use OCA\LocalBase\Privacy\PersonalDataSubject;
+    use OCA\FilzmannDataProtection\PublicApi\V1\DataSubjectRef;
+    use OCA\FilzmannDataProtection\PublicApi\V1\PersonalDataRequest;
+    use OCA\FilzmannDataProtection\PublicApi\V1\RegisterPersonalDataProvidersEvent;
 
     $entries = new CalendarEntryRepository();
     $entries->items = [
@@ -53,31 +53,48 @@ namespace {
         public function setValueString(string $appId, string $key, string $value): void {}
     };
     $provider = new CalendarPersonalDataProvider($entries, new CalendarContextSettingsService($config));
-    $report = $provider->collect(new PersonalDataRequest(new PersonalDataSubject(PersonalDataSubject::NEXTCLOUD_USER, 'self'), 'de', PersonalDataRequest::PURPOSE_SELF_SERVICE, 50));
-    if (count($report->items()) !== 2) throw new RuntimeException('Kalenderauskunft liefert fremde Einträge oder lässt eigene aus.');
-    $items = array_map(static fn($item): array => $item->toArray(), $report->items());
-    $appointment = array_values(array_filter($items, static fn(array $item): bool => $item['category'] === 'appointment'))[0] ?? null;
-    $shift = array_values(array_filter($items, static fn(array $item): bool => $item['category'] === 'shift'))[0] ?? null;
+    $descriptor = $provider->descriptor();
+    if ($descriptor->appId() !== 'adcalendar' || $descriptor->contractVersion() !== '1.0' || !$descriptor->supportsSubjectType('nextcloud-user')) throw new RuntimeException('AD Kalender beschreibt den Standalone-V1-Vertrag nicht korrekt.');
+    $subject = new DataSubjectRef('nextcloud-user', 'self');
+    $report = $provider->collect(new PersonalDataRequest($subject, 'de', 'access-report', 50, []));
+    if (count($report->entries()) !== 2 || $report->status() !== 'complete') throw new RuntimeException('Kalenderauskunft liefert fremde Einträge, lässt eigene aus oder meldet einen falschen Status.');
+    $items = array_map(static fn($item): array => [
+        'categoryId'=>$item->categoryId(),'categoryLabel'=>$item->categoryLabel(),'reference'=>$item->reference(),
+        'summary'=>$item->summary(),'purpose'=>$item->purpose(),'source'=>$item->source(),
+        'recipientCategories'=>$item->recipientCategories(),'retention'=>$item->retention(),
+        'thirdCountryTransfer'=>$item->thirdCountryTransfer(),'automatedDecision'=>$item->automatedDecision(),
+        'thirdPartyContentNotice'=>$item->thirdPartyContentNotice(),'attributes'=>$item->attributes(),
+    ], $report->entries());
+    $appointment = array_values(array_filter($items, static fn(array $item): bool => $item['categoryId'] === 'appointment'))[0] ?? null;
+    $shift = array_values(array_filter($items, static fn(array $item): bool => $item['categoryId'] === 'shift'))[0] ?? null;
     if ($appointment === null || $shift === null) throw new RuntimeException('Termin und Dienst sind nicht getrennt ausgewiesen.');
     if (array_key_exists('Art', $appointment['attributes']) || array_key_exists('Art', $shift['attributes'])) throw new RuntimeException('Der bereits als Tabellenabschnitt ausgewiesene Datentyp wird redundant als Art-Spalte ausgegeben.');
-    foreach (['Du hast im Kalender folgende Termine gespeichert:', 'Gemeinsamer Termin', '12.08.26, 10:00 bis 11:00 Uhr', 'Termin- und Verfügbarkeitsplanung', 'Keine feste Löschfrist'] as $expected) {
+    foreach (['Termin', 'Gemeinsamer Termin', '12.08.26, 10:00 bis 11:00 Uhr', 'Termin- und Verfügbarkeitsplanung', 'Keine feste Löschfrist'] as $expected) {
         if (!str_contains(json_encode($appointment, JSON_THROW_ON_ERROR|JSON_UNESCAPED_UNICODE), $expected)) throw new RuntimeException("Menschenlesbarer Terminbestand fehlt: {$expected}");
     }
-    if (!str_contains((string)$appointment['thirdPartyNote'], 'weitere Personen beteiligt') || str_contains(json_encode($appointment, JSON_THROW_ON_ERROR), 'other-person') || str_contains(json_encode($appointment, JSON_THROW_ON_ERROR), 'Fremder Titel')) {
+    if (!str_contains((string)$appointment['thirdPartyContentNotice'], 'weitere Personen beteiligt') || str_contains(json_encode($appointment, JSON_THROW_ON_ERROR), 'other-person') || str_contains(json_encode($appointment, JSON_THROW_ON_ERROR), 'Fremder Titel')) {
         throw new RuntimeException('Drittpersonenhinweis nennt fremde Identitäten oder fehlt.');
     }
-    foreach (['Im Kalender sind folgende Dienste für dich gespeichert:', '13.08.26, 08:00 bis 16:00 Uhr', 'Dienstplanung'] as $expected) {
+    foreach (['Dienst', '13.08.26, 08:00 bis 16:00 Uhr', 'Dienstplanung'] as $expected) {
         if (!str_contains(json_encode($shift, JSON_THROW_ON_ERROR|JSON_UNESCAPED_UNICODE), $expected)) throw new RuntimeException("Menschenlesbarer Dienstbestand fehlt: {$expected}");
     }
-    if ($shift['thirdPartyNote'] !== null) throw new RuntimeException('Ein eigener Dienst behauptet weitere Beteiligte.');
+    if ($shift['thirdPartyContentNotice'] !== null) throw new RuntimeException('Ein eigener Dienst behauptet weitere Beteiligte.');
     if ($entries->participantQueries !== 1) throw new RuntimeException('Drittpersonenprüfung wird nicht gebündelt.');
-    $limited = $provider->collect(new PersonalDataRequest(new PersonalDataSubject(PersonalDataSubject::NEXTCLOUD_USER, 'self'), 'de', PersonalDataRequest::PURPOSE_SELF_SERVICE, 1));
-    if ($limited->isComplete() || !in_array('Ausgabelimit erreicht; weitere Kalendereinträge können vorhanden sein.', $limited->limitations(), true)) throw new RuntimeException('Begrenzter Kalenderbericht behauptet Vollständigkeit.');
+    $limited = $provider->collect(new PersonalDataRequest($subject, 'de', 'access-report', 1, []));
+    if ($limited->status() !== 'partial' || !in_array('Ausgabelimit erreicht; weitere Kalendereinträge können vorhanden sein.', $limited->restrictions(), true)) throw new RuntimeException('Begrenzter Kalenderbericht behauptet Vollständigkeit.');
+    $unsupported = $provider->collect(new PersonalDataRequest(new DataSubjectRef('external-applicant', 'self'), 'de', 'access-report', 50, []));
+    if ($unsupported->status() !== 'not_applicable' || $unsupported->entries() !== []) throw new RuntimeException('Ein nicht unterstützter Subject-Typ erhält Kalenderdaten.');
+    try {
+        $provider->collect((new PersonalDataRequest($subject, 'de', 'access-report', 50, ['adcalendar'=>'opaque']))->forProvider('adcalendar', 50));
+        throw new RuntimeException('Ein unbekannter Provider-Cursor wurde akzeptiert.');
+    } catch (InvalidArgumentException) {}
 
     $listener = new CalendarPrivacyProviderListener($provider);
-    $registry = new PersonalDataProviderRegistryEvent();
+    $registry = new RegisterPersonalDataProvidersEvent();
     $listener->handle($registry);
     if (array_keys($registry->providers()) !== ['adcalendar']) throw new RuntimeException('AD Kalender registriert seinen Privacy-Provider nicht.');
+    $application = (string)file_get_contents(dirname(__DIR__, 2) . '/lib/AppInfo/Application.php');
+    if (!str_contains($application, 'registerEventListener(RegisterPersonalDataProvidersEvent::class, CalendarPrivacyProviderListener::class)') || str_contains($application, 'PersonalDataProviderRegistryEvent')) throw new RuntimeException('AD Kalender registriert den Provider nicht ausschließlich am Standalone-V1-Event.');
 
     echo "AD Kalender privacy provider test passed\n";
 }

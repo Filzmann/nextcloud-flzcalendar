@@ -123,8 +123,9 @@ Urlaubsansichten sind dynamisch ergänzbare Rollen-/Bereichsschnitte. Die Standa
 
 ## Architektur
 
-- AD Kalender registriert einen subjectgebundenen PersonalDataProvider über
-  den öffentlichen LocalBase-Registry-Event. Er liefert ausschließlich eigene
+- AD Kalender registriert einen subjectgebundenen PersonalDataProvider lazy
+  über den öffentlichen Standalone-V1-Vertrag von
+  `filzmann_data_protection`. Er liefert ausschließlich eigene
   Dienste und Termine. Bei einem gemeinsamen Meeting fragt das Repository nur
   ab, ob weitere Beteiligte existieren; deren UIDs, Namen und fremde Einträge
   gelangen nicht in den Bericht. Zeiten verwenden die gemeinsame fachliche
