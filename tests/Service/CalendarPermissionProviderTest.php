@@ -13,6 +13,7 @@ namespace OCA\FilzmannPermissionMatrix\PublicApi\V1 {
         public static function self(): self { return new self('self'); }
         public static function authenticated(): self { return new self('authenticated'); }
         public static function nextcloudAdmin(): self { return new self('nextcloud-admin'); }
+        public static function temporaryAppAdminGrant(): self { return new self('app-admin-grant'); }
     }
     final class PermissionRule { public function __construct(public string $objectType, public string $objectName, public string $detail, public string $permission, public string $label, public string $effect, public string $scope, public PermissionCondition $condition, public string $source, public string $confidence) {} }
     final class PermissionProviderResult { public function __construct(public array $rules, public bool $complete = true, public array $warnings = []) {} }
@@ -38,7 +39,12 @@ namespace {
 
     if (($byPermission['calendar.read'][0]->condition->operator ?? null) !== 'authenticated') throw new RuntimeException('Lesen muss als Anmeldebedingung ausgewiesen werden.');
     if (($byPermission['calendar.entry.manage-own'][0]->condition->operator ?? null) !== 'self') throw new RuntimeException('Eigene Bearbeitung darf kein Gruppenrecht werden.');
-    if (($byPermission['calendar.entry.manage-all'][0]->condition->operator ?? null) !== 'nextcloud-admin') throw new RuntimeException('Adminrechte müssen nativ markiert werden.');
+    $adminCondition = $byPermission['calendar.entry.manage-all'][0]->condition ?? null;
+    if (($adminCondition->operator ?? null) !== 'all'
+        || ($adminCondition->children[0]->operator ?? null) !== 'nextcloud-admin'
+        || ($adminCondition->children[1]->operator ?? null) !== 'app-admin-grant') {
+        throw new RuntimeException('Vollzugriff muss native Administration und aktive app-lokale Freigabe verlangen.');
+    }
     $peerGroups = array_map(static fn($rule) => $rule->condition->groupId, $byPermission['calendar.entry.manage-peer'] ?? []);
     if ($peerGroups !== ['ad-EB']) throw new RuntimeException('Nur tatsächlich konfigurierte Peer-Gruppen dürfen projiziert werden.');
     if (($byPermission['calendar.entry.manage-subordinate'] ?? []) === []) throw new RuntimeException('Die kanonische Hierarchie muss als Detailrecht projiziert werden.');

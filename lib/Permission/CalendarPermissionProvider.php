@@ -22,7 +22,7 @@ final class CalendarPermissionProvider implements PermissionProvider {
         $rules = [
             $this->rule('Kalender', 'Alle Kalenderdaten', 'Lesen', 'calendar.read', 'Lesen', 'all-calendars', PermissionCondition::authenticated()),
             $this->rule('Kalendereintrag', 'Eigene Einträge', 'Anlegen, ändern und löschen', 'calendar.entry.manage-own', 'Eigene Einträge verwalten', 'own-entry', PermissionCondition::self()),
-            $this->rule('Kalendereintrag', 'Alle Einträge', 'Native Nextcloud-Administration', 'calendar.entry.manage-all', 'Alle Einträge verwalten', 'all-entries', PermissionCondition::nextcloudAdmin()),
+            $this->rule('Kalendereintrag', 'Alle Einträge', 'Native Nextcloud-Administration mit aktiver app-lokaler Freigabe (maximal 24 Stunden)', 'calendar.entry.manage-all', 'Alle Einträge verwalten', 'all-entries', PermissionCondition::all([PermissionCondition::nextcloudAdmin(), PermissionCondition::temporaryAppAdminGrant()])),
         ];
 
         foreach ($definition->hierarchy() as $actorKey => $directTargets) {

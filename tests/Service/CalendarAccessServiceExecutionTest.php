@@ -29,6 +29,10 @@ namespace OCA\LocalBase\Organization {
 }
 
 namespace OCA\AdCalendar\Service {
+    final class TemporaryAdminAccessChecker {
+        public bool $active = false;
+        public function hasActiveGrant(string $uid): bool { return $this->active; }
+    }
     final class CalendarPermissionPolicy {
         public array $calls = [];
         public bool $allowed = true;
@@ -52,6 +56,7 @@ namespace {
     use OCA\AdCalendar\Service\CalendarGroupProfile;
     use OCA\AdCalendar\Service\CalendarPermissionPolicy;
     use OCA\AdCalendar\Service\CalendarSettingsService;
+    use OCA\AdCalendar\Service\TemporaryAdminAccessChecker;
     use OCA\LocalBase\Organization\AdOrganizationSettingsService;
     use OCP\IGroupManager;
     use OCP\IUser;
@@ -92,6 +97,7 @@ namespace {
         'zeta' => ['role-a', 'area-b'],
     ];
     $policy = new CalendarPermissionPolicy();
+    $adminAccess = new TemporaryAdminAccessChecker();
     $access = new CalendarAccessService(
         $groups,
         $session,
@@ -99,6 +105,7 @@ namespace {
         $policy,
         new CalendarSettingsService(),
         new CalendarGroupProfile(),
+        $adminAccess,
         new AdOrganizationSettingsService(),
     );
 
@@ -112,10 +119,13 @@ namespace {
     if (!$access->canView() || $access->canManage('unknown')) throw new RuntimeException('Angemeldete Sicht oder unbekanntes Ziel wird falsch bewertet.');
     if (!$access->canManage('alpha')) throw new RuntimeException('Policy-Ergebnis wird nicht für bekannte Zielkonten verwendet.');
     $policyCall = $policy->calls[0];
-    if ($policyCall[0] !== 'actor' || $policyCall[1] !== true || $policyCall[2] !== ['role-planner', 'area-a']
+    if ($policyCall[0] !== 'actor' || $policyCall[1] !== false || $policyCall[2] !== ['role-planner', 'area-a']
         || $policyCall[3] !== 'alpha' || $policyCall[4] !== ['role-a', 'area-a'] || $policyCall[5] !== ['peer-a']) {
-        throw new RuntimeException('Berechtigungsprüfung erhält nicht Akteur, Adminstatus, Profile und Peer-Vertrag.');
+        throw new RuntimeException('Native Administration darf ohne app-lokale Freigabe nicht als Fachadministration gelten.');
     }
+    $adminAccess->active = true;
+    $access->canManage('alpha');
+    if (($policy->calls[1][1] ?? null) !== true) throw new RuntimeException('Aktive app-lokale Freigabe muss die fachliche Adminbedingung erfüllen.');
     $profile = $access->currentProfile();
     if ($profile['roles'] !== ['role-planner'] || $profile['areas'] !== ['area-a']) throw new RuntimeException('Aktuelles Fachprofil wird nicht aus nativen Gruppen abgeleitet.');
     $visible = $access->visibleEmployees();

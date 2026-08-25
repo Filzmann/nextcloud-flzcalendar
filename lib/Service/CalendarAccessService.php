@@ -24,6 +24,7 @@ final class CalendarAccessService {
         private CalendarPermissionPolicy $policy,
         private CalendarSettingsService $settings,
         private CalendarGroupProfile $profiles,
+        private TemporaryAdminAccessChecker $temporaryAdminAccess,
         private ?AdOrganizationSettingsService $organization = null,
     ) {}
 
@@ -47,7 +48,7 @@ final class CalendarAccessService {
 
         return $this->policy->canManage(
             $user->getUID(),
-            $this->groups->isAdmin($user->getUID()),
+            $this->groups->isAdmin($user->getUID()) && $this->temporaryAdminAccess->hasActiveGrant($user->getUID()),
             $actorGroups,
             $employeeUid,
             $targetGroups,

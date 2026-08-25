@@ -11,6 +11,7 @@ use OCA\AdCalendar\AppInfo\AppId;
 use OCA\AdCalendar\CalendarSync\ExternalCalendarConnectionStore;
 use OCA\AdCalendar\Model\CalendarEntry;
 use OCA\AdCalendar\Repository\CalendarEntryRepository;
+use OCA\AdCalendar\Repository\TemporaryAdminAccessRepository;
 use OCA\AdCalendar\Service\CalendarPreferenceService;
 use OCA\LocalBase\Calendar\CalendarContextSettingsService;
 use OCA\FilzmannDataProtection\PublicApi\V1\PersonalDataEntry;
@@ -25,6 +26,7 @@ final class CalendarPersonalDataProvider implements PersonalDataProvider {
         private CalendarContextSettingsService $calendarContext,
         private CalendarPreferenceService $preferences,
         private ExternalCalendarConnectionStore $externalConnections,
+        private TemporaryAdminAccessRepository $adminAccess,
     ) {}
 
     public function descriptor(): ProviderDescriptor {
@@ -47,6 +49,7 @@ final class CalendarPersonalDataProvider implements PersonalDataProvider {
         $preferenceProjection = $this->preferences->personalDataProjection($subjectUid);
         $items = [...$items, ...$this->preferenceItems($preferenceProjection)];
         $items = [...$items, ...$this->externalConnectionItems($subjectUid)];
+        $items = [...$items, ...$this->adminAccessItems($subjectUid, $timezone, $request->pageLimit() + 1)];
         $limited = count($items) > $request->pageLimit();
         if ($limited) $items = array_slice($items, 0, $request->pageLimit());
         $restrictions = [];
@@ -130,6 +133,29 @@ final class CalendarPersonalDataProvider implements PersonalDataProvider {
             );
         }
 
+        return $items;
+    }
+
+    private function adminAccessItems(string $subjectUid, DateTimeZone $timezone, int $limit): array {
+        $items = [];
+        foreach ($this->adminAccess->historyForUid($subjectUid, $limit) as $grant) {
+            $roles = [];
+            if ($grant['targetUid'] === $subjectUid) $roles[] = 'Ziel der Vollzugriffsfreigabe';
+            if ($grant['grantedBy'] === $subjectUid) $roles[] = 'Freigebende Administration';
+            if ($grant['revokedBy'] === $subjectUid) $roles[] = 'Widerrufende Administration';
+            $actualEnd = $grant['revokedAt'] ?? $grant['endsAt'];
+            $items[] = new PersonalDataEntry(
+                categoryId: 'admin-access', categoryLabel: 'Zeitlich begrenzter Admin-Vollzugriff', reference: 'admin-access:' . (string)$grant['id'],
+                summary: sprintf('%s bis %s', self::germanDateTime($grant['startsAt']->setTimezone($timezone)), self::germanDateTime($actualEnd->setTimezone($timezone))),
+                purpose: 'Nachweis einer zeitlich begrenzten administrativen Kalenderfreigabe', source: 'App-lokale Freigabe im Nextcloud-Adminbereich',
+                recipientCategories: ['Berechtigte Nextcloud-Administrator*innen und prüfberechtigte Stellen'],
+                retention: 'Keine feste Löschfrist festgelegt; die sicherheitsrelevante Freigabehistorie bleibt bis zu einer gesonderten Aufbewahrungsentscheidung erhalten.',
+                thirdCountryTransfer: 'Durch AD Kalender sind keine Drittlandübermittlungen für diese Freigabehistorie vorgesehen.',
+                automatedDecision: 'Der Server beendet den Vollzugriff spätestens nach 24 Stunden automatisch.',
+                thirdPartyContentNotice: 'Kennungen anderer beteiligter Administrator*innen werden in dieser subjectgebundenen Auskunft nicht ausgegeben.',
+                attributes: ['Eigene Rolle im Vorgang' => implode(', ', $roles), 'Beginn' => self::germanDateTime($grant['startsAt']->setTimezone($timezone)), 'Geplantes Ende' => self::germanDateTime($grant['endsAt']->setTimezone($timezone)), 'Tatsächliches Ende' => self::germanDateTime($actualEnd->setTimezone($timezone)), 'Status' => $grant['revokedAt'] === null ? 'planmäßig beendet oder noch aktiv' : 'widerrufen'],
+            );
+        }
         return $items;
     }
 

@@ -14,6 +14,10 @@ use OCA\AdCalendar\Privacy\CalendarPrivacyProviderListener;
 use OCA\AdCalendar\Permission\CalendarPermissionProviderListener;
 use OCA\AdCalendar\Permission\CalendarPermissionSourceInterface;
 use OCA\AdCalendar\Permission\NextcloudCalendarPermissionSource;
+use OCA\AdCalendar\Repository\TemporaryAdminAccessRepository;
+use OCA\AdCalendar\Repository\TemporaryAdminAccessRepositoryInterface;
+use OCA\AdCalendar\Service\TemporaryAdminAccessChecker;
+use OCA\AdCalendar\Service\TemporaryAdminAccessService;
 use OCA\FilzmannDataProtection\PublicApi\V1\RegisterPersonalDataProvidersEvent;
 use OCA\FilzmannPermissionMatrix\PublicApi\V1\RegisterPermissionProvidersEvent;
 use OCA\LocalBase\Calendar\ScheduleConflictQueryEvent;
@@ -39,6 +43,8 @@ class Application extends App implements IBootstrap {
         $context->registerEventListener(RegisterPersonalDataProvidersEvent::class, CalendarPrivacyProviderListener::class);
         $context->registerEventListener(RegisterPermissionProvidersEvent::class, CalendarPermissionProviderListener::class);
         $context->registerServiceAlias(CalendarPermissionSourceInterface::class, NextcloudCalendarPermissionSource::class);
+        $context->registerServiceAlias(TemporaryAdminAccessChecker::class, TemporaryAdminAccessService::class);
+        $context->registerServiceAlias(TemporaryAdminAccessRepositoryInterface::class, TemporaryAdminAccessRepository::class);
         $context->registerEventListener(LoadAdditionalEntriesEvent::class, StandaloneNavigationListener::class);
     }
     public function boot(IBootContext $context): void {}

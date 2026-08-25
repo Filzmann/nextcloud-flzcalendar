@@ -54,6 +54,12 @@ namespace OCA\AdCalendar\Repository {
             ))));
         }
     }
+    class TemporaryAdminAccessRepository {
+        public array $items = [];
+        public function historyForUid(string $uid, int $limit): array {
+            return array_slice(array_values(array_filter($this->items, static fn(array $item): bool => in_array($uid, [$item['targetUid'], $item['grantedBy'], $item['revokedBy']], true))), 0, $limit);
+        }
+    }
 }
 
 namespace {
@@ -61,6 +67,7 @@ namespace {
     use OCA\AdCalendar\Privacy\CalendarPersonalDataProvider;
     use OCA\AdCalendar\Privacy\CalendarPrivacyProviderListener;
     use OCA\AdCalendar\Repository\CalendarEntryRepository;
+    use OCA\AdCalendar\Repository\TemporaryAdminAccessRepository;
     use OCA\AdCalendar\CalendarSync\ExternalCalendarConnectionStore;
     use OCA\AdCalendar\Service\CalendarPreferenceService;
     use OCA\LocalBase\Calendar\CalendarContextSettingsService;
@@ -101,17 +108,22 @@ namespace {
         public function encrypt(string $plaintext, string $password = ''): string { return 'cipher'; }
         public function decrypt(string $authenticatedCiphertext, string $password = ''): string { $this->decryptCalls++; throw new RuntimeException('Privacy provider must not decrypt stored secrets.'); }
     };
+    $adminAccess = new TemporaryAdminAccessRepository();
+    $adminAccess->items = [[
+        'id'=>9,'targetUid'=>'self','grantedBy'=>'other-admin','startsAt'=>new DateTimeImmutable('2026-08-12T08:00:00+00:00'),'endsAt'=>new DateTimeImmutable('2026-08-12T12:00:00+00:00'),'revokedAt'=>null,'revokedBy'=>null,
+    ]];
     $provider = new CalendarPersonalDataProvider(
         $entries,
         new CalendarContextSettingsService($config),
         new CalendarPreferenceService($userConfig),
         new ExternalCalendarConnectionStore($userConfig, $crypto),
+        $adminAccess,
     );
     $descriptor = $provider->descriptor();
     if ($descriptor->appId() !== 'adcalendar' || $descriptor->contractVersion() !== '1.0' || !$descriptor->supportsSubjectType('nextcloud-user')) throw new RuntimeException('AD Kalender beschreibt den Standalone-V1-Vertrag nicht korrekt.');
     $subject = new DataSubjectRef('nextcloud-user', 'self');
     $report = $provider->collect(new PersonalDataRequest($subject, 'de', 'access-report', 50, []));
-    if (count($report->entries()) !== 6 || $report->status() !== 'complete') throw new RuntimeException('Kalenderauskunft liefert fremde Einträge, lässt persönliche Einstellungen aus oder meldet einen falschen Status.');
+    if (count($report->entries()) !== 7 || $report->status() !== 'complete') throw new RuntimeException('Kalenderauskunft liefert fremde Einträge, lässt persönliche Einstellungen oder Adminfreigaben aus oder meldet einen falschen Status.');
     $items = array_map(static fn($item): array => [
         'categoryId'=>$item->categoryId(),'categoryLabel'=>$item->categoryLabel(),'reference'=>$item->reference(),
         'summary'=>$item->summary(),'purpose'=>$item->purpose(),'source'=>$item->source(),
@@ -125,6 +137,8 @@ namespace {
     $shiftDefaults = array_values(array_filter($items, static fn(array $item): bool => $item['categoryId'] === 'shift_defaults'))[0] ?? null;
     $syncPreference = array_values(array_filter($items, static fn(array $item): bool => $item['categoryId'] === 'calendar_sync_preference'))[0] ?? null;
     $externalConnections = array_values(array_filter($items, static fn(array $item): bool => $item['categoryId'] === 'external_calendar_connections'))[0] ?? null;
+    $adminGrant = array_values(array_filter($items, static fn(array $item): bool => $item['categoryId'] === 'admin-access'))[0] ?? null;
+    if ($adminGrant === null || str_contains(json_encode($adminGrant), 'other-admin')) throw new RuntimeException('App-lokale Adminfreigabe fehlt oder legt fremde Admin-IDs offen.');
     if ($appointment === null || $shift === null) throw new RuntimeException('Termin und Dienst sind nicht getrennt ausgewiesen.');
     if (array_key_exists('Art', $appointment['attributes']) || array_key_exists('Art', $shift['attributes'])) throw new RuntimeException('Der bereits als Tabellenabschnitt ausgewiesene Datentyp wird redundant als Art-Spalte ausgegeben.');
     foreach (['Termin', 'Gemeinsamer Termin', '12.08.26, 10:00 bis 11:00 Uhr', 'Termin- und Verfügbarkeitsplanung', 'Keine feste Löschfrist'] as $expected) {

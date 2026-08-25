@@ -26,5 +26,8 @@ return [
         ['name' => 'google_oauth_admin#remove', 'url' => '/api/admin/google-oauth', 'verb' => 'DELETE'],
         ['name' => 'external_calendar_admin#testCalDav', 'url' => '/api/admin/external-calendars/caldav/test', 'verb' => 'POST'],
         ['name' => 'calendar_defaults_admin#save', 'url' => '/api/admin/calendar-defaults', 'verb' => 'PUT'],
+        ['name' => 'temporary_admin_access#status', 'url' => '/api/admin/full-access', 'verb' => 'GET'],
+        ['name' => 'temporary_admin_access#activate', 'url' => '/api/admin/full-access', 'verb' => 'POST'],
+        ['name' => 'temporary_admin_access#revoke', 'url' => '/api/admin/full-access/{targetUid}', 'verb' => 'DELETE'],
     ],
 ];

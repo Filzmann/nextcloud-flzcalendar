@@ -59,6 +59,10 @@ sind abgeleitete Kopien der führenden AD-Kalenderdaten; ihre Objekte werden
 nicht zusätzlich als zweite Datenquelle ausgelesen. AD Kalender speichert
 keine Daten in Files oder Team Folders.
 
+## Zeitlich begrenzter Admin-Vollzugriff
+
+Ein Nextcloud-Administrationskonto erhält nicht automatisch Zugriff auf alle Mitarbeiterkalender. Der fachliche Vollzugriff wird im Adminbereich von AD Kalender pro Administrationskonto für 1, 4, 8 oder höchstens 24 Stunden aktiviert und kann vorzeitig widerrufen werden. Beginn, geplantes Ende, Freigabe und Widerruf werden app-lokal protokolliert und in Datenschutz- sowie Berechtigungsprovider einbezogen. Technische OAuth-, CalDAV- und Kalenderdefault-Konfiguration bleibt davon getrennt.
+
 ## Roadmap
 
 Geplante Erweiterungen und offene Produktentscheidungen stehen in der [Roadmap](ROADMAP.md).
