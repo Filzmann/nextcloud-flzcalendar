@@ -161,7 +161,7 @@ Ursprung bleiben und unterliegen Nextclouds SSRF-Schutz. Zugangsdaten werden
 nie an einen Discovery-Ursprung auf einem anderen Host weitergereicht.
 Providerfehler bleiben voneinander und von der führenden AD-Mutation isoliert.
 
-## Organisation, Rechte und optionale Urlaube
+## Organisation, Rechte und optionale Urlaube und Planungskonflikte
 
 Alle angemeldeten Nutzer*innen dürfen Kalenderdaten lesen und eigene Einträge
 bearbeiten. Fremdbearbeitung folgt ausschließlich der konfigurierten
@@ -183,6 +183,17 @@ bearbeitbar. Nur genehmigter Urlaub wird aus Meetinglücken entfernt. Im
 persönlichen DAV-Kalender bleibt geplanter Urlaub davon unabhängig tentative
 und transparent, genehmigter Urlaub confirmed und opaque. Ohne AD Urlaub
 bleiben manuelle Sperrtermine der gültige Standalone-Weg.
+
+Ist AdPlaner aktiv, konsumiert AD Kalender dessen belegte Schichten über den
+versionierten `ScheduleConflictQueryEvent` ausschließlich read-only. Die
+Kalenderantwort projiziert sie mit sicherem Label `Assistenz`, Provider-ID und
+Verfügbarkeitsstatus; die UI zeigt sie ohne Bearbeitungsaktionen als
+`Assistenz` oder bei schmaler Zelle als `AS`. Echte Überlappungen blockieren
+manuelle und materialisierte Standarddienste, direkte Randberührungen nicht.
+Fehlende Listener bilden den Standalone-Zustand. Providerfehler werden in der
+Leseantwort als `unavailable` ausgewiesen und verhindern neue Dienste, statt
+Konfliktfreiheit zu behaupten. Umgekehrt publiziert AD Kalender seine Dienste
+datensparsam als `Dienst/Büro`; private Termintitel verlassen die App nicht.
 
 ## Demo- und Legacy-Grenzen
 

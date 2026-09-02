@@ -248,6 +248,9 @@ OC.L10N.register(
     "Deselect {employee}" : "Deselect {employee}",
     "Please enter a title for the block." : "Please enter a title for the block.",
     "The appointment was blocked for all selected people." : "The appointment was blocked for all selected people.",
-    "No people match the current filters." : "No people match the current filters."
+    "No people match the current filters." : "No people match the current filters.",
+    "Assistenz" : "Assistance",
+    "AS" : "AS",
+    "Assistenz – blocked time from {start} to {end}" : "Assistance – blocked time from {start} to {end}"
 },
 "nplurals=2; plural=(n != 1);");

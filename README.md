@@ -17,6 +17,12 @@ Für Staging und Auslieferung das Produktbundle `ad-product-adcalendar-<release>
 
 AD Kalender funktioniert einzeln. Ohne AD Urlaub stehen manuelle Sperrtermine zur Verfügung; die read-only Urlaubsmarkierungen entfallen.
 
+Ist AdPlaner aktiv, erscheinen belegte Assistenzschichten über den
+versionierten LocalBase-Konfliktvertrag als nicht bearbeitbare Sperrzeiten.
+Breite Zellen zeigen `Assistenz`, schmale Zellen `AS`. Überlappende manuelle
+und regelmäßige Kalenderdienste werden verhindert; ohne AdPlaner bleibt der
+Kalender unverändert eigenständig nutzbar.
+
 Der Befehl `adcalendar:demo:seed` ist ausschließlich für synthetische Testdaten gedacht und darf auf einem realitätsnahen Staging-System nicht ohne bewusste Entscheidung ausgeführt werden.
 
 ## Externe Kalender

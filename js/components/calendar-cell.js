@@ -9,7 +9,7 @@
      * Zusammenspiel: main.js liefert Tagesdaten und bindet die delegierten data-action-Ereignisse.
      */
     class CalendarCell {
-        render(entries, employee, absences = [], layout = null, day = null, timeline = null) {
+        render(entries, employee, absences = [], layout = null, day = null, timeline = null, planningConflicts = []) {
             const shifts = entries.filter(entry => entry.type === 'shift');
             const standalone = entries.filter(entry => entry.type === 'appointment' && entry.parentEntryId === null);
             const hasAbsence = absences.length > 0;
@@ -34,8 +34,15 @@
                     this.rowStyle(layout, entry, day, timeline),
                 ))
                 .join('');
+            const assistanceEntries = planningConflicts
+                .map(conflict => this.assistance(
+                    conflict,
+                    this.rowStyle(layout, conflict, day, timeline),
+                    day,
+                ))
+                .join('');
 
-            return `${markers}${actions}<div class="adc-cell-entries"${gridStyle}>${shiftEntries}${blockedEntries}</div>`;
+            return `${markers}${actions}<div class="adc-cell-entries"${gridStyle}>${shiftEntries}${blockedEntries}${assistanceEntries}</div>`;
         }
 
         actions(canManage, canCreateShift) {
@@ -78,6 +85,19 @@
             const label = kind === 'blocked' ? l10n.t('Blocked time') : l10n.t('Appointment');
             const manageable = canManage && (!entry.meetingUid || entry.canManageMeeting !== false);
             return `<article class="adc-entry adc-entry--${kind}" data-entry-id="${esc(entry.id)}"${style}>${this.header(entry, label, manageable, kind === 'blocked')}</article>`;
+        }
+
+        assistance(conflict, style = '', day = null) {
+            const label = l10n.t('Assistenz');
+            const shortLabel = l10n.t('AS');
+            const period = this.dayPeriod(conflict, day);
+            const accessible = l10n.t('Assistenz – blocked time from {start} to {end}', { start: period.start, end: period.end });
+            return `<article class="adc-entry adc-entry--assistance" aria-label="${esc(accessible)}"${style}>
+                <header class="adc-entry__header"><span><strong>
+                    <span class="adc-assistance-label adc-assistance-label--full">${esc(label)}</span>
+                    <span class="adc-assistance-label adc-assistance-label--short" aria-hidden="true">${esc(shortLabel)}</span>
+                </strong> ${esc(period.start)}–${esc(period.end)}${period.continuation}</span></header>
+            </article>`;
         }
 
         rowStyle(layout, entry, day, timeline) {

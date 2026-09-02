@@ -92,11 +92,12 @@
                 && new Date(value.end) > day;
             const entries = state.data.entries.filter(overlaps);
             const absences = (state.data.absences || []).filter(overlaps);
+            const planningConflicts = (state.data.planningConflicts || []).filter(overlaps);
             const cell = document.createElement('div');
             cell.className = 'adc-mobile-cell';
             cell.dataset.employeeUid = employee.uid;
             cell.dataset.day = CalendarDate.isoDay(day);
-            cell.innerHTML = this.calendarCell.render(entries, employee, absences, null, day);
+            cell.innerHTML = this.calendarCell.render(entries, employee, absences, null, day, null, planningConflicts);
             article.append(cell);
             return article;
         }
@@ -124,9 +125,10 @@
                 const name = this.node('th', employee.displayName, this.classes('adc-person-heading', state.selected.has(employee.uid) ? 'adc-selected' : ''));
                 name.scope = 'row'; row.append(name);
                 const employeeEntries = state.data.entries.filter(entry => entry.employeeUid === employee.uid);
-                const layout = this.timeline.layout(employeeEntries, days);
+                const employeePlanningConflicts = (state.data.planningConflicts || []).filter(conflict => conflict.employeeUid === employee.uid);
+                const layout = this.timeline.layout([...employeeEntries, ...employeePlanningConflicts], days);
                 for (const day of days) {
-                    row.append(this.cellFor(employee, day, state.data.entries, state.data.absences || [], layout, activeMonth, compactDays.has(CalendarDate.isoDay(day))));
+                    row.append(this.cellFor(employee, day, state.data.entries, state.data.absences || [], state.data.planningConflicts || [], layout, activeMonth, compactDays.has(CalendarDate.isoDay(day))));
                 }
                 rows.push(row);
             }
@@ -149,18 +151,20 @@
                 const dayEnd = new Date(day); dayEnd.setDate(dayEnd.getDate() + 1);
                 const visibleUids = new Set(employees.map(employee => employee.uid));
                 const dayEntries = state.data.entries.filter(entry => visibleUids.has(entry.employeeUid) && new Date(entry.start) < dayEnd && new Date(entry.end) > day);
-                const layout = this.timeline.layout(dayEntries, [day]);
-                for (const employee of employees) row.append(this.cellFor(employee, day, state.data.entries, state.data.absences || [], layout, activeMonth, compact));
+                const dayPlanningConflicts = (state.data.planningConflicts || []).filter(conflict => visibleUids.has(conflict.employeeUid) && new Date(conflict.start) < dayEnd && new Date(conflict.end) > day);
+                const layout = this.timeline.layout([...dayEntries, ...dayPlanningConflicts], [day]);
+                for (const employee of employees) row.append(this.cellFor(employee, day, state.data.entries, state.data.absences || [], state.data.planningConflicts || [], layout, activeMonth, compact));
                 return row;
             });
             body.replaceChildren(...rows);
         }
 
-        cellFor(employee, day, allEntries, allAbsences, layout, activeMonth = null, compact = false) {
+        cellFor(employee, day, allEntries, allAbsences, allPlanningConflicts, layout, activeMonth = null, compact = false) {
             const cell = document.createElement('td');
             const dayEnd = new Date(day); dayEnd.setDate(dayEnd.getDate() + 1);
             const entries = allEntries.filter(entry => entry.employeeUid === employee.uid && new Date(entry.start) < dayEnd && new Date(entry.end) > day);
             const absences = allAbsences.filter(absence => absence.employeeUid === employee.uid && new Date(absence.start) < dayEnd && new Date(absence.end) > day);
+            const planningConflicts = allPlanningConflicts.filter(conflict => conflict.employeeUid === employee.uid && new Date(conflict.start) < dayEnd && new Date(conflict.end) > day);
             cell.dataset.employeeUid = employee.uid;
             cell.dataset.day = CalendarDate.isoDay(day);
             if (compact) cell.classList.add('adc-compact-day');
@@ -171,7 +175,7 @@
                 cell.classList.add('adc-holiday');
                 cell.dataset.holiday = holiday;
             }
-            cell.innerHTML = this.calendarCell.render(entries, employee, absences, layout, day, this.timeline);
+            cell.innerHTML = this.calendarCell.render(entries, employee, absences, layout, day, this.timeline, planningConflicts);
             return cell;
         }
 
@@ -204,7 +208,7 @@
             const overlaps = value => visibleUids.has(value.employeeUid)
                 && new Date(value.start) < dayEnd
                 && new Date(value.end) > day;
-            return !state.data.entries.some(overlaps);
+            return !state.data.entries.some(overlaps) && !(state.data.planningConflicts || []).some(overlaps);
         }
 
         clusterLabel(employee) {

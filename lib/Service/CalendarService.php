@@ -20,6 +20,7 @@ final class CalendarService {
         private AbsenceService $absences,
         private ContainingShiftAssignment $shiftAssignment,
         private ShiftCalendarSyncService $shiftSync,
+        private PlanningConflictService $planningConflicts,
     ) {}
 
     public function week(DateTimeImmutable $start, array $employees): array {
@@ -38,8 +39,9 @@ final class CalendarService {
         }
         $employeeUids = array_column($employees, 'uid');
         $absences = $this->absences->query($start, $end, $employeeUids);
+        $planning = $this->planningConflicts->queryRange($start, $end, $employeeUids);
         for ($week = $start; $week < $end; $week = $week->modify('+7 days')) {
-            $this->defaultShifts->syncWeek($week, $employeeUids, $absences);
+            $this->defaultShifts->syncWeek($week, $employeeUids, $absences, $planning['conflicts'], $planning['status']);
         }
         $entries = $this->entries->findRange($start, $end, $employeeUids);
         return [
@@ -48,6 +50,8 @@ final class CalendarService {
             'employees' => $employees,
             'entries' => array_map([$this, 'serializeEntry'], $entries),
             'absences' => array_map(static fn($absence): array => $absence->toArray(), $absences),
+            'planningConflictStatus' => $planning['status'],
+            'planningConflicts' => $planning['conflicts'],
         ];
     }
 
@@ -75,6 +79,7 @@ final class CalendarService {
         $entry = CalendarEntry::get($payload);
         if ($entry->type() === CalendarEntry::TYPE_SHIFT) {
             $this->absences->assertShiftWritable($entry->employeeUid(), $entry->start(), $entry->end());
+            $this->planningConflicts->assertShiftWritable($entry->employeeUid(), $entry->start(), $entry->end());
         }
         $this->assertTypeUnchanged($entry, $id);
         $this->assertShiftDoesNotOverlap($entry);

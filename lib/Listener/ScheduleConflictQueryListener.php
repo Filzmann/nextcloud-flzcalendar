@@ -23,14 +23,13 @@ final class ScheduleConflictQueryListener implements IEventListener {
         if (!$event instanceof ScheduleConflictQueryEvent) return;
 
         foreach ($this->entries->findRange($event->start(), $event->end(), [$event->employeeUid()]) as $entry) {
-            $label = $entry->type() === CalendarEntry::TYPE_SHIFT
-                ? 'Dienst'
-                : ($entry->title() !== '' ? $entry->title() : 'Termin');
+            $label = $entry->type() === CalendarEntry::TYPE_SHIFT ? 'Dienst/Büro' : 'Termin';
             $event->add(new ScheduleConflict(
                 $entry->type(),
                 $entry->start(),
                 $entry->end(),
                 $label,
+                'adcalendar',
             ));
         }
     }

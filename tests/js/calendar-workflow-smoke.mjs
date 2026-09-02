@@ -91,7 +91,7 @@ for (const contract of ['class CalendarFilters', 'this.renderLeadershipStaffChec
 for (const contract of ['class TabNavigation', "addEventListener('click'", "this.show('settings')", "this.onChange(active)"]) {
     if (!tabNavigation.includes(contract)) throw new Error(`Tab-Komponentenvertrag fehlt: ${contract}`);
 }
-for (const contract of ['class WeekTable', 'adc-group-heading', 'adc-period-matrix', 'adc-mobile-calendar', 'adc-mobile-day', 'adc-mobile-person', 'adc-outside-month', 'this.calendarCell.render(entries, employee, absences, layout, day, this.timeline)', 'this.calendarCell.render(entries, employee, absences, null, day)', 'this.timeline.layout(employeeEntries, days)', 'this.timeline.layout(dayEntries, [day])', 'organization.staffBlockLabel', 'organization.roleShortLabel(value)', 'organization.areaShortLabel(value)', 'this.daysInRange(range.start, range.end)', 'groupCell.colSpan = days.length + 1', 'this.orderedEmployees(employees)', 'this.staffRank(a) - this.staffRank(b)', 'roleNames.slice(1)', "join('/')"]) {
+for (const contract of ['class WeekTable', 'adc-group-heading', 'adc-period-matrix', 'adc-mobile-calendar', 'adc-mobile-day', 'adc-mobile-person', 'adc-outside-month', 'state.data.planningConflicts || []', 'this.calendarCell.render(entries, employee, absences, layout, day, this.timeline, planningConflicts)', 'this.calendarCell.render(entries, employee, absences, null, day, null, planningConflicts)', 'this.timeline.layout([...employeeEntries, ...employeePlanningConflicts], days)', 'this.timeline.layout([...dayEntries, ...dayPlanningConflicts], [day])', 'organization.staffBlockLabel', 'organization.roleShortLabel(value)', 'organization.areaShortLabel(value)', 'this.daysInRange(range.start, range.end)', 'groupCell.colSpan = days.length + 1', 'this.orderedEmployees(employees)', 'this.staffRank(a) - this.staffRank(b)', 'roleNames.slice(1)', "join('/')"]) {
     if (!weekTable.includes(contract)) throw new Error(`Wochenmatrix-Komponentenvertrag fehlt: ${contract}`);
 }
 const timelineContext = { window: {}, Date, Set, Math };
@@ -356,7 +356,7 @@ if (sortableOrganization.leadershipStaffRoleGroups().join(',') !== 'ad-PDL,ad-St
 for (const contract of ['window.LocalBase.models.Model', 'extends BaseModel', 'toArray()', 'this.defaultDate', 'this.defaultModified', 'this.defaultDeleted', 'this.meetingUid', 'this.seriesUid', 'this.seriesTimezone', 'this.canManageMeeting']) {
     if (!model.includes(contract)) throw new Error(`Modell-Vertrag fehlt: ${contract}`);
 }
-for (const contract of ['class CalendarCell', 'adc-cell-actions', 'adc-entry__children', 'grid-template-rows:', 'grid-row:', 'entry.parentEntryId === shift.id', 'entry.canManageMeeting !== false', 'adc-entry__blocked-marker', 'adc-entry__series-marker', 'aria-hidden="true">🔒', "data-action=\"add-entry\"", "l10n.t('Create shift')", 'icon-calendar-dark']) {
+for (const contract of ['class CalendarCell', 'adc-cell-actions', 'adc-entry__children', 'grid-template-rows:', 'grid-row:', 'entry.parentEntryId === shift.id', 'entry.canManageMeeting !== false', 'adc-entry__blocked-marker', 'adc-entry__series-marker', 'adc-entry--assistance', 'adc-assistance-label--full', 'adc-assistance-label--short', 'aria-hidden="true">🔒', "data-action=\"add-entry\"", "l10n.t('Create shift')", 'icon-calendar-dark']) {
     if (!calendarCell.includes(contract)) throw new Error(`Kalenderzellen-Vertrag fehlt: ${contract}`);
 }
 for (const contract of ['const previousWrap = this.container.querySelector', 'previousWrap?.scrollLeft', 'wrap.scrollLeft = previousScroll.left', 'wrap.scrollTop = previousScroll.top']) {
@@ -481,6 +481,24 @@ if (!vacationHtml.includes('>U?</') || vacationHtml.includes('Planned absence</d
     throw new Error('Urlaubsmarker ist nicht als kompakter, read-only Marker gerendert.');
 }
 if (!vacationHtml.includes('data-action="edit-entry"')) throw new Error('Sperrtermine bleiben während Urlaub bearbeitbar.');
+
+const assistanceHtml = cell.render([], { canManage: true }, [], null, new Date('2026-07-06T00:00:00Z'), null, [{
+    employeeUid: 'person-a',
+    start: '2026-07-06T10:00:00Z',
+    end: '2026-07-06T18:00:00Z',
+    type: 'shift',
+    label: 'Assistenz',
+    sourceAppId: 'adplaner',
+}]);
+if (!assistanceHtml.includes('adc-entry--assistance')
+    || !assistanceHtml.includes('adc-assistance-label--full">Assistenz<')
+    || !assistanceHtml.includes('adc-assistance-label--short')
+    || !assistanceHtml.includes('>AS<')
+    || assistanceHtml.includes('data-entry-id')
+    || assistanceHtml.includes('edit-entry')
+    || assistanceHtml.includes('delete-entry')) {
+    throw new Error('Assistenzschicht wird nicht als responsiver, unveränderlicher Sperrtermin dargestellt.');
+}
 
 const maliciousTranslation = '<img src=x onerror=alert(1)>';
 const escapingContext = {

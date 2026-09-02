@@ -31,6 +31,11 @@ namespace OCA\AdCalendar\Service {
         public function query(\DateTimeImmutable $start, \DateTimeImmutable $end, array $uids): array { return []; }
         public function assertShiftWritable(string $uid, \DateTimeImmutable $start, \DateTimeImmutable $end): void { $this->shiftChecks[] = $uid; }
     }
+    final class PlanningConflictService {
+        public array $shiftChecks = [];
+        public function queryRange(\DateTimeImmutable $start, \DateTimeImmutable $end, array $uids): array { return ['status' => 'available', 'conflicts' => []]; }
+        public function assertShiftWritable(string $uid, \DateTimeImmutable $start, \DateTimeImmutable $end): void { $this->shiftChecks[] = $uid; }
+    }
     final class ContainingShiftAssignment { public function assign(CalendarEntry $entry, array $parents): CalendarEntry { return $entry; } }
     final class ShiftCalendarSyncService {
         public array $published = [];
@@ -48,12 +53,14 @@ namespace {
     use OCA\AdCalendar\Service\CalendarService;
     use OCA\AdCalendar\Service\ContainingShiftAssignment;
     use OCA\AdCalendar\Service\DefaultShiftMaterializer;
+    use OCA\AdCalendar\Service\PlanningConflictService;
     use OCA\AdCalendar\Service\ShiftCalendarSyncService;
 
     $repository = new CalendarEntryRepository();
     $sync = new ShiftCalendarSyncService();
     $absences = new AbsenceService();
-    $service = new CalendarService($repository, new DefaultShiftMaterializer(), $absences, new ContainingShiftAssignment(), $sync);
+    $planning = new PlanningConflictService();
+    $service = new CalendarService($repository, new DefaultShiftMaterializer(), $absences, new ContainingShiftAssignment(), $sync, $planning);
     $payload = ['employeeUid' => 'person-a', 'start' => '2026-07-20T08:00:00+02:00', 'end' => '2026-07-20T16:00:00+02:00', 'type' => CalendarEntry::TYPE_SHIFT, 'title' => ''];
 
     $id = $service->save($payload, null, 'planner');
@@ -84,6 +91,7 @@ namespace {
         throw new RuntimeException('Gelöschter eigener Termin bleibt im privaten Kalender.');
     }
     if ($absences->shiftChecks !== ['person-a', 'person-b']) throw new RuntimeException('Urlaub wird nicht ausschließlich für Dienstmutationen geprüft.');
+    if ($planning->shiftChecks !== ['person-a', 'person-b']) throw new RuntimeException('Assistenzplanung wird nicht ausschließlich für Dienstmutationen geprüft.');
 
     $repository->found = CalendarEntry::get([
         'id' => 42, 'employeeUid' => 'person-a', 'start' => '2026-07-20T10:00:00+02:00', 'end' => '2026-07-20T11:00:00+02:00',

@@ -4,6 +4,9 @@
 
 - Dokumentations- und Steuerungsstruktur vereinheitlicht; die Roadmap auf
   verbleibende Abnahmen, Freigaben und Erweiterungen reduziert.
+- AdPlaner-Schichten als responsive read-only Sperrzeiten `Assistenz`/`AS`
+  eingeblendet und überlappende manuelle sowie regelmäßige Dienste über den
+  versionierten LocalBase-Konfliktvertrag verhindert.
 
 ## 0.15.0-rc.1
 
