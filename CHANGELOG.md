@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Dokumentations- und Steuerungsstruktur vereinheitlicht; die Roadmap auf
+  verbleibende Abnahmen, Freigaben und Erweiterungen reduziert.
+
 ## 0.15.0-rc.1
 
 - Subjectgebundene persönliche Datenauskunft für eigene Dienste und Termine ergänzt; bei gemeinsamen Terminen werden weitere Beteiligte nur abstrakt erwähnt.
