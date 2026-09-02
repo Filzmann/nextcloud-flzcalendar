@@ -2,6 +2,20 @@
 
 Diese Datei bündelt geplante Erweiterungen und offene Produktentscheidungen. Verbindliche Fach-, Sicherheits- und Architekturregeln stehen in `AGENTS.md`.
 
+## Nextcloud-Kompatibilitätsgate
+
+### ADC-NC-COMPAT – DAV-Grenze für OpenDesk/NC 33 und künftige Majors sichern
+
+Status: `info.xml` bleibt bei 34/34. NC 33.0.7 enthält die verwendete private
+`CalDavBackend`-Klasse, aber der Kalender-Rename übergibt derzeit ein Array,
+obwohl NC 33 und 34 ein `Sabre\DAV\PropPatch` erwarten. Diese Abweichung wird
+app-lokal test-first korrigiert. Danach müssen Fresh Install/Upgrade, DI,
+Migrationen, Background-Job, interner DAV-Abgleich, Providerfehler,
+Standalone-/LocalBase-Kombination, Assets und sichtbare Oberfläche auf NC 33
+grün sein. Die obere Grenze wird je Major lückenlos über
+`verify-nextcloud-future-compatibility` bestimmt; der private DAV-Port erhält
+bei jeder Major einen eigenen Source- und Runtime-Nachweis.
+
 ## Umgesetzte Aufgaben mit offener manueller Abnahme
 
 ### ADC-ADMIN-DEFAULTS – Kalenderdefaults administrierbar machen
