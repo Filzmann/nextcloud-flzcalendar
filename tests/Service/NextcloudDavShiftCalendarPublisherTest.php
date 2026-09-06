@@ -3,7 +3,25 @@
 declare(strict_types=1);
 
 namespace OCP { interface IL10N { public function t(string $text, array $parameters = []): string; } }
+namespace Sabre\DAV {
+    final class PropPatch {
+        public static bool $commitResult = true;
+        private bool $committed = false;
+        private $callback = null;
+        public function __construct(private array $mutations) {}
+        public function mutations(): array { return $this->mutations; }
+        public function handle(string|array $properties, callable $callback): void { $this->callback = $callback; }
+        public function commit(): bool {
+            $this->committed = true;
+            if (!self::$commitResult) return false;
+            return ($this->callback)($this->mutations);
+        }
+        public function isCommitted(): bool { return $this->committed; }
+    }
+}
 namespace OCA\DAV\CalDAV {
+    use Sabre\DAV\PropPatch;
+
     final class CalDavBackend {
         public const CALENDAR_TYPE_CALENDAR = 0;
         public array $calendars = [];
@@ -46,9 +64,12 @@ namespace OCA\DAV\CalDAV {
             $this->deletedCalendars[] = [$calendarId, $force];
             unset($this->calendars[$calendarId], $this->objects[$calendarId]);
         }
-        public function updateCalendar(int $calendarId, array $mutations): void {
-            $this->updatedCalendars[] = [$calendarId, $mutations];
-            foreach ($mutations as $property => $value) $this->calendars[$calendarId][$property] = $value;
+        public function updateCalendar(int $calendarId, PropPatch $propPatch): void {
+            $this->updatedCalendars[] = [$calendarId, $propPatch];
+            $propPatch->handle('{DAV:}displayname', function (array $mutations) use ($calendarId): bool {
+                foreach ($mutations as $property => $value) $this->calendars[$calendarId][$property] = $value;
+                return true;
+            });
         }
     }
 }
@@ -162,9 +183,32 @@ namespace {
     $legacyBackend->objects[71] = [];
     (new NextcloudDavShiftCalendarPublisher($legacyBackend, new ShiftCalendarEventSerializer($l10n), $targets))->replaceAll('sync-person', [$shift(7)]);
     if (($legacyBackend->calendars[71]['{DAV:}displayname'] ?? '') !== 'Team & Dienst'
-        || ($legacyBackend->updatedCalendars[0] ?? null) !== [71, ['{DAV:}displayname' => 'Team & Dienst']]
+        || ($legacyBackend->updatedCalendars[0][0] ?? null) !== 71
+        || !(($legacyBackend->updatedCalendars[0][1] ?? null) instanceof \Sabre\DAV\PropPatch)
+        || !$legacyBackend->updatedCalendars[0][1]->isCommitted()
+        || ($legacyBackend->updatedCalendars[0][1]->mutations() ?? null) !== ['{DAV:}displayname' => 'Team & Dienst']
         || ($legacyBackend->calendars[71]['uri'] ?? '') !== $uri) {
         throw new RuntimeException('Vorhandener app-eigener Kalender wird nicht idempotent bei stabiler URI umbenannt.');
+    }
+
+    \Sabre\DAV\PropPatch::$commitResult = false;
+    $failedBackend = new CalDavBackend();
+    $failedBackend->calendars[72] = [
+        'id' => 72,
+        'principaluri' => 'principals/users/sync-person',
+        'uri' => $uri,
+        '{DAV:}displayname' => 'AD Dienste',
+    ];
+    try {
+        (new NextcloudDavShiftCalendarPublisher($failedBackend, new ShiftCalendarEventSerializer($l10n), $targets))->replaceAll('sync-person', [$shift(8)]);
+        throw new RuntimeException('Fehlgeschlagener DAV-PropPatch-Commit wurde nicht gemeldet.');
+    } catch (RuntimeException $error) {
+        if ($error->getMessage() === 'Fehlgeschlagener DAV-PropPatch-Commit wurde nicht gemeldet.') throw $error;
+    } finally {
+        \Sabre\DAV\PropPatch::$commitResult = true;
+    }
+    if (($failedBackend->calendars[72]['{DAV:}displayname'] ?? '') !== 'AD Dienste') {
+        throw new RuntimeException('Fehlgeschlagener DAV-PropPatch-Commit hat den Kalendernamen verändert.');
     }
 
     echo "NextcloudDavShiftCalendarPublisherTest: OK\n";

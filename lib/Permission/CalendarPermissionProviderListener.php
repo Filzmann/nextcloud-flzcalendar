@@ -5,10 +5,13 @@ declare(strict_types=1);
 namespace OCA\AdCalendar\Permission;
 
 use OCA\FilzmannPermissionMatrix\PublicApi\V1\RegisterPermissionProvidersEvent;
+use OCP\EventDispatcher\Event;
+use OCP\EventDispatcher\IEventListener;
 
-final class CalendarPermissionProviderListener {
+/** @template-implements IEventListener<RegisterPermissionProvidersEvent> */
+final class CalendarPermissionProviderListener implements IEventListener {
     public function __construct(private CalendarPermissionProvider $provider) {}
-    public function handle(object $event): void {
+    public function handle(Event $event): void {
         if ($event instanceof RegisterPermissionProvidersEvent) $event->register($this->provider);
     }
 }

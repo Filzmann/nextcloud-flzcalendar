@@ -2,6 +2,19 @@
 
 ## Unreleased
 
+- Die interne Nextcloud-DAV-Grenze beim Umbenennen des app-eigenen Kalenders
+  auf den erwarteten `Sabre\DAV\PropPatch`-Vertrag einschließlich explizitem
+  Commit und sichtbarem Fehlerpfad korrigiert und durch einen fokussierten
+  Adaptertest sowie reale DAV-Läufe abgesichert.
+- Den Berechtigungsprovider-Listener an Nextclouds `IEventListener`-Vertrag
+  gebunden, damit die eigenständige Berechtigungsmatrix ihn zuverlässig
+  entdeckt.
+- Nextcloud 33 und 34 durch Fresh Install, Upgrade mit synthetischen
+  Bestandsdaten, reale Integrationsläufe, Provider, HTTP/API und Assets
+  nachgewiesen und als unterstützten Bereich deklariert.
+- Öffentliche Nextcloud-Kalenderverträge als unvollständigen Ersatz für den
+  gekapselten DAV-Publisher dokumentiert; der private Adapter bleibt an einen
+  eigenen Source- und Runtime-Kompatibilitätsnachweis gebunden.
 - Dokumentations- und Steuerungsstruktur vereinheitlicht; die Roadmap auf
   verbleibende Abnahmen, Freigaben und Erweiterungen reduziert.
 - AdPlaner-Schichten als responsive read-only Sperrzeiten `Assistenz`/`AS`

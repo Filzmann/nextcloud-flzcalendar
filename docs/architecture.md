@@ -109,6 +109,25 @@ Der interne DAV-Zugriff ist hinter `PersonalCalendarPublisher` gekapselt. Der
 interne Nextcloud-DAV-Vertrag bleibt auf
 `NextcloudDavShiftCalendarPublisher` begrenzt.
 
+Die am 2. September 2026 geprüften öffentlichen Nextcloud-Verträge decken
+diesen Publisher nicht vollständig ab: `OCP\Calendar\IManager` und
+`OCP\Calendar\ICalendar` ermöglichen Ermittlung und lesenden Zugriff;
+`OCP\Calendar\ICreateFromString` kann ein ICS-Objekt in einem bereits
+schreibbaren Kalender anlegen. Öffentliche Verträge für das Anlegen,
+Umbenennen und bedingte Löschen des app-eigenen Kalenders sowie für das
+deterministische Aktualisieren und Löschen seiner Objekte fehlen. Deshalb
+bleibt der private `OCA\DAV\CalDAV\CalDavBackend` ausschließlich innerhalb
+des genannten Adapters zulässig. Seine Signaturen werden testbar gekapselt
+und vor jeder Erweiterung der Nextcloud-Kompatibilität durch einen eigenen
+Source- und Runtime-Nachweis geprüft. Eine loopback-basierte CalDAV-
+Authentifizierung innerhalb derselben Nextcloud-Instanz ist kein Ersatz für
+diese Grenze.
+
+Beim Umbenennen reicht das Registrieren der Änderung über `PropPatch` nicht
+aus: Der Adapter führt den Patch explizit mit `commit()` aus und behandelt
+einen fehlgeschlagenen Commit als sichtbaren Fehler, bevor er Objekte
+abgleicht.
+
 ## Responsive Kalenderdarstellung
 
 Die Desktopdarstellung bleibt die durchgehende Wochen- beziehungsweise

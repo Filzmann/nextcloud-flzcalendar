@@ -5,18 +5,6 @@ und Freigabegates. Der aktuelle Funktionsumfang steht in `README.md`,
 erledigte Änderungen in `CHANGELOG.md` und geltende Architektur in
 `docs/architecture.md`.
 
-## Nextcloud-Kompatibilitätsgate
-
-### ADC-NC-COMPAT – DAV-Grenze für OpenDesk/NC 33 und künftige Majors sichern
-
-`info.xml` bleibt bei 34/34, bis der Kalender-Rename test-first auf den von
-NC 33 und 34 erwarteten `Sabre\DAV\PropPatch`-Vertrag korrigiert ist.
-Danach müssen Fresh Install/Upgrade, DI, Migrationen, Background-Job,
-interner DAV-Abgleich, Providerfehler, Standalone-/LocalBase-Kombination,
-Assets und sichtbare Oberfläche auf NC 33 grün sein. Jede höhere Major wird
-lückenlos mit `verify-nextcloud-future-compatibility` belegt; der private
-DAV-Port benötigt dabei einen eigenen Source- und Runtime-Nachweis.
-
 ## Offene Abnahmen
 
 ### ADC-STAGING-ACCEPTANCE – bestehenden Kernumfang fachlich abnehmen

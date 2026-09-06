@@ -2,6 +2,10 @@
 
 declare(strict_types=1);
 
+namespace OCP\EventDispatcher {
+    class Event {}
+    interface IEventListener { public function handle(Event $event): void; }
+}
 namespace OCA\FilzmannPermissionMatrix\PublicApi\V1 {
     interface PermissionProvider { public function descriptor(): PermissionProviderDescriptor; public function collect(): PermissionProviderResult; }
     final class PermissionProviderDescriptor { public function __construct(public string $appId, public string $name, public string $version, public array $capabilities) {} }
@@ -17,7 +21,7 @@ namespace OCA\FilzmannPermissionMatrix\PublicApi\V1 {
     }
     final class PermissionRule { public function __construct(public string $objectType, public string $objectName, public string $detail, public string $permission, public string $label, public string $effect, public string $scope, public PermissionCondition $condition, public string $source, public string $confidence) {} }
     final class PermissionProviderResult { public function __construct(public array $rules, public bool $complete = true, public array $warnings = []) {} }
-    final class RegisterPermissionProvidersEvent { public array $providers = []; public function register(PermissionProvider $provider): void { $this->providers[] = $provider; } }
+    final class RegisterPermissionProvidersEvent extends \OCP\EventDispatcher\Event { public array $providers = []; public function register(PermissionProvider $provider): void { $this->providers[] = $provider; } }
 }
 
 namespace {
@@ -26,6 +30,7 @@ namespace {
     use OCA\AdCalendar\Permission\CalendarPermissionSourceInterface;
     use OCA\FilzmannPermissionMatrix\PublicApi\V1\RegisterPermissionProvidersEvent;
     use OCA\LocalBase\Organization\AdOrganizationDefinition;
+    use OCP\EventDispatcher\IEventListener;
 
     $source = new class implements CalendarPermissionSourceInterface {
         public function definition(): AdOrganizationDefinition { return AdOrganizationDefinition::defaults(); }
@@ -50,7 +55,9 @@ namespace {
     if (($byPermission['calendar.entry.manage-subordinate'] ?? []) === []) throw new RuntimeException('Die kanonische Hierarchie muss als Detailrecht projiziert werden.');
 
     $event = new RegisterPermissionProvidersEvent();
-    (new CalendarPermissionProviderListener($provider))->handle($event);
+    $listener = new CalendarPermissionProviderListener($provider);
+    if (!$listener instanceof IEventListener) throw new RuntimeException('Der Permission-Provider-Listener muss den Nextcloud-Eventvertrag implementieren.');
+    $listener->handle($event);
     if (($event->providers[0] ?? null) !== $provider) throw new RuntimeException('Der Provider muss lazy registriert werden.');
 
     echo 'Calendar permission provider tests passed' . PHP_EOL;

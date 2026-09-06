@@ -9,6 +9,7 @@ use OCA\AdCalendar\Service\CalendarTargetConfig;
 use OCA\LocalBase\Calendar\AbsenceInterval;
 use OCA\DAV\CalDAV\CalDavBackend;
 use RuntimeException;
+use Sabre\DAV\PropPatch;
 
 /**
  * Zweck: Veröffentlicht AD-Dienste in einem privaten, app-eigenen Nextcloud-DAV-Kalender.
@@ -135,7 +136,14 @@ final class NextcloudDavShiftCalendarPublisher implements ShiftCalendarPublisher
                 throw new RuntimeException('Die reservierte AD-Kalender-URI wird bereits von einem fremden Kalender verwendet.');
             }
             if ($displayName !== $calendarName) {
-                $this->backend->updateCalendar((int)$calendar['id'], ['{DAV:}displayname' => $calendarName]);
+                $propPatch = new PropPatch(['{DAV:}displayname' => $calendarName]);
+                $this->backend->updateCalendar(
+                    (int)$calendar['id'],
+                    $propPatch,
+                );
+                if (!$propPatch->commit()) {
+                    throw new RuntimeException('Der app-eigene Nextcloud-Kalender konnte nicht umbenannt werden.');
+                }
             }
             return (int)$calendar['id'];
         }
