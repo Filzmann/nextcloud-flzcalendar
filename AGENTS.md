@@ -140,6 +140,11 @@ Urlaubsansichten sind dynamisch ergänzbare Rollen-/Bereichsschnitte. Die Standa
   Datenwahrheit aus fremden Kalenderobjekten gelesen. Solange keine
   Kalender-Retention-Policy freigegeben ist, wird ehrlich „keine feste
   Löschfrist“ ausgewiesen.
+- AD Kalender registriert zusätzlich einen `ProcessingMetadataProvider` lazy
+  über den öffentlichen V1-Vertrag des Datenschutz-Centers. Seine einzige
+  fachliche Policyquelle ist `resources/privacy-processing.json`; sie enthält
+  keine personenbezogenen Laufzeitdaten oder entschlüsselten Secrets und
+  markiert ungeklärte Entscheidungen als `PRIVACY-DECISION-REQUIRED`.
 - Controller bleiben duenn.
 - `CalendarAccessService` buendelt Sicht-, Erstell-, Aenderungs- und Loeschrechte.
 - Repository-/Store-Klassen kapseln Datenzugriffe und QueryBuilder-Parameter.

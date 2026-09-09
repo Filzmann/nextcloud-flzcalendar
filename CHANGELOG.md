@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Einen app-eigenen Processing-Metadata-Katalog für Kalenderplanung,
+  persönliche Standards, externe Verbindungen, Kalenderableitungen und
+  temporäre Adminfreigaben über den V1-Vertrag des Datenschutz-Centers
+  veröffentlicht.
 - Die interne Nextcloud-DAV-Grenze beim Umbenennen des app-eigenen Kalenders
   auf den erwarteten `Sabre\DAV\PropPatch`-Vertrag einschließlich explizitem
   Commit und sichtbarem Fehlerpfad korrigiert und durch einen fokussierten

@@ -214,6 +214,17 @@ Leseantwort als `unavailable` ausgewiesen und verhindern neue Dienste, statt
 Konfliktfreiheit zu behaupten. Umgekehrt publiziert AD Kalender seine Dienste
 datensparsam als `Dienst/Büro`; private Termintitel verlassen die App nicht.
 
+## Processing-Metadaten
+
+Der zusätzliche `ProcessingMetadataProvider` veröffentlicht den app-eigenen
+Katalog `resources/privacy-processing.json` lazy über den öffentlichen
+Standalone-V1-Vertrag des Datenschutz-Centers. Er trennt führende
+Kalendereinträge, persönliche UserConfig-Werte, verschlüsselte externe
+Verbindungen, abgeleitete Zielkalender und temporäre Adminfreigaben. Der
+Katalog enthält keine personenbezogenen Laufzeitdaten oder entschlüsselten
+Secrets und ersetzt fehlende fachliche Entscheidungen nicht durch technische
+Defaults.
+
 ## Demo- und Legacy-Grenzen
 
 WordPress-Code, Rollen, Nonces, Shortcodes, Tabellen und Bestandsdaten werden
