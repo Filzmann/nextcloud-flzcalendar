@@ -2,12 +2,23 @@
 
 declare(strict_types=1);
 
-if (!interface_exists('OCP\\Config\\IUserConfig')) {
-    eval('namespace OCP\\Config; interface IUserConfig { public function getValueString(string $userId, string $app, string $key, string $default = "", bool $lazy = false): string; public function setValueString(string $userId, string $app, string $key, string $value, bool $lazy = false, int $flags = 0): bool; public function getValuesByUsers(string $app, string $key, mixed $typedAs = null, ?array $userIds = null): array; }');
+namespace OCP\Config {
+    if (!interface_exists(IUserConfig::class)) {
+        interface IUserConfig {
+            public function getValueString(string $userId, string $app, string $key, string $default = '', bool $lazy = false): string;
+            public function setValueString(string $userId, string $app, string $key, string $value, bool $lazy = false, int $flags = 0): bool;
+            public function getValuesByUsers(string $app, string $key, mixed $typedAs = null, ?array $userIds = null): array;
+        }
+    }
 }
-if (!class_exists('OCA\\AdCalendar\\AppInfo\\Application', false)) {
-    eval('namespace OCA\\AdCalendar\\AppInfo; final class Application { public const APP_ID = "adcalendar"; }');
+
+namespace OCA\AdCalendar\AppInfo {
+    if (!class_exists(Application::class, false)) {
+        final class Application { public const APP_ID = 'adcalendar'; }
+    }
 }
+
+namespace {
 
 use OCA\AdCalendar\Service\CalendarPreferenceService;
 use OCP\Config\IUserConfig;
@@ -82,3 +93,4 @@ if (($corrupt['incomplete'] ?? false) !== true
 }
 
 echo "CalendarPreferenceServiceTest: OK\n";
+}
