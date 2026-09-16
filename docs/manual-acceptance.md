@@ -153,6 +153,22 @@ konfigurierte Eigennamen dürfen sich nicht ändern.
 | I6 | Sprachwechsel ohne fachliche Zustandsänderung | Zeitraum, Ausrichtung, Filter, Serienstatus und Providerverbindungen merken, Sprache wechseln und dieselben Objekte erneut öffnen. | Nur die Darstellung ändert sich. Rechte, Auswahl, technische Statuswerte, Termine, Serien und Verbindungen bleiben unverändert. | [ ] erfolgreich [ ] nicht erfolgreich [x] nicht geprüft | Wegen geringer Priorität der Mehrsprachigkeit übersprungen. |
 
 
+## Automatisierter lokaler Nachweis vom 11.09.2026
+
+Im Rahmen der risikoarmen Luna-Prüfung wurden aus dem Repository-Root nur die
+lokalen, nicht mutierenden Prüfungen ausgeführt:
+
+| Prüfung | Ergebnis | Aussagegrenze |
+|---|---|---|
+| `php tests/run.php` | erfolgreich | PHP-Syntax sowie Controller-, Migrations-, Rechte-, Privacy-, DAV-/Sync-, Service- und Negativtests sind grün. |
+| `node tests/run-js.mjs` | erfolgreich | JavaScript-Syntax sowie Localization-, Kalenderworkflow-, Admin- und Coverage-Smokes sind grün. |
+| `git diff --check` | erfolgreich | Keine Whitespace-Fehler im aktuellen Arbeitsbaum. |
+
+DDEV, `occ`, Installation, App-Aktivierung, Kalenderdaten und externe
+Provider wurden nicht verändert. Dieser Nachweis ersetzt weder die offene
+manuelle Staging-Abnahme noch die in `P-01` bis `P-05` dokumentierten
+fachlichen beziehungsweise visuellen Nacharbeiten.
+
 ## Zu bearbeitende Punkte
 
 ### Abnahmeblockierende Funktionsfehler
