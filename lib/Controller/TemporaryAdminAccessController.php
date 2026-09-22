@@ -11,18 +11,20 @@ use OCA\AdCalendar\Service\TemporaryAdminAccessDeniedException;
 use OCA\AdCalendar\Service\TemporaryAdminAccessService;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http;
+use OCP\AppFramework\Http\Attribute\NoAdminRequired;
 use OCP\AppFramework\Http\Attribute\NoCSRFRequired;
 use OCP\AppFramework\Http\JSONResponse;
 use OCP\IRequest;
 use Psr\Log\LoggerInterface;
 use Throwable;
 
-/** Dünne Admin-API für app-lokale, zeitbegrenzte Vollzugriffszeiträume. */
+/** Dünne DPO-API für app-lokale, zeitbegrenzte Vollzugriffszeiträume. */
 final class TemporaryAdminAccessController extends Controller {
     public function __construct(IRequest $request, private TemporaryAdminAccessService $service, private LoggerInterface $logger) {
         parent::__construct(AppId::VALUE, $request);
     }
 
+    #[NoAdminRequired]
     #[NoCSRFRequired]
     public function status(): JSONResponse {
         try {
@@ -36,6 +38,7 @@ final class TemporaryAdminAccessController extends Controller {
         }
     }
 
+    #[NoAdminRequired]
     public function activate(string $targetUid, int $durationMinutes): JSONResponse {
         try {
             return new JSONResponse(['grant' => $this->serializeGrant($this->service->activate($targetUid, $durationMinutes))]);
@@ -48,9 +51,12 @@ final class TemporaryAdminAccessController extends Controller {
         }
     }
 
+    #[NoAdminRequired]
     public function revoke(string $targetUid): JSONResponse {
         try {
             return new JSONResponse(['revoked' => $this->service->revoke($targetUid)]);
+        } catch (InvalidArgumentException $error) {
+            return new JSONResponse(['message' => $error->getMessage()], Http::STATUS_BAD_REQUEST);
         } catch (TemporaryAdminAccessDeniedException) {
             return $this->denied();
         } catch (Throwable $error) {
@@ -74,4 +80,3 @@ final class TemporaryAdminAccessController extends Controller {
         return new JSONResponse(['message' => 'Der Vollzugriff konnte nicht verarbeitet werden.'], Http::STATUS_INTERNAL_SERVER_ERROR);
     }
 }
-

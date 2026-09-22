@@ -110,7 +110,7 @@ namespace {
     };
     $adminAccess = new TemporaryAdminAccessRepository();
     $adminAccess->items = [[
-        'id'=>9,'targetUid'=>'self','grantedBy'=>'other-admin','startsAt'=>new DateTimeImmutable('2026-08-12T08:00:00+00:00'),'endsAt'=>new DateTimeImmutable('2026-08-12T12:00:00+00:00'),'revokedAt'=>null,'revokedBy'=>null,
+        'id'=>9,'targetUid'=>'self','grantedBy'=>'self','startsAt'=>new DateTimeImmutable('2026-08-12T08:00:00+00:00'),'endsAt'=>new DateTimeImmutable('2026-08-12T12:00:00+00:00'),'revokedAt'=>new DateTimeImmutable('2026-08-12T10:00:00+00:00'),'revokedBy'=>'other-admin',
     ]];
     $provider = new CalendarPersonalDataProvider(
         $entries,
@@ -139,6 +139,8 @@ namespace {
     $externalConnections = array_values(array_filter($items, static fn(array $item): bool => $item['categoryId'] === 'external_calendar_connections'))[0] ?? null;
     $adminGrant = array_values(array_filter($items, static fn(array $item): bool => $item['categoryId'] === 'admin-access'))[0] ?? null;
     if ($adminGrant === null || str_contains(json_encode($adminGrant), 'other-admin')) throw new RuntimeException('App-lokale Adminfreigabe fehlt oder legt fremde Admin-IDs offen.');
+    $adminGrantJson=json_encode($adminGrant,JSON_THROW_ON_ERROR|JSON_UNESCAPED_UNICODE);
+    foreach(['Freigebendes Mitglied von Datenschutzbeauftragte','App-lokale Freigabesteuerung im AD Kalender','Datenschutz-Prüfrolle'] as $expected)if(!str_contains($adminGrantJson,$expected))throw new RuntimeException("Adminfreigabe projiziert Rolle oder Quelle nicht korrekt: {$expected}");
     if ($appointment === null || $shift === null) throw new RuntimeException('Termin und Dienst sind nicht getrennt ausgewiesen.');
     if (array_key_exists('Art', $appointment['attributes']) || array_key_exists('Art', $shift['attributes'])) throw new RuntimeException('Der bereits als Tabellenabschnitt ausgewiesene Datentyp wird redundant als Art-Spalte ausgegeben.');
     foreach (['Termin', 'Gemeinsamer Termin', '12.08.26, 10:00 bis 11:00 Uhr', 'Termin- und Verfügbarkeitsplanung', 'Keine feste Löschfrist'] as $expected) {

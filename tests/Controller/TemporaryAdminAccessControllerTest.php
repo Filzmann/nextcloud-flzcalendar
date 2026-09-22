@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace OCP { interface IRequest {} }
 namespace OCP\AppFramework { class Controller { public function __construct(string $appId,\OCP\IRequest $request){} } final class Http { public const STATUS_BAD_REQUEST=400;public const STATUS_FORBIDDEN=403;public const STATUS_INTERNAL_SERVER_ERROR=500; } }
 namespace OCP\AppFramework\Http { final class JSONResponse { public function __construct(private array $data=[],private int $status=200){}public function getData():array{return $this->data;}public function getStatus():int{return $this->status;} } }
-namespace OCP\AppFramework\Http\Attribute { #[\Attribute(\Attribute::TARGET_METHOD)] final class NoCSRFRequired {} }
+namespace OCP\AppFramework\Http\Attribute { #[\Attribute(\Attribute::TARGET_METHOD)] final class NoCSRFRequired {} #[\Attribute(\Attribute::TARGET_METHOD)] final class NoAdminRequired {} }
 namespace Psr\Log { interface LoggerInterface { public function error(string $message,array $context=[]):void; } }
 namespace OCA\AdCalendar\Service {
     final class TemporaryAdminAccessService {
@@ -24,6 +24,9 @@ namespace {
     $service=new TemporaryAdminAccessService();
     $logger=new class implements Psr\Log\LoggerInterface { public array $errors=[];public function error(string $message,array $context=[]):void{$this->errors[]=$message;} };
     $controller=new TemporaryAdminAccessController(new class implements OCP\IRequest{},$service,$logger);
+    $statusMethod=new ReflectionMethod(TemporaryAdminAccessController::class,'status');
+    if($statusMethod->getAttributes(OCP\AppFramework\Http\Attribute\NoAdminRequired::class)===[]||$statusMethod->getAttributes(OCP\AppFramework\Http\Attribute\NoCSRFRequired::class)===[])throw new RuntimeException('DPO-Nichtadmins erreichen den read-only Statuspfad nicht.');
+    foreach(['activate','revoke'] as $methodName){$method=new ReflectionMethod(TemporaryAdminAccessController::class,$methodName);if($method->getAttributes(OCP\AppFramework\Http\Attribute\NoAdminRequired::class)===[]||$method->getAttributes(OCP\AppFramework\Http\Attribute\NoCSRFRequired::class)!==[])throw new RuntimeException($methodName.' hat falschen DPO-/CSRF-Routenvertrag.');}
     if($controller->status()->getData()['maxDurationMinutes']!==1440)throw new RuntimeException('Status liefert die 24-Stunden-Grenze nicht.');
     $response=$controller->activate('admin-target',60);
     if($response->getStatus()!==200||$response->getData()['grant']['targetUid']!=='admin-target'||$response->getData()['grant']['endsAt']!=='2026-08-25T11:00:00+00:00')throw new RuntimeException('Gültige Freigabe wird nicht sicher serialisiert.');
@@ -35,4 +38,3 @@ namespace {
     if($controller->activate('admin-target',60)->getStatus()!==Http::STATUS_INTERNAL_SERVER_ERROR||$logger->errors===[])throw new RuntimeException('Persistenzfehler wird nicht sicher diagnostiziert.');
     echo "AD Kalender temporary admin access controller tests passed\n";
 }
-

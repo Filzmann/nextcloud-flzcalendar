@@ -152,6 +152,20 @@ konfigurierte Eigennamen dürfen sich nicht ändern.
 | I5 | Veröffentlichte Dienstereignisse | Einen betitelten und einen unbetitelten synthetischen Dienst in den privaten Nextcloud-Kalender sowie – sobald H1 freigegeben ist – nach Google synchronisieren. | Eigene Titel bleiben unverändert. Fallbacktitel und Beschreibung folgen der aktiven Locale; technische Event-ID, Eigentumsmarker und konfigurierter Kalendername bleiben stabil. | [ ] erfolgreich [ ] nicht erfolgreich [x] nicht geprüft | Wegen geringer Priorität der Mehrsprachigkeit übersprungen; Google-Provider zudem nicht eingerichtet. |
 | I6 | Sprachwechsel ohne fachliche Zustandsänderung | Zeitraum, Ausrichtung, Filter, Serienstatus und Providerverbindungen merken, Sprache wechseln und dieselben Objekte erneut öffnen. | Nur die Darstellung ändert sich. Rechte, Auswahl, technische Statuswerte, Termine, Serien und Verbindungen bleiben unverändert. | [ ] erfolgreich [ ] nicht erfolgreich [x] nicht geprüft | Wegen geringer Priorität der Mehrsprachigkeit übersprungen. |
 
+## J. DPO-gesteuerte Adminfreigabe
+
+Diese Runtime-Abnahme verwendet ausschließlich neutrale Testkonten. Sie bleibt
+offen, bis eine ausdrücklich freigegebene DDEV- oder Staging-Umgebung verfügbar
+ist.
+
+| ID | Was wird geprüft? | Auszuführende Schritte | Erwartetes Ergebnis | Ergebnis | Warum/Beleg/Abweichung |
+|---|---|---|---|---|---|
+| J1 | DPO ohne native Adminrolle | Mit einem Mitglied von `Datenschutzbeauftragte` ohne Adminrolle AD Kalender öffnen, Historie laden und einem aktiven nativen Testadmin für eine Stunde Zugriff erteilen. | Steuerung und Historie sind erreichbar; die Freigabe wird genau einmal protokolliert. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
+| J2 | Nativer Admin ohne DPO-Rolle | Als nativer Testadmin ohne DPO-Rolle AD Kalender ohne aktive Freigabe öffnen und die Freigabe-API direkt lesen sowie schreibend aufrufen. | Sichere Hinweismeldung ohne Direktlink; Historie und Mutation werden verweigert und bleiben unverändert. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
+| J3 | Gewöhnliches Konto und ungültige Ziele | Als gewöhnliches Konto direkte API-Aufrufe versuchen; als DPO ein Nichtadmin-Ziel und eine Dauer über 24 Stunden senden. | Keine Steuerung oder Historie wird offengelegt; alle Aufrufe werden ohne Mutation verweigert. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
+| J4 | CSRF, Ablauf, Widerruf und Rollenverlust | Schreibenden Request ohne CSRF senden, eine aktive Freigabe widerrufen, Ablauf abwarten beziehungsweise kontrolliert simulieren und Ziel-Adminstatus sowie DPO-Rolle jeweils entziehen. | Fehlendes CSRF mutiert nicht; Widerruf, Ablauf und Verlust des Ziel-Adminstatus beenden den fachlichen Zugriff; ohne DPO-Rolle sind Steuerung und Historie nicht mehr erreichbar. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
+| J5 | Tastaturbedienung und Fokus | Steuerung, Dauer, Bestätigung, Absenden, Historie und Widerruf nur per Tastatur bedienen; Fehlermeldung auslösen. | Alle Funktionen sind erreichbar, Fokus sichtbar, Status verständlich und Fehler werden als Alert ausgegeben. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
+
 
 ## Automatisierter lokaler Nachweis vom 11.09.2026
 

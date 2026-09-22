@@ -154,6 +154,15 @@
 .adc-meeting-gap-list button { flex: 0 0 auto; margin: 0; }
 .adc-meeting-result-actions { display: flex; flex-wrap: wrap; gap: 5px; }
 .adc-meeting-result-actions button { margin: 0; }
+.adc-admin-access { margin: 0 0 12px; padding: 12px; border: 1px solid var(--color-border); border-radius: var(--border-radius-large); background: var(--color-main-background); }
+.adc-admin-access--warning { border-inline-start: 5px solid var(--color-warning); background: var(--color-warning-light); }
+.adc-admin-access h2 { margin: 0 0 6px; font-size: 1.2rem; }
+.adc-admin-access form { display: flex; flex-wrap: wrap; align-items: end; gap: 8px; }
+.adc-admin-access form label { display: grid; gap: 3px; }
+.adc-admin-access form label:has(input[type="checkbox"]) { display: flex; align-items: center; }
+.adc-admin-access .adc-table-wrap { display: block; flex: none; max-height: 240px; margin-top: 8px; overflow: auto; }
+.adc-admin-access table { width: 100%; border-collapse: collapse; }
+.adc-admin-access th, .adc-admin-access td { padding: 6px; border-bottom: 1px solid var(--color-border); text-align: start; }
 @media (max-width: 700px) {
     .adc-app { padding: 10px 8px 28px; }
     #adc-calendar-view, .adc-overview, .adc-calendar-tables, .adc-period-matrix { flex: none; min-height: auto; overflow: visible; }

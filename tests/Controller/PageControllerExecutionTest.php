@@ -14,18 +14,31 @@ namespace OCP\AppFramework\Http\Attribute {
 namespace OCA\AdCalendar\AppInfo { final class Application { public const APP_ID = 'adcalendar'; } }
 namespace OCA\AdCalendar\Service {
     final class CalendarTargetConfig { public function adminStatus(): array { return ['kopanoUrl' => 'https://default.example.test/', 'calendarName' => 'Team & Dienst']; } }
+    final class TemporaryAdminAccessService {
+        public function __construct(public bool $canManage, public bool $needsGrant) {}
+        public function canManageGrants(): bool { return $this->canManage; }
+        public function currentAdminNeedsGrant(): bool { return $this->needsGrant; }
+    }
 }
 
 namespace {
 
     use OCA\AdCalendar\Controller\PageController;
     use OCA\AdCalendar\Service\CalendarTargetConfig;
+    use OCA\AdCalendar\Service\TemporaryAdminAccessService;
     use OCP\IRequest;
 
-    $response = (new PageController(new class implements IRequest {}, new CalendarTargetConfig()))->index();
+    $response = (new PageController(new class implements IRequest {}, new CalendarTargetConfig(), new TemporaryAdminAccessService(true, true)))->index();
     if ($response->app !== 'adcalendar' || $response->template !== 'index'
-        || $response->params !== ['calendarDefaults' => ['kopanoUrl' => 'https://default.example.test/', 'calendarName' => 'Team & Dienst']]) {
-        throw new RuntimeException('Persönliche Oberfläche erhält nicht ausschließlich die nicht geheimen Kalenderdefaults.');
+        || $response->params !== [
+            'calendarDefaults' => ['kopanoUrl' => 'https://default.example.test/', 'calendarName' => 'Team & Dienst'],
+            'canManageAdminAccess' => true,
+            'showMissingAdminGrant' => true,
+            'showAdminAccessLink' => true,
+        ]) {
+        throw new RuntimeException('Persönliche Oberfläche erhält nicht die nicht geheimen Kalenderdefaults und sichere DPO-Rollenmatrix.');
     }
+    $nativeAdminOnly = (new PageController(new class implements IRequest {}, new CalendarTargetConfig(), new TemporaryAdminAccessService(false, true)))->index();
+    if (($nativeAdminOnly->params['showAdminAccessLink'] ?? true) !== false) throw new RuntimeException('Nativer Admin ohne Datenschutzrolle erhält einen Freigabelink.');
     echo "PageControllerExecutionTest: OK\n";
 }

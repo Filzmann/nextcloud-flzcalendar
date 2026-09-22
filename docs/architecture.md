@@ -214,6 +214,23 @@ Leseantwort als `unavailable` ausgewiesen und verhindern neue Dienste, statt
 Konfliktfreiheit zu behaupten. Umgekehrt publiziert AD Kalender seine Dienste
 datensparsam als `Dienst/Büro`; private Termintitel verlassen die App nicht.
 
+## Zeitlich begrenzter fachlicher Admin-Vollzugriff
+
+Native Nextcloud-Administration bleibt von fachlicher Kalenderberechtigung
+getrennt. Vollzugriff entsteht nur für ein aktuell natives Administrationskonto
+mit aktiver app-lokaler Freigabe und endet spätestens nach 24 Stunden. Nur
+Mitglieder der kanonischen Nextcloud-Gruppe `Datenschutzbeauftragte` dürfen
+Freigaben erteilen, widerrufen und deren Historie lesen; ein nativer Admin ohne
+diese Rolle und gewöhnliche Konten werden ohne Zustandsänderung abgewiesen.
+
+Die Steuerung liegt im authentifizierten AD-Kalender-Hauptbereich und bleibt
+außerhalb der technischen Nextcloud-Administration. Schreibende Requests
+verwenden den Nextcloud-CSRF-Schutz. Ein natives Administrationskonto ohne
+aktive Freigabe sieht eine sichere Hinweismeldung; der Direktlink zur
+Freigabesteuerung erscheint nur bei gleichzeitiger DPO-Rolle. Audit- und
+Art.-15-Projektionen geben ausschließlich die subjectgebundene Beteiligung und
+Zeitpunkte aus und neutralisieren Kennungen anderer beteiligter Personen.
+
 ## Processing-Metadaten
 
 Der zusätzliche `ProcessingMetadataProvider` veröffentlicht den app-eigenen

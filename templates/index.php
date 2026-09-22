@@ -1,6 +1,7 @@
 <?php
 translation('adcalendar');
 \OCP\Util::addScript('localbase', 'api/api-client');
+\OCP\Util::addScript('adcalendar', 'admin-access');
 \OCP\Util::addScript('localbase', 'models/model');
 \OCP\Util::addScript('localbase', 'repositories/repository');
 \OCP\Util::addScript('localbase', 'ui/ui');
@@ -35,6 +36,31 @@ translation('adcalendar');
             <p><?php p($l->t('Shifts, appointments and blocked times in a weekly or monthly overview')); ?></p>
         </div>
     </header>
+    <?php if ($_['showMissingAdminGrant'] ?? false): ?>
+        <section class="adc-admin-access adc-admin-access--warning" aria-labelledby="adc-missing-admin-grant-heading">
+            <h2 id="adc-missing-admin-grant-heading"><?php p($l->t('Kein fachlicher Admin-Vollzugriff')); ?></h2>
+            <p><?php p($l->t('Native Nextcloud-Administration erteilt keinen fachlichen Vollzugriff. Für geschützte Kalenderverwaltung und fachliche Demodaten fehlt eine aktive app-lokale Freigabe.')); ?></p>
+            <?php if ($_['showAdminAccessLink'] ?? false): ?>
+                <p><a href="#adc-full-access"><?php p($l->t('Freigabesteuerung öffnen')); ?></a></p>
+            <?php endif; ?>
+        </section>
+    <?php endif; ?>
+    <?php if ($_['canManageAdminAccess'] ?? false): ?>
+        <section id="adc-full-access" class="adc-admin-access" aria-labelledby="adc-full-access-heading">
+            <h2 id="adc-full-access-heading"><?php p($l->t('Zeitlich begrenzter Admin-Vollzugriff')); ?></h2>
+            <p><?php p($l->t('Nur Mitglieder der Nextcloud-Gruppe Datenschutzbeauftragte dürfen Freigaben für aktive native Administrationskonten verwalten. Maximal 24 Stunden sind zulässig.')); ?></p>
+            <form id="adc-full-access-form">
+                <label><?php p($l->t('Admin-Benutzerkennung')); ?> <input name="targetUid" required maxlength="64" autocomplete="off"></label>
+                <label><?php p($l->t('Dauer')); ?> <select name="durationMinutes" required><option value="60"><?php p($l->t('1 Stunde')); ?></option><option value="240"><?php p($l->t('4 Stunden')); ?></option><option value="480"><?php p($l->t('8 Stunden')); ?></option><option value="1440"><?php p($l->t('24 Stunden')); ?></option></select></label>
+                <label><input id="adc-full-access-enabled" name="enabled" type="checkbox" required> <?php p($l->t('Vollzugriff für diesen Zeitraum aktivieren')); ?></label>
+                <button type="submit" class="primary"><?php p($l->t('Freigabe aktivieren')); ?></button>
+            </form>
+            <p id="adc-full-access-status" role="status" aria-live="polite"></p>
+            <div class="adc-table-wrap">
+                <table><caption><?php p($l->t('Protokollierte Admin-Vollzugriffszeiträume')); ?></caption><thead><tr><th><?php p($l->t('Ziel-Admin')); ?></th><th><?php p($l->t('Freigegeben von')); ?></th><th><?php p($l->t('Von')); ?></th><th><?php p($l->t('Geplant bis')); ?></th><th><?php p($l->t('Tatsächlich bis / Status')); ?></th><th><?php p($l->t('Aktion')); ?></th></tr></thead><tbody id="adc-full-access-history"><tr><td colspan="6"><?php p($l->t('Freigaben werden geladen.')); ?></td></tr></tbody></table>
+            </div>
+        </section>
+    <?php endif; ?>
     <div id="adc-notice" role="status" aria-live="polite"></div>
     <nav class="adc-tabs" role="tablist" aria-label="<?php p($l->t('AD Calendar sections')); ?>">
         <button type="button" id="adc-tab-calendar" role="tab" aria-controls="adc-calendar-view" aria-selected="true"><?php p($l->t('Calendar')); ?></button>

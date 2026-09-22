@@ -36,6 +36,8 @@ namespace {
     if (array_key_exists('personal_runtime_data', $catalog->toArray())) {
         throw new RuntimeException('Der Processing-Katalog enthält personenbezogene Laufzeitdaten.');
     }
+    $encodedCatalog=json_encode($catalog->toArray(),JSON_THROW_ON_ERROR|JSON_UNESCAPED_UNICODE);
+    if(!str_contains($encodedCatalog,'App-lokaler Freigabevorgang durch Datenschutzbeauftragte im AD Kalender')||str_contains($encodedCatalog,'Laufzeitdurchsetzung der Ziel- und Gruppenbedingungen sowie Allow-, Deny- und Manipulationsprüfungen stehen aus'))throw new RuntimeException('Der Processing-Katalog projiziert den umgesetzten DPO-Freigabevertrag nicht korrekt.');
 
     $registration = new RegisterProcessingMetadataProvidersEvent();
     $listener = new CalendarProcessingMetadataProviderListener($provider);

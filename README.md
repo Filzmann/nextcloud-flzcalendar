@@ -75,7 +75,7 @@ Drittlandentscheidungen bleiben als `PRIVACY-DECISION-REQUIRED` sichtbar.
 
 ## Zeitlich begrenzter Admin-Vollzugriff
 
-Ein Nextcloud-Administrationskonto erhält nicht automatisch Zugriff auf alle Mitarbeiterkalender. Der fachliche Vollzugriff wird im Adminbereich von AD Kalender pro Administrationskonto für 1, 4, 8 oder höchstens 24 Stunden aktiviert und kann vorzeitig widerrufen werden. Beginn, geplantes Ende, Freigabe und Widerruf werden app-lokal protokolliert und in Datenschutz- sowie Berechtigungsprovider einbezogen. Technische OAuth-, CalDAV- und Kalenderdefault-Konfiguration bleibt davon getrennt.
+Ein Nextcloud-Administrationskonto erhält nicht automatisch Zugriff auf alle Mitarbeiterkalender. Ausschließlich Mitglieder der Nextcloud-Gruppe `Datenschutzbeauftragte` verwalten die app-lokale Freigabe im Hauptbereich von AD Kalender für ein aktives Administrationskonto; der Datenschutzrolle muss selbst kein nativer Adminstatus zugewiesen sein. Die Freigabe gilt für 1, 4, 8 oder höchstens 24 Stunden und kann vorzeitig widerrufen werden. Native Administration allein genügt weder für die Freigabesteuerung noch für den fachlichen Zugriff. Beginn, geplantes Ende, Freigabe und Widerruf werden app-lokal protokolliert und in Datenschutz- sowie Berechtigungsprovider einbezogen. Technische OAuth-, CalDAV- und Kalenderdefault-Konfiguration bleibt davon getrennt.
 
 ## Roadmap
 

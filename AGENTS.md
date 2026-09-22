@@ -208,7 +208,8 @@ Geplante Checks:
 - Das Template stellt den optionalen Menühost mit `data-suite="ad"` und `data-current-app="adcalendar"` bereit, lädt aber keine OrgSuite-Assets direkt.
 - Ohne AD Urlaub bleiben Sperrtermine der manuelle Abwesenheitsweg; fehlende optionale Provider dürfen die Wochenansicht nicht verhindern.
 - Fachliche Lese- und Bearbeitungsrechte bleiben ausschliesslich serverseitig im AD Kalender; Menuesichtbarkeit ist keine Berechtigung.
-- Native Nextcloud-Administration erteilt keinen fachlichen Kalender-Vollzugriff. Er setzt pro Administrationskonto eine aktive, app-lokale Freigabe von höchstens 24 Stunden voraus; Beginn, geplantes Ende und Widerruf bleiben historisch protokolliert.
+- Native Nextcloud-Administration erteilt keinen fachlichen Kalender-Vollzugriff. Er setzt pro Administrationskonto eine aktive, app-lokale Freigabe von höchstens 24 Stunden voraus; Beginn, geplantes Ende und Widerruf bleiben historisch protokolliert. Ausschließlich Mitglieder der Nextcloud-Gruppe `Datenschutzbeauftragte` verwalten Freigaben und Historie im AD-Kalender-Hauptbereich; native Administration allein genügt weder für die Steuerung noch für den fachlichen Zugriff.
+- Ein natives Administrationskonto ohne aktive Freigabe erhält im Hauptbereich eine sichere Hinweismeldung. Der Direktlink zur Freigabesteuerung erscheint nur, wenn dasselbe Konto zugleich Mitglied von `Datenschutzbeauftragte` ist.
 - Technische Appkonfiguration wie OAuth und CalDAV bleibt native Administration. Das Installieren fachlicher Demodaten benötigt dagegen die aktive app-lokale Vollzugriffsfreigabe.
 - Änderungen an Freigabehistorie oder Kalenderrechten werden gleichzeitig im PersonalDataProvider und PermissionProvider nachgeführt.
 

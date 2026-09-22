@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Die zeitlich begrenzte fachliche Adminfreigabe auf Mitglieder der
+  Nextcloud-Gruppe `Datenschutzbeauftragte` begrenzt, die Steuerung aus dem
+  technischen Adminbereich in den rollenabhängigen Hauptbereich verschoben
+  und Allow-, Deny-, Manipulations-, UI-, Audit- und Providerprojektionen
+  automatisiert abgesichert.
 - Einen app-eigenen Processing-Metadata-Katalog für Kalenderplanung,
   persönliche Standards, externe Verbindungen, Kalenderableitungen und
   temporäre Adminfreigaben über den V1-Vertrag des Datenschutz-Centers

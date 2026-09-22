@@ -10,18 +10,6 @@ $calendarDefaults = $_['calendarDefaults'] ?? ['kopanoUrl' => 'https://mail.adbe
 ?>
 <section id="adcalendar-admin" class="section adc-admin" aria-labelledby="adc-admin-heading">
     <h2 id="adc-admin-heading"><?php p($l->t('AD Calendar')); ?></h2>
-    <section class="adc-admin-panel" aria-labelledby="adc-full-access-heading">
-        <h3 id="adc-full-access-heading">Zeitlich begrenzter Admin-Vollzugriff</h3>
-        <p>Native Nextcloud-Administration erteilt keinen automatischen Zugriff auf Mitarbeiterkalender. Eine Freigabe gilt nur für das angegebene Administrationskonto. Maximal 24 Stunden sind zulässig.</p>
-        <form id="adc-full-access-form">
-            <label>Admin-Benutzerkennung <input name="targetUid" required maxlength="64" autocomplete="off"></label>
-            <label>Dauer <select name="durationMinutes" required><option value="60">1 Stunde</option><option value="240">4 Stunden</option><option value="480">8 Stunden</option><option value="1440">24 Stunden</option></select></label>
-            <label><input id="adc-full-access-enabled" name="enabled" type="checkbox" required> Vollzugriff für diesen Zeitraum aktivieren</label>
-            <button type="submit" class="primary">Freigabe aktivieren</button>
-        </form>
-        <p id="adc-full-access-status" role="status" aria-live="polite"></p>
-        <table><caption>Protokollierte Admin-Vollzugriffszeiträume</caption><thead><tr><th>Ziel-Admin</th><th>Freigegeben von</th><th>Von</th><th>Geplant bis</th><th>Tatsächlich bis / Status</th><th>Aktion</th></tr></thead><tbody id="adc-full-access-history"><tr><td colspan="6">Freigaben werden geladen.</td></tr></tbody></table>
-    </section>
     <section class="adc-admin-panel" aria-labelledby="adc-calendar-sync-heading">
         <h3 id="adc-calendar-sync-heading"><?php p($l->t('Shift calendar synchronisation')); ?></h3>
         <p><?php p($l->t('The background job synchronises approved shift entries one-way from AD Calendar to personal DAV calendars. The technical structure remains open to a later bidirectional extension.')); ?></p>
