@@ -31,20 +31,21 @@ translation('adcalendar');
 <div id="adcalendar-app" class="adc-app">
     <div class="orgsuite-host" data-orgsuite data-suite="ad" data-current-app="adcalendar"></div>
     <header class="adc-header">
-        <div>
+        <div class="adc-title-row">
             <h1><?php p($l->t('AD Calendar')); ?></h1>
+            <?php if ($_['showMissingAdminGrant'] ?? false): ?>
+                <details class="adc-admin-access-warning">
+                    <summary aria-label="<?php p($l->t('Informationen zum fehlenden fachlichen Admin-Vollzugriff')); ?>"><span aria-hidden="true">⚠</span></summary>
+                    <div class="adc-admin-access-warning__panel">
+                        <strong><?php p($l->t('Kein fachlicher Admin-Vollzugriff aktiv.')); ?></strong>
+                        <p><?php p($l->t('Native Nextcloud-Administration erteilt keinen fachlichen Vollzugriff. Mitglieder der Gruppe Datenschutzbeauftragte können eine app-lokale Freigabe von höchstens 24 Stunden erteilen.')); ?></p>
+                        <?php if ($_['showAdminAccessLink'] ?? false): ?><a href="#adc-full-access" target="_blank" rel="noopener noreferrer"><?php p($l->t('Freigabesteuerung in neuem Tab öffnen')); ?></a><?php endif; ?>
+                    </div>
+                </details>
+            <?php endif; ?>
             <p><?php p($l->t('Shifts, appointments and blocked times in a weekly or monthly overview')); ?></p>
         </div>
     </header>
-    <?php if ($_['showMissingAdminGrant'] ?? false): ?>
-        <section class="adc-admin-access adc-admin-access--warning" aria-labelledby="adc-missing-admin-grant-heading">
-            <h2 id="adc-missing-admin-grant-heading"><?php p($l->t('Kein fachlicher Admin-Vollzugriff')); ?></h2>
-            <p><?php p($l->t('Native Nextcloud-Administration erteilt keinen fachlichen Vollzugriff. Für geschützte Kalenderverwaltung und fachliche Demodaten fehlt eine aktive app-lokale Freigabe.')); ?></p>
-            <?php if ($_['showAdminAccessLink'] ?? false): ?>
-                <p><a href="#adc-full-access"><?php p($l->t('Freigabesteuerung öffnen')); ?></a></p>
-            <?php endif; ?>
-        </section>
-    <?php endif; ?>
     <?php if ($_['canManageAdminAccess'] ?? false): ?>
         <section id="adc-full-access" class="adc-admin-access" aria-labelledby="adc-full-access-heading">
             <h2 id="adc-full-access-heading"><?php p($l->t('Zeitlich begrenzter Admin-Vollzugriff')); ?></h2>

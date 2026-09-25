@@ -22,5 +22,6 @@ if(str_contains($technicalAdminTemplate,'adc-full-access-form'))throw new Runtim
 foreach(['canManageAdminAccess','showMissingAdminGrant','showAdminAccessLink'] as $contract)if(!str_contains($template,$contract)||!str_contains($pageController,"'{$contract}'"))throw new RuntimeException("Rollenabhängige Eintrittsgrenze fehlt: {$contract}");
 if(!str_contains($pageController,"'showAdminAccessLink' => \$canManageAdminAccess && \$showMissingAdminGrant"))throw new RuntimeException('Direktlink ist nicht auf gleichzeitige Datenschutz- und Adminrolle begrenzt.');
 if(str_contains($accessController,'PublicPage'))throw new RuntimeException('Freigaberouten dürfen nicht öffentlich erreichbar sein.');
+foreach(['adc-admin-access-warning','<details','<summary','Datenschutzbeauftragte','target="_blank"','rel="noopener noreferrer"'] as $contract)if(!str_contains($template,$contract))throw new RuntimeException("Kompakte Vollzugriffswarnung am App-Titel fehlt: {$contract}");
 
 echo "AD Kalender admin full access UI contract tests passed\n";

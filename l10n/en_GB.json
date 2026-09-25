@@ -325,6 +325,10 @@
     "No people match the current filters." : "No people match the current filters.",
     "Assistenz" : "Assistance",
     "AS" : "AS",
-    "Assistenz – blocked time from {start} to {end}" : "Assistance – blocked time from {start} to {end}"
+    "Assistenz – blocked time from {start} to {end}" : "Assistance – blocked time from {start} to {end}",
+    "Informationen zum fehlenden fachlichen Admin-Vollzugriff" : "Information about missing specialist admin full access",
+    "Kein fachlicher Admin-Vollzugriff aktiv." : "No specialist admin full access is active.",
+    "Native Nextcloud-Administration erteilt keinen fachlichen Vollzugriff. Mitglieder der Gruppe Datenschutzbeauftragte können eine app-lokale Freigabe von höchstens 24 Stunden erteilen." : "Native Nextcloud administration does not grant specialist full access. Members of the Datenschutzbeauftragte group can grant app-local access for up to 24 hours.",
+    "Freigabesteuerung in neuem Tab öffnen" : "Open access management in a new tab"
 }, "pluralForm" :"nplurals=2; plural=(n != 1);"
 }

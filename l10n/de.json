@@ -325,6 +325,10 @@
     "No people match the current filters." : "Keine Personen entsprechen den aktuellen Filtern.",
     "Assistenz" : "Assistenz",
     "AS" : "AS",
-    "Assistenz – blocked time from {start} to {end}" : "Assistenz – Sperrzeit von {start} bis {end}"
+    "Assistenz – blocked time from {start} to {end}" : "Assistenz – Sperrzeit von {start} bis {end}",
+    "Informationen zum fehlenden fachlichen Admin-Vollzugriff" : "Informationen zum fehlenden fachlichen Admin-Vollzugriff",
+    "Kein fachlicher Admin-Vollzugriff aktiv." : "Kein fachlicher Admin-Vollzugriff aktiv.",
+    "Native Nextcloud-Administration erteilt keinen fachlichen Vollzugriff. Mitglieder der Gruppe Datenschutzbeauftragte können eine app-lokale Freigabe von höchstens 24 Stunden erteilen." : "Native Nextcloud-Administration erteilt keinen fachlichen Vollzugriff. Mitglieder der Gruppe Datenschutzbeauftragte können eine app-lokale Freigabe von höchstens 24 Stunden erteilen.",
+    "Freigabesteuerung in neuem Tab öffnen" : "Freigabesteuerung in neuem Tab öffnen"
 }, "pluralForm" :"nplurals=2; plural=(n != 1);"
 }
