@@ -4,6 +4,27 @@ Diese Datei dokumentiert den geltenden Ist-Vertrag. Zukünftige Ziele und
 offene Entscheidungen stehen ausschließlich in `ROADMAP.md`; kurze harte
 Arbeits-, Rechte- und Testregeln stehen in `AGENTS.md`.
 
+## Datenverantwortung und Aufbewahrung
+
+Fachlicher Data Owner ist die jeweils zuständige Führungskraft der
+Organisationseinheit. Die IKT-Administration verantwortet nur den technischen
+Betrieb; Datenschutzbeauftragte entscheiden über Policies und begründete
+Holds. Daraus entsteht kein pauschaler fachlicher Adminzugriff.
+
+Kalendereinträge werden 24 Monate nach Ende ihres Kalenderjahres vollständig
+gelöscht. Persönliche Einstellungen bestehen bis Reset oder belastbar
+festgestellter Kontolöschung. Abgeleitete Kalender führen keine unabhängige
+Historie und werden bei Quelländerung, Opt-out oder Trennung abgeglichen oder
+entfernt. Externe Kalenderanbieter bleiben in Produktion deaktiviert, bis der
+jeweilige Anbieter einzeln fachlich und datenschutzrechtlich freigegeben ist.
+Adminfreigabehistorien werden sechs Monate nach ihrem tatsächlichen Ende
+vollständig gelöscht und durch Restore nie reaktiviert.
+
+Die Regeln sind Policy, kein Implementierungs- oder Rechtsnachweis. Löschung,
+Restore, Holds, Backups und Providerverträge müssen app-lokal getestet werden;
+ohne verlässliche Beschäftigtenquelle und getestete Verträge gibt es keinen
+globalen Lifecycle-Löschlauf. Rechtsgrundlagen bleiben rechtlich zu prüfen.
+
 ## Kalendereinträge und Ansichten
 
 AD Kalender unterscheidet Dienste und Termine in einem gemeinsamen
