@@ -11,13 +11,13 @@ Testkonten und synthetische Termine verwenden.
 
 | Feld | Eintrag |
 |---|---|
-| Datum und Uhrzeit | 02.08.2026, ca. 14:52–18:16 Uhr |
-| Prüfer*in | Simon |
-| Umgebung und URL | DEV/Staging – `https://nextcloud-dev.ddev.site/index.php/apps/adcalendar/` |
+| Datum und Uhrzeit |  |
+| Prüfer*in |  |
+| Umgebung und URL |  |
 | AD-Kalender-Version | 0.13.0-rc.5 |
-| Nextcloud-Version | Nextcloud Hub 26 Spring (34.0.2) |
-| Browser und Version | Google Chrome 150.0.7871.186, offizieller 64-Bit-Build unter Ubuntu |
-| Fenstergröße / Zoom | ca. zwei Drittel der Bildschirmbreite von 1920 px; Zoom 100 % |
+| Nextcloud-Version |  |
+| Browser und Version |  |
+| Fenstergröße / Zoom |  |
 | Verwendete neutrale Testkonten und Rollen | `admin`; `adc-demo-bl-now`; `adc-demo-eb-sued`; weitere erforderliche Gruppen-/Hierarchiekonten fehlten teilweise |
 
 Ergebniskennzeichnung: `[ ] erfolgreich` / `[ ] nicht erfolgreich` /
@@ -46,14 +46,14 @@ Ergebnisse zu unverändertem Verhalten bleiben bestehen.
 
 | ID | Was wird geprüft? | Auszuführende Schritte | Erwartetes Ergebnis | Ergebnis | Warum/Beleg/Abweichung |
 |---|---|---|---|---|---|
-| B1 | Personenfilter | Nach einem neutralen Testkonto suchen, auswählen und die Auswahl wieder zurücksetzen. | Nur die ausgewählte Person erscheint; Status und Rücksetzen sind verständlich und vollständig. | [x] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | Personenfilter, verständliche Auswahl und vollständiges Zurücksetzen funktionierten; konkretes Testkonto nicht dokumentiert. |
-| B2 | ODER innerhalb der Rollen | Zwei Rollen auswählen, die jeweils mindestens ein unterschiedliches Testkonto enthalten. | Personen mit Rolle A oder Rolle B erscheinen. | [x] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | ODER-Verknüpfung innerhalb der Rollen funktionierte; konkrete Rollen nicht dokumentiert. |
-| B3 | ODER innerhalb der Bereiche | Zwei Bürobereiche auswählen. | Personen aus Bereich A oder Bereich B erscheinen. | [x] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | ODER-Verknüpfung innerhalb der Bereiche funktionierte; konkrete Bereiche und Prüfung auf Duplikate nicht separat dokumentiert. |
-| B4 | Schnittmenge Rolle und Bereich | Eine bereichsgebundene Rolle und genau einen Bereich auswählen. | Nur Personen erscheinen, die beide Kriterien erfüllen. | [x] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | Rolle und Bereich wurden als Schnittmenge gefiltert; konkrete Auswahl nicht dokumentiert. |
-| B5 | Vorrangige Rolle | Ein Testkonto mit Leitungsrolle und zusätzlicher unterstellter Rolle über beide Rollenfilter suchen. | Die Person wird nur über ihre nach Organisationsreihenfolge vorrangige Rolle gefunden. | [x] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | Vorrangige Rolle wurde korrekt verwendet und die Person bei gemeinsamer Auswahl nur einmal angezeigt; konkrete Rollen nicht dokumentiert. |
-| B6 | Bereichsübergreifende Büroleitung | Eine Büroleitung mit Nordost und West nacheinander über beide Bereichsfilter sowie gemeinsam anzeigen. | Sie wird über beide Bereiche gefunden, erscheint in der Matrix aber nur einmal. | [x] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | Bereichsübergreifende Büroleitung wurde über Nordost und West gefunden und gemeinsam nur einmal angezeigt; Testkonto nicht dokumentiert. |
+| B1 | Personenfilter | Nach einem neutralen Testkonto suchen, auswählen und die Auswahl wieder zurücksetzen. | Nur die ausgewählte Person erscheint; Status und Rücksetzen sind verständlich und vollständig. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
+| B2 | ODER innerhalb der Rollen | Zwei Rollen auswählen, die jeweils mindestens ein unterschiedliches Testkonto enthalten. | Personen mit Rolle A oder Rolle B erscheinen. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
+| B3 | ODER innerhalb der Bereiche | Zwei Bürobereiche auswählen. | Personen aus Bereich A oder Bereich B erscheinen. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
+| B4 | Schnittmenge Rolle und Bereich | Eine bereichsgebundene Rolle und genau einen Bereich auswählen. | Nur Personen erscheinen, die beide Kriterien erfüllen. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
+| B5 | Vorrangige Rolle | Ein Testkonto mit Leitungsrolle und zusätzlicher unterstellter Rolle über beide Rollenfilter suchen. | Die Person wird nur über ihre nach Organisationsreihenfolge vorrangige Rolle gefunden. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
+| B6 | Bereichsübergreifende Büroleitung | Eine Büroleitung mit Nordost und West nacheinander über beide Bereichsfilter sowie gemeinsam anzeigen. | Sie wird über beide Bereiche gefunden, erscheint in der Matrix aber nur einmal. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
 | B7 | Leitungs-/Stabsblock | Den gemeinsamen Anzeigen-/Ausblenden-Schalter für GF, PDL, Sekretariat, HR, QMB und Assistenz GF Digi betätigen. | Der Block wird vollständig ein- beziehungsweise ausgeblendet und gemäß Organisationshierarchie sortiert. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
-| B8 | Persönlicher Standard | Filter, Zeitraum und Ausrichtung wählen, „Zum Standard machen“ drücken, App neu laden und anschließend eine andere Konfiguration ohne Speichern testen. | Nur bewusst gespeicherte Werte werden nach dem Neuladen wiederhergestellt. | [x] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | Bewusst gespeicherter Zeitraum, Ausrichtung und Filter wurden nach Neuladen wiederhergestellt; nicht gespeicherte Änderungen wurden verworfen. |
+| B8 | Persönlicher Standard | Filter, Zeitraum und Ausrichtung wählen, „Zum Standard machen“ drücken, App neu laden und anschließend eine andere Konfiguration ohne Speichern testen. | Nur bewusst gespeicherte Werte werden nach dem Neuladen wiederhergestellt. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
 
 ## C. Reihenfolge, Hierarchie und Bearbeitungsrechte
 
@@ -96,12 +96,12 @@ Ergebnisse zu unverändertem Verhalten bleiben bestehen.
 
 | ID | Was wird geprüft? | Auszuführende Schritte | Erwartetes Ergebnis | Ergebnis | Warum/Beleg/Abweichung |
 |---|---|---|---|---|---|
-| F1 | Kopano-Verbindung | Unter „Einstellungen“ Kopano öffnen, vorbelegte Adresse prüfen, gültiges neutrales Testkonto verbinden und Passwort nicht dokumentieren. | Verbindung wird bestätigt; das Passwort ist danach nicht mehr im Formular sichtbar. | [ ] erfolgreich [ ] nicht erfolgreich [x] nicht geprüft | Kopano-CalDAV ist administrativ nicht freigegeben; Verbindungstest nicht möglich. |
-| F2 | Manueller CalDAV-Anbieter | Einen freigegebenen HTTPS-CalDAV-Endpunkt mit neutralem Testkonto verbinden. | Verbindung wird bestätigt; unsichere oder ungültige Adressen werden verständlich abgewiesen. | [ ] erfolgreich [ ] nicht erfolgreich [x] nicht geprüft | Wegen geringer Priorität übersprungen. |
-| F3 | Externer Exportvertrag | Nach F1/F2 Dienst anlegen, ändern und löschen; beim Anbieter jeweils den Kalender mit dem aktuell administrativ konfigurierten Namen prüfen. Zusätzlich einen Termin und Urlaub anlegen. | Dienst wird ohne Duplikate nachgeführt und gelöscht; Termin und Urlaub werden nicht exportiert. | [ ] erfolgreich [ ] nicht erfolgreich [x] nicht geprüft | Keine verbundene Kopano- oder manuelle CalDAV-Testverbindung vorhanden. |
-| F4 | Kein Rückimport | Im externen Zielkalender ein neutrales Objekt anlegen und AD Kalender neu laden. | Das externe Objekt erscheint nicht im AD Kalender. | [ ] erfolgreich [ ] nicht erfolgreich [x] nicht geprüft | Keine verbundene externe Kopano- oder CalDAV-Testverbindung vorhanden. |
-| F5 | Parallele Verbindungen und Fehlerisolation | Kopano und manuelles CalDAV parallel verbinden; einen Anbieter vorübergehend mit ungültigen Testdaten stören und einen Dienst ändern. | Der andere Anbieter und die führenden AD-Daten bleiben funktionsfähig. | [ ] erfolgreich [ ] nicht erfolgreich [x] nicht geprüft | Keine parallelen Kopano- und manuellen CalDAV-Testverbindungen vorhanden. |
-| F6 | Trennen | Beide Provider einzeln trennen. | Status wird je Provider aktualisiert; die jeweils andere Verbindung bleibt unberührt. | [ ] erfolgreich [ ] nicht erfolgreich [x] nicht geprüft | Keine verbundenen Kopano- oder manuellen CalDAV-Testprovider vorhanden. |
+| F1 | Kopano-Verbindung | Unter „Einstellungen“ Kopano öffnen, vorbelegte Adresse prüfen, gültiges neutrales Testkonto verbinden und Passwort nicht dokumentieren. | Verbindung wird bestätigt; das Passwort ist danach nicht mehr im Formular sichtbar. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
+| F2 | Manueller CalDAV-Anbieter | Einen freigegebenen HTTPS-CalDAV-Endpunkt mit neutralem Testkonto verbinden. | Verbindung wird bestätigt; unsichere oder ungültige Adressen werden verständlich abgewiesen. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
+| F3 | Externer Exportvertrag | Nach F1/F2 Dienst anlegen, ändern und löschen; beim Anbieter jeweils den Kalender mit dem aktuell administrativ konfigurierten Namen prüfen. Zusätzlich einen Termin und Urlaub anlegen. | Dienst wird ohne Duplikate nachgeführt und gelöscht; Termin und Urlaub werden nicht exportiert. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
+| F4 | Kein Rückimport | Im externen Zielkalender ein neutrales Objekt anlegen und AD Kalender neu laden. | Das externe Objekt erscheint nicht im AD Kalender. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
+| F5 | Parallele Verbindungen und Fehlerisolation | Kopano und manuelles CalDAV parallel verbinden; einen Anbieter vorübergehend mit ungültigen Testdaten stören und einen Dienst ändern. | Der andere Anbieter und die führenden AD-Daten bleiben funktionsfähig. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
+| F6 | Trennen | Beide Provider einzeln trennen. | Status wird je Provider aktualisiert; die jeweils andere Verbindung bleibt unberührt. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
 | F7 | Administrativer read-only Kopano-Test | Als Nextcloud-Admin Adresse und temporäre Zugangsdaten im AD-Kalender-Adminabschnitt prüfen; danach als Nichtadmin denselben API-/UI-Weg versuchen. | Admin erhält das Ergebnis einer reinen Leseprüfung; Passwort wird geleert und nicht gespeichert. Nichtadmin-Zugriff wird abgewiesen. Es wird kein Kalender angelegt. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
 | F8 | Diagnose eines nicht freigegebenen Endpunkts | Einen dafür vorgesehenen Testendpunkt verwenden, der CalDAV mit HTTP 405 ablehnt. | Die Meldung erklärt den nicht freigegebenen CalDAV-Zugriff und behauptet nicht, AD Kalender könne ihn selbst freischalten. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
 
@@ -118,39 +118,35 @@ Kalender- oder Providerkennungen in diesem Formular notieren.
 | G2 | Gültiges administratives Speichern | Als Nextcloud-Admin eine gültige HTTPS-CalDAV-Vorgabe und einen neutralen neuen Kalendernamen speichern, Seite neu laden und einen noch nicht verbundenen persönlichen Kopano-Dialog öffnen. | Beide normalisierten Werte bleiben nach dem Neuladen erhalten; der neue Dialog verwendet die neue URL-Vorgabe und neue Kalender erhalten den neuen Namen. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
 | G3 | Validierung ohne Teilkonfiguration | Nacheinander HTTP, direkte IP, URL mit Zugangsdaten, leeren Namen, Namen über 255 Zeichen und Namen mit Steuerzeichen absenden; danach die Adminseite neu laden. | Jeder ungültige Versuch wird abgewiesen und beide zuvor gültigen Werte bleiben gemeinsam unverändert. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
 | G4 | Admin-, Anonym- und CSRF-Schutz | Als Nichtadmin den Adminabschnitt und den Speichervorgang versuchen. Den API-Aufruf zusätzlich ohne gültiges Requesttoken sowie ohne Sitzung wiederholen, ohne Zugangsdaten im Werkzeug zu protokollieren. | Nur der bestätigte Admin mit gültigem CSRF-Token darf speichern; alle anderen Versuche ändern keinen AppConfig-Wert. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
-| G5 | Gespeicherte persönliche Serveradresse bleibt stabil | Vor G2 ein neutrales Kopano-/CalDAV-Testkonto mit einer von der Vorgabe abweichenden HTTPS-Adresse verbinden. G2 durchführen, Dienst abgleichen und persönlichen Status erneut öffnen. | Die bereits gespeicherte persönliche Server- und Kalenderadresse bleibt unverändert; nur der sichtbare app-eigene Kalendername wird fällig. | [ ] erfolgreich [ ] nicht erfolgreich [x] nicht geprüft | Vor G2 bestand keine persönliche Kopano-/CalDAV-Testverbindung mit abweichender Serveradresse; notwendiger Ausgangszustand fehlte. |
+| G5 | Gespeicherte persönliche Serveradresse bleibt stabil | Vor G2 ein neutrales Kopano-/CalDAV-Testkonto mit einer von der Vorgabe abweichenden HTTPS-Adresse verbinden. G2 durchführen, Dienst abgleichen und persönlichen Status erneut öffnen. | Die bereits gespeicherte persönliche Server- und Kalenderadresse bleibt unverändert; nur der sichtbare app-eigene Kalendername wird fällig. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
 | G6 | Interne Bestandsumbenennung | Für ein neutrales Konto mit bestehendem internem Dienstkalender einen Dienst synchronisieren, den Kalendernamen administrativ ändern und den nächsten ausgehenden Abgleich abwarten. Den Dienst danach ändern und erneut abgleichen. | Derselbe Kalender trägt den neuen sichtbaren Namen; Dienst und Aktualisierung bleiben ohne Duplikat erhalten. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
-| G7 | Externe CalDAV-Bestandsumbenennung | Mit einer bestehenden neutralen CalDAV-Verbindung und synchronisiertem Dienst den Namen administrativ ändern und den nächsten Abgleich abwarten. Danach denselben Abgleich wiederholen. | Derselbe externe Kalender trägt den neuen Namen; URL und Dienstobjekte bleiben stabil und die Wiederholung erzeugt weder weiteren Kalender noch Duplikat. | [ ] erfolgreich [ ] nicht erfolgreich [x] nicht geprüft | Keine bestehende externe CalDAV-Testverbindung mit synchronisiertem Dienst vorhanden. |
-| G8 | Fremdkalenderschutz | Den sichtbaren Namen eines verbundenen Testkalenders direkt beim Anbieter auf einen dritten, AD Kalender unbekannten Namen ändern und anschließend einen neuen administrativen Namen sowie einen Abgleich auslösen. | AD Kalender benennt den nicht mehr sicher als app-eigen belegten Kalender nicht um und meldet den Providerfehler, ohne führende AD-Daten zu verändern. | [ ] erfolgreich [ ] nicht erfolgreich [x] nicht geprüft | Kein externer, sicher als app-eigen identifizierter Testkalender vorhanden. |
-| G9 | Providerfehler, Isolation und Wiederholung | Zwei neutrale Provider parallel verbinden. Einen davon während einer fälligen Umbenennung unerreichbar machen, abgleichen, anschließend wieder erreichbar machen und erneut abgleichen. | Der erreichbare Provider wird umbenannt und weiter synchronisiert; der Fehler des anderen blockiert ihn nicht. Nach Wiederherstellung wird die ausstehende Umbenennung erfolgreich nachgeholt. | [ ] erfolgreich [ ] nicht erfolgreich [x] nicht geprüft | Keine zwei parallel verbundenen neutralen Provider vorhanden. |
+| G7 | Externe CalDAV-Bestandsumbenennung | Mit einer bestehenden neutralen CalDAV-Verbindung und synchronisiertem Dienst den Namen administrativ ändern und den nächsten Abgleich abwarten. Danach denselben Abgleich wiederholen. | Derselbe externe Kalender trägt den neuen Namen; URL und Dienstobjekte bleiben stabil und die Wiederholung erzeugt weder weiteren Kalender noch Duplikat. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
+| G8 | Fremdkalenderschutz | Den sichtbaren Namen eines verbundenen Testkalenders direkt beim Anbieter auf einen dritten, AD Kalender unbekannten Namen ändern und anschließend einen neuen administrativen Namen sowie einen Abgleich auslösen. | AD Kalender benennt den nicht mehr sicher als app-eigen belegten Kalender nicht um und meldet den Providerfehler, ohne führende AD-Daten zu verändern. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
+| G9 | Providerfehler, Isolation und Wiederholung | Zwei neutrale Provider parallel verbinden. Einen davon während einer fälligen Umbenennung unerreichbar machen, abgleichen, anschließend wieder erreichbar machen und erneut abgleichen. | Der erreichbare Provider wird umbenannt und weiter synchronisiert; der Fehler des anderen blockiert ihn nicht. Nach Wiederherstellung wird die ausstehende Umbenennung erfolgreich nachgeholt. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
 | G10 | Kontextgerechte Ausgabe des Namens | Einen gültigen Testnamen mit `&`, `<`, `>`, Anführungszeichen und Umlauten speichern und in Adminseite, persönlicher Einstellung sowie an einem Test-CalDAV-Ziel prüfen. | Der Name erscheint als Text und als korrekter DAV-Anzeigename; kein Zeichen wird als HTML oder XML ausgeführt und es entsteht kein Markupfehler. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
 
 ## H. Aufgeschobene Providerabnahme
 
-Google und Apple werden Mitte bis Ende August 2026 mit demselben Grundvertrag
-wie in F3 bis F6 geprüft. Bis dahin werden die folgenden Zeilen als „nicht
-geprüft – planmäßig verschoben“ markiert.
+Die folgenden optionalen Providerprüfungen werden bei verfügbarer, freigegebener Testumgebung ausgeführt.
 
 | ID | Was wird geprüft? | Auszuführende Schritte | Erwartetes Ergebnis | Ergebnis | Warum/Beleg/Abweichung |
 |---|---|---|---|---|---|
-| H1 | Google OAuth und Export | OAuth-Konfiguration prüfen, neutrales Testkonto verbinden und Dienstexport/-aktualisierung/-löschung sowie fehlenden Rückimport prüfen. | Autorisierung verwendet den angezeigten Redirect und begrenzten Scope; ausschließlich Dienste werden idempotent exportiert. | [ ] erfolgreich [ ] nicht erfolgreich [x] nicht geprüft | Wegen geringer Priorität übersprungen; ursprünglich planmäßig auf spätere Providerabnahme verschoben. |
-| H2 | Apple CalDAV und Export | Mit app-spezifischem Testpasswort verbinden und F3 bis F6 wiederholen. | Ausschließlich Dienste werden idempotent exportiert; keine Zugangsdaten erscheinen in Anzeige oder Formular. | [ ] erfolgreich [ ] nicht erfolgreich [x] nicht geprüft | Wegen geringer Priorität übersprungen; ursprünglich planmäßig auf spätere Providerabnahme verschoben. |
+| H1 | Google OAuth und Export | OAuth-Konfiguration prüfen, neutrales Testkonto verbinden und Dienstexport/-aktualisierung/-löschung sowie fehlenden Rückimport prüfen. | Autorisierung verwendet den angezeigten Redirect und begrenzten Scope; ausschließlich Dienste werden idempotent exportiert. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
+| H2 | Apple CalDAV und Export | Mit app-spezifischem Testpasswort verbinden und F3 bis F6 wiederholen. | Ausschließlich Dienste werden idempotent exportiert; keine Zugangsdaten erscheinen in Anzeige oder Formular. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
 
 ## I. Lokalisierung
 
-Diese Prüfungen werden bis zur ausdrücklich gestarteten manuellen L10N-Abnahme
-als „nicht geprüft – nicht freigegeben und planmäßig verschoben“ markiert. Für
-den Sprachwechsel nur neutrale Testdaten verwenden; technische IDs und
+Für den Sprachwechsel nur neutrale Testdaten verwenden; technische IDs und
 konfigurierte Eigennamen dürfen sich nicht ändern.
 
 | ID | Was wird geprüft? | Auszuführende Schritte | Erwartetes Ergebnis | Ergebnis | Warum/Beleg/Abweichung |
 |---|---|---|---|---|---|
 | I1 | Deutsche und englische Oberfläche | Nextcloud-Sprache nacheinander auf Deutsch und English (United Kingdom) stellen. Kalender, persönliche Einstellungen, Dialoge und Adminbereich jeweils neu laden. | Alle sichtbaren Bedienelemente, Hilfen, Status- und Fehlermeldungen folgen der aktiven Sprache; es erscheinen keine gemischten deutschen/englischen Rohtexte oder internen Schlüssel. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
 | I2 | Lange Beschriftungen und kleine Viewports | In englischer Sprache Kalendernavigation, Zeitraumumschalter, Filter, Dialoge und Adminbereich bei normaler Breite sowie höchstens 700 px prüfen. | Beschriftungen umbrechen ohne Überlagerung oder abgeschnittene Bedienaktionen; Fokus, Scrollleisten und Dialogaktionen bleiben erreichbar. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
-| I3 | Plural und dynamische Werte | Suchergebnisse, Filterstatus und Serienaktionen jeweils mit einem und mehreren Treffern/Vorkommen auslösen. Einen neutralen Kalendernamen mit Umlauten und HTML-Sonderzeichen verwenden. | Singular/Plural und eingesetzte Zahlen/Namen sind grammatisch und vollständig; keine Platzhalter bleiben sichtbar und Sonderzeichen werden nicht als Markup ausgeführt. | [ ] erfolgreich [ ] nicht erfolgreich [x] nicht geprüft | Wegen geringer Priorität der Mehrsprachigkeit übersprungen. |
-| I4 | Lokalisierte Fehler bei stabilen Codes | In beiden Sprachen je eine ungültige Eintrags-, Provider- und Adminaktion auslösen und die JSON-Antwort nur ohne Geheimnisse prüfen. | Die Meldung wechselt die Sprache; maschinenlesbarer Fehlercode und HTTP-Status bleiben identisch. Keine URL, Kennung oder Zugangsdaten erscheinen in der Meldung. | [ ] erfolgreich [ ] nicht erfolgreich [x] nicht geprüft | Wegen geringer Priorität der Mehrsprachigkeit übersprungen. |
-| I5 | Veröffentlichte Dienstereignisse | Einen betitelten und einen unbetitelten synthetischen Dienst in den privaten Nextcloud-Kalender sowie – sobald H1 freigegeben ist – nach Google synchronisieren. | Eigene Titel bleiben unverändert. Fallbacktitel und Beschreibung folgen der aktiven Locale; technische Event-ID, Eigentumsmarker und konfigurierter Kalendername bleiben stabil. | [ ] erfolgreich [ ] nicht erfolgreich [x] nicht geprüft | Wegen geringer Priorität der Mehrsprachigkeit übersprungen; Google-Provider zudem nicht eingerichtet. |
-| I6 | Sprachwechsel ohne fachliche Zustandsänderung | Zeitraum, Ausrichtung, Filter, Serienstatus und Providerverbindungen merken, Sprache wechseln und dieselben Objekte erneut öffnen. | Nur die Darstellung ändert sich. Rechte, Auswahl, technische Statuswerte, Termine, Serien und Verbindungen bleiben unverändert. | [ ] erfolgreich [ ] nicht erfolgreich [x] nicht geprüft | Wegen geringer Priorität der Mehrsprachigkeit übersprungen. |
+| I3 | Plural und dynamische Werte | Suchergebnisse, Filterstatus und Serienaktionen jeweils mit einem und mehreren Treffern/Vorkommen auslösen. Einen neutralen Kalendernamen mit Umlauten und HTML-Sonderzeichen verwenden. | Singular/Plural und eingesetzte Zahlen/Namen sind grammatisch und vollständig; keine Platzhalter bleiben sichtbar und Sonderzeichen werden nicht als Markup ausgeführt. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
+| I4 | Lokalisierte Fehler bei stabilen Codes | In beiden Sprachen je eine ungültige Eintrags-, Provider- und Adminaktion auslösen und die JSON-Antwort nur ohne Geheimnisse prüfen. | Die Meldung wechselt die Sprache; maschinenlesbarer Fehlercode und HTTP-Status bleiben identisch. Keine URL, Kennung oder Zugangsdaten erscheinen in der Meldung. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
+| I5 | Veröffentlichte Dienstereignisse | Einen betitelten und einen unbetitelten synthetischen Dienst in den privaten Nextcloud-Kalender sowie – sobald H1 freigegeben ist – nach Google synchronisieren. | Eigene Titel bleiben unverändert. Fallbacktitel und Beschreibung folgen der aktiven Locale; technische Event-ID, Eigentumsmarker und konfigurierter Kalendername bleiben stabil. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
+| I6 | Sprachwechsel ohne fachliche Zustandsänderung | Zeitraum, Ausrichtung, Filter, Serienstatus und Providerverbindungen merken, Sprache wechseln und dieselben Objekte erneut öffnen. | Nur die Darstellung ändert sich. Rechte, Auswahl, technische Statuswerte, Termine, Serien und Verbindungen bleiben unverändert. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
 
 ## J. DPO-gesteuerte Adminfreigabe
 
@@ -167,65 +163,6 @@ ist.
 | J5 | Tastaturbedienung und Fokus | Steuerung, Dauer, Bestätigung, Absenden, Historie und Widerruf nur per Tastatur bedienen; Fehlermeldung auslösen. | Alle Funktionen sind erreichbar, Fokus sichtbar, Status verständlich und Fehler werden als Alert ausgegeben. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
 
 
-## Automatisierter lokaler Nachweis vom 11.09.2026
-
-Im Rahmen der risikoarmen Luna-Prüfung wurden aus dem Repository-Root nur die
-lokalen, nicht mutierenden Prüfungen ausgeführt:
-
-| Prüfung | Ergebnis | Aussagegrenze |
-|---|---|---|
-| `php tests/run.php` | erfolgreich | PHP-Syntax sowie Controller-, Migrations-, Rechte-, Privacy-, DAV-/Sync-, Service- und Negativtests sind grün. |
-| `node tests/run-js.mjs` | erfolgreich | JavaScript-Syntax sowie Localization-, Kalenderworkflow-, Admin- und Coverage-Smokes sind grün. |
-| `git diff --check` | erfolgreich | Keine Whitespace-Fehler im aktuellen Arbeitsbaum. |
-
-DDEV, `occ`, Installation, App-Aktivierung, Kalenderdaten und externe
-Provider wurden nicht verändert. Dieser Nachweis ersetzt weder die offene
-manuelle Staging-Abnahme noch die in `P-01` bis `P-05` dokumentierten
-fachlichen beziehungsweise visuellen Nacharbeiten.
-
-## Zu bearbeitende Punkte
-
-### Abnahmeblockierende Funktionsfehler
-
-| Ref. | Bezug | Zu bearbeiten / Akzeptanzkriterium |
-|---|---|---|
-| P-01 | G2, G4, F7 | Administrativen Speicher- und Testweg reparieren: Speichern/Testen ohne Seitensprung, verständliche Erfolgs-/Fehlermeldung, sichere Passwortbehandlung; berechtigter Admin kann speichern. Anschließend G2–G4, G6, G10 sowie F7/F8 wiederholen. |
-| P-02 | E5, E6 | Opt-out-Bereinigung implementieren: alle app-eigenen Dienste, Termine und Urlaube entfernen, fremde Objekte erhalten, leeren app-eigenen Kalender nach Soll löschen; Reaktivierung stellt aktuellen Bestand idempotent wieder her. |
-| P-03 | D8, D9 | Urlaubslogik und Read-only-Verhalten nach präzisiertem Soll umsetzen: Urlaub blockiert Dienste, Sperrtermine bleiben möglich, Marker sind ausschließlich im Urlaubsplaner bearbeitbar. Standardmaterialisierung und Meeting-Lückensuche anschließend vollständig nachprüfen. |
-| P-04 | E2 | Persönlichen Nextcloud-Kalender auf das neue Soll anpassen: eigene Dienste, eigene Termine und eigene Urlaube synchronisieren; fremde Einträge anderer Personen ausschließen. |
-| P-05 | A11 | Tastaturzugänglichkeit herstellen: sichtbarer Fokus für alle Elemente, insbesondere Filter-Checkboxen; Tastaturfalle beseitigen; Fokus nach Dialogschluss sinnvoll zurückgeben. |
-
-### Darstellung und Bedienbarkeit
-
-| Ref. | Bezug | Zu bearbeiten / Akzeptanzkriterium |
-|---|---|---|
-| P-06 | A5 | Sticky-/Scroll-Verhalten korrigieren: Aktionsicons dürfen Datumsangaben nicht überdecken; Gruppenbezeichnungen dürfen beim horizontalen Scrollen nicht unkontrolliert verschwinden. |
-| P-07 | A8 | Leere Feiertage kompakt halten; Feiertagsnamen aus der Zellenbreite lösen, etwa per Tooltip/Overlay; Feiertagsmarkierung zugleich deutlicher gestalten. |
-| P-08 | A9 | Alleinstehender Urlaubsmarker darf Sondertage nicht vergrößern; kompakte farbliche `U`-Kennzeichnung verwenden. |
-| P-09 | A10 | Scrollposition nach Bearbeitung erhalten und bearbeitetes Feld sichtbar beziehungsweise fokussiert halten. |
-| P-10 | B7 | Anzeigen-/Ausblenden-Schalter fachlich auftrennen; IT, Sekretariat und FiBu/LoBu nicht ungewollt gemeinsam mit dem Leitungs-/Stabsblock schalten. Sollbeschreibung danach aktualisieren. |
-| P-11 | C5 | Validierungsfehlermeldung bei identischem Terminbeginn und -ende deutlich kontrastreicher darstellen. |
-| P-12 | D3 | Redundante Auswahl „Typ“ aus Dienst- und Termindialog entfernen, sofern der öffnende Button den Typ eindeutig festlegt. |
-| P-13 | D5 | Höhe des Termineintrags so anpassen, dass der Titel nicht abgeschnitten wird. |
-| P-14 | D6 | Dienste über Mitternacht je Kalendertag mit Teilzeitraum darstellen, z. B. `20–24` und `0–8`, mit erkennbarer Fortsetzung. |
-| P-15 | A2 | Monatsansicht zeigt höchstens drei Randtage je Monatsgrenze; unvollständige erste und letzte sichtbare Kalenderwochen sind ausdrücklich zulässig. |
-
-### Testinfrastruktur und nachzuholende Abnahme
-
-| Ref. | Bezug | Zu bearbeiten / Akzeptanzkriterium |
-|---|---|---|
-| P-16 | C1, C2 | Demo-Seeding vervollständigen: jede fachliche Gruppe mindestens einmal vertreten; zusätzlich geeignete Leitung-/Unterstellungs-, Bereichs- und Mehrfachrollenkonstellationen. Insbesondere Stv. PDL, BuS, Büroorganisation Pflege und Empfang nachrüsten. |
-| P-17 | C4 | Serverseitige Rechteprüfung durch direkten API-/Manipulationsversuch nachprüfen; reine UI-Ausblendung genügt nicht. |
-| P-18 | F1–F6, G5, G7–G9 | Für spätere Erweiterungsphase vorgemerkt und aus dem aktuellen Grundumfang/Freigabenachweis genommen. Bei ausdrücklicher Wiederaufnahme neutrale externe Kopano-/CalDAV-Testprovider bereitstellen und Export, Rückimportschutz, Trennung, parallele Fehlerisolation und Bestandsumbenennung prüfen. |
-| P-19 | E7 | Aggregierten Hintergrundstatus mit Erfolg und absichtlichem Teilfehler sowie Nichtadmin-Schutz nachprüfen. |
-| P-20 | H1, H2, I3–I6 | Für spätere Erweiterungsphase vorgemerkt. Google-/Apple- sowie providerabhängige Lokalisierungsprüfungen erst nach ausdrücklicher Scope-Öffnung und mit neutralen Testkonten ausführen; der lokale Sprachvertrag bleibt im Grundumfang. |
-
-### Präzisierte fachliche Sollvorgaben
-
-- Persönlicher Nextcloud-Kalender: eigene Dienste, Termine und Urlaube synchronisieren; keine fremden Einträge anderer Personen.
-- Geplanter und genehmigter Urlaub: Dienste blockieren, Sperrtermine zulassen, Urlaubsmarker im AD Kalender read-only.
-- Konfigurierte Gruppen-, Rollen- und Eigennamen werden beim Sprachwechsel nicht übersetzt; nur die umgebende Benutzeroberfläche wird lokalisiert.
-- Für spätere Abnahmen muss jede fachliche Gruppe durch geeignete Demoaccounts abgedeckt sein.
 
 ## Abschlussentscheidung
 
