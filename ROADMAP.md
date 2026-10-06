@@ -19,6 +19,23 @@ erledigte Änderungen in `CHANGELOG.md` und geltende Architektur in
   Ablauf, Widerruf, Rollenverlust, CSRF und Tastaturbedienung einschließen.
 - Ergebnisse ausschließlich in `docs/manual-acceptance.md` dokumentieren.
 
+### ADC-STAGING-FOLLOWUP – Abweichungen der laufenden Abnahme schließen
+
+- Den geöffneten Filter als überlagerndes Panel ausführen, damit er die
+  Kalendermatrix auch bei kleinen Viewports nicht verdrängt; Fokus,
+  Escape-Verhalten und erreichbare Scrollleisten mitprüfen.
+- Den gemeinsamen Leitungs-/Stabs-Schalter ohne vorausgesetzte zusätzliche
+  Bereichsauswahl bedienbar machen.
+- Bereichsfilter für bereichsgebundene Rollen weiterhin als Schnittmenge
+  anwenden, globale Rollen ohne natürliche Bereichszuordnung jedoch nicht
+  allein wegen einer Bereichsauswahl ausblenden.
+- Neutrale Testkonten für jeden konfigurierten Bereich und die relevanten
+  Hierarchiepfade bereitstellen, damit Rollen-, Bereichs- und Deny-Fälle
+  vollständig abgenommen werden können.
+- Die systemweite UI-Nacharbeit der temporären Adminfreigabe folgt
+  `DP-11` im Parent-Zukunftsplan; die app-lokalen Rechte- und Auditgrenzen
+  bleiben unverändert.
+
 ### ADC-L10N-ACCEPTANCE – deutsche und englische Oberfläche prüfen
 
 - Deutsche und englische Kalender-/Adminoberfläche mit langen

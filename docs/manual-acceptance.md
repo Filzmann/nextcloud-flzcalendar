@@ -11,13 +11,13 @@ Testkonten und synthetische Termine verwenden.
 
 | Feld | Eintrag |
 |---|---|
-| Datum und Uhrzeit |  |
-| Prüfer*in |  |
-| Umgebung und URL |  |
+| Datum und Uhrzeit | 3.11.226 11:12 |
+| Prüfer*in | filzmann |
+| Umgebung und URL | ddev lokal  |
 | AD-Kalender-Version | 0.13.0-rc.5 |
-| Nextcloud-Version |  |
-| Browser und Version |  |
-| Fenstergröße / Zoom |  |
+| Nextcloud-Version | 34.0.2 |
+| Browser und Version | Google Chrome Version 154.0.8037.57 (Offizieller Build) (x86_64) |
+| Fenstergröße / Zoom | 100% bei 1920er breite |
 | Verwendete neutrale Testkonten und Rollen | `admin`; `adc-demo-bl-now`; `adc-demo-eb-sued`; weitere erforderliche Gruppen-/Hierarchiekonten fehlten teilweise |
 
 Ergebniskennzeichnung: `[ ] erfolgreich` / `[ ] nicht erfolgreich` /
@@ -30,36 +30,36 @@ Ergebnisse zu unverändertem Verhalten bleiben bestehen.
 
 | ID | Was wird geprüft? | Auszuführende Schritte | Erwartetes Ergebnis | Ergebnis | Warum/Beleg/Abweichung |
 |---|---|---|---|---|---|
-| A1 | Wochenansicht als Ausgangszustand | App öffnen, „Woche“ wählen und zwischen beiden Ausrichtungen wechseln. | Eine Wochenmatrix erscheint; Personen-/Tagesachsen, Einträge und Aktionen bleiben bedienbar. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
-| A2 | Durchgehende Monatsmatrix, Tage als Spalten | „Monat“ und anschließend „Tage als Zeilen“ wählen, sodass Personen die Zeilen bilden. Vorherigen und nächsten Monat aufrufen. | Der gesamte Zeitraum erscheint als eine Matrix ohne KW-Blöcke oder wiederholte Tabellenköpfe. Randtage sind gedimmt. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
-| A3 | Durchgehende Monatsmatrix, Tage als Zeilen | Auf „Personen als Zeilen“ umschalten, sodass Tage die Zeilen bilden. Vorherigen und nächsten Monat aufrufen. | Der gesamte Zeitraum erscheint als eine Matrix ohne KW-Blöcke oder wiederholte Tabellenköpfe. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
-| A4 | Erreichbare horizontale Scrollleiste | Einen Monat und so viele Personen anzeigen, dass die Matrix breiter und höher als das Fenster ist. Ohne zum Inhaltsende zu scrollen die horizontale Leiste am unteren Rand des sichtbaren Kalenderbereichs suchen und bis ganz rechts sowie zurück bewegen. Danach die Ausrichtung wechseln und wiederholen. | Die horizontale Leiste bleibt unabhängig von der Inhaltshöhe am unteren Rand des sichtbaren Kalender-Viewports erreichbar. Die vertikale Leiste bleibt ebenfalls bedienbar. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
-| A5 | Scrollen bei geöffnetem Filter und kleinem Viewport | Filter öffnen, Browserfenster verkleinern und A4 wiederholen. Filter schließen und erneut prüfen. | Navigation und Scrollleisten bleiben sichtbar und erreichbar; es entsteht kein zweiter horizontaler Seiten-Scrollbar. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
-| A6 | Fixierte Personenachse | Eine große Matrix horizontal und vertikal scrollen. | Die zu Personen gehörende erste Spalte beziehungsweise Kopfzeile bleibt sichtbar; Inhalte überdecken sie nicht. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
-| A7 | Wochenendbezeichnung | Samstag und Sonntag in beiden Ausrichtungen ansehen. | Es stehen nur Wochentag und Datum dort; das zusätzliche Wort „Wochenende“ erscheint nicht. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
-| A8 | Kompakte leere Sondertage | Einen leeren Samstag, Sonntag und gesetzlichen Feiertag in beiden Ausrichtungen anzeigen. | Leere Sondertage sind deutlich platzsparender; bei Tagen als Spalten besitzen sie eine feste schmale Breite. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
-| A9 | Urlaubsmarker und Kompaktklasse | Auf einem sonst leeren Wochenend- oder Feiertag nur einen geplanten beziehungsweise genehmigten Urlaubsmarker anzeigen. | Der Urlaubsmarker allein vergrößert den Tag nicht. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
-| A10 | Automatische Normalgröße bei Einträgen | Auf einem kompakten Sondertag für eine sichtbare Person einen Dienst oder Termin anlegen und danach löschen. | Mit Eintrag verwendet der gesamte Tag Normalgröße; nach dem Löschen wird er wieder kompakt, sofern kein anderer Dienst oder Termin vorliegt. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
-| A11 | Tastatur und Fokus | Tabs, Zeitraum, Navigation, Ausrichtung, Filter, Schnellaktionen und Dialoge nur mit Tab, Umschalt+Tab, Eingabe und Escape bedienen. | Alle Funktionen sind erreichbar; Fokus ist sichtbar; kein Dialog erzeugt eine Tastaturfalle. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
+| A1 | Wochenansicht als Ausgangszustand | App öffnen, „Woche“ wählen und zwischen beiden Ausrichtungen wechseln. | Eine Wochenmatrix erscheint; Personen-/Tagesachsen, Einträge und Aktionen bleiben bedienbar. | [x] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
+| A2 | Durchgehende Monatsmatrix, Tage als Spalten | „Monat“ und anschließend „Tage als Zeilen“ wählen, sodass Personen die Zeilen bilden. Vorherigen und nächsten Monat aufrufen. | Der gesamte Zeitraum erscheint als eine Matrix ohne KW-Blöcke oder wiederholte Tabellenköpfe. Randtage sind gedimmt. | [x] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
+| A3 | Durchgehende Monatsmatrix, Tage als Zeilen | Auf „Personen als Zeilen“ umschalten, sodass Tage die Zeilen bilden. Vorherigen und nächsten Monat aufrufen. | Der gesamte Zeitraum erscheint als eine Matrix ohne KW-Blöcke oder wiederholte Tabellenköpfe. | [x] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
+| A4 | Erreichbare horizontale Scrollleiste | Einen Monat und so viele Personen anzeigen, dass die Matrix breiter und höher als das Fenster ist. Ohne zum Inhaltsende zu scrollen die horizontale Leiste am unteren Rand des sichtbaren Kalenderbereichs suchen und bis ganz rechts sowie zurück bewegen. Danach die Ausrichtung wechseln und wiederholen. | Die horizontale Leiste bleibt unabhängig von der Inhaltshöhe am unteren Rand des sichtbaren Kalender-Viewports erreichbar. Die vertikale Leiste bleibt ebenfalls bedienbar. | [x] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
+| A5 | Scrollen bei geöffnetem Filter und kleinem Viewport | Filter öffnen, Browserfenster verkleinern und A4 wiederholen. Filter schließen und erneut prüfen. | Navigation und Scrollleisten bleiben sichtbar und erreichbar; es entsteht kein zweiter horizontaler Seiten-Scrollbar. | [x] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | Der Filterbereich verdrängte den Kalenderinhalt statt ihn zu überlagern; siehe `ADC-STAGING-FOLLOWUP` in `ROADMAP.md`. |
+| A6 | Fixierte Personenachse | Eine große Matrix horizontal und vertikal scrollen. | Die zu Personen gehörende erste Spalte beziehungsweise Kopfzeile bleibt sichtbar; Inhalte überdecken sie nicht. | [x] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
+| A7 | Wochenendbezeichnung | Samstag und Sonntag in beiden Ausrichtungen ansehen. | Es stehen nur Wochentag und Datum dort; das zusätzliche Wort „Wochenende“ erscheint nicht. | [x] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
+| A8 | Kompakte leere Sondertage | Einen leeren Samstag, Sonntag und gesetzlichen Feiertag in beiden Ausrichtungen anzeigen. | Leere Sondertage sind deutlich platzsparender; bei Tagen als Spalten besitzen sie eine feste schmale Breite. | [x] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
+| A9 | Urlaubsmarker und Kompaktklasse | Auf einem sonst leeren Wochenend- oder Feiertag nur einen geplanten beziehungsweise genehmigten Urlaubsmarker anzeigen. | Der Urlaubsmarker allein vergrößert den Tag nicht. | [x] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
+| A10 | Automatische Normalgröße bei Einträgen | Auf einem kompakten Sondertag für eine sichtbare Person einen Dienst oder Termin anlegen und danach löschen. | Mit Eintrag verwendet der gesamte Tag Normalgröße; nach dem Löschen wird er wieder kompakt, sofern kein anderer Dienst oder Termin vorliegt. | [x] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
+| A11 | Tastatur und Fokus | Tabs, Zeitraum, Navigation, Ausrichtung, Filter, Schnellaktionen und Dialoge nur mit Tab, Umschalt+Tab, Eingabe und Escape bedienen. | Alle Funktionen sind erreichbar; Fokus ist sichtbar; kein Dialog erzeugt eine Tastaturfalle. | [x] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
 
 ## B. Personen-, Rollen- und Bereichsfilter
 
 | ID | Was wird geprüft? | Auszuführende Schritte | Erwartetes Ergebnis | Ergebnis | Warum/Beleg/Abweichung |
 |---|---|---|---|---|---|
-| B1 | Personenfilter | Nach einem neutralen Testkonto suchen, auswählen und die Auswahl wieder zurücksetzen. | Nur die ausgewählte Person erscheint; Status und Rücksetzen sind verständlich und vollständig. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
-| B2 | ODER innerhalb der Rollen | Zwei Rollen auswählen, die jeweils mindestens ein unterschiedliches Testkonto enthalten. | Personen mit Rolle A oder Rolle B erscheinen. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
-| B3 | ODER innerhalb der Bereiche | Zwei Bürobereiche auswählen. | Personen aus Bereich A oder Bereich B erscheinen. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
-| B4 | Schnittmenge Rolle und Bereich | Eine bereichsgebundene Rolle und genau einen Bereich auswählen. | Nur Personen erscheinen, die beide Kriterien erfüllen. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
-| B5 | Vorrangige Rolle | Ein Testkonto mit Leitungsrolle und zusätzlicher unterstellter Rolle über beide Rollenfilter suchen. | Die Person wird nur über ihre nach Organisationsreihenfolge vorrangige Rolle gefunden. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
-| B6 | Bereichsübergreifende Büroleitung | Eine Büroleitung mit Nordost und West nacheinander über beide Bereichsfilter sowie gemeinsam anzeigen. | Sie wird über beide Bereiche gefunden, erscheint in der Matrix aber nur einmal. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
-| B7 | Leitungs-/Stabsblock | Den gemeinsamen Anzeigen-/Ausblenden-Schalter für GF, PDL, Sekretariat, HR, QMB und Assistenz GF Digi betätigen. | Der Block wird vollständig ein- beziehungsweise ausgeblendet und gemäß Organisationshierarchie sortiert. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
-| B8 | Persönlicher Standard | Filter, Zeitraum und Ausrichtung wählen, „Zum Standard machen“ drücken, App neu laden und anschließend eine andere Konfiguration ohne Speichern testen. | Nur bewusst gespeicherte Werte werden nach dem Neuladen wiederhergestellt. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
+| B1 | Personenfilter | Nach einem neutralen Testkonto suchen, auswählen und die Auswahl wieder zurücksetzen. | Nur die ausgewählte Person erscheint; Status und Rücksetzen sind verständlich und vollständig. | [x] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
+| B2 | ODER innerhalb der Rollen | Zwei Rollen auswählen, die jeweils mindestens ein unterschiedliches Testkonto enthalten. | Personen mit Rolle A oder Rolle B erscheinen. | [x] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
+| B3 | ODER innerhalb der Bereiche | Zwei Bürobereiche auswählen. | Personen aus Bereich A oder Bereich B erscheinen. | [x] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
+| B4 | Schnittmenge Rolle und Bereich | Eine bereichsgebundene Rolle und genau einen Bereich auswählen. | Nur Personen erscheinen, die beide Kriterien erfüllen. | [x] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
+| B5 | Vorrangige Rolle | Ein Testkonto mit Leitungsrolle und zusätzlicher unterstellter Rolle über beide Rollenfilter suchen. | Die Person wird nur über ihre nach Organisationsreihenfolge vorrangige Rolle gefunden. | [x] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
+| B6 | Bereichsübergreifende Büroleitung | Eine Büroleitung mit Nordost und West nacheinander über beide Bereichsfilter sowie gemeinsam anzeigen. | Sie wird über beide Bereiche gefunden, erscheint in der Matrix aber nur einmal. | [x] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
+| B7 | Leitungs-/Stabsblock | Den gemeinsamen Anzeigen-/Ausblenden-Schalter für GF, PDL, Sekretariat, HR, QMB und Assistenz GF Digi betätigen. | Der Block wird vollständig ein- beziehungsweise ausgeblendet und gemäß Organisationshierarchie sortiert. | [ ] erfolgreich [x] nicht erfolgreich [ ] nicht geprüft | Der Schalter war nur bei zusätzlicher Bereichsauswahl bedienbar; siehe `ADC-STAGING-FOLLOWUP` in `ROADMAP.md`. |
+| B8 | Persönlicher Standard | Filter, Zeitraum und Ausrichtung wählen, „Zum Standard machen“ drücken, App neu laden und anschließend eine andere Konfiguration ohne Speichern testen. | Nur bewusst gespeicherte Werte werden nach dem Neuladen wiederhergestellt. | [x] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
 
 ## C. Reihenfolge, Hierarchie und Bearbeitungsrechte
 
 | ID | Was wird geprüft? | Auszuführende Schritte | Erwartetes Ergebnis | Ergebnis | Warum/Beleg/Abweichung |
 |---|---|---|---|---|---|
-| C1 | Gruppenreihenfolge und Betriebskürzel | BO und EB aus mehreren Bereichen sowie PFK, Büroorganisation Pflege, IT, Stv. PDL, Fahrzeugverwaltung und Empfang gemeinsam anzeigen. | Die Übersicht zeigt unter anderem `BO-NO`, `EB-W`, `PFK`, `BO-Pflege` und `IT`; Stv. PDL steht vor Büroorganisation Pflege und PFK, Fahrzeugverwaltung folgt auf IT und Empfang auf Sekretariat. Filter und Administration behalten die Langnamen. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
+| C1 | Gruppenreihenfolge und Betriebskürzel | BO und EB aus mehreren Bereichen sowie PFK, Büroorganisation Pflege, IT, Stv. PDL, Fahrzeugverwaltung und Empfang gemeinsam anzeigen. | Die Übersicht zeigt unter anderem `BO-NO`, `EB-W`, `PFK`, `BO-Pflege` und `IT`; Stv. PDL steht vor Büroorganisation Pflege und PFK, Fahrzeugverwaltung folgt auf IT und Empfang auf Sekretariat. Filter und Administration behalten die Langnamen. | [ ] erfolgreich [x] nicht erfolgreich [ ] nicht geprüft | Bei gewähltem Bereich fehlten globale Rollen ohne natürliche Bereichszuordnung, darunter IT und PFK; siehe `ADC-STAGING-FOLLOWUP` in `ROADMAP.md`. |
 | C2 | Hierarchie der globalen Gruppen | Mit passenden neutralen Leitungskonten Einträge der jeweils unterstellten Testkonten anlegen oder ändern. Gegenrichtung ebenfalls versuchen. | PDL/Stv. PDL, GF Digi/Fahrzeugverwaltung und Sekretariat/Empfang folgen der festgelegten Hierarchie; Untergebene dürfen Vorgesetzte nicht bearbeiten. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
 | C3 | Bereichsgebundene Führung | Mit BL und StvBL BO/EB im eigenen und in einem fremden Bereich bearbeiten. PFK ebenfalls versuchen. | BO/EB im passenden Bereich sind bearbeitbar; fremder Bereich und PFK sind nicht bearbeitbar. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
 | C4 | Schutz bei Mehrfachrollen | Mit einem normalen EB-Konto versuchen, eine StvBL zu bearbeiten, die zusätzlich EB ist. | Die Leitungsrolle schützt die Person; Bearbeitung wird serverseitig abgewiesen. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
@@ -69,16 +69,16 @@ Ergebnisse zu unverändertem Verhalten bleiben bestehen.
 
 | ID | Was wird geprüft? | Auszuführende Schritte | Erwartetes Ergebnis | Ergebnis | Warum/Beleg/Abweichung |
 |---|---|---|---|---|---|
-| D1 | Dienst mit zugeordnetem Termin | Dienst anlegen und darin einen Termin anlegen. | Der Termin erscheint innerhalb des Dienstes und bleibt diesem fachlich zugeordnet. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
-| D2 | Sperrtermin | Termin außerhalb eines Dienstes anlegen. | Er erscheint ausdrücklich als Sperrtermin und nicht nur mit einer anderen Farbe. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
-| D3 | Wiederholter Termin | Eine tägliche, wöchentliche und monatliche Testserie mit Enddatum anlegen; ein Vorkommen einzeln ändern und löschen. | Serie und Einzelabweichungen folgen den gewählten Regeln; ungültige Serien werden verständlich abgewiesen. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
+| D1 | Dienst mit zugeordnetem Termin | Dienst anlegen und darin einen Termin anlegen. | Der Termin erscheint innerhalb des Dienstes und bleibt diesem fachlich zugeordnet. | [x] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
+| D2 | Sperrtermin | Termin außerhalb eines Dienstes anlegen. | Er erscheint ausdrücklich als Sperrtermin und nicht nur mit einer anderen Farbe. | [x] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
+| D3 | Wiederholter Termin | Eine tägliche, wöchentliche und monatliche Testserie mit Enddatum anlegen; ein Vorkommen einzeln ändern und löschen. | Serie und Einzelabweichungen folgen den gewählten Regeln; ungültige Serien werden verständlich abgewiesen. | [x] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
 | D4 | Meeting-Lückensuche | Mindestens zwei Personen auswählen, eine Mindestdauer setzen, freie Woche suchen, weitersuchen und eine Person abwählen. | Nur gemeinsame freie Zeiten innerhalb vorhandener Dienste erscheinen; Termine und genehmigte Urlaube werden abgezogen. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
 | D5 | Atomares gemeinsames Meeting | Einen gefundenen Slot mit berechtigtem Konto blockieren, gemeinsam ändern und löschen. Danach mit fehlendem Recht auf mindestens eine Person wiederholen. | Berechtigt entstehen/ändern/löschen sich alle Einträge gemeinsam; bei fehlendem Recht entsteht kein Teileintrag. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
-| D6 | Standard-Dienstzeiten | Für einen Wochentag Beginn/Ende speichern, Woche öffnen und einen Standard über Mitternacht testen. | Standards werden als normale Dienste materialisiert; Ende vor Beginn reicht in den Folgetag. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
+| D6 | Standard-Dienstzeiten | Für einen Wochentag Beginn/Ende speichern, Woche öffnen und einen Standard über Mitternacht testen. | Standards werden als normale Dienste materialisiert; Ende vor Beginn reicht in den Folgetag. | [x] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
 | D7 | Abweichung und Lösch-Tombstone | Einen materialisierten Standarddienst ändern und einen anderen löschen; Woche neu laden. | Änderung bleibt einmalig erhalten; gelöschter Dienst erscheint für genau dieses Datum nicht erneut. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
-| D8 | Geplanter Urlaub | Mit aktiver AD-Urlaub-Integration einen geplanten Urlaub anzeigen und am selben Tag einen Dienst sowie einen Sperrtermin anlegen. Standardmaterialisierung und Meetinglücke ebenfalls prüfen. | `U?` erscheint read-only, blockiert Dienste und Standardmaterialisierung, lässt Sperrtermine zu und wird nicht aus Meetinglücken entfernt. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
-| D9 | Genehmigter Urlaub | Einen genehmigten Urlaub anzeigen und Dienst, Sperrtermin, Standardmaterialisierung sowie Meetinglücke für diesen Tag prüfen. | `U` erscheint read-only, blockiert Dienste und Standardmaterialisierung, lässt Sperrtermine zu und wird aus Meetinglücken entfernt. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
-| D10 | Assistenzkonflikt mit aktivem AdPlaner | Für ein neutrales in beiden Apps schichtfähiges Konto eine Assistenzschicht belegen. In breiter und schmaler Kalenderzelle ansehen; einen überlappenden und einen direkt anschließenden Dienst sowie einen regelmäßigen Standarddienst versuchen. Danach AdPlaner deaktivieren und mit synthetischen Daten erneut prüfen. | Die Sperrzeit erscheint read-only als `Assistenz` beziehungsweise `AS`. Echte Überlappungen werden manuell und automatisch verhindert, direkte Anschlüsse bleiben möglich. Ohne AdPlaner bleibt der Kalender nutzbar und zeigt keine Assistenzsperre. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
+| D8 | Geplanter Urlaub | Mit aktiver AD-Urlaub-Integration einen geplanten Urlaub anzeigen und am selben Tag einen Dienst sowie einen Sperrtermin anlegen. Standardmaterialisierung und Meetinglücke ebenfalls prüfen. | `U?` erscheint read-only, blockiert Dienste und Standardmaterialisierung, lässt Sperrtermine zu und wird nicht aus Meetinglücken entfernt. | [x] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
+| D9 | Genehmigter Urlaub | Einen genehmigten Urlaub anzeigen und Dienst, Sperrtermin, Standardmaterialisierung sowie Meetinglücke für diesen Tag prüfen. | `U` erscheint read-only, blockiert Dienste und Standardmaterialisierung, lässt Sperrtermine zu und wird aus Meetinglücken entfernt. | [x] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
+| D10 | Assistenzkonflikt mit aktivem AdPlaner | Für ein neutrales in beiden Apps schichtfähiges Konto eine Assistenzschicht belegen. In breiter und schmaler Kalenderzelle ansehen; einen überlappenden und einen direkt anschließenden Dienst sowie einen regelmäßigen Standarddienst versuchen. Danach AdPlaner deaktivieren und mit synthetischen Daten erneut prüfen. | Die Sperrzeit erscheint read-only als `Assistenz` beziehungsweise `AS`. Echte Überlappungen werden manuell und automatisch verhindert, direkte Anschlüsse bleiben möglich. Ohne AdPlaner bleibt der Kalender nutzbar und zeigt keine Assistenzsperre. | [x] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
 
 ## E. Persönlicher Nextcloud-Dienstkalender
 
@@ -171,8 +171,8 @@ ist.
 | Anzahl erfolgreich | |
 | Anzahl nicht erfolgreich | |
 | Anzahl nicht geprüft | |
-| Kritische Abweichungen / Ticketreferenzen | |
+| Kritische Abweichungen / Ticketreferenzen | A5, B7 und C1: siehe `ADC-STAGING-FOLLOWUP` in `ROADMAP.md`. Die UI-Nacharbeit zur temporären Adminfreigabe ist systemweit als `DP-11` im Parent-Zukunftsplan erfasst. |
 | Erneute Prüfung erforderlich bis | |
-| Gesamtentscheidung | [ ] abgenommen [ ] mit Auflagen abgenommen [ ] nicht abgenommen |
-| Begründung der Gesamtentscheidung | |
+| Gesamtentscheidung | [ ] abgenommen [ ] mit Auflagen abgenommen [x] nicht abgenommen |
+| Begründung der Gesamtentscheidung | Nicht abgenommen wegen der dokumentierten Filterabweichungen, der noch nicht zusammengeführten Adminfreigabe-Oberfläche und fehlender neutraler Testkonten für alle Bereiche. |
 | Name / Datum | |
