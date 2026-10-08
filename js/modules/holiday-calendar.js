@@ -43,7 +43,7 @@
         }
     }
 
-    window.AdCalendar = window.AdCalendar || {};
-    window.AdCalendar.modules = window.AdCalendar.modules || {};
-    window.AdCalendar.modules.HolidayCalendar = HolidayCalendar;
+    window.FlzCalendar = window.FlzCalendar || {};
+    window.FlzCalendar.modules = window.FlzCalendar.modules || {};
+    window.FlzCalendar.modules.HolidayCalendar = HolidayCalendar;
 }());

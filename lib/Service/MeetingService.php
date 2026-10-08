@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace OCA\AdCalendar\Service;
+namespace OCA\FlzCalendar\Service;
 
 use DateTimeImmutable;
 use InvalidArgumentException;
-use OCA\AdCalendar\Exception\MeetingSlotUnavailableException;
-use OCA\AdCalendar\Model\CalendarEntry;
-use OCA\AdCalendar\Repository\CalendarEntryRepository;
+use OCA\FlzCalendar\Exception\MeetingSlotUnavailableException;
+use OCA\FlzCalendar\Model\CalendarEntry;
+use OCA\FlzCalendar\Repository\CalendarEntryRepository;
 
 /**
  * Zweck: Findet gemeinsame Dienstlücken und verwaltet einen verknüpften Termin atomar für alle Beteiligten.

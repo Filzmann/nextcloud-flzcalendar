@@ -1,63 +1,63 @@
-.adc-admin {
+.flz-calendar-admin {
     max-width: 900px;
 }
 
-.adc-admin > .adc-admin-panel + .adc-admin-panel {
+.flz-calendar-admin > .flz-calendar-admin-panel + .flz-calendar-admin-panel {
     margin-top: 18px;
 }
 
-.adc-admin-panel {
+.flz-calendar-admin-panel {
     padding: 18px;
     border: 1px solid var(--color-border);
     border-radius: var(--border-radius-large);
     background: var(--color-main-background);
 }
 
-.adc-sync-state {
+.flz-calendar-sync-state {
     margin: 12px 0;
     padding-inline-start: 10px;
     border-inline-start: 4px solid var(--color-text-maxcontrast);
 }
 
-.adc-sync-state--success {
+.flz-calendar-sync-state--success {
     border-inline-start-color: var(--color-success);
 }
 
-.adc-sync-state--warning {
+.flz-calendar-sync-state--warning {
     border-inline-start-color: var(--color-warning);
 }
 
-.adc-sync-summary {
+.flz-calendar-sync-summary {
     display: flex;
     gap: 10px;
     flex-wrap: wrap;
     margin: 12px 0;
 }
 
-.adc-sync-summary > div {
+.flz-calendar-sync-summary > div {
     min-width: 8rem;
     padding: 8px 10px;
     border: 1px solid var(--color-border);
     border-radius: var(--border-radius);
 }
 
-.adc-sync-summary dt {
+.flz-calendar-sync-summary dt {
     color: var(--color-text-maxcontrast);
 }
 
-.adc-sync-summary dd {
+.flz-calendar-sync-summary dd {
     margin: 2px 0 0;
     font-size: 1.25rem;
     font-weight: 700;
 }
 
-.adc-sync-privacy {
+.flz-calendar-sync-privacy {
     color: var(--color-text-maxcontrast);
     font-size: var(--font-size-small);
 }
 
-.adc-kopano-test-form,
-.adc-calendar-defaults-form {
+.flz-calendar-kopano-test-form,
+.flz-calendar-calendar-defaults-form {
     display: grid;
     grid-template-columns: minmax(12rem, 15rem) minmax(18rem, 1fr);
     gap: 8px 12px;
@@ -66,92 +66,92 @@
     margin-top: 14px;
 }
 
-.adc-kopano-test-form > label,
-.adc-calendar-defaults-form > label {
+.flz-calendar-kopano-test-form > label,
+.flz-calendar-calendar-defaults-form > label {
     font-weight: 600;
 }
 
-.adc-kopano-test-form > input,
-.adc-calendar-defaults-form > input {
+.flz-calendar-kopano-test-form > input,
+.flz-calendar-calendar-defaults-form > input {
     min-width: 0;
     width: 100%;
 }
 
-.adc-kopano-test-form > small,
-.adc-kopano-test-form > div,
-.adc-calendar-defaults-form > small,
-.adc-calendar-defaults-form > div {
+.flz-calendar-kopano-test-form > small,
+.flz-calendar-kopano-test-form > div,
+.flz-calendar-calendar-defaults-form > small,
+.flz-calendar-calendar-defaults-form > div {
     grid-column: 2;
 }
 
-.adc-kopano-test-status,
-.adc-calendar-defaults-status {
+.flz-calendar-kopano-test-status,
+.flz-calendar-calendar-defaults-status {
     margin: 12px 0 0;
     padding-inline-start: 10px;
     border-inline-start: 4px solid var(--color-text-maxcontrast);
 }
 
-.adc-kopano-test-status.is-success { border-inline-start-color: var(--color-success); }
-.adc-kopano-test-status.is-error { border-inline-start-color: var(--color-error); }
-.adc-calendar-defaults-status.is-success { border-inline-start-color: var(--color-success); }
-.adc-calendar-defaults-status.is-error { border-inline-start-color: var(--color-error); }
+.flz-calendar-kopano-test-status.is-success { border-inline-start-color: var(--color-success); }
+.flz-calendar-kopano-test-status.is-error { border-inline-start-color: var(--color-error); }
+.flz-calendar-calendar-defaults-status.is-success { border-inline-start-color: var(--color-success); }
+.flz-calendar-calendar-defaults-status.is-error { border-inline-start-color: var(--color-error); }
 
-.adc-google-oauth-status {
+.flz-calendar-google-oauth-status {
     margin: 12px 0;
     padding-inline-start: 10px;
     border-inline-start: 4px solid var(--color-warning);
 }
 
-.adc-google-oauth-status.is-success,
-.adc-google-oauth-status[data-configured="true"] {
+.flz-calendar-google-oauth-status.is-success,
+.flz-calendar-google-oauth-status[data-configured="true"] {
     border-inline-start-color: var(--color-success);
 }
 
-.adc-google-oauth-status.is-error {
+.flz-calendar-google-oauth-status.is-error {
     border-inline-start-color: var(--color-error);
 }
 
-.adc-google-registration-guide {
+.flz-calendar-google-registration-guide {
     margin: 14px 0;
     border: 1px solid var(--color-border);
     border-radius: var(--border-radius);
     background: var(--color-background-hover);
 }
 
-.adc-google-registration-guide summary {
+.flz-calendar-google-registration-guide summary {
     padding: 10px 12px;
     cursor: pointer;
     font-weight: 600;
 }
 
-.adc-google-registration-guide summary:focus-visible {
+.flz-calendar-google-registration-guide summary:focus-visible {
     outline: 2px solid var(--color-primary-element);
     outline-offset: 2px;
 }
 
-.adc-google-registration-guide__content {
+.flz-calendar-google-registration-guide__content {
     padding: 0 14px 14px;
 }
 
-.adc-google-registration-guide ol {
+.flz-calendar-google-registration-guide ol {
     margin: 10px 0 12px 24px;
 }
 
-.adc-google-registration-guide li + li {
+.flz-calendar-google-registration-guide li + li {
     margin-top: 8px;
 }
 
-.adc-google-registration-guide code {
+.flz-calendar-google-registration-guide code {
     overflow-wrap: anywhere;
     user-select: all;
 }
 
-.adc-google-registration-guide__sources {
+.flz-calendar-google-registration-guide__sources {
     color: var(--color-text-maxcontrast);
     font-size: var(--font-size-small);
 }
 
-.adc-google-oauth-form {
+.flz-calendar-google-oauth-form {
     display: grid;
     grid-template-columns: minmax(12rem, 15rem) minmax(18rem, 1fr);
     gap: 8px 12px;
@@ -159,36 +159,36 @@
     max-width: 760px;
 }
 
-.adc-google-oauth-form > label {
+.flz-calendar-google-oauth-form > label {
     font-weight: 600;
 }
 
-.adc-google-oauth-form > input,
-.adc-google-redirect-row {
+.flz-calendar-google-oauth-form > input,
+.flz-calendar-google-redirect-row {
     min-width: 0;
     width: 100%;
 }
 
-.adc-google-oauth-form > small {
+.flz-calendar-google-oauth-form > small {
     grid-column: 2;
     color: var(--color-text-maxcontrast);
 }
 
-.adc-google-redirect-row {
+.flz-calendar-google-redirect-row {
     display: flex;
     gap: 6px;
 }
 
-.adc-google-redirect-row input {
+.flz-calendar-google-redirect-row input {
     min-width: 0;
     flex: 1 1 auto;
 }
 
-.adc-google-redirect-row button {
+.flz-calendar-google-redirect-row button {
     flex: 0 0 auto;
 }
 
-.adc-google-oauth-actions {
+.flz-calendar-google-oauth-actions {
     grid-column: 2;
     display: flex;
     flex-wrap: wrap;
@@ -196,20 +196,20 @@
 }
 
 @media (max-width: 700px) {
-    .adc-google-oauth-form, .adc-kopano-test-form, .adc-calendar-defaults-form { grid-template-columns: 1fr; }
-    .adc-kopano-test-form > small, .adc-kopano-test-form > div,
-    .adc-calendar-defaults-form > small, .adc-calendar-defaults-form > div,
-    .adc-google-oauth-form > small,
-    .adc-google-oauth-actions { grid-column: 1; }
-    .adc-google-redirect-row { align-items: stretch; flex-direction: column; }
+    .flz-calendar-google-oauth-form, .flz-calendar-kopano-test-form, .flz-calendar-calendar-defaults-form { grid-template-columns: 1fr; }
+    .flz-calendar-kopano-test-form > small, .flz-calendar-kopano-test-form > div,
+    .flz-calendar-calendar-defaults-form > small, .flz-calendar-calendar-defaults-form > div,
+    .flz-calendar-google-oauth-form > small,
+    .flz-calendar-google-oauth-actions { grid-column: 1; }
+    .flz-calendar-google-redirect-row { align-items: stretch; flex-direction: column; }
 }
 
-.adc-demo-confirm {
+.flz-calendar-demo-confirm {
     display: block;
     margin: 16px 0 10px;
 }
 
-.adc-admin-notice {
+.flz-calendar-admin-notice {
     padding: 10px 12px;
     border: 2px solid var(--color-primary-element);
     border-radius: var(--border-radius);
@@ -217,11 +217,11 @@
     color: var(--color-main-text);
 }
 
-.adc-admin-notice.is-success {
+.flz-calendar-admin-notice.is-success {
     border-color: var(--color-success);
 }
 
-.adc-admin-notice.is-error {
+.flz-calendar-admin-notice.is-error {
     border-color: var(--color-error);
     background: var(--color-error-hover);
 }

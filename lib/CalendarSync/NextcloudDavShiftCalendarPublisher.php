@@ -2,22 +2,23 @@
 
 declare(strict_types=1);
 
-namespace OCA\AdCalendar\CalendarSync;
+namespace OCA\FlzCalendar\CalendarSync;
 
-use OCA\AdCalendar\Model\CalendarEntry;
-use OCA\AdCalendar\Service\CalendarTargetConfig;
+use OCA\FlzCalendar\Model\CalendarEntry;
+use OCA\FlzCalendar\Service\CalendarTargetConfig;
 use OCA\LocalBase\Calendar\AbsenceInterval;
 use OCA\DAV\CalDAV\CalDavBackend;
 use RuntimeException;
+use Sabre\DAV\PropPatch;
 
 /**
- * Zweck: Veröffentlicht AD-Dienste in einem privaten, app-eigenen Nextcloud-DAV-Kalender.
+ * Zweck: Veröffentlicht FLZ-Dienste in einem privaten, app-eigenen Nextcloud-DAV-Kalender.
  * Architekturgrenze: Nur diese Klasse kennt die bewusst freigegebene interne OCA\DAV-Schnittstelle.
  * Vertrag: Deterministische URIs erlauben idempotentes Schreiben; fremde Kalenderobjekte bleiben unangetastet.
  */
 final class NextcloudDavShiftCalendarPublisher implements ShiftCalendarPublisher, PersonalCalendarPublisher {
-    private const CALENDAR_URI_PREFIX = 'adcalendar-dienste-';
-    private const OBJECT_URI_PREFIX = 'adcalendar-shift-';
+    private const CALENDAR_URI_PREFIX = 'flzcalendar-dienste-';
+    private const OBJECT_URI_PREFIX = 'flzcalendar-shift-';
 
     public function __construct(
         private CalDavBackend $backend,
@@ -132,10 +133,17 @@ final class NextcloudDavShiftCalendarPublisher implements ShiftCalendarPublisher
             if (($calendar['principaluri'] ?? '') !== $principal || ($calendar['uri'] ?? '') !== $uri) continue;
             $displayName = (string)($calendar['{DAV:}displayname'] ?? '');
             if (!in_array($displayName, $this->targets->acceptedCalendarNames(), true)) {
-                throw new RuntimeException('Die reservierte AD-Kalender-URI wird bereits von einem fremden Kalender verwendet.');
+                throw new RuntimeException('Die reservierte Filzmann-Kalender-URI wird bereits von einem fremden Kalender verwendet.');
             }
             if ($displayName !== $calendarName) {
-                $this->backend->updateCalendar((int)$calendar['id'], ['{DAV:}displayname' => $calendarName]);
+                $propPatch = new PropPatch(['{DAV:}displayname' => $calendarName]);
+                $this->backend->updateCalendar(
+                    (int)$calendar['id'],
+                    $propPatch,
+                );
+                if (!$propPatch->commit()) {
+                    throw new RuntimeException('Der app-eigene Nextcloud-Kalender konnte nicht umbenannt werden.');
+                }
             }
             return (int)$calendar['id'];
         }
@@ -159,23 +167,23 @@ final class NextcloudDavShiftCalendarPublisher implements ShiftCalendarPublisher
 
     private function assertOwnedObject(array $object): void {
         if (!$this->isOwnedObject($object)) {
-            throw new RuntimeException('Die reservierte AD-Dienst-URI wird bereits von einem fremden Kalenderobjekt verwendet.');
+            throw new RuntimeException('Die reservierte FLZ-Dienst-URI wird bereits von einem fremden Kalenderobjekt verwendet.');
         }
     }
 
     private function isOwnedObject(array $object): bool {
         $uri = (string)($object['uri'] ?? '');
         $data = str_replace(["\r\n ", "\n "], '', (string)($object['calendardata'] ?? ''));
-        if (preg_match('/(?:^|\r?\n)X-AD-CALENDAR-SOURCE:adcalendar(?:\r?\n|$)/', $data) !== 1) return false;
-        if (preg_match('/^adcalendar-(shift|appointment)-(\d+)\.ics$/', $uri, $uriMatch) === 1) {
-            if (preg_match('/(?:^|\r?\n)X-AD-CALENDAR-ENTRY-ID:(\d+)(?:\r?\n|$)/', $data, $idMatch) !== 1
+        if (preg_match('/(?:^|\r?\n)X-FLZ-CALENDAR-SOURCE:flzcalendar(?:\r?\n|$)/', $data) !== 1) return false;
+        if (preg_match('/^flzcalendar-(shift|appointment)-(\d+)\.ics$/', $uri, $uriMatch) === 1) {
+            if (preg_match('/(?:^|\r?\n)X-FLZ-CALENDAR-ENTRY-ID:(\d+)(?:\r?\n|$)/', $data, $idMatch) !== 1
                 || $idMatch[1] !== $uriMatch[2]) return false;
-            if ($uriMatch[1] === 'shift' && !str_contains($data, 'X-AD-CALENDAR-ENTRY-TYPE:')) return true;
-            return preg_match('/(?:^|\r?\n)X-AD-CALENDAR-ENTRY-TYPE:(shift|appointment)(?:\r?\n|$)/', $data, $typeMatch) === 1
+            if ($uriMatch[1] === 'shift' && !str_contains($data, 'X-FLZ-CALENDAR-ENTRY-TYPE:')) return true;
+            return preg_match('/(?:^|\r?\n)X-FLZ-CALENDAR-ENTRY-TYPE:(shift|appointment)(?:\r?\n|$)/', $data, $typeMatch) === 1
                 && $typeMatch[1] === $uriMatch[1];
         }
-        if (preg_match('/^adcalendar-absence-([a-f0-9]{64})\.ics$/', $uri, $uriMatch) !== 1) return false;
-        return preg_match('/(?:^|\r?\n)X-AD-CALENDAR-ABSENCE-ID:([a-f0-9]{64})(?:\r?\n|$)/', $data, $idMatch) === 1
+        if (preg_match('/^flzcalendar-absence-([a-f0-9]{64})\.ics$/', $uri, $uriMatch) !== 1) return false;
+        return preg_match('/(?:^|\r?\n)X-FLZ-CALENDAR-ABSENCE-ID:([a-f0-9]{64})(?:\r?\n|$)/', $data, $idMatch) === 1
             && $idMatch[1] === $uriMatch[1];
     }
 

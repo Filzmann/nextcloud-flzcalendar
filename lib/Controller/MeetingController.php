@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace OCA\AdCalendar\Controller;
+namespace OCA\FlzCalendar\Controller;
 
 use DateTimeImmutable;
 use InvalidArgumentException;
-use OCA\AdCalendar\AppInfo\Application;
-use OCA\AdCalendar\Exception\MeetingSlotUnavailableException;
-use OCA\AdCalendar\Http\LocalizedErrorResponseFactory;
-use OCA\AdCalendar\Service\CalendarAccessService;
-use OCA\AdCalendar\Service\MeetingService;
+use OCA\FlzCalendar\AppInfo\Application;
+use OCA\FlzCalendar\Exception\MeetingSlotUnavailableException;
+use OCA\FlzCalendar\Http\LocalizedErrorResponseFactory;
+use OCA\FlzCalendar\Service\CalendarAccessService;
+use OCA\FlzCalendar\Service\MeetingService;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\Attribute\NoAdminRequired;

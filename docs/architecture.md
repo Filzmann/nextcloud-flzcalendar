@@ -1,12 +1,33 @@
-# Fach- und Integrationsarchitektur von AD Kalender
+# Fach- und Integrationsarchitektur von Filzmann Kalender
 
 Diese Datei dokumentiert den geltenden Ist-Vertrag. Zukünftige Ziele und
 offene Entscheidungen stehen ausschließlich in `ROADMAP.md`; kurze harte
 Arbeits-, Rechte- und Testregeln stehen in `AGENTS.md`.
 
+## Datenverantwortung und Aufbewahrung
+
+Fachlicher Data Owner ist die jeweils zuständige Führungskraft der
+Organisationseinheit. Die IKT-Administration verantwortet nur den technischen
+Betrieb; Datenschutzbeauftragte entscheiden über Policies und begründete
+Holds. Daraus entsteht kein pauschaler fachlicher Adminzugriff.
+
+Kalendereinträge werden 24 Monate nach Ende ihres Kalenderjahres vollständig
+gelöscht. Persönliche Einstellungen bestehen bis Reset oder belastbar
+festgestellter Kontolöschung. Abgeleitete Kalender führen keine unabhängige
+Historie und werden bei Quelländerung, Opt-out oder Trennung abgeglichen oder
+entfernt. Externe Kalenderanbieter bleiben in Produktion deaktiviert, bis der
+jeweilige Anbieter einzeln fachlich und datenschutzrechtlich freigegeben ist.
+Adminfreigabehistorien werden sechs Monate nach ihrem tatsächlichen Ende
+vollständig gelöscht und durch Restore nie reaktiviert.
+
+Die Regeln sind Policy, kein Implementierungs- oder Rechtsnachweis. Löschung,
+Restore, Holds, Backups und Providerverträge müssen app-lokal getestet werden;
+ohne verlässliche Beschäftigtenquelle und getestete Verträge gibt es keinen
+globalen Lifecycle-Löschlauf. Rechtsgrundlagen bleiben rechtlich zu prüfen.
+
 ## Kalendereinträge und Ansichten
 
-AD Kalender unterscheidet Dienste und Termine in einem gemeinsamen
+Filzmann Kalender unterscheidet Dienste und Termine in einem gemeinsamen
 Kalendereintragsmodell mit explizitem Typ. Dienste besitzen Mitarbeiter*in,
 Beginn und Ende; ihr Titel ist optional. Termine besitzen einen sprechenden
 Titel. Termine innerhalb eines Dienstes referenzieren ihn über
@@ -86,20 +107,20 @@ Erhalt als Sperrtermine gewählt.
 
 ## Persönlicher Kalenderabgleich
 
-AD Kalender ist alleinige Quelle der Wahrheit. Der standardmäßig aktive
+Filzmann Kalender ist alleinige Quelle der Wahrheit. Der standardmäßig aktive
 persönliche Abgleich veröffentlicht ausschließlich eigene Dienste, Termine und
 Urlaube in einem privaten Nextcloud-Kalender mit dem administrativ
 konfigurierten sichtbaren Namen. Ohne gesetzten AppConfig-Wert bleibt
-„AD Dienste“ der Bestandsdefault. Urlaube kommen read-only und ohne Notizen
+„Filzmann Dienste“ der Bestandsdefault. Urlaube kommen read-only und ohne Notizen
 über LocalBase aus einem optionalen Provider. Ihr halboffener Horizont reicht
 vom Beginn des laufenden fachlichen Kalenderjahres bis zum Beginn des dritten
 Folgejahres. Ohne Provider bleibt der Urlaubsbestand leer.
 Ein bewusstes Opt-out entfernt nur die
-von AD Kalender erzeugten Objekte; fremde Objekte bleiben unangetastet und der
+von Filzmann Kalender erzeugten Objekte; fremde Objekte bleiben unangetastet und der
 Kalender wird nur gelöscht, wenn er danach leer ist.
 
 Deterministische Kalender-, Objekt- und Ereigniskennungen machen Wiederholungen
-idempotent. DAV-Fehler rollen führende AD-Daten nicht zurück, sondern werden
+idempotent. DAV-Fehler rollen führende FLZ-Daten nicht zurück, sondern werden
 sicher protokolliert. Der nicht parallele Hintergrundjob wird alle 15 Minuten
 fällig, gleicht vorhandene Dienste vollständig ab, respektiert Opt-outs und
 isoliert Fehler je Konto. Sein Adminstatus enthält nur Zeitpunkt, Richtung und
@@ -108,6 +129,25 @@ aggregierte Anzahlen.
 Der interne DAV-Zugriff ist hinter `PersonalCalendarPublisher` gekapselt. Der
 interne Nextcloud-DAV-Vertrag bleibt auf
 `NextcloudDavShiftCalendarPublisher` begrenzt.
+
+Die am 2. September 2026 geprüften öffentlichen Nextcloud-Verträge decken
+diesen Publisher nicht vollständig ab: `OCP\Calendar\IManager` und
+`OCP\Calendar\ICalendar` ermöglichen Ermittlung und lesenden Zugriff;
+`OCP\Calendar\ICreateFromString` kann ein ICS-Objekt in einem bereits
+schreibbaren Kalender anlegen. Öffentliche Verträge für das Anlegen,
+Umbenennen und bedingte Löschen des app-eigenen Kalenders sowie für das
+deterministische Aktualisieren und Löschen seiner Objekte fehlen. Deshalb
+bleibt der private `OCA\DAV\CalDAV\CalDavBackend` ausschließlich innerhalb
+des genannten Adapters zulässig. Seine Signaturen werden testbar gekapselt
+und vor jeder Erweiterung der Nextcloud-Kompatibilität durch einen eigenen
+Source- und Runtime-Nachweis geprüft. Eine loopback-basierte CalDAV-
+Authentifizierung innerhalb derselben Nextcloud-Instanz ist kein Ersatz für
+diese Grenze.
+
+Beim Umbenennen reicht das Registrieren der Änderung über `PropPatch` nicht
+aus: Der Adapter führt den Patch explizit mit `commit()` aus und behandelt
+einen fehlgeschlagenen Commit als sichtbaren Fehler, bevor er Objekte
+abgleicht.
 
 ## Responsive Kalenderdarstellung
 
@@ -140,13 +180,13 @@ Kopano, Google, Apple und generisches CalDAV können parallel verbunden werden.
 Sie erhalten einen sichtbaren, app-eigenen Kalender mit dem administrativ
 konfigurierten Namen und
 exportieren ebenfalls ausschließlich Dienste. Providerinhalte werden nicht in
-AD Kalender eingeblendet oder zurückimportiert.
+Filzmann Kalender eingeblendet oder zurückimportiert.
 
 Die administrativ konfigurierte Kopano-Adresse ist nur die Vorgabe für neue
 persönliche Verbindungen. Bereits gespeicherte persönliche Server- und
 Kalenderadressen werden durch eine spätere Defaultänderung nicht ersetzt.
 Fehlschläge bei einer fälligen Bestandsumbenennung verändern weder den
-globalen Default noch führende AD-Daten und blockieren keine anderen Provider;
+globalen Default noch führende FLZ-Daten und blockieren keine anderen Provider;
 der nächste ausgehende Abgleich versucht sie erneut.
 
 Persönliche CalDAV-Zugangsdaten und Google-Tokens werden mit Nextclouds
@@ -159,9 +199,9 @@ Provideradapter verwenden ausschließlich den Nextcloud-HTTP-Client.
 Nutzerkonfigurierte CalDAV-Adressen müssen HTTPS verwenden, auf demselben
 Ursprung bleiben und unterliegen Nextclouds SSRF-Schutz. Zugangsdaten werden
 nie an einen Discovery-Ursprung auf einem anderen Host weitergereicht.
-Providerfehler bleiben voneinander und von der führenden AD-Mutation isoliert.
+Providerfehler bleiben voneinander und von der führenden FLZ-Mutation isoliert.
 
-## Organisation, Rechte und optionale Urlaube
+## Organisation, Rechte und optionale Urlaube und Planungskonflikte
 
 Alle angemeldeten Nutzer*innen dürfen Kalenderdaten lesen und eigene Einträge
 bearbeiten. Fremdbearbeitung folgt ausschließlich der konfigurierten
@@ -172,17 +212,56 @@ den erlaubten Personenkreis begrenzt.
 
 Rollen, Bereiche, sichtbare Bezeichnungen, Reihenfolge, Peer-Fähigkeit,
 Assistenzteam-Konventionen und Hierarchiekanten stammen aus
-`AdOrganizationDefinition`. Fachcode führt kein paralleles Rollenregister.
+`FlzOrganizationDefinition`. Fachcode führt kein paralleles Rollenregister.
 Eine Änderung technischer Gruppen-IDs verschiebt keine bestehenden
 Nextcloud-Mitgliedschaften.
 
-Ist AD Urlaub aktiv, erscheinen geplante Urlaube als read-only `U?` und
+Ist Filzmann Urlaubsplanung aktiv, erscheinen geplante Urlaube als read-only `U?` und
 genehmigte Urlaube als `U`. Beide Status blockieren neue und materialisierte
-Standarddienste, lassen Sperrtermine zu und sind ausschließlich im AD Urlaub
+Standarddienste, lassen Sperrtermine zu und sind ausschließlich im Filzmann Urlaubsplanung
 bearbeitbar. Nur genehmigter Urlaub wird aus Meetinglücken entfernt. Im
 persönlichen DAV-Kalender bleibt geplanter Urlaub davon unabhängig tentative
-und transparent, genehmigter Urlaub confirmed und opaque. Ohne AD Urlaub
+und transparent, genehmigter Urlaub confirmed und opaque. Ohne Filzmann Urlaubsplanung
 bleiben manuelle Sperrtermine der gültige Standalone-Weg.
+
+Ist FlzPlaner aktiv, konsumiert Filzmann Kalender dessen belegte Schichten über den
+versionierten `ScheduleConflictQueryEvent` ausschließlich read-only. Die
+Kalenderantwort projiziert sie mit sicherem Label `Assistenz`, Provider-ID und
+Verfügbarkeitsstatus; die UI zeigt sie ohne Bearbeitungsaktionen als
+`Assistenz` oder bei schmaler Zelle als `AS`. Echte Überlappungen blockieren
+manuelle und materialisierte Standarddienste, direkte Randberührungen nicht.
+Fehlende Listener bilden den Standalone-Zustand. Providerfehler werden in der
+Leseantwort als `unavailable` ausgewiesen und verhindern neue Dienste, statt
+Konfliktfreiheit zu behaupten. Umgekehrt publiziert Filzmann Kalender seine Dienste
+datensparsam als `Dienst/Büro`; private Termintitel verlassen die App nicht.
+
+## Zeitlich begrenzter fachlicher Admin-Vollzugriff
+
+Native Nextcloud-Administration bleibt von fachlicher Kalenderberechtigung
+getrennt. Vollzugriff entsteht nur für ein aktuell natives Administrationskonto
+mit aktiver app-lokaler Freigabe und endet spätestens nach 24 Stunden. Nur
+Mitglieder der kanonischen Nextcloud-Gruppe `Datenschutzbeauftragte` dürfen
+Freigaben erteilen, widerrufen und deren Historie lesen; ein nativer Admin ohne
+diese Rolle und gewöhnliche Konten werden ohne Zustandsänderung abgewiesen.
+
+Die Steuerung liegt im authentifizierten Filzmann-Kalender-Hauptbereich und bleibt
+außerhalb der technischen Nextcloud-Administration. Schreibende Requests
+verwenden den Nextcloud-CSRF-Schutz. Ein natives Administrationskonto ohne
+aktive Freigabe sieht eine sichere Hinweismeldung; der Direktlink zur
+Freigabesteuerung erscheint nur bei gleichzeitiger DPO-Rolle. Audit- und
+Art.-15-Projektionen geben ausschließlich die subjectgebundene Beteiligung und
+Zeitpunkte aus und neutralisieren Kennungen anderer beteiligter Personen.
+
+## Processing-Metadaten
+
+Der zusätzliche `ProcessingMetadataProvider` veröffentlicht den app-eigenen
+Katalog `resources/privacy-processing.json` lazy über den öffentlichen
+Standalone-V1-Vertrag des Datenschutz-Centers. Er trennt führende
+Kalendereinträge, persönliche UserConfig-Werte, verschlüsselte externe
+Verbindungen, abgeleitete Zielkalender und temporäre Adminfreigaben. Der
+Katalog enthält keine personenbezogenen Laufzeitdaten oder entschlüsselten
+Secrets und ersetzt fehlende fachliche Entscheidungen nicht durch technische
+Defaults.
 
 ## Demo- und Legacy-Grenzen
 

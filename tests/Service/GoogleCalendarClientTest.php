@@ -8,19 +8,19 @@ namespace OCP\Http\Client {
     interface IClient { public function request(string $method, string $uri, array $options = []): IResponse; public function getResponseFromThrowable(\Throwable $error): IResponse; }
     interface IClientService { public function newClient(): IClient; }
 }
-namespace OCA\AdCalendar\CalendarSync {
+namespace OCA\FlzCalendar\CalendarSync {
     final class GoogleOAuthService { public function accessToken(string $uid, array $connection): string { return 'access-token'; } }
     final class ExternalCalendarConnectionStore { public array $saved = []; public function save(string $uid, string $provider, array $connection): void { $this->saved[] = [$uid, $provider, $connection]; } }
 }
-namespace OCA\AdCalendar\Service { final class CalendarTargetConfig { public function calendarName(): string { return 'AD Dienste'; } } }
+namespace OCA\FlzCalendar\Service { final class CalendarTargetConfig { public function calendarName(): string { return 'Filzmann Dienste'; } } }
 
 namespace {
 
-    use OCA\AdCalendar\CalendarSync\ExternalCalendarConnectionStore;
-    use OCA\AdCalendar\CalendarSync\GoogleCalendarClient;
-    use OCA\AdCalendar\CalendarSync\GoogleOAuthService;
-    use OCA\AdCalendar\Model\CalendarEntry;
-    use OCA\AdCalendar\Service\CalendarTargetConfig;
+    use OCA\FlzCalendar\CalendarSync\ExternalCalendarConnectionStore;
+    use OCA\FlzCalendar\CalendarSync\GoogleCalendarClient;
+    use OCA\FlzCalendar\CalendarSync\GoogleOAuthService;
+    use OCA\FlzCalendar\Model\CalendarEntry;
+    use OCA\FlzCalendar\Service\CalendarTargetConfig;
     use OCP\Http\Client\IClient;
     use OCP\Http\Client\IClientService;
     use OCP\Http\Client\IResponse;
@@ -31,7 +31,7 @@ namespace {
         public function getBody(): string { return $this->body === [] ? '' : json_encode($this->body, JSON_THROW_ON_ERROR); }
         public function getStatusCode(): int { return $this->status; }
     };
-    $owned = ['id' => 'adcalendarshift51', 'extendedProperties' => ['private' => ['adcalendarSource' => 'adcalendar']]];
+    $owned = ['id' => 'flzcalendarshift51', 'extendedProperties' => ['private' => ['flzcalendarSource' => 'flzcalendar']]];
     $client = new class([$response(404), $response(200), $response(200, $owned), $response(200), $response(200, $owned), $response(204)]) implements IClient {
         public array $calls = [];
         public function __construct(private array $responses) {}
@@ -41,7 +41,7 @@ namespace {
     $clients = new class($client) implements IClientService { public function __construct(private IClient $client) {} public function newClient(): IClient { return $this->client; } };
     $l10n = new class implements IL10N {
         public function t(string $text, array $parameters = []): string {
-            return $text === 'Automatically synchronised from AD Calendar. Please make changes there.'
+            return $text === 'Automatically synchronised from Filzmann Calendar. Please make changes there.'
                 ? 'Translated provider description.'
                 : strtr($text, $parameters);
         }
@@ -56,8 +56,8 @@ namespace {
 
     if (array_column($client->calls, 0) !== ['GET', 'POST', 'GET', 'PUT', 'GET', 'DELETE']) throw new RuntimeException('Google-Ereignisse werden nicht idempotent erstellt, aktualisiert und gelöscht.');
     $created = json_decode((string)($client->calls[1][2]['body'] ?? ''), true);
-    if (($created['id'] ?? '') !== 'adcalendarshift51'
-        || ($created['extendedProperties']['private']['adcalendarSource'] ?? '') !== 'adcalendar'
+    if (($created['id'] ?? '') !== 'flzcalendarshift51'
+        || ($created['extendedProperties']['private']['flzcalendarSource'] ?? '') !== 'flzcalendar'
         || ($created['summary'] ?? '') !== 'Frühdienst'
         || ($created['description'] ?? '') !== 'Translated provider description.') {
         throw new RuntimeException('Google-Ereignis ist nicht stabil oder als App-Eigentum markiert.');

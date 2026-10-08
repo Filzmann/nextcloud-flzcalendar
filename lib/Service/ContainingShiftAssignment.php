@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace OCA\AdCalendar\Service;
+namespace OCA\FlzCalendar\Service;
 
 use InvalidArgumentException;
-use OCA\AdCalendar\Model\CalendarEntry;
+use OCA\FlzCalendar\Model\CalendarEntry;
 
 /**
  * Zweck: Ordnet einen Termin genau einem ihn vollständig enthaltenden Dienst zu.

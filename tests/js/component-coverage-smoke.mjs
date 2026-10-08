@@ -74,9 +74,9 @@ class BaseRepository {
     encode(value) { return encodeURIComponent(String(value)); }
     request(path, options = {}) { this.calls.push([path, options]); return Promise.resolve({ path, options }); }
 }
-const repositoryContext = { window: { LocalBase: { repositories: { Repository: BaseRepository } }, AdCalendar: {} }, JSON, Promise, encodeURIComponent };
+const repositoryContext = { window: { LocalBase: { repositories: { Repository: BaseRepository } }, FlzCalendar: {} }, JSON, Promise, encodeURIComponent };
 load('../../js/repositories/calendar-repository.js', repositoryContext);
-const repository = new repositoryContext.window.AdCalendar.repositories.CalendarRepository({});
+const repository = new repositoryContext.window.FlzCalendar.repositories.CalendarRepository({});
 await repository.week('2026-07-01');
 await repository.range('2026-07-01', '2026-08-01');
 await repository.save({ title: 'A' });
@@ -104,9 +104,9 @@ if (repository.calls.length !== 16
 
 // CalendarEntry: server payload hydration and stable serialisation defaults.
 class BaseModel {}
-const modelContext = { window: { LocalBase: { models: { Model: BaseModel } }, AdCalendar: {} }, Number, String, Boolean };
+const modelContext = { window: { LocalBase: { models: { Model: BaseModel } }, FlzCalendar: {} }, Number, String, Boolean };
 load('../../js/models/calendar-entry.js', modelContext);
-const CalendarEntry = modelContext.window.AdCalendar.models.CalendarEntry;
+const CalendarEntry = modelContext.window.FlzCalendar.models.CalendarEntry;
 const hydratedEntry = new CalendarEntry({
     id: '7', employeeUid: 42, start: null, end: 'end', type: 'appointment', title: 9,
     parentEntryId: '3', meetingUid: 5, seriesUid: 6, seriesTimezone: 7,
@@ -126,15 +126,15 @@ if (emptyEntry.id !== null || emptyEntry.parentEntryId !== null || emptyEntry.me
 
 // ShiftDefaults: rendering, enable/disable behavior, collection and form validation.
 const shiftElements = {
-    'adc-shift-defaults': new FakeNode(),
-    'adc-shift-defaults-form': new FakeNode('form'),
+    'flz-calendar-shift-defaults': new FakeNode(),
+    'flz-calendar-shift-defaults-form': new FakeNode('form'),
 };
-const shiftContext = { window: { AdCalendar: { l10n } }, document: documentFor(shiftElements), Array, Object };
+const shiftContext = { window: { FlzCalendar: { l10n } }, document: documentFor(shiftElements), Array, Object };
 load('../../js/components/shift-defaults.js', shiftContext);
 const savedDefaults = [];
-const shiftDefaults = new shiftContext.window.AdCalendar.components.ShiftDefaults({ onSave: async value => savedDefaults.push(value) });
+const shiftDefaults = new shiftContext.window.FlzCalendar.components.ShiftDefaults({ onSave: async value => savedDefaults.push(value) });
 shiftDefaults.set({ 1: { enabled: false, start: '09:00', end: '17:30' }, 2: { start: '07:30', end: '15:00' } });
-const rows = shiftElements['adc-shift-defaults'].querySelectorAll('[data-weekday]');
+const rows = shiftElements['flz-calendar-shift-defaults'].querySelectorAll('[data-weekday]');
 const mondayEnabled = rows[0].querySelector('[data-field="enabled"]');
 if (rows.length !== 7 || mondayEnabled.checked || !rows[0].querySelector('[data-field="start"]').disabled) {
     throw new Error('Standarddienstzeilen übernehmen deaktivierte Tageswerte nicht.');
@@ -142,17 +142,17 @@ if (rows.length !== 7 || mondayEnabled.checked || !rows[0].querySelector('[data-
 mondayEnabled.checked = true;
 await mondayEnabled.fire('change');
 if (rows[0].querySelector('[data-field="start"]').disabled) throw new Error('Aktivierter Standarddienst bleibt gesperrt.');
-shiftElements['adc-shift-defaults-form'].valid = false;
-await shiftElements['adc-shift-defaults-form'].fire('submit');
-shiftElements['adc-shift-defaults-form'].valid = true;
-await shiftElements['adc-shift-defaults-form'].fire('submit');
+shiftElements['flz-calendar-shift-defaults-form'].valid = false;
+await shiftElements['flz-calendar-shift-defaults-form'].fire('submit');
+shiftElements['flz-calendar-shift-defaults-form'].valid = true;
+await shiftElements['flz-calendar-shift-defaults-form'].fire('submit');
 if (savedDefaults.length !== 1 || savedDefaults[0]['1'].start !== '09:00' || savedDefaults[0]['2'].end !== '15:00') {
     throw new Error('Standarddienstformular validiert oder sammelt Tageswerte nicht korrekt.');
 }
 
 // CalendarFilters: ordered facets, leadership switch, search selection and reset.
 const filterElements = Object.fromEntries([
-    'adc-role-filters', 'adc-area-filters', 'adc-person-search', 'adc-search-results', 'adc-selected-people', 'adc-reset-selection',
+    'flz-calendar-role-filters', 'flz-calendar-area-filters', 'flz-calendar-person-search', 'flz-calendar-search-results', 'flz-calendar-selected-people', 'flz-calendar-reset-selection',
 ].map(id => [id, new FakeNode()]));
 const filterState = {
     data: { employees: [
@@ -171,37 +171,37 @@ const organization = {
     roleLabel: value => value.toUpperCase(), areaLabel: value => value.toUpperCase(),
 };
 let filterChanges = 0;
-const filterContext = { window: { AdCalendar: { l10n } }, document: documentFor(filterElements), Set };
+const filterContext = { window: { FlzCalendar: { l10n } }, document: documentFor(filterElements), Set };
 load('../../js/components/calendar-filters.js', filterContext);
-const filters = new filterContext.window.AdCalendar.components.CalendarFilters({
+const filters = new filterContext.window.FlzCalendar.components.CalendarFilters({
     state: filterState, organization: () => organization, leadershipStaffRoles: new Set(['staff']), onChange: () => { filterChanges += 1; },
 });
 filters.render();
-if (filterElements['adc-role-filters'].children.length !== 3
-    || filterElements['adc-role-filters'].children[0].children[1].textContent !== ' ROLE-A') {
+if (filterElements['flz-calendar-role-filters'].children.length !== 3
+    || filterElements['flz-calendar-role-filters'].children[0].children[1].textContent !== ' ROLE-A') {
     throw new Error('Rollenfilter werden nicht ohne Stabsrollen in Organisationsreihenfolge gerendert.');
 }
-const leadershipInput = filterElements['adc-role-filters'].children[2].children[0];
+const leadershipInput = filterElements['flz-calendar-role-filters'].children[2].children[0];
 leadershipInput.checked = false;
 await leadershipInput.fire('change');
 if (filterState.roles.has('staff') || filterState.leadershipStaffOnly || filterState.showLeadershipStaff) {
     throw new Error('Ausblenden des Leitungs-/Stabsblocks bereinigt den Filterzustand nicht.');
 }
-filterElements['adc-person-search'].value = 'alp';
-await filterElements['adc-person-search'].fire('input');
-const selectAlpha = filterElements['adc-search-results'].children[0].children[0];
+filterElements['flz-calendar-person-search'].value = 'alp';
+await filterElements['flz-calendar-person-search'].fire('input');
+const selectAlpha = filterElements['flz-calendar-search-results'].children[0].children[0];
 await selectAlpha.fire('click');
-if (!filterState.selected.has('a') || filterElements['adc-person-search'].value !== '') throw new Error('Personensuche übernimmt die Auswahl nicht.');
-const removeAlpha = filterElements['adc-selected-people'].children[0].children[0];
+if (!filterState.selected.has('a') || filterElements['flz-calendar-person-search'].value !== '') throw new Error('Personensuche übernimmt die Auswahl nicht.');
+const removeAlpha = filterElements['flz-calendar-selected-people'].children[0].children[0];
 await removeAlpha.fire('click');
 filterState.selected.add('b');
-await filterElements['adc-reset-selection'].fire('click');
+await filterElements['flz-calendar-reset-selection'].fire('click');
 if (filterState.selected.size !== 0 || filterState.persisted < 4 || filterChanges < 4) throw new Error('Filteränderungen werden nicht persistiert und gemeldet.');
 
 // MeetingFinder: validation, search, permission note, week advance, deselection and blocking.
 const meetingIds = [
-    'adc-meeting-dialog', 'adc-meeting-form', 'adc-meeting-search', 'adc-meeting-people', 'adc-meeting-duration',
-    'adc-meeting-title', 'adc-meeting-results', 'adc-meeting-week', 'adc-meeting-close', 'adc-meeting-cancel',
+    'flz-calendar-meeting-dialog', 'flz-calendar-meeting-form', 'flz-calendar-meeting-search', 'flz-calendar-meeting-people', 'flz-calendar-meeting-duration',
+    'flz-calendar-meeting-title', 'flz-calendar-meeting-results', 'flz-calendar-meeting-week', 'flz-calendar-meeting-close', 'flz-calendar-meeting-cancel',
 ];
 const meetingElements = Object.fromEntries(meetingIds.map(id => [id, new FakeNode(id.includes('form') ? 'form' : 'div')]));
 const gapCalls = []; const blockCalls = []; const meetingErrors = [];
@@ -214,39 +214,39 @@ const calendarDate = { isoDay: date => new Date(date).toISOString().slice(0, 10)
 const meetingDocument = documentFor(meetingElements);
 const meetingOpener = Object.assign(new FakeNode('button'), { isConnected: true });
 meetingDocument.activeElement = meetingOpener;
-const meetingContext = { window: { AdCalendar: { l10n, modules: { CalendarDate: calendarDate } } }, document: meetingDocument, Date, Number, Set };
+const meetingContext = { window: { FlzCalendar: { l10n, modules: { CalendarDate: calendarDate } } }, document: meetingDocument, Date, Number, Set };
 load('../../js/components/meeting-finder.js', meetingContext);
 let blocked = 0;
-const finder = new meetingContext.window.AdCalendar.components.MeetingFinder({
+const finder = new meetingContext.window.FlzCalendar.components.MeetingFinder({
     repository: meetingRepository, onError: error => meetingErrors.push(error.message), onBlocked: async () => { blocked += 1; },
 });
 const employees = [{ uid: 'a', displayName: 'Alpha' }, { uid: 'b', displayName: 'Beta' }, { uid: 'c', displayName: 'Gamma' }];
 finder.open('2026-07-06', employees, ['a']);
-if (!meetingElements['adc-meeting-dialog'].open || !meetingElements['adc-meeting-search'].focused || finder.selected.size !== 1) {
+if (!meetingElements['flz-calendar-meeting-dialog'].open || !meetingElements['flz-calendar-meeting-search'].focused || finder.selected.size !== 1) {
     throw new Error('Meetingdialog initialisiert Auswahl, Fokus oder Modalzustand nicht.');
 }
 await finder.searchWeek();
-if (!meetingElements['adc-meeting-results'].textContent.includes('at least two')) throw new Error('Meeting-Suche akzeptiert zu wenige Personen.');
-finder.selected.add('b'); meetingElements['adc-meeting-duration'].value = '10';
+if (!meetingElements['flz-calendar-meeting-results'].textContent.includes('at least two')) throw new Error('Meeting-Suche akzeptiert zu wenige Personen.');
+finder.selected.add('b'); meetingElements['flz-calendar-meeting-duration'].value = '10';
 await finder.searchWeek();
-if (!meetingElements['adc-meeting-results'].textContent.includes('15 and 480')) throw new Error('Meeting-Suche akzeptiert eine ungültige Dauer.');
-meetingElements['adc-meeting-duration'].value = '30';
+if (!meetingElements['flz-calendar-meeting-results'].textContent.includes('15 and 480')) throw new Error('Meeting-Suche akzeptiert eine ungültige Dauer.');
+meetingElements['flz-calendar-meeting-duration'].value = '30';
 gapResponse = { gaps: [{ start: '2026-07-06T10:00:00Z' }], canBlockAll: true };
 await finder.searchWeek();
-const blockButton = meetingElements['adc-meeting-results'].children[1].children[0].children[1];
+const blockButton = meetingElements['flz-calendar-meeting-results'].children[1].children[0].children[1];
 await blockButton.fire('click');
-if (!meetingElements['adc-meeting-title'].reported) throw new Error('Leerer Meetingtitel wird nicht validiert.');
-meetingElements['adc-meeting-title'].value = 'Planning';
+if (!meetingElements['flz-calendar-meeting-title'].reported) throw new Error('Leerer Meetingtitel wird nicht validiert.');
+meetingElements['flz-calendar-meeting-title'].value = 'Planning';
 await blockButton.fire('click');
-if (blockCalls.length !== 1 || blocked !== 1 || !meetingElements['adc-meeting-results'].textContent.includes('blocked')) {
+if (blockCalls.length !== 1 || blocked !== 1 || !meetingElements['flz-calendar-meeting-results'].textContent.includes('blocked')) {
     throw new Error('Gemeinsame Meetingblockierung wird nicht vollständig ausgeführt.');
 }
 gapResponse = { gaps: [{ start: '2026-07-06T11:00:00Z' }], canBlockAll: false };
 await finder.searchWeek();
-if (meetingElements['adc-meeting-results'].children.length !== 3) throw new Error('Fehlendes gemeinsames Bearbeitungsrecht wird nicht erklärt.');
+if (meetingElements['flz-calendar-meeting-results'].children.length !== 3) throw new Error('Fehlendes gemeinsames Bearbeitungsrecht wird nicht erklärt.');
 gapResponse = { gaps: [], canBlockAll: false };
 await finder.searchWeek();
-const actions = meetingElements['adc-meeting-results'].children[1];
+const actions = meetingElements['flz-calendar-meeting-results'].children[1];
 await actions.children[0].fire('click');
 if (finder.start !== '2026-07-13') throw new Error('Weitersuche springt nicht exakt eine Kalenderwoche.');
 await actions.children[1].fire('click');
@@ -254,18 +254,18 @@ if (finder.selected.has('a')) throw new Error('Person kann aus der erfolglosen M
 finder.selected.add('a');
 gapResponse = new Error('gap failed');
 await finder.searchWeek();
-meetingElements['adc-meeting-title'].value = 'fail';
+meetingElements['flz-calendar-meeting-title'].value = 'fail';
 await finder.block(new Date('2026-07-06T10:00:00Z'), new Date('2026-07-06T10:30:00Z'), blockButton);
 if (!meetingErrors.includes('gap failed') || !meetingErrors.includes('block failed') || blockButton.disabled) {
     throw new Error('Meeting-Suche oder -Blockierung meldet Providerfehler nicht bedienbar zurück.');
 }
-await meetingElements['adc-meeting-close'].fire('click');
-if (meetingElements['adc-meeting-dialog'].open || !meetingOpener.focused) throw new Error('Meetingdialog schließt nicht oder gibt den Fokus nicht an den Auslöser zurück.');
+await meetingElements['flz-calendar-meeting-close'].fire('click');
+if (meetingElements['flz-calendar-meeting-dialog'].open || !meetingOpener.focused) throw new Error('Meetingdialog schließt nicht oder gibt den Fokus nicht an den Auslöser zurück.');
 
 // EntryWorkflow: save/delete variants, meeting permissions, delegated clicks and choice dialogs.
 const workflowDocument = documentFor({});
 const workflowContext = {
-    window: { AdCalendar: { l10n }, confirm: () => true },
+    window: { FlzCalendar: { l10n }, confirm: () => true },
     document: workflowDocument,
     Element: FakeNode,
     Date, Number, Promise, Error,
@@ -286,7 +286,7 @@ const workflowState = { data: { employees: [{ uid: 'a', canManage: true }], entr
 const workflowDialog = { opened: [], closed: 0, open(value) { this.opened.push(value); }, close() { this.closed += 1; } };
 const workflowMessages = []; let workflowReloads = 0;
 const workflowBody = new FakeNode();
-const workflow = new workflowContext.window.AdCalendar.modules.EntryWorkflow({
+const workflow = new workflowContext.window.FlzCalendar.modules.EntryWorkflow({
     repository: workflowRepository, state: workflowState, dialog: workflowDialog, body: workflowBody,
     show: (message, error = false) => workflowMessages.push([message, error]), reload: async () => { workflowReloads += 1; },
 });

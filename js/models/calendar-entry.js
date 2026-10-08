@@ -5,7 +5,7 @@
 
     /**
      * Zweck: Hydriert den serverseitigen CalendarEntry-Vertrag für Komponenten und Workflows.
-     * Spiegelung: PHP: OCA\AdCalendar\Model\CalendarEntry::toArray().
+     * Spiegelung: PHP: OCA\FlzCalendar\Model\CalendarEntry::toArray().
      */
     class CalendarEntry extends BaseModel {
         constructor(data = {}) {
@@ -47,7 +47,7 @@
         }
     }
 
-    window.AdCalendar = window.AdCalendar || {};
-    window.AdCalendar.models = window.AdCalendar.models || {};
-    window.AdCalendar.models.CalendarEntry = CalendarEntry;
+    window.FlzCalendar = window.FlzCalendar || {};
+    window.FlzCalendar.models = window.FlzCalendar.models || {};
+    window.FlzCalendar.models.CalendarEntry = CalendarEntry;
 })();

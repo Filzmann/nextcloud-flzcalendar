@@ -8,8 +8,8 @@ namespace OCP {
 namespace OCP\Config {
     interface IUserConfig { public function getValueString(string $uid, string $app, string $key, string $default = ''): string; }
 }
-namespace OCA\AdCalendar\Repository {
-    use OCA\AdCalendar\Model\CalendarEntry;
+namespace OCA\FlzCalendar\Repository {
+    use OCA\FlzCalendar\Model\CalendarEntry;
     final class CalendarEntryRepository {
         public array $existing = [];
         public array $removed = [];
@@ -26,8 +26,8 @@ namespace OCA\AdCalendar\Repository {
         }
     }
 }
-namespace OCA\AdCalendar\Service {
-    use OCA\AdCalendar\Model\CalendarEntry;
+namespace OCA\FlzCalendar\Service {
+    use OCA\FlzCalendar\Model\CalendarEntry;
     final class CalendarPreferenceService {
         public array $defaults = [];
         public function storedShiftDefaults(string $uid): ?array { return $this->defaults[$uid] ?? null; }
@@ -51,16 +51,24 @@ namespace OCA\AdCalendar\Service {
         public function remove(CalendarEntry $entry): void { $this->removed[] = $entry->id(); }
         public function publish(CalendarEntry $entry): void { $this->published[] = $entry; }
     }
+    final class PlanningConflictService {
+        public array $checks = [];
+        public function checkShift(string $uid, \DateTimeImmutable $start, \DateTimeImmutable $end): array {
+            $this->checks[] = [$uid, $start->format('Y-m-d')];
+            return ['status' => 'available', 'blocked' => $start->format('Y-m-d') === '2026-07-11'];
+        }
+    }
 }
 
 namespace {
 
-    use OCA\AdCalendar\Model\CalendarEntry;
-    use OCA\AdCalendar\Repository\CalendarEntryRepository;
-    use OCA\AdCalendar\Service\CalendarPreferenceService;
-    use OCA\AdCalendar\Service\DefaultShiftMaterializer;
-    use OCA\AdCalendar\Service\DefaultShiftOccurrenceFactory;
-    use OCA\AdCalendar\Service\ShiftCalendarSyncService;
+    use OCA\FlzCalendar\Model\CalendarEntry;
+    use OCA\FlzCalendar\Repository\CalendarEntryRepository;
+    use OCA\FlzCalendar\Service\CalendarPreferenceService;
+    use OCA\FlzCalendar\Service\DefaultShiftMaterializer;
+    use OCA\FlzCalendar\Service\DefaultShiftOccurrenceFactory;
+    use OCA\FlzCalendar\Service\PlanningConflictService;
+    use OCA\FlzCalendar\Service\ShiftCalendarSyncService;
     use OCP\Config\IUserConfig;
     use OCP\IConfig;
 
@@ -109,11 +117,12 @@ namespace {
         public function overlaps(\DateTimeImmutable $start, \DateTimeImmutable $end): bool { return true; }
     };
 
-    $materializer = new DefaultShiftMaterializer($entries, $preferences, $factory, $config, $userConfig, $sync);
+    $planning = new PlanningConflictService();
+    $materializer = new DefaultShiftMaterializer($entries, $preferences, $factory, $config, $userConfig, $sync, $planning);
     $materializer->syncWeek(new DateTimeImmutable('2026-07-06T00:00:00Z'), ['person-a', 'person-a', 'no-defaults'], [$irrelevantAbsence, $absence]);
 
-    if ($entries->removed !== [3, 4] || $sync->removed !== [3, 4]) {
-        throw new RuntimeException('Deaktivierte oder bereits durch geplanten Urlaub blockierte Standarddienste werden nicht konsistent entfernt.');
+    if ($entries->removed !== [3, 4, 6] || $sync->removed !== [3, 4, 6]) {
+        throw new RuntimeException('Deaktivierte oder durch Urlaub beziehungsweise Assistenz blockierte Standarddienste werden nicht konsistent entfernt.');
     }
     if (count($entries->saved) !== 1 || $entries->saved[0][1] !== 'person-a'
         || $entries->saved[0][0]->defaultDate() !== '2026-07-12'
@@ -126,6 +135,9 @@ namespace {
     }
     if (count($factory->calls) !== 4 || array_unique(array_column($factory->calls, 2)) !== ['UTC']) {
         throw new RuntimeException('Geschützte Vorkommen werden nicht übersprungen oder ungültige Zeitzone fällt nicht auf UTC zurück.');
+    }
+    if (!in_array(['person-a', '2026-07-11'], $planning->checks, true)) {
+        throw new RuntimeException('Regelmäßige Kalenderdienste werden nicht gegen Assistenzschichten geprüft.');
     }
 
     echo "DefaultShiftMaterializerExecutionTest: OK\n";

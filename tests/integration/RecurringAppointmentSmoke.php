@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 require dirname(__DIR__, 4) . '/lib/base.php';
 
-use OCA\AdCalendar\Repository\CalendarEntryRepository;
-use OCA\AdCalendar\Service\RecurringAppointmentService;
+use OCA\FlzCalendar\Repository\CalendarEntryRepository;
+use OCA\FlzCalendar\Service\RecurringAppointmentService;
 use OCP\IUserManager;
 
 /**
@@ -20,7 +20,7 @@ $assert = static function (bool $condition, string $message): void {
 $users = \OCP\Server::get(IUserManager::class);
 $entries = \OCP\Server::get(CalendarEntryRepository::class);
 $recurrences = \OCP\Server::get(RecurringAppointmentService::class);
-$uid = 'adc-series-smoke-' . bin2hex(random_bytes(5));
+$uid = 'flz-calendar-series-smoke-' . bin2hex(random_bytes(5));
 $user = $users->createUser($uid, bin2hex(random_bytes(24)));
 if ($user === null) throw new RuntimeException('Temporäres Serienkonto konnte nicht angelegt werden.');
 
@@ -65,7 +65,7 @@ try {
     $assert($entries->findSeries($seriesUid) === [], 'Die reale Serienlöschung hat Vorkommen zurückgelassen.');
     $seriesUid = null;
 
-    echo "AD Kalender/Serientermine DDEV-Integration: OK\n";
+    echo "Filzmann Kalender/Serientermine DDEV-Integration: OK\n";
 } finally {
     if ($seriesUid !== null) $entries->deleteSeries($seriesUid);
     $user->delete();

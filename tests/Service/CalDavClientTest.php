@@ -8,18 +8,18 @@ namespace OCP\Http\Client {
     interface IClient { public function request(string $method, string $uri, array $options = []): IResponse; public function getResponseFromThrowable(\Throwable $error): IResponse; }
     interface IClientService { public function newClient(): IClient; }
 }
-namespace OCA\AdCalendar\Service {
-    final class CalendarTargetConfig { public function calendarName(): string { return 'AD Dienste'; } }
+namespace OCA\FlzCalendar\Service {
+    final class CalendarTargetConfig { public function calendarName(): string { return 'Filzmann Dienste'; } }
 }
 
 namespace {
 
-    use OCA\AdCalendar\CalendarSync\CalDavClient;
-    use OCA\AdCalendar\CalendarSync\ExternalCalendarConnectionException;
-    use OCA\AdCalendar\CalendarSync\ExternalCalendarUrlValidator;
-    use OCA\AdCalendar\CalendarSync\ShiftCalendarEventSerializer;
-    use OCA\AdCalendar\Model\CalendarEntry;
-    use OCA\AdCalendar\Service\CalendarTargetConfig;
+    use OCA\FlzCalendar\CalendarSync\CalDavClient;
+    use OCA\FlzCalendar\CalendarSync\ExternalCalendarConnectionException;
+    use OCA\FlzCalendar\CalendarSync\ExternalCalendarUrlValidator;
+    use OCA\FlzCalendar\CalendarSync\ShiftCalendarEventSerializer;
+    use OCA\FlzCalendar\Model\CalendarEntry;
+    use OCA\FlzCalendar\Service\CalendarTargetConfig;
     use OCP\Http\Client\IClient;
     use OCP\Http\Client\IClientService;
     use OCP\Http\Client\IResponse;
@@ -33,7 +33,7 @@ namespace {
         public function getStatusCode(): int { return $this->status; }
         public function getHeader(string $key): string { return ''; }
     };
-    $calendarXml = '<?xml version="1.0"?><d:multistatus xmlns:d="DAV:"><d:response><d:href>/caldav/person/ad-dienste/</d:href><d:propstat><d:prop><d:displayname>AD Dienste</d:displayname></d:prop></d:propstat></d:response></d:multistatus>';
+    $calendarXml = '<?xml version="1.0"?><d:multistatus xmlns:d="DAV:"><d:response><d:href>/caldav/person/flz-dienste/</d:href><d:propstat><d:prop><d:displayname>Filzmann Dienste</d:displayname></d:prop></d:propstat></d:response></d:multistatus>';
     $queue = [
         $response(207, $calendarXml),
         $response(207, $calendarXml),
@@ -69,7 +69,7 @@ namespace {
     $dav = new CalDavClient($clients, new ExternalCalendarUrlValidator(), new ShiftCalendarEventSerializer($l10n), $targets);
     $connection = [
         'serverUrl' => 'https://calendar.example.test/',
-        'calendarUrl' => 'https://calendar.example.test/caldav/person/ad-dienste/',
+        'calendarUrl' => 'https://calendar.example.test/caldav/person/flz-dienste/',
         'username' => 'person',
         'password' => 'secret',
     ];
@@ -79,7 +79,7 @@ namespace {
 
     $methods = array_column($client->calls, 0);
     if ($methods !== ['PROPFIND', 'PROPFIND', 'GET', 'PUT', 'PROPFIND', 'GET', 'DELETE']) throw new RuntimeException('CalDAV-Abgleich ist nicht idempotent oder räumt Dienste nicht gezielt auf.');
-    if (!str_contains($client->saved, 'X-AD-CALENDAR-SOURCE:adcalendar') || !str_contains($client->saved, 'X-AD-CALENDAR-ENTRY-ID:42')) throw new RuntimeException('CalDAV-Objekt trägt keine sichere Eigentumsmarkierung.');
+    if (!str_contains($client->saved, 'X-FLZ-CALENDAR-SOURCE:flzcalendar') || !str_contains($client->saved, 'X-FLZ-CALENDAR-ENTRY-ID:42')) throw new RuntimeException('CalDAV-Objekt trägt keine sichere Eigentumsmarkierung.');
     foreach ($client->calls as [, $url, $options]) {
         if (str_contains($url, 'secret') || ($options['auth'] ?? null) !== ['person', 'secret'] || ($options['allow_redirects'] ?? null) !== false) {
             throw new RuntimeException('CalDAV-Zugangsdaten oder HTTPS-Weiterleitungsgrenze sind unsicher.');

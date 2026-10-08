@@ -1,18 +1,18 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-: "${ADC_BASE_URL:?ADC_BASE_URL fehlt}"
-: "${ADC_USER:?ADC_USER fehlt}"
-: "${ADC_PASSWORD:?ADC_PASSWORD fehlt}"
+: "${FLZC_BASE_URL:?FLZC_BASE_URL fehlt}"
+: "${FLZC_USER:?FLZC_USER fehlt}"
+: "${FLZC_PASSWORD:?FLZC_PASSWORD fehlt}"
 
 app_page="$(mktemp)"
 api_response="$(mktemp)"
 trap 'rm -f "$app_page" "$api_response"' EXIT
 
-curl --fail --silent --show-error --insecure --user "$ADC_USER:$ADC_PASSWORD" \
-    "$ADC_BASE_URL/index.php/apps/adcalendar/" --output "$app_page"
+curl --fail --silent --show-error --insecure --user "$FLZC_USER:$FLZC_PASSWORD" \
+    "$FLZC_BASE_URL/index.php/apps/flzcalendar/" --output "$app_page"
 
-for contract in 'id="adcalendar-app"' 'id="adc-week-number"' 'id="adc-person-search"' 'id="adc-toggle-view"'; do
+for contract in 'id="flzcalendar-app"' 'id="flz-calendar-week-number"' 'id="flz-calendar-person-search"' 'id="flz-calendar-toggle-view"'; do
     if ! grep -q "$contract" "$app_page"; then
         echo "App-DOM-Vertrag fehlt: $contract" >&2
         exit 1
@@ -20,8 +20,8 @@ for contract in 'id="adcalendar-app"' 'id="adc-week-number"' 'id="adc-person-sea
 done
 
 week_start="$(date -d 'monday this week' +%F)"
-curl --fail --silent --show-error --insecure --user "$ADC_USER:$ADC_PASSWORD" \
-    "$ADC_BASE_URL/index.php/apps/adcalendar/api/week?start=$week_start" --output "$api_response"
+curl --fail --silent --show-error --insecure --user "$FLZC_USER:$FLZC_PASSWORD" \
+    "$FLZC_BASE_URL/index.php/apps/flzcalendar/api/week?start=$week_start" --output "$api_response"
 for contract in '"employees"' '"entries"' '"organization"' '"currentUserProfile"'; do
     if ! grep -q "$contract" "$api_response"; then
         echo "API-Vertrag fehlt: $contract" >&2
@@ -29,4 +29,4 @@ for contract in '"employees"' '"entries"' '"organization"' '"currentUserProfile"
     fi
 done
 
-echo "AD Calendar HTTP smoke: OK ($ADC_USER)"
+echo "Filzmann Calendar HTTP smoke: OK ($FLZC_USER)"

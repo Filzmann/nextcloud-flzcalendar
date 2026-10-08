@@ -1,11 +1,11 @@
 (function() {
     'use strict';
-    const l10n = window.AdCalendar.l10n;
+    const l10n = window.FlzCalendar.l10n;
 
     const providers = {
         kopano: {
             title: l10n.t('Connect Kopano'),
-            serverUrl: 'https://mail.adberlin.org',
+            serverUrl: '',
             instruction: l10n.t('Sign in with your Kopano username and password. The prefilled server address can be changed. Requirement: the Kopano provider must allow CalDAV over HTTPS; the app cannot enable this server access itself.'),
             usernameLabel: l10n.t('Kopano username'),
             passwordLabel: l10n.t('Kopano password'),
@@ -31,24 +31,24 @@
         constructor(options) {
             this.repository = options.repository;
             this.onMessage = options.onMessage;
-            this.dialog = document.getElementById('adc-external-calendar-dialog');
-            this.form = document.getElementById('adc-external-calendar-form');
-            this.provider = document.getElementById('adc-external-provider');
-            this.heading = document.getElementById('adc-external-dialog-heading');
-            this.instruction = document.getElementById('adc-external-instruction');
-            this.serverUrl = document.getElementById('adc-external-server-url');
-            this.username = document.getElementById('adc-external-username');
-            this.password = document.getElementById('adc-external-password');
-            this.usernameLabel = document.getElementById('adc-external-username-label');
-            this.passwordLabel = document.getElementById('adc-external-password-label');
+            this.dialog = document.getElementById('flz-calendar-external-calendar-dialog');
+            this.form = document.getElementById('flz-calendar-external-calendar-form');
+            this.provider = document.getElementById('flz-calendar-external-provider');
+            this.heading = document.getElementById('flz-calendar-external-dialog-heading');
+            this.instruction = document.getElementById('flz-calendar-external-instruction');
+            this.serverUrl = document.getElementById('flz-calendar-external-server-url');
+            this.username = document.getElementById('flz-calendar-external-username');
+            this.password = document.getElementById('flz-calendar-external-password');
+            this.usernameLabel = document.getElementById('flz-calendar-external-username-label');
+            this.passwordLabel = document.getElementById('flz-calendar-external-password-label');
             this.returnFocus = null;
-            this.calendarName = this.dialog.dataset?.calendarName || 'AD Dienste';
+            this.calendarName = this.dialog.dataset?.calendarName || 'Filzmann Dienste';
             providers.kopano.serverUrl = this.dialog.dataset?.kopanoDefault || providers.kopano.serverUrl;
-            providers.manual.instruction = l10n.t('Enter your provider’s HTTPS CalDAV address. AD Calendar discovers the calendar path and creates the visible calendar “{calendar}”.', { calendar: this.calendarName });
+            providers.manual.instruction = l10n.t('Enter your provider’s HTTPS CalDAV address. Filzmann Calendar discovers the calendar path and creates the visible calendar “{calendar}”.', { calendar: this.calendarName });
             this.form.addEventListener('submit', event => this.submit(event));
             this.dialog.addEventListener('cancel', event => { event.preventDefault(); this.close(); });
-            document.getElementById('adc-external-dialog-close').addEventListener('click', () => this.close());
-            document.getElementById('adc-external-dialog-cancel').addEventListener('click', () => this.close());
+            document.getElementById('flz-calendar-external-dialog-close').addEventListener('click', () => this.close());
+            document.getElementById('flz-calendar-external-dialog-cancel').addEventListener('click', () => this.close());
             for (const button of document.querySelectorAll('[data-external-connect]')) button.addEventListener('click', () => this.connect(button.dataset.externalConnect));
             for (const button of document.querySelectorAll('[data-external-disconnect]')) button.addEventListener('click', () => this.disconnect(button.dataset.externalDisconnect));
         }
@@ -63,12 +63,12 @@
         set(statuses) {
             for (const [provider, status] of Object.entries(statuses)) {
                 if (status.calendarName) this.calendarName = status.calendarName;
-                const text = document.getElementById(`adc-external-${provider}-status`);
+                const text = document.getElementById(`flz-calendar-external-${provider}-status`);
                 const connect = document.querySelector(`[data-external-connect="${provider}"]`);
                 const disconnect = document.querySelector(`[data-external-disconnect="${provider}"]`);
                 if (!text || !connect || !disconnect) continue;
                 text.textContent = status.connected
-                    ? l10n.t('Connected – target calendar “{calendar}”', { calendar: status.calendarName || 'AD Dienste' })
+                    ? l10n.t('Connected – target calendar “{calendar}”', { calendar: status.calendarName || 'Filzmann Dienste' })
                     : status.available === false ? l10n.t('Not configured by an administrator yet.') : l10n.t('Not connected.');
                 connect.hidden = false;
                 connect.disabled = status.available === false;
@@ -117,7 +117,7 @@
         }
 
         async disconnect(provider) {
-            if (!window.confirm(l10n.t('Disconnect and remove all shifts created by AD Calendar from this provider?'))) return;
+            if (!window.confirm(l10n.t('Disconnect and remove all shifts created by Filzmann Calendar from this provider?'))) return;
             try {
                 const response = await this.repository.disconnectExternalCalendar(provider);
                 this.set(response.externalCalendars || {});
@@ -138,7 +138,7 @@
         }
     }
 
-    window.AdCalendar = window.AdCalendar || {};
-    window.AdCalendar.components = window.AdCalendar.components || {};
-    window.AdCalendar.components.ExternalCalendars = ExternalCalendars;
+    window.FlzCalendar = window.FlzCalendar || {};
+    window.FlzCalendar.components = window.FlzCalendar.components || {};
+    window.FlzCalendar.components.ExternalCalendars = ExternalCalendars;
 })();

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OCA\AdCalendar\CalendarSync;
+namespace OCA\FlzCalendar\CalendarSync;
 
 /** Sichere, für Nutzer*innen verständliche Providerdiagnose ohne interne Verbindungsdetails. */
 final class ExternalCalendarConnectionException extends \RuntimeException {

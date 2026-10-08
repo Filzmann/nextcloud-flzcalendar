@@ -17,7 +17,7 @@ namespace OCP\BackgroundJob {
         abstract protected function run($argument): void;
     }
 }
-namespace OCA\AdCalendar\Service {
+namespace OCA\FlzCalendar\Service {
     final class ShiftCalendarReconciliationService {
         public int $calls = 0;
         public function reconcileAll(): array { $this->calls++; return ['attempted' => 2, 'succeeded' => 1, 'failed' => 1]; }
@@ -30,9 +30,9 @@ namespace OCA\AdCalendar\Service {
 
 namespace {
 
-    use OCA\AdCalendar\BackgroundJob\ReconcileShiftCalendarsJob;
-    use OCA\AdCalendar\Service\ShiftCalendarReconciliationService;
-    use OCA\AdCalendar\Service\ShiftCalendarReconciliationStatusService;
+    use OCA\FlzCalendar\BackgroundJob\ReconcileShiftCalendarsJob;
+    use OCA\FlzCalendar\Service\ShiftCalendarReconciliationService;
+    use OCA\FlzCalendar\Service\ShiftCalendarReconciliationStatusService;
     use OCP\AppFramework\Utility\ITimeFactory;
     use OCP\BackgroundJob\IJob;
 
@@ -48,7 +48,7 @@ namespace {
     if ($status->recorded !== [['attempted' => 2, 'succeeded' => 1, 'failed' => 1]]) throw new RuntimeException('Background-Job schreibt keinen aggregierten DAV-Laufstatus.');
 
     $info = file_get_contents(__DIR__ . '/../../appinfo/info.xml');
-    if ($info === false || !str_contains($info, '<job>OCA\AdCalendar\BackgroundJob\ReconcileShiftCalendarsJob</job>')) {
+    if ($info === false || !str_contains($info, '<job>OCA\FlzCalendar\BackgroundJob\ReconcileShiftCalendarsJob</job>')) {
         throw new RuntimeException('DAV-Abgleich ist nicht im Nextcloud-App-Manifest registriert.');
     }
 

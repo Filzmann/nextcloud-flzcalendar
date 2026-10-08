@@ -3,11 +3,11 @@
 declare(strict_types=1);
 
 
-use OCA\AdCalendar\CalendarSync\ExternalCalendarUrlValidator;
+use OCA\FlzCalendar\CalendarSync\ExternalCalendarUrlValidator;
 
 $validator = new ExternalCalendarUrlValidator();
 
-if ($validator->normalize('https://mail.adberlin.org') !== 'https://mail.adberlin.org/') {
+if ($validator->normalize('https://calendar.example.test') !== 'https://calendar.example.test/') {
     throw new RuntimeException('Die Kopano-Vorgabe wird nicht als HTTPS-CalDAV-Basis normalisiert.');
 }
 if ($validator->normalize(' https://calendar.example.test/dav ') !== 'https://calendar.example.test/dav/') {

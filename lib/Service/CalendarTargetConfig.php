@@ -2,17 +2,17 @@
 
 declare(strict_types=1);
 
-namespace OCA\AdCalendar\Service;
+namespace OCA\FlzCalendar\Service;
 
 use InvalidArgumentException;
-use OCA\AdCalendar\AppInfo\Application;
-use OCA\AdCalendar\CalendarSync\ExternalCalendarUrlValidator;
+use OCA\FlzCalendar\AppInfo\Application;
+use OCA\FlzCalendar\CalendarSync\ExternalCalendarUrlValidator;
 use OCP\IAppConfig;
 
 /** Zentrale, validierte AppConfig-Quelle für nicht geheime Kalenderdefaults. */
 final class CalendarTargetConfig {
-    public const DEFAULT_KOPANO_URL = 'https://mail.adberlin.org/';
-    public const DEFAULT_CALENDAR_NAME = 'AD Dienste';
+    public const DEFAULT_KOPANO_URL = '';
+    public const DEFAULT_CALENDAR_NAME = 'Filzmann Dienste';
     private const KOPANO_URL_KEY = 'calendar_default_kopano_url';
     private const CALENDAR_NAME_KEY = 'calendar_default_name';
     private const CALENDAR_NAME_HISTORY_KEY = 'calendar_default_name_history';
@@ -21,13 +21,15 @@ final class CalendarTargetConfig {
     public function __construct(private IAppConfig $config, private ExternalCalendarUrlValidator $urls) {}
 
     public function kopanoUrl(): string {
+        $configured = $this->config->getValueString(
+            Application::APP_ID,
+            self::KOPANO_URL_KEY,
+            self::DEFAULT_KOPANO_URL,
+            true,
+        );
+        if (trim($configured) === '') return self::DEFAULT_KOPANO_URL;
         try {
-            return $this->urls->normalize($this->config->getValueString(
-                Application::APP_ID,
-                self::KOPANO_URL_KEY,
-                self::DEFAULT_KOPANO_URL,
-                true,
-            ));
+            return $this->urls->normalize($configured);
         } catch (InvalidArgumentException) {
             return self::DEFAULT_KOPANO_URL;
         }

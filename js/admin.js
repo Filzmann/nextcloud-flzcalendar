@@ -1,16 +1,16 @@
 (function() {
     'use strict';
 
-    const client = new window.LocalBase.api.ApiClient({ appId: 'adcalendar' });
-    const l10n = window.AdCalendar.l10n;
+    const client = new window.LocalBase.api.ApiClient({ appId: 'flzcalendar' });
+    const l10n = window.FlzCalendar.l10n;
 
     function initCalendarDefaults() {
-        const form = document.getElementById('adc-calendar-defaults-form');
+        const form = document.getElementById('flz-calendar-calendar-defaults-form');
         if (!form) return;
-        const kopanoUrl = document.getElementById('adc-calendar-default-kopano-url');
-        const calendarName = document.getElementById('adc-calendar-default-name');
-        const status = document.getElementById('adc-calendar-defaults-status');
-        const submit = document.getElementById('adc-calendar-defaults-submit');
+        const kopanoUrl = document.getElementById('flz-calendar-calendar-default-kopano-url');
+        const calendarName = document.getElementById('flz-calendar-calendar-default-name');
+        const status = document.getElementById('flz-calendar-calendar-defaults-status');
+        const submit = document.getElementById('flz-calendar-calendar-defaults-submit');
         const showStatus = (message, error = false) => {
             status.textContent = message;
             status.classList.remove('is-success', 'is-error');
@@ -36,14 +36,14 @@
     }
 
     function initGoogleOAuth() {
-        const form = document.getElementById('adc-google-oauth-form');
+        const form = document.getElementById('flz-calendar-google-oauth-form');
         if (!form) return;
-        const clientId = document.getElementById('adc-google-client-id');
-        const secret = document.getElementById('adc-google-client-secret');
-        const status = document.getElementById('adc-google-oauth-status');
-        const remove = document.getElementById('adc-google-oauth-remove');
-        const copy = document.getElementById('adc-google-copy-redirect');
-        const redirect = document.getElementById('adc-google-redirect-uri');
+        const clientId = document.getElementById('flz-calendar-google-client-id');
+        const secret = document.getElementById('flz-calendar-google-client-secret');
+        const status = document.getElementById('flz-calendar-google-oauth-status');
+        const remove = document.getElementById('flz-calendar-google-oauth-remove');
+        const copy = document.getElementById('flz-calendar-google-copy-redirect');
+        const redirect = document.getElementById('flz-calendar-google-redirect-uri');
 
         const showStatus = (message, error = false) => {
             status.textContent = message;
@@ -101,13 +101,13 @@
     }
 
     function initCalDavTest() {
-        const form = document.getElementById('adc-kopano-test-form');
+        const form = document.getElementById('flz-calendar-kopano-test-form');
         if (!form) return;
-        const serverUrl = document.getElementById('adc-kopano-test-url');
-        const username = document.getElementById('adc-kopano-test-username');
-        const password = document.getElementById('adc-kopano-test-password');
-        const status = document.getElementById('adc-kopano-test-status');
-        const submit = document.getElementById('adc-kopano-test-submit');
+        const serverUrl = document.getElementById('flz-calendar-kopano-test-url');
+        const username = document.getElementById('flz-calendar-kopano-test-username');
+        const password = document.getElementById('flz-calendar-kopano-test-password');
+        const status = document.getElementById('flz-calendar-kopano-test-status');
+        const submit = document.getElementById('flz-calendar-kopano-test-submit');
 
         const showStatus = (message, error = false) => {
             status.textContent = message;
@@ -135,9 +135,9 @@
     }
 
     function initDemoPack() {
-        const confirmation = document.getElementById('adc-demo-confirm');
-        const button = document.getElementById('adc-demo-install');
-        const notice = document.getElementById('adc-demo-notice');
+        const confirmation = document.getElementById('flz-calendar-demo-confirm');
+        const button = document.getElementById('flz-calendar-demo-install');
+        const notice = document.getElementById('flz-calendar-demo-notice');
         if (!confirmation || !button || !notice) return;
 
         confirmation.addEventListener('change', () => { button.disabled = !confirmation.checked; });
@@ -145,7 +145,7 @@
             if (!confirmation.checked) return;
             button.disabled = true;
             notice.hidden = false;
-            notice.className = 'adc-admin-notice';
+            notice.className = 'flz-calendar-admin-notice';
             notice.textContent = l10n.t('The demo pack is being checked and installed …');
             try {
                 const response = await client.request('/api/admin/demo-pack/install', { method: 'POST', body: '{}' });

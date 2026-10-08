@@ -1,7 +1,7 @@
 (function() {
     'use strict';
-    const CalendarDate = window.AdCalendar.modules.CalendarDate;
-    const l10n = window.AdCalendar.l10n;
+    const CalendarDate = window.FlzCalendar.modules.CalendarDate;
+    const l10n = window.FlzCalendar.l10n;
 
     /**
      * Zweck: Steuert Woche, Monat und Orientierung der Kalendermatrix als zusammengehörige Navigation.
@@ -14,17 +14,17 @@
             this.onWeekChange = options.onWeekChange;
             this.onViewChange = options.onViewChange;
             this.onPeriodChange = options.onPeriodChange || options.onWeekChange;
-            this.label = document.getElementById('adc-week-label');
-            this.weekNumber = document.getElementById('adc-week-number');
-            this.monthNumber = document.getElementById('adc-month-number');
-            this.weekPicker = document.getElementById('adc-week-picker');
-            this.monthPicker = document.getElementById('adc-month-picker');
-            this.previous = document.getElementById('adc-previous-period');
-            this.next = document.getElementById('adc-next-period');
-            this.weekButton = document.getElementById('adc-period-week');
-            this.monthButton = document.getElementById('adc-period-month');
-            this.toggleView = document.getElementById('adc-toggle-view');
-            this.heading = document.getElementById('adc-overview-heading');
+            this.label = document.getElementById('flz-calendar-week-label');
+            this.weekNumber = document.getElementById('flz-calendar-week-number');
+            this.monthNumber = document.getElementById('flz-calendar-month-number');
+            this.weekPicker = document.getElementById('flz-calendar-week-picker');
+            this.monthPicker = document.getElementById('flz-calendar-month-picker');
+            this.previous = document.getElementById('flz-calendar-previous-period');
+            this.next = document.getElementById('flz-calendar-next-period');
+            this.weekButton = document.getElementById('flz-calendar-period-week');
+            this.monthButton = document.getElementById('flz-calendar-period-month');
+            this.toggleView = document.getElementById('flz-calendar-toggle-view');
+            this.heading = document.getElementById('flz-calendar-overview-heading');
             this.previous.addEventListener('click', () => this.state.period === 'month' ? this.moveMonth(-1) : this.move(-7));
             this.next.addEventListener('click', () => this.state.period === 'month' ? this.moveMonth(1) : this.move(7));
             this.weekNumber.addEventListener('change', event => this.select(event.target.value));
@@ -103,7 +103,7 @@
 
     }
 
-    window.AdCalendar = window.AdCalendar || {};
-    window.AdCalendar.components = window.AdCalendar.components || {};
-    window.AdCalendar.components.WeekNavigation = WeekNavigation;
+    window.FlzCalendar = window.FlzCalendar || {};
+    window.FlzCalendar.components = window.FlzCalendar.components || {};
+    window.FlzCalendar.components.WeekNavigation = WeekNavigation;
 })();

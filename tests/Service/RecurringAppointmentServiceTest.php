@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-namespace OCA\AdCalendar\Repository {
-    use OCA\AdCalendar\Model\CalendarEntry;
+namespace OCA\FlzCalendar\Repository {
+    use OCA\FlzCalendar\Model\CalendarEntry;
 
     final class CalendarEntryRepository {
         public array $saved = [];
@@ -19,18 +19,18 @@ namespace OCA\AdCalendar\Repository {
     }
 }
 
-namespace OCA\AdCalendar\Service {
-    use OCA\AdCalendar\Model\CalendarEntry;
+namespace OCA\FlzCalendar\Service {
+    use OCA\FlzCalendar\Model\CalendarEntry;
 
     final class ContainingShiftAssignment { public function assign(CalendarEntry $entry, array $parents): CalendarEntry { return $entry; } }
 }
 
 namespace {
 
-    use OCA\AdCalendar\Model\CalendarEntry;
-    use OCA\AdCalendar\Repository\CalendarEntryRepository;
-    use OCA\AdCalendar\Service\ContainingShiftAssignment;
-    use OCA\AdCalendar\Service\RecurringAppointmentService;
+    use OCA\FlzCalendar\Model\CalendarEntry;
+    use OCA\FlzCalendar\Repository\CalendarEntryRepository;
+    use OCA\FlzCalendar\Service\ContainingShiftAssignment;
+    use OCA\FlzCalendar\Service\RecurringAppointmentService;
 
     $repository = new CalendarEntryRepository();
     $service = new RecurringAppointmentService($repository, new ContainingShiftAssignment());

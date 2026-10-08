@@ -8,22 +8,22 @@ namespace OCP\Http\Client {
     interface IClient { public function request(string $method, string $uri, array $options = []): IResponse; public function getResponseFromThrowable(\Throwable $error): IResponse; }
     interface IClientService { public function newClient(): IClient; }
 }
-namespace OCA\AdCalendar\CalendarSync {
+namespace OCA\FlzCalendar\CalendarSync {
     final class GoogleOAuthService { public function accessToken(string $uid, array $connection): string { return 'token-for-' . $uid; } }
     final class ExternalCalendarConnectionStore {
         public array $saved = [];
         public function save(string $uid, string $provider, array $connection): void { $this->saved[] = [$uid, $provider, $connection]; }
     }
 }
-namespace OCA\AdCalendar\Service { final class CalendarTargetConfig { public function calendarName(): string { return 'AD Teamdienste'; } } }
+namespace OCA\FlzCalendar\Service { final class CalendarTargetConfig { public function calendarName(): string { return 'FLZ Teamdienste'; } } }
 
 namespace {
 
-    use OCA\AdCalendar\CalendarSync\ExternalCalendarConnectionStore;
-    use OCA\AdCalendar\CalendarSync\GoogleCalendarClient;
-    use OCA\AdCalendar\CalendarSync\GoogleOAuthService;
-    use OCA\AdCalendar\Model\CalendarEntry;
-    use OCA\AdCalendar\Service\CalendarTargetConfig;
+    use OCA\FlzCalendar\CalendarSync\ExternalCalendarConnectionStore;
+    use OCA\FlzCalendar\CalendarSync\GoogleCalendarClient;
+    use OCA\FlzCalendar\CalendarSync\GoogleOAuthService;
+    use OCA\FlzCalendar\Model\CalendarEntry;
+    use OCA\FlzCalendar\Service\CalendarTargetConfig;
     use OCP\Http\Client\IClient;
     use OCP\Http\Client\IClientService;
     use OCP\Http\Client\IResponse;
@@ -63,13 +63,13 @@ namespace {
         'end' => '2026-07-22T16:00:00+02:00', 'type' => CalendarEntry::TYPE_SHIFT, 'title' => '',
     ]);
     $owned = static fn(string $id): array => [
-        'id' => $id, 'extendedProperties' => ['private' => ['adcalendarSource' => 'adcalendar']],
+        'id' => $id, 'extendedProperties' => ['private' => ['flzcalendarSource' => 'flzcalendar']],
     ];
 
     $connectClient = $clientFor([$response(200, ['id' => 'created/calendar'])]);
     [$google, $store] = $googleFor($connectClient);
     $created = $google->connect('person-a', ['refreshToken' => 'refresh']);
-    if (($created['calendarId'] ?? '') !== 'created/calendar' || ($created['calendarName'] ?? '') !== 'AD Teamdienste'
+    if (($created['calendarId'] ?? '') !== 'created/calendar' || ($created['calendarName'] ?? '') !== 'FLZ Teamdienste'
         || $store->saved !== [['person-a', 'google', $created]]
         || array_column($connectClient->calls, 0) !== ['POST']) {
         throw new RuntimeException('Google-Zielkalender wird nicht eindeutig angelegt und gespeichert.');
@@ -92,9 +92,9 @@ namespace {
     }
 
     $syncClient = $clientFor([
-        $response(200, ['items' => [['id' => 'adcalendarshift99'], ['id' => 'adcalendarshift99'], ['id' => 7]], 'nextPageToken' => 'page-2']),
-        $response(200, ['items' => [['id' => 'adcalendarshift100']]]),
-        $response(200, $owned('adcalendarshift99')), $response(204),
+        $response(200, ['items' => [['id' => 'flzcalendarshift99'], ['id' => 'flzcalendarshift99'], ['id' => 7]], 'nextPageToken' => 'page-2']),
+        $response(200, ['items' => [['id' => 'flzcalendarshift100']]]),
+        $response(200, $owned('flzcalendarshift99')), $response(204),
         $response(404),
         $response(404), $response(200),
     ]);
@@ -103,7 +103,7 @@ namespace {
     $syncGoogle->replaceAll('person-a', $connection, [$shift(51)]);
     if (array_column($syncClient->calls, 0) !== ['GET', 'GET', 'GET', 'DELETE', 'GET', 'GET', 'POST']
         || !str_contains($syncClient->calls[1][1], 'pageToken=page-2')
-        || !str_contains($syncClient->calls[3][1], 'adcalendarshift99')) {
+        || !str_contains($syncClient->calls[3][1], 'flzcalendarshift99')) {
         throw new RuntimeException('Paginierter Google-Abgleich bereinigt veraltete App-Ereignisse nicht gezielt.');
     }
     $published = json_decode((string)($syncClient->calls[6][2]['body'] ?? ''), true);
@@ -116,8 +116,8 @@ namespace {
     if ($emptyClient->calls !== []) throw new RuntimeException('Google-Bereinigung ohne Zielkalender führt Providerzugriffe aus.');
 
     $removeAllClient = $clientFor([
-        $response(200, ['items' => [['id' => 'adcalendarshift70']]]),
-        $response(200, $owned('adcalendarshift70')), $response(204),
+        $response(200, ['items' => [['id' => 'flzcalendarshift70']]]),
+        $response(200, $owned('flzcalendarshift70')), $response(204),
     ]);
     [$removeAllGoogle] = $googleFor($removeAllClient);
     $removeAllGoogle->removeCalendar('person-a', $connection);
@@ -125,7 +125,7 @@ namespace {
         throw new RuntimeException('Google-Kalenderbereinigung entfernt nicht ausschließlich gefundene App-Ereignisse.');
     }
 
-    $foreignClient = $clientFor([$response(200, ['id' => 'adcalendarshift51'])]);
+    $foreignClient = $clientFor([$response(200, ['id' => 'flzcalendarshift51'])]);
     [$foreignGoogle] = $googleFor($foreignClient);
     try {
         $foreignGoogle->publish('person-a', $connection, $shift(51));

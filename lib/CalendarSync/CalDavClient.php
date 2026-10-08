@@ -2,21 +2,21 @@
 
 declare(strict_types=1);
 
-namespace OCA\AdCalendar\CalendarSync;
+namespace OCA\FlzCalendar\CalendarSync;
 
 use DOMDocument;
 use DOMElement;
 use DOMXPath;
 use InvalidArgumentException;
-use OCA\AdCalendar\Model\CalendarEntry;
-use OCA\AdCalendar\Service\CalendarTargetConfig;
+use OCA\FlzCalendar\Model\CalendarEntry;
+use OCA\FlzCalendar\Service\CalendarTargetConfig;
 use OCP\Http\Client\IClient;
 use OCP\Http\Client\IClientService;
 use RuntimeException;
 
 /** Kleiner CalDAV-Adapter für app-eigene Dienstobjekte ohne neue Produktionsabhängigkeit. */
 final class CalDavClient {
-    private const OBJECT_PREFIX = 'adcalendar-shift-';
+    private const OBJECT_PREFIX = 'flzcalendar-shift-';
 
     public function __construct(
         private IClientService $clients,
@@ -138,7 +138,7 @@ final class CalDavClient {
                 return $this->sameOriginHref($baseUrl, $homeUrl, $resource['href']);
             }
         }
-        $calendarUrl = $this->sameOriginHref($baseUrl, $homeUrl, 'ad-dienste/');
+        $calendarUrl = $this->sameOriginHref($baseUrl, $homeUrl, 'flz-dienste/');
         $created = $this->request('MKCALENDAR', $calendarUrl, $connection, '<?xml version="1.0" encoding="utf-8" ?>'
             . '<c:mkcalendar xmlns:d="DAV:" xmlns:c="urn:ietf:params:xml:ns:caldav"><d:set><d:prop>'
             . '<d:displayname>' . $this->xml($this->targets->calendarName()) . '</d:displayname><c:supported-calendar-component-set>'
@@ -324,8 +324,8 @@ final class CalDavClient {
 
     private function assertOwnedData(string $uri, string $data): void {
         if (!$this->isOwnedUri($uri)
-            || preg_match('/(?:^|\r?\n)X-AD-CALENDAR-SOURCE:adcalendar(?:\r?\n|$)/', $data) !== 1
-            || preg_match('/(?:^|\r?\n)X-AD-CALENDAR-ENTRY-ID:(\d+)(?:\r?\n|$)/', $data, $match) !== 1
+            || preg_match('/(?:^|\r?\n)X-FLZ-CALENDAR-SOURCE:flzcalendar(?:\r?\n|$)/', $data) !== 1
+            || preg_match('/(?:^|\r?\n)X-FLZ-CALENDAR-ENTRY-ID:(\d+)(?:\r?\n|$)/', $data, $match) !== 1
             || $uri !== self::OBJECT_PREFIX . $match[1] . '.ics') {
             throw new RuntimeException('Die reservierte Dienstkennung wird bereits von einem fremden Kalenderobjekt verwendet.');
         }

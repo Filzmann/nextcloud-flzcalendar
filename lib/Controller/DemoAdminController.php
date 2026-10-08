@@ -2,11 +2,12 @@
 
 declare(strict_types=1);
 
-namespace OCA\AdCalendar\Controller;
+namespace OCA\FlzCalendar\Controller;
 
-use OCA\AdCalendar\AppInfo\Application;
-use OCA\AdCalendar\Http\LocalizedErrorResponseFactory;
-use OCA\AdCalendar\Service\CalendarDemoPackService;
+use OCA\FlzCalendar\AppInfo\Application;
+use OCA\FlzCalendar\Http\LocalizedErrorResponseFactory;
+use OCA\FlzCalendar\Service\CalendarDemoPackService;
+use OCA\FlzCalendar\Service\TemporaryAdminAccessChecker;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\JSONResponse;
@@ -27,6 +28,7 @@ final class DemoAdminController extends Controller {
         private CalendarDemoPackService $demoPack,
         private LoggerInterface $logger,
         private LocalizedErrorResponseFactory $errors,
+        private TemporaryAdminAccessChecker $temporaryAdminAccess,
     ) {
         parent::__construct(Application::APP_ID, $request);
     }
@@ -43,6 +45,8 @@ final class DemoAdminController extends Controller {
 
     private function isAdmin(): bool {
         $user = $this->session->getUser();
-        return $user !== null && $this->groups->isAdmin($user->getUID());
+        return $user !== null
+            && $this->groups->isAdmin($user->getUID())
+            && $this->temporaryAdminAccess->hasActiveGrant($user->getUID());
     }
 }

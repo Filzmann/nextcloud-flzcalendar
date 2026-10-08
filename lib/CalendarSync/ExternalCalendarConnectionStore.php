@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace OCA\AdCalendar\CalendarSync;
+namespace OCA\FlzCalendar\CalendarSync;
 
 use InvalidArgumentException;
-use OCA\AdCalendar\AppInfo\Application;
+use OCA\FlzCalendar\AppInfo\Application;
 use OCP\Config\IUserConfig;
 use OCP\Security\ICrypto;
 use RuntimeException;
@@ -80,6 +80,15 @@ final class ExternalCalendarConnectionStore {
     public function hasConnections(string $uid): bool {
         foreach (self::PROVIDERS as $provider) if ($this->hasStored($uid, $provider)) return true;
         return false;
+    }
+
+    /** @return list<string> */
+    public function privacyConnectedProviders(string $uid): array {
+        return array_values(array_filter(self::PROVIDERS, fn(string $provider): bool => $this->hasStored($uid, $provider)));
+    }
+
+    public function hasPendingGoogleOAuthState(string $uid): bool {
+        return $this->config->getValueString($uid, Application::APP_ID, self::OAUTH_STATE_KEY, '', true) !== '';
     }
 
     /** @return list<string> */

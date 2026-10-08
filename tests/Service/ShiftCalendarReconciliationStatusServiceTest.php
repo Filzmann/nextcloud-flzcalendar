@@ -17,9 +17,9 @@ namespace OCP\AppFramework\Utility {
     }
 }
 
-namespace OCA\AdCalendar\AppInfo {
+namespace OCA\FlzCalendar\AppInfo {
     if (!class_exists(Application::class, false)) {
-        final class Application { public const APP_ID = 'adcalendar'; }
+        final class Application { public const APP_ID = 'flzcalendar'; }
     }
 }
 
@@ -33,7 +33,7 @@ namespace {
     $time = new class implements \OCP\AppFramework\Utility\ITimeFactory {
         public function getTime(): int { return 1_753_000_000; }
     };
-    $service = new \OCA\AdCalendar\Service\ShiftCalendarReconciliationStatusService($config, $time);
+    $service = new \OCA\FlzCalendar\Service\ShiftCalendarReconciliationStatusService($config, $time);
 
     $pending = $service->status();
     if ($pending !== ['hasRun' => false, 'lastRunAt' => 0, 'attempted' => 0, 'succeeded' => 0, 'failed' => 0, 'state' => 'pending']) {
@@ -45,12 +45,12 @@ namespace {
     if ($status !== ['hasRun' => true, 'lastRunAt' => 1_753_000_000, 'attempted' => 4, 'succeeded' => 3, 'failed' => 1, 'state' => 'warning']) {
         throw new \RuntimeException('Aggregierter DAV-Abgleichstatus ist unvollständig.');
     }
-    $stored = reset($config->values['adcalendar']);
+    $stored = reset($config->values['flzcalendar']);
     if (!is_string($stored) || str_contains($stored, 'darf-nicht-persistiert-werden') || !str_contains($stored, '"direction":"outbound"')) {
         throw new \RuntimeException('DAV-Status persistiert personenbezogene Details oder hält die spätere Richtungs-Erweiterung nicht offen.');
     }
 
-    $config->values['adcalendar'][array_key_first($config->values['adcalendar'])] = '{ungültig';
+    $config->values['flzcalendar'][array_key_first($config->values['flzcalendar'])] = '{ungültig';
     if ($service->status()['state'] !== 'pending') throw new \RuntimeException('Ungültiger DAV-Status fällt nicht sicher auf den neutralen Zustand zurück.');
 
     echo "ShiftCalendarReconciliationStatusServiceTest: OK\n";

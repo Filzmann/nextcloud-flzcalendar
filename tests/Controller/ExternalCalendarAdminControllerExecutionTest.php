@@ -17,19 +17,19 @@ namespace OCP\AppFramework\Http {
     class JSONResponse { public function __construct(private array $data = [], private int $status = 200) {} public function getData(): array { return $this->data; } public function getStatus(): int { return $this->status; } }
 }
 namespace Psr\Log { interface LoggerInterface { public function error(string|\Stringable $message, array $context = []): void; } }
-namespace OCA\AdCalendar\AppInfo { final class Application { public const APP_ID = 'adcalendar'; } }
-namespace OCA\AdCalendar\CalendarSync {
+namespace OCA\FlzCalendar\AppInfo { final class Application { public const APP_ID = 'flzcalendar'; } }
+namespace OCA\FlzCalendar\CalendarSync {
     final class ExternalCalendarConnectionException extends \RuntimeException {
         public function userMessage(string $provider): string { return $provider === 'kopano' ? 'Der Kopano-Betreiber erlaubt an dieser Adresse keine CalDAV-Verbindung (HTTP 405). Bitte wende dich an dessen Administration.' : $this->getMessage(); }
     }
 }
-namespace OCA\AdCalendar\Service {
+namespace OCA\FlzCalendar\Service {
     final class ExternalCalendarService {
         public array $calls = [];
         public bool $blocked = false;
         public function testCalDavConnection(string $provider, string $serverUrl, string $username, string $password): int {
             $this->calls[] = [$provider, $serverUrl, $username, $password];
-            if ($this->blocked) throw new \OCA\AdCalendar\CalendarSync\ExternalCalendarConnectionException('Blockiert.', 405);
+            if ($this->blocked) throw new \OCA\FlzCalendar\CalendarSync\ExternalCalendarConnectionException('Blockiert.', 405);
             return 207;
         }
     }
@@ -37,9 +37,9 @@ namespace OCA\AdCalendar\Service {
 
 namespace {
 
-    use OCA\AdCalendar\Controller\ExternalCalendarAdminController;
-    use OCA\AdCalendar\Http\LocalizedErrorResponseFactory;
-    use OCA\AdCalendar\Service\ExternalCalendarService;
+    use OCA\FlzCalendar\Controller\ExternalCalendarAdminController;
+    use OCA\FlzCalendar\Http\LocalizedErrorResponseFactory;
+    use OCA\FlzCalendar\Service\ExternalCalendarService;
     use OCP\IGroupManager;
     use OCP\IL10N;
     use OCP\IRequest;

@@ -1,6 +1,6 @@
 (function() {
     'use strict';
-    const CalendarDate = window.AdCalendar.modules.CalendarDate;
+    const CalendarDate = window.FlzCalendar.modules.CalendarDate;
 
     /**
      * Zweck: Kapselt URL-, Filter-, Tab- und persönlichen Standardzustand der Kalenderansicht.
@@ -119,7 +119,7 @@
         values(params, key) { return new Set((params.get(key) || '').split(',').filter(Boolean)); }
     }
 
-    window.AdCalendar = window.AdCalendar || {};
-    window.AdCalendar.modules = window.AdCalendar.modules || {};
-    window.AdCalendar.modules.CalendarState = CalendarState;
+    window.FlzCalendar = window.FlzCalendar || {};
+    window.FlzCalendar.modules = window.FlzCalendar.modules || {};
+    window.FlzCalendar.modules.CalendarState = CalendarState;
 })();

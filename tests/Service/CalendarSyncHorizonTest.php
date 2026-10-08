@@ -20,7 +20,7 @@ namespace OCA\LocalBase\AppInfo {
 }
 
 namespace {
-    use OCA\AdCalendar\Service\CalendarSyncHorizon;
+    use OCA\FlzCalendar\Service\CalendarSyncHorizon;
     use OCA\LocalBase\Calendar\CalendarContextSettingsService;
     use OCP\AppFramework\Utility\ITimeFactory;
     use OCP\IAppConfig;

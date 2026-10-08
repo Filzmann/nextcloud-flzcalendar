@@ -8,12 +8,12 @@ namespace OCP {
         public function setValueString(string $app, string $key, string $value, bool $lazy = false, bool $sensitive = false): bool;
     }
 }
-namespace OCA\AdCalendar\AppInfo { final class Application { public const APP_ID = 'adcalendar'; } }
+namespace OCA\FlzCalendar\AppInfo { final class Application { public const APP_ID = 'flzcalendar'; } }
 
 namespace {
 
-    use OCA\AdCalendar\CalendarSync\ExternalCalendarUrlValidator;
-    use OCA\AdCalendar\Service\CalendarTargetConfig;
+    use OCA\FlzCalendar\CalendarSync\ExternalCalendarUrlValidator;
+    use OCA\FlzCalendar\Service\CalendarTargetConfig;
     use OCP\IAppConfig;
 
     $config = new class implements IAppConfig {
@@ -33,8 +33,8 @@ namespace {
     };
     $targets = new CalendarTargetConfig($config, new ExternalCalendarUrlValidator());
 
-    if ($targets->kopanoUrl() !== 'https://mail.adberlin.org/' || $targets->calendarName() !== 'AD Dienste') {
-        throw new RuntimeException('Bestandsdefaults fehlen bei einer frischen Installation.');
+    if ($targets->kopanoUrl() !== '' || $targets->calendarName() !== 'Filzmann Dienste') {
+        throw new RuntimeException('Markenneutrale Defaults fehlen bei einer frischen Installation.');
     }
     $saved = $targets->save(' https://calendar.example.test/caldav ', ' Team & Dienst ');
     if ($saved !== ['kopanoUrl' => 'https://calendar.example.test/caldav/', 'calendarName' => 'Team & Dienst']
@@ -42,7 +42,7 @@ namespace {
         || $config->writes[0] !== ['calendar_default_kopano_url', 'https://calendar.example.test/caldav/', true, false]) {
         throw new RuntimeException('Validierte Kalenderdefaults werden nicht nativ und nicht geheim gespeichert.');
     }
-    if (!in_array('AD Dienste', $targets->acceptedCalendarNames(), true) || !in_array('Team & Dienst', $targets->acceptedCalendarNames(), true)) {
+    if (!in_array('Filzmann Dienste', $targets->acceptedCalendarNames(), true) || !in_array('Team & Dienst', $targets->acceptedCalendarNames(), true)) {
         throw new RuntimeException('Die sichere Namenshistorie für vorhandene App-Kalender fehlt.');
     }
 
@@ -73,8 +73,8 @@ namespace {
     $config->throwOnWrite = null;
     $config->values['calendar_default_name'] = "\x01kaputt";
     $config->values['calendar_default_kopano_url'] = 'http://unsicher.example.test';
-    if ($targets->calendarName() !== 'AD Dienste' || $targets->kopanoUrl() !== 'https://mail.adberlin.org/') {
-        throw new RuntimeException('Direkt manipulierte AppConfig umgeht sichere Bestandsdefaults.');
+    if ($targets->calendarName() !== 'Filzmann Dienste' || $targets->kopanoUrl() !== '') {
+        throw new RuntimeException('Direkt manipulierte AppConfig umgeht sichere markenneutrale Defaults.');
     }
 
     echo "CalendarTargetConfigTest: OK\n";

@@ -1,6 +1,6 @@
 (function() {
     'use strict';
-    const l10n = window.AdCalendar.l10n;
+    const l10n = window.FlzCalendar.l10n;
 
     /**
      * Zweck: Kapselt den typabhängigen Eintragsdialog und verhindert erkennbare Dienstüberschneidungen bereits vor dem API-Aufruf.
@@ -8,17 +8,17 @@
      */
     class EntryDialog {
         constructor(options) {
-            this.dialog = document.getElementById('adc-entry-dialog');
-            this.form = document.getElementById('adc-entry-form');
+            this.dialog = document.getElementById('flz-calendar-entry-dialog');
+            this.form = document.getElementById('flz-calendar-entry-form');
             this.entries = options.entries;
             this.shiftDefaults = options.shiftDefaults;
             this.onSubmit = options.onSubmit;
             this.returnFocus = null;
-            this.fields = Object.fromEntries(['entry-id', 'employee', 'employee-name', 'type', 'start', 'end', 'title', 'title-field', 'title-label', 'title-help', 'time-help', 'entry-dialog-title', 'recurrence-fields', 'recurrence-frequency', 'recurrence-options', 'recurrence-interval', 'recurrence-until', 'recurrence-weekdays'].map(id => [id, document.getElementById(`adc-${id}`)]));
+            this.fields = Object.fromEntries(['entry-id', 'employee', 'employee-name', 'type', 'start', 'end', 'title', 'title-field', 'title-label', 'title-help', 'time-help', 'entry-dialog-title', 'recurrence-fields', 'recurrence-frequency', 'recurrence-options', 'recurrence-interval', 'recurrence-until', 'recurrence-weekdays'].map(id => [id, document.getElementById(`flz-calendar-${id}`)]));
             this.employeeNames = new Map();
-            this.weekdays = Array.from(document.querySelectorAll('input[name="adc-recurrence-weekday"]'));
-            document.getElementById('adc-cancel-edit').addEventListener('click', () => this.close());
-            document.getElementById('adc-dialog-cancel').addEventListener('click', () => this.close());
+            this.weekdays = Array.from(document.querySelectorAll('input[name="flz-calendar-recurrence-weekday"]'));
+            document.getElementById('flz-calendar-cancel-edit').addEventListener('click', () => this.close());
+            document.getElementById('flz-calendar-dialog-cancel').addEventListener('click', () => this.close());
             this.dialog.addEventListener('cancel', event => { event.preventDefault(); this.close(); });
             this.fields.type.addEventListener('change', () => { this.updateType(); this.validate(); });
             this.fields['recurrence-frequency'].addEventListener('change', () => this.updateRecurrence());
@@ -205,7 +205,7 @@
         }
     }
 
-    window.AdCalendar = window.AdCalendar || {};
-    window.AdCalendar.components = window.AdCalendar.components || {};
-    window.AdCalendar.components.EntryDialog = EntryDialog;
+    window.FlzCalendar = window.FlzCalendar || {};
+    window.FlzCalendar.components = window.FlzCalendar.components || {};
+    window.FlzCalendar.components.EntryDialog = EntryDialog;
 })();

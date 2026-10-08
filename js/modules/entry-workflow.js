@@ -1,6 +1,6 @@
 (function() {
     'use strict';
-    const l10n = window.AdCalendar.l10n;
+    const l10n = window.FlzCalendar.l10n;
 
     /**
      * Zweck: Koordiniert Anlegen, Bearbeiten und Löschen von Kalender- und gemeinsamen Meetingeinträgen.
@@ -121,8 +121,8 @@
             return new Promise(resolve => {
                 const returnFocus = document.activeElement;
                 const dialog = document.createElement('dialog');
-                dialog.className = 'adc-dialog adc-delete-dialog';
-                dialog.setAttribute('aria-labelledby', 'adc-delete-title');
+                dialog.className = 'flz-calendar-dialog flz-calendar-delete-dialog';
+                dialog.setAttribute('aria-labelledby', 'flz-calendar-delete-title');
                 let settled = false;
                 const finish = value => {
                     if (settled) return;
@@ -133,7 +133,7 @@
                     resolve(value);
                 };
                 const title = this.node('h2', l10n.t('Delete shift with appointments'));
-                title.id = 'adc-delete-title';
+                title.id = 'flz-calendar-delete-title';
                 dialog.append(title, this.node('p', l10n.n('The shift contains {count} appointment. What should happen to it?', 'The shift contains {count} appointments. What should happen to them?', count, { count })));
                 [['delete', l10n.t('Delete shift and appointments')], ['detach', l10n.t('Delete only the shift; keep appointments as blocked times')], [null, l10n.t('Cancel')]]
                     .forEach(([value, label]) => {
@@ -152,8 +152,8 @@
             return new Promise(resolve => {
                 const returnFocus = document.activeElement;
                 const dialog = document.createElement('dialog');
-                dialog.className = 'adc-dialog adc-delete-dialog';
-                dialog.setAttribute('aria-labelledby', 'adc-series-scope-title');
+                dialog.className = 'flz-calendar-dialog flz-calendar-delete-dialog';
+                dialog.setAttribute('aria-labelledby', 'flz-calendar-series-scope-title');
                 let settled = false;
                 const finish = value => {
                     if (settled) return;
@@ -164,7 +164,7 @@
                     resolve(value);
                 };
                 const title = this.node('h2', action === 'edit' ? l10n.t('Edit recurring appointment') : l10n.t('Delete recurring appointment'));
-                title.id = 'adc-series-scope-title';
+                title.id = 'flz-calendar-series-scope-title';
                 dialog.append(title, this.node('p', action === 'edit' ? l10n.t('Should only this occurrence or the entire series be edited?') : l10n.t('Should only this occurrence or the entire series be deleted?')));
                 [['occurrence', l10n.t('Only this occurrence')], ['series', l10n.t('Entire series')], [null, l10n.t('Cancel')]]
                     .forEach(([value, label]) => {
@@ -186,7 +186,7 @@
         }
     }
 
-    window.AdCalendar = window.AdCalendar || {};
-    window.AdCalendar.modules = window.AdCalendar.modules || {};
-    window.AdCalendar.modules.EntryWorkflow = EntryWorkflow;
+    window.FlzCalendar = window.FlzCalendar || {};
+    window.FlzCalendar.modules = window.FlzCalendar.modules || {};
+    window.FlzCalendar.modules.EntryWorkflow = EntryWorkflow;
 })();

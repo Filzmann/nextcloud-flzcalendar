@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace OCA\AdCalendar\AppInfo;
+namespace OCA\FlzCalendar\AppInfo;
 
 final class AppId {
-    public const VALUE = 'adcalendar';
+    public const VALUE = 'flzcalendar';
 
     private function __construct() {}
 }

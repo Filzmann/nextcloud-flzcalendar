@@ -6,8 +6,8 @@ namespace OCP { interface IL10N { public function t(string $text, array $paramet
 
 namespace {
 
-use OCA\AdCalendar\CalendarSync\ShiftCalendarEventSerializer;
-use OCA\AdCalendar\Model\CalendarEntry;
+use OCA\FlzCalendar\CalendarSync\ShiftCalendarEventSerializer;
+use OCA\FlzCalendar\Model\CalendarEntry;
 use OCA\LocalBase\Calendar\AbsenceInterval;
 use OCP\IL10N;
 
@@ -15,7 +15,7 @@ $l10n = new class implements IL10N {
     public function t(string $text, array $parameters = []): string {
         return match ($text) {
             'Shift' => 'Übersetzter Dienst',
-            'Automatically synchronised from AD Calendar. Please make changes there.' => 'Übersetzte Kalenderbeschreibung.',
+            'Automatically synchronised from Filzmann Calendar. Please make changes there.' => 'Übersetzte Kalenderbeschreibung.',
             default => strtr($text, $parameters),
         };
     }
@@ -33,18 +33,18 @@ $ics = $serializer->serialize($shift, '20260718T090000Z');
 
 foreach ([
     "BEGIN:VCALENDAR\r\n",
-    "UID:adcalendar-shift-17@local\r\n",
+    "UID:flzcalendar-shift-17@local\r\n",
     "DTSTAMP:20260718T090000Z\r\n",
     "DTSTART:20260720T060000Z\r\n",
     "DTEND:20260720T140000Z\r\n",
     "SUMMARY:Frühdienst\\, Büro\\; Nordost\\nHinweis\r\n",
     "CLASS:PRIVATE\r\n",
-    "X-AD-CALENDAR-ENTRY-ID:17\r\n",
+    "X-FLZ-CALENDAR-ENTRY-ID:17\r\n",
     "END:VCALENDAR\r\n",
 ] as $contract) {
     if (!str_contains($ics, $contract)) throw new RuntimeException("ICS-Vertrag fehlt: {$contract}");
 }
-if ($serializer->objectUri($shift) !== 'adcalendar-shift-17.ics') throw new RuntimeException('Deterministische Objekt-URI fehlt.');
+if ($serializer->objectUri($shift) !== 'flzcalendar-shift-17.ics') throw new RuntimeException('Deterministische Objekt-URI fehlt.');
 
 $appointment = CalendarEntry::get(array_replace($shift->toArray(), [
     'id' => 18,
@@ -52,10 +52,10 @@ $appointment = CalendarEntry::get(array_replace($shift->toArray(), [
     'title' => 'Eigener Termin',
 ]));
 $appointmentIcs = $serializer->serialize($appointment, '20260718T090000Z');
-if ($serializer->objectUri($appointment) !== 'adcalendar-appointment-18.ics'
-    || !str_contains($appointmentIcs, "UID:adcalendar-appointment-18@local\r\n")
+if ($serializer->objectUri($appointment) !== 'flzcalendar-appointment-18.ics'
+    || !str_contains($appointmentIcs, "UID:flzcalendar-appointment-18@local\r\n")
     || !str_contains($appointmentIcs, "SUMMARY:Eigener Termin\r\n")
-    || !str_contains($appointmentIcs, "X-AD-CALENDAR-ENTRY-TYPE:appointment\r\n")) {
+    || !str_contains($appointmentIcs, "X-FLZ-CALENDAR-ENTRY-TYPE:appointment\r\n")) {
     throw new RuntimeException('Eigener Termin besitzt keinen stabilen privaten ICS-Vertrag.');
 }
 
@@ -67,7 +67,7 @@ $planned = new AbsenceInterval(
 );
 $plannedUri = $serializer->absenceObjectUri($planned);
 $plannedIcs = $serializer->serializeAbsence($planned, '20260718T090000Z');
-if (!preg_match('/^adcalendar-absence-[a-f0-9]{64}\.ics$/', $plannedUri)
+if (!preg_match('/^flzcalendar-absence-[a-f0-9]{64}\.ics$/', $plannedUri)
     || !str_contains($plannedIcs, "DTSTART;VALUE=DATE:20260721\r\n")
     || !str_contains($plannedIcs, "DTEND;VALUE=DATE:20260724\r\n")
     || !str_contains($plannedIcs, "STATUS:TENTATIVE\r\n")

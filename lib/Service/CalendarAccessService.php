@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace OCA\AdCalendar\Service;
+namespace OCA\FlzCalendar\Service;
 
-use OCA\LocalBase\Organization\AdOrganizationDefinition;
-use OCA\LocalBase\Organization\AdOrganizationSettingsService;
+use OCA\LocalBase\Organization\FlzOrganizationDefinition;
+use OCA\LocalBase\Organization\FlzOrganizationSettingsService;
 use OCP\IGroupManager;
 use OCP\IUser;
 use OCP\IUserManager;
@@ -24,7 +24,8 @@ final class CalendarAccessService {
         private CalendarPermissionPolicy $policy,
         private CalendarSettingsService $settings,
         private CalendarGroupProfile $profiles,
-        private ?AdOrganizationSettingsService $organization = null,
+        private TemporaryAdminAccessChecker $temporaryAdminAccess,
+        private ?FlzOrganizationSettingsService $organization = null,
     ) {}
 
     public function currentUser(): ?IUser {
@@ -47,7 +48,7 @@ final class CalendarAccessService {
 
         return $this->policy->canManage(
             $user->getUID(),
-            $this->groups->isAdmin($user->getUID()),
+            $this->groups->isAdmin($user->getUID()) && $this->temporaryAdminAccess->hasActiveGrant($user->getUID()),
             $actorGroups,
             $employeeUid,
             $targetGroups,
@@ -100,7 +101,7 @@ final class CalendarAccessService {
         return array_map('strval', $this->groups->getUserGroupIds($user));
     }
 
-    private function definition(): AdOrganizationDefinition {
-        return $this->organization?->definition() ?? AdOrganizationDefinition::defaults();
+    private function definition(): FlzOrganizationDefinition {
+        return $this->organization?->definition() ?? FlzOrganizationDefinition::defaults();
     }
 }

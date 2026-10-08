@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
-namespace OCA\AdCalendar\Service;
+namespace OCA\FlzCalendar\Service;
 
-use OCA\AdCalendar\CalendarSync\ExternalCalendarConnectionStore;
-use OCA\AdCalendar\CalendarSync\ExternalShiftCalendarPublisher;
-use OCA\AdCalendar\CalendarSync\PersonalCalendarPublisher;
-use OCA\AdCalendar\Repository\CalendarEntryRepository;
+use OCA\FlzCalendar\CalendarSync\ExternalCalendarConnectionStore;
+use OCA\FlzCalendar\CalendarSync\ExternalShiftCalendarPublisher;
+use OCA\FlzCalendar\CalendarSync\PersonalCalendarPublisher;
+use OCA\FlzCalendar\Repository\CalendarEntryRepository;
 use Psr\Log\LoggerInterface;
 
 /**
- * Zweck: Stellt den vollständigen führenden AD-Eintrags- und Urlaubsbestand aktiver persönlicher Nextcloud-Kalender periodisch wieder her.
+ * Zweck: Stellt den vollständigen führenden FLZ-Eintrags- und Urlaubsbestand aktiver persönlicher Nextcloud-Kalender periodisch wieder her.
  * Zukunftsvertrag: Bei bidirektionalem Ausbau bleibt dies der ausgehende Konsistenzschritt nach Import und Konfliktauflösung.
  */
 final class ShiftCalendarReconciliationService {

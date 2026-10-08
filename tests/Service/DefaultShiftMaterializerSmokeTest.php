@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 
-use OCA\AdCalendar\Service\DefaultShiftOccurrenceFactory;
+use OCA\FlzCalendar\Service\DefaultShiftOccurrenceFactory;
 
 $factory = new DefaultShiftOccurrenceFactory();
 $timezone = new DateTimeZone('Europe/Berlin');

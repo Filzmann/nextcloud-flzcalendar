@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace OCA\AdCalendar\Repository {
+namespace OCA\FlzCalendar\Repository {
     use DateTimeImmutable;
-    use OCA\AdCalendar\Model\CalendarEntry;
+    use OCA\FlzCalendar\Model\CalendarEntry;
 
     class CalendarEntryRepository {
         /** @var list<CalendarEntry> */ public array $range = [];
@@ -26,7 +26,7 @@ namespace OCA\AdCalendar\Repository {
     }
 }
 
-namespace OCA\AdCalendar\Service {
+namespace OCA\FlzCalendar\Service {
     use DateTimeImmutable;
     class DefaultShiftMaterializer { public function syncWeek(DateTimeImmutable $start, array $uids, array $absences): void {} }
     class AbsenceService {
@@ -37,13 +37,13 @@ namespace OCA\AdCalendar\Service {
 
 namespace {
 
-    use OCA\AdCalendar\Exception\MeetingSlotUnavailableException;
-    use OCA\AdCalendar\Model\CalendarEntry;
-    use OCA\AdCalendar\Repository\CalendarEntryRepository;
-    use OCA\AdCalendar\Service\AbsenceService;
-    use OCA\AdCalendar\Service\DefaultShiftMaterializer;
-    use OCA\AdCalendar\Service\MeetingAvailabilityService;
-    use OCA\AdCalendar\Service\MeetingService;
+    use OCA\FlzCalendar\Exception\MeetingSlotUnavailableException;
+    use OCA\FlzCalendar\Model\CalendarEntry;
+    use OCA\FlzCalendar\Repository\CalendarEntryRepository;
+    use OCA\FlzCalendar\Service\AbsenceService;
+    use OCA\FlzCalendar\Service\DefaultShiftMaterializer;
+    use OCA\FlzCalendar\Service\MeetingAvailabilityService;
+    use OCA\FlzCalendar\Service\MeetingService;
 
     $repository = new CalendarEntryRepository();
     $shift = static fn(int $id, string $uid): CalendarEntry => CalendarEntry::get(['id' => $id, 'employeeUid' => $uid, 'start' => '2026-07-13T08:00:00+02:00', 'end' => '2026-07-13T16:00:00+02:00', 'type' => CalendarEntry::TYPE_SHIFT, 'title' => '']);

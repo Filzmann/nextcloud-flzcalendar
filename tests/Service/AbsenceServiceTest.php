@@ -13,7 +13,7 @@ namespace OCP\EventDispatcher {
 
 namespace {
 
-    use OCA\AdCalendar\Service\AbsenceService;
+    use OCA\FlzCalendar\Service\AbsenceService;
     use OCA\LocalBase\Calendar\AbsenceEmployeeDiscoveryEvent;
     use OCA\LocalBase\Calendar\AbsenceInterval;
     use OCA\LocalBase\Calendar\AbsenceQueryEvent;

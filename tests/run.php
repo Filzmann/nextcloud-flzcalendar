@@ -11,6 +11,6 @@ PhpTestRunner::run(
     lintDirectories: ['appinfo', 'lib', 'templates', 'tests'],
     testDirectories: ['tests/Model', 'tests/Repository', 'tests/Controller', 'tests/Service', 'tests/Command', 'tests/Ui', 'tests/Migration'],
     testSuffixes: ['Test.php'],
-    successMessage: 'AD Kalender PHP tests passed',
+    successMessage: 'Filzmann Kalender PHP tests passed',
     prependBootstrap: true,
 );

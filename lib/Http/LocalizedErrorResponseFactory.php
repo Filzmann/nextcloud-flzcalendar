@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OCA\AdCalendar\Http;
+namespace OCA\FlzCalendar\Http;
 
 use OCP\AppFramework\Http\JSONResponse;
 use OCP\IL10N;

@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace OCA\AdCalendar\Service;
+namespace OCA\FlzCalendar\Service;
 
-use OCA\AdCalendar\AppInfo\Application;
+use OCA\FlzCalendar\AppInfo\Application;
 use OCP\AppFramework\Utility\ITimeFactory;
 use OCP\IAppConfig;
 

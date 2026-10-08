@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 
-use OCA\AdCalendar\Model\RecurrenceRule;
+use OCA\FlzCalendar\Model\RecurrenceRule;
 
 $start = new DateTimeImmutable('2026-03-23T09:00:00+01:00');
 $weekly = RecurrenceRule::get([
