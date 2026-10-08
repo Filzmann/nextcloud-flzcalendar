@@ -17,19 +17,19 @@ namespace OCP\AppFramework\Http {
     class RedirectResponse { public function __construct(private string $url) {} public function getRedirectURL(): string { return $this->url; } }
 }
 namespace Psr\Log { interface LoggerInterface { public function error(string|\Stringable $message, array $context = []): void; } }
-namespace OCA\AdCalendar\AppInfo { final class Application { public const APP_ID = 'adcalendar'; } }
-namespace OCA\AdCalendar\Service {
+namespace OCA\FlzCalendar\AppInfo { final class Application { public const APP_ID = 'flzcalendar'; } }
+namespace OCA\FlzCalendar\Service {
     final class CalendarAccessService { public ?\OCP\IUser $user = null; public function currentUser(): ?\OCP\IUser { return $this->user; } }
     final class ExternalCalendarService {
         public array $calls = [];
         public bool $blocked = false;
         public function status(string $uid): array { $this->calls[] = ['status', $uid]; return ['kopano' => ['connected' => false]]; }
-        public function connectCalDav(string $uid, string $provider, string $serverUrl, string $username, string $password): array { $this->calls[] = ['connect', $uid, $provider]; if ($this->blocked) throw new \OCA\AdCalendar\CalendarSync\ExternalCalendarConnectionException('Der Kalenderanbieter erlaubt an dieser Adresse keine CalDAV-Verbindung (HTTP 405). Bitte wende dich an die Administration des Anbieters.', 405); return ['kopano' => ['connected' => true]]; }
+        public function connectCalDav(string $uid, string $provider, string $serverUrl, string $username, string $password): array { $this->calls[] = ['connect', $uid, $provider]; if ($this->blocked) throw new \OCA\FlzCalendar\CalendarSync\ExternalCalendarConnectionException('Der Kalenderanbieter erlaubt an dieser Adresse keine CalDAV-Verbindung (HTTP 405). Bitte wende dich an die Administration des Anbieters.', 405); return ['kopano' => ['connected' => true]]; }
         public function disconnect(string $uid, string $provider): array { $this->calls[] = ['disconnect', $uid, $provider]; return ['kopano' => ['connected' => false]]; }
         public function connectGoogle(string $uid, array $tokens): array { $this->calls[] = ['google', $uid]; return ['google' => ['connected' => true]]; }
     }
 }
-namespace OCA\AdCalendar\CalendarSync {
+namespace OCA\FlzCalendar\CalendarSync {
     final class ExternalCalendarConnectionException extends \RuntimeException {
         public function userMessage(string $provider): string {
             return $provider === 'kopano' && $this->getCode() === 405
@@ -47,11 +47,11 @@ namespace OCA\AdCalendar\CalendarSync {
 
 namespace {
 
-    use OCA\AdCalendar\CalendarSync\GoogleOAuthService;
-    use OCA\AdCalendar\Controller\ExternalCalendarController;
-    use OCA\AdCalendar\Http\LocalizedErrorResponseFactory;
-    use OCA\AdCalendar\Service\CalendarAccessService;
-    use OCA\AdCalendar\Service\ExternalCalendarService;
+    use OCA\FlzCalendar\CalendarSync\GoogleOAuthService;
+    use OCA\FlzCalendar\Controller\ExternalCalendarController;
+    use OCA\FlzCalendar\Http\LocalizedErrorResponseFactory;
+    use OCA\FlzCalendar\Service\CalendarAccessService;
+    use OCA\FlzCalendar\Service\ExternalCalendarService;
     use OCP\IRequest;
     use OCP\IL10N;
     use OCP\IURLGenerator;
@@ -71,16 +71,16 @@ namespace {
         $access,
         $calendars,
         $google,
-        new class implements IURLGenerator { public function linkToRoute(string $routeName, array $arguments = []): string { return '/apps/adcalendar/'; } },
+        new class implements IURLGenerator { public function linkToRoute(string $routeName, array $arguments = []): string { return '/apps/flzcalendar/'; } },
         $logger,
         $errors,
     );
 
-    if ($controller->connectCalDav('kopano', 'https://mail.adberlin.org', 'person-a', 'secret')->getStatus() !== 403 || $calendars->calls !== []) {
+    if ($controller->connectCalDav('kopano', 'https://calendar.example.test', 'person-a', 'secret')->getStatus() !== 403 || $calendars->calls !== []) {
         throw new RuntimeException('Nicht angemeldete Person kann eine Providerverbindung verändern.');
     }
     $access->user = new class implements IUser { public function getUID(): string { return 'person-a'; } };
-    $connected = $controller->connectCalDav('kopano', 'https://mail.adberlin.org', 'person-a', 'secret');
+    $connected = $controller->connectCalDav('kopano', 'https://calendar.example.test', 'person-a', 'secret');
     if ($connected->getStatus() !== 200 || $calendars->calls !== [['connect', 'person-a', 'kopano']] || str_contains(json_encode($connected->getData()), 'secret')) {
         throw new RuntimeException('Providerverbindung ist nicht auf das angemeldete Konto begrenzt oder gibt Geheimnisse aus.');
     }

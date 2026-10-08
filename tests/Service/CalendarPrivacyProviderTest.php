@@ -31,13 +31,13 @@ namespace OCP\Security {
         }
     }
 }
-namespace OCA\AdCalendar\AppInfo {
+namespace OCA\FlzCalendar\AppInfo {
     if (!class_exists(Application::class, false)) {
-        final class Application { public const APP_ID = 'adcalendar'; }
+        final class Application { public const APP_ID = 'flzcalendar'; }
     }
 }
-namespace OCA\AdCalendar\Repository {
-    use OCA\AdCalendar\Model\CalendarEntry;
+namespace OCA\FlzCalendar\Repository {
+    use OCA\FlzCalendar\Model\CalendarEntry;
     class CalendarEntryRepository {
         /** @var list<CalendarEntry> */ public array $items = [];
         public int $participantQueries = 0;
@@ -63,17 +63,17 @@ namespace OCA\AdCalendar\Repository {
 }
 
 namespace {
-    use OCA\AdCalendar\Model\CalendarEntry;
-    use OCA\AdCalendar\Privacy\CalendarPersonalDataProvider;
-    use OCA\AdCalendar\Privacy\CalendarPrivacyProviderListener;
-    use OCA\AdCalendar\Repository\CalendarEntryRepository;
-    use OCA\AdCalendar\Repository\TemporaryAdminAccessRepository;
-    use OCA\AdCalendar\CalendarSync\ExternalCalendarConnectionStore;
-    use OCA\AdCalendar\Service\CalendarPreferenceService;
+    use OCA\FlzCalendar\Model\CalendarEntry;
+    use OCA\FlzCalendar\Privacy\CalendarPersonalDataProvider;
+    use OCA\FlzCalendar\Privacy\CalendarPrivacyProviderListener;
+    use OCA\FlzCalendar\Repository\CalendarEntryRepository;
+    use OCA\FlzCalendar\Repository\TemporaryAdminAccessRepository;
+    use OCA\FlzCalendar\CalendarSync\ExternalCalendarConnectionStore;
+    use OCA\FlzCalendar\Service\CalendarPreferenceService;
     use OCA\LocalBase\Calendar\CalendarContextSettingsService;
-    use OCA\FilzmannDataProtection\PublicApi\V1\DataSubjectRef;
-    use OCA\FilzmannDataProtection\PublicApi\V1\PersonalDataRequest;
-    use OCA\FilzmannDataProtection\PublicApi\V1\RegisterPersonalDataProvidersEvent;
+    use OCA\FlzDataProtection\PublicApi\V1\DataSubjectRef;
+    use OCA\FlzDataProtection\PublicApi\V1\PersonalDataRequest;
+    use OCA\FlzDataProtection\PublicApi\V1\RegisterPersonalDataProvidersEvent;
     use OCP\Config\IUserConfig;
     use OCP\Security\ICrypto;
 
@@ -89,8 +89,8 @@ namespace {
     };
     $userConfig = new class implements IUserConfig {
         public array $values = [
-            'self' => ['adcalendar' => [
-                'filter_default' => '{"people":["other-person"],"roles":["ad-Buero"],"areas":["ad-Bereich-Sued"],"vertical":false,"period":"month","showLeadershipStaff":true,"leadershipStaffOnly":false}',
+            'self' => ['flzcalendar' => [
+                'filter_default' => '{"people":["other-person"],"roles":["flz-Buero"],"areas":["flz-Bereich-Sued"],"vertical":false,"period":"month","showLeadershipStaff":true,"leadershipStaffOnly":false}',
                 'shift_defaults' => '{"1":{"enabled":true,"start":"07:30","end":"15:30"}}',
                 'shift_calendar_sync_enabled' => '0',
                 'external_calendar_google' => 'cipher:access-token-secret',
@@ -120,7 +120,7 @@ namespace {
         $adminAccess,
     );
     $descriptor = $provider->descriptor();
-    if ($descriptor->appId() !== 'adcalendar' || $descriptor->contractVersion() !== '1.0' || !$descriptor->supportsSubjectType('nextcloud-user')) throw new RuntimeException('AD Kalender beschreibt den Standalone-V1-Vertrag nicht korrekt.');
+    if ($descriptor->appId() !== 'flzcalendar' || $descriptor->contractVersion() !== '1.0' || !$descriptor->supportsSubjectType('nextcloud-user')) throw new RuntimeException('Filzmann Kalender beschreibt den Standalone-V1-Vertrag nicht korrekt.');
     $subject = new DataSubjectRef('nextcloud-user', 'self');
     $report = $provider->collect(new PersonalDataRequest($subject, 'de', 'access-report', 50, []));
     if (count($report->entries()) !== 7 || $report->status() !== 'complete') throw new RuntimeException('Kalenderauskunft liefert fremde Einträge, lässt persönliche Einstellungen oder Adminfreigaben aus oder meldet einen falschen Status.');
@@ -140,7 +140,7 @@ namespace {
     $adminGrant = array_values(array_filter($items, static fn(array $item): bool => $item['categoryId'] === 'admin-access'))[0] ?? null;
     if ($adminGrant === null || str_contains(json_encode($adminGrant), 'other-admin')) throw new RuntimeException('App-lokale Adminfreigabe fehlt oder legt fremde Admin-IDs offen.');
     $adminGrantJson=json_encode($adminGrant,JSON_THROW_ON_ERROR|JSON_UNESCAPED_UNICODE);
-    foreach(['Freigebendes Mitglied von Datenschutzbeauftragte','App-lokale Freigabesteuerung im AD Kalender','Datenschutz-Prüfrolle'] as $expected)if(!str_contains($adminGrantJson,$expected))throw new RuntimeException("Adminfreigabe projiziert Rolle oder Quelle nicht korrekt: {$expected}");
+    foreach(['Freigebendes Mitglied von Datenschutzbeauftragte','App-lokale Freigabesteuerung im Filzmann Kalender','Datenschutz-Prüfrolle'] as $expected)if(!str_contains($adminGrantJson,$expected))throw new RuntimeException("Adminfreigabe projiziert Rolle oder Quelle nicht korrekt: {$expected}");
     if ($appointment === null || $shift === null) throw new RuntimeException('Termin und Dienst sind nicht getrennt ausgewiesen.');
     if (array_key_exists('Art', $appointment['attributes']) || array_key_exists('Art', $shift['attributes'])) throw new RuntimeException('Der bereits als Tabellenabschnitt ausgewiesene Datentyp wird redundant als Art-Spalte ausgegeben.');
     foreach (['Termin', 'Gemeinsamer Termin', '12.08.26, 10:00 bis 11:00 Uhr', 'Termin- und Verfügbarkeitsplanung', 'Keine feste Löschfrist'] as $expected) {
@@ -167,24 +167,24 @@ namespace {
     if ($limited->status() !== 'partial' || !in_array('Ausgabelimit erreicht; weitere Kalenderdaten können vorhanden sein.', $limited->restrictions(), true)) throw new RuntimeException('Begrenzter Kalenderbericht behauptet Vollständigkeit.');
     $unsupported = $provider->collect(new PersonalDataRequest(new DataSubjectRef('external-applicant', 'self'), 'de', 'access-report', 50, []));
     if ($unsupported->status() !== 'not_applicable' || $unsupported->entries() !== []) throw new RuntimeException('Ein nicht unterstützter Subject-Typ erhält Kalenderdaten.');
-    $userConfig->values['corrupt']['adcalendar']['filter_default'] = '{private-person-value';
-    $userConfig->values['corrupt']['adcalendar']['shift_calendar_sync_enabled'] = 'unexpected';
+    $userConfig->values['corrupt']['flzcalendar']['filter_default'] = '{private-person-value';
+    $userConfig->values['corrupt']['flzcalendar']['shift_calendar_sync_enabled'] = 'unexpected';
     $corruptReport = $provider->collect(new PersonalDataRequest(new DataSubjectRef('nextcloud-user', 'corrupt'), 'de', 'access-report', 50, []));
     if ($corruptReport->status() !== 'partial' || $corruptReport->entries() !== [] || !str_contains(implode(' ', $corruptReport->restrictions()), 'nicht sicher auswertbar')) {
         throw new RuntimeException('Gespeicherte unlesbare persönliche Kalenderwerte werden fälschlich als nicht vorhanden behandelt.');
     }
     if (str_contains(json_encode($corruptReport->restrictions(), JSON_THROW_ON_ERROR), 'private-person-value')) throw new RuntimeException('Eine sichere Diagnose gibt den unlesbaren persönlichen Rohwert aus.');
     try {
-        $provider->collect((new PersonalDataRequest($subject, 'de', 'access-report', 50, ['adcalendar'=>'opaque']))->forProvider('adcalendar', 50));
+        $provider->collect((new PersonalDataRequest($subject, 'de', 'access-report', 50, ['flzcalendar'=>'opaque']))->forProvider('flzcalendar', 50));
         throw new RuntimeException('Ein unbekannter Provider-Cursor wurde akzeptiert.');
     } catch (InvalidArgumentException) {}
 
     $listener = new CalendarPrivacyProviderListener($provider);
     $registry = new RegisterPersonalDataProvidersEvent();
     $listener->handle($registry);
-    if (array_keys($registry->providers()) !== ['adcalendar']) throw new RuntimeException('AD Kalender registriert seinen Privacy-Provider nicht.');
+    if (array_keys($registry->providers()) !== ['flzcalendar']) throw new RuntimeException('Filzmann Kalender registriert seinen Privacy-Provider nicht.');
     $application = (string)file_get_contents(dirname(__DIR__, 2) . '/lib/AppInfo/Application.php');
-    if (!str_contains($application, 'registerEventListener(RegisterPersonalDataProvidersEvent::class, CalendarPrivacyProviderListener::class)') || str_contains($application, 'PersonalDataProviderRegistryEvent')) throw new RuntimeException('AD Kalender registriert den Provider nicht ausschließlich am Standalone-V1-Event.');
+    if (!str_contains($application, 'registerEventListener(RegisterPersonalDataProvidersEvent::class, CalendarPrivacyProviderListener::class)') || str_contains($application, 'PersonalDataProviderRegistryEvent')) throw new RuntimeException('Filzmann Kalender registriert den Provider nicht ausschließlich am Standalone-V1-Event.');
 
-    echo "AD Kalender privacy provider test passed\n";
+    echo "Filzmann Kalender privacy provider test passed\n";
 }

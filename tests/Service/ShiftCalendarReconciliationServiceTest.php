@@ -8,7 +8,7 @@ namespace Psr\Log {
     }
 }
 
-namespace OCA\AdCalendar\Repository {
+namespace OCA\FlzCalendar\Repository {
     final class CalendarEntryRepository {
         public array $entries = [];
         public array $uids = [];
@@ -19,7 +19,7 @@ namespace OCA\AdCalendar\Repository {
     }
 }
 
-namespace OCA\AdCalendar\Service {
+namespace OCA\FlzCalendar\Service {
     final class CalendarPreferenceService {
         public array $uids = [];
         public array $disabled = [];
@@ -43,7 +43,7 @@ namespace OCA\AdCalendar\Service {
         public function range(): array { return [new \DateTimeImmutable('2026-01-01T00:00:00+01:00'), new \DateTimeImmutable('2029-01-01T00:00:00+01:00')]; }
     }
 }
-namespace OCA\AdCalendar\CalendarSync {
+namespace OCA\FlzCalendar\CalendarSync {
     final class ExternalCalendarConnectionStore {
         public array $uids = [];
         public function connectedEmployeeUids(): array { return $this->uids; }
@@ -57,15 +57,15 @@ namespace OCA\AdCalendar\CalendarSync {
 
 namespace {
 
-    use OCA\AdCalendar\CalendarSync\PersonalCalendarPublisher;
-    use OCA\AdCalendar\CalendarSync\ExternalCalendarConnectionStore;
-    use OCA\AdCalendar\CalendarSync\ExternalShiftCalendarPublisher;
-    use OCA\AdCalendar\Model\CalendarEntry;
-    use OCA\AdCalendar\Repository\CalendarEntryRepository;
-    use OCA\AdCalendar\Service\CalendarPreferenceService;
-    use OCA\AdCalendar\Service\AbsenceService;
-    use OCA\AdCalendar\Service\CalendarSyncHorizon;
-    use OCA\AdCalendar\Service\ShiftCalendarReconciliationService;
+    use OCA\FlzCalendar\CalendarSync\PersonalCalendarPublisher;
+    use OCA\FlzCalendar\CalendarSync\ExternalCalendarConnectionStore;
+    use OCA\FlzCalendar\CalendarSync\ExternalShiftCalendarPublisher;
+    use OCA\FlzCalendar\Model\CalendarEntry;
+    use OCA\FlzCalendar\Repository\CalendarEntryRepository;
+    use OCA\FlzCalendar\Service\CalendarPreferenceService;
+    use OCA\FlzCalendar\Service\AbsenceService;
+    use OCA\FlzCalendar\Service\CalendarSyncHorizon;
+    use OCA\FlzCalendar\Service\ShiftCalendarReconciliationService;
     use Psr\Log\LoggerInterface;
 
     $preferences = new CalendarPreferenceService();

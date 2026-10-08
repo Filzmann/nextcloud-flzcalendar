@@ -146,7 +146,7 @@ const context = {
     window: {
         location: { search: '?calendarConnection=google-connected' },
         LocalBase: { api: { ApiClient }, ui: { Notice } },
-        AdCalendar: {
+        FlzCalendar: {
             l10n,
             repositories: { CalendarRepository }, models: { CalendarEntry, Organization },
             modules: {
@@ -190,21 +190,21 @@ if (ApiClient.last.options.errorMessage({ error: 'safe error' }, 400) !== 'safe 
     throw new Error('API-Fehleradapter besitzt keinen stabilen öffentlichen Fallback.');
 }
 
-await elements.get('adc-open-meeting-finder').fire('click');
+await elements.get('flz-calendar-open-meeting-finder').fire('click');
 if (MeetingFinder.last.opens[0][0] !== '2026-07-06' || MeetingFinder.last.opens[0][1].length !== 1) {
     throw new Error('Meeting-Suche erhält nicht Woche, Mitarbeitende und Auswahl aus dem Zustand.');
 }
-await elements.get('adc-back-to-top').fire('click');
-const backToTopCall = elements.get('adcalendar-app').scrollCalls[0];
+await elements.get('flz-calendar-back-to-top').fire('click');
+const backToTopCall = elements.get('flzcalendar-app').scrollCalls[0];
 if (backToTopCall?.top !== 0 || backToTopCall?.behavior !== 'smooth') {
     throw new Error('Der mobile Rücksprung scrollt nicht den einzigen App-Scroller an den Anfang.');
 }
 state.selected.add('a');
 CalendarFilters.last.options.onChange();
-if (!elements.get('adc-filter-status').textContent.includes('1 selected')) throw new Error('Explizite Auswahl wird nicht im Filterstatus gerendert.');
+if (!elements.get('flz-calendar-filter-status').textContent.includes('1 selected')) throw new Error('Explizite Auswahl wird nicht im Filterstatus gerendert.');
 state.selected.clear(); state.forceFiltered = true;
 CalendarFilters.last.options.onChange();
-if (!elements.get('adc-filter-status').textContent.includes('1 filtered')) throw new Error('Gruppenfilter wird nicht im Filterstatus gerendert.');
+if (!elements.get('flz-calendar-filter-status').textContent.includes('1 filtered')) throw new Error('Gruppenfilter wird nicht im Filterstatus gerendert.');
 WeekNavigation.last.options.onViewChange();
 
 repository.deferWeek = true;
@@ -246,12 +246,12 @@ if (!Notice.last.messages.some(item => String(item[1]).includes('disabled'))
     || !Notice.last.messages.some(item => String(item[1]).includes('Team calendar'))) {
     throw new Error('Kalendersynchronisation zeigt Aktivierung und Opt-out nicht an.');
 }
-await elements.get('adc-save-default').fire('click');
+await elements.get('flz-calendar-save-default').fire('click');
 if (!calls.some(call => call[0] === 'savePreferences')) throw new Error('Persönlicher Ansichtsstandard wird nicht gespeichert.');
 
 state.period = 'month';
 await WeekNavigation.last.options.onPeriodChange();
-if (!calls.some(call => call[0] === 'range') || elements.get('adc-open-meeting-finder').disabled !== true) {
+if (!calls.some(call => call[0] === 'range') || elements.get('flz-calendar-open-meeting-finder').disabled !== true) {
     throw new Error('Monatswechsel lädt keinen Bereich oder sperrt die wöchentliche Meeting-Suche nicht.');
 }
 repository.fail = new Error('load failed');
@@ -259,7 +259,7 @@ state.period = 'week';
 await WeekNavigation.last.options.onWeekChange();
 await ShiftDefaults.last.options.onSave({});
 await ShiftCalendarSync.last.options.onSave(true);
-await elements.get('adc-save-default').fire('click');
+await elements.get('flz-calendar-save-default').fire('click');
 if (Notice.last.messages.filter(item => item[0] === 'error').length < 4) {
     throw new Error('Lade- und Speicherfehler werden nicht einheitlich als Fehlermeldung angezeigt.');
 }

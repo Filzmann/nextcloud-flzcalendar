@@ -1,12 +1,12 @@
 (function() {
     'use strict';
-    const l10n = window.AdCalendar.l10n;
+    const l10n = window.FlzCalendar.l10n;
 
     /** Zweck: Rendert und sammelt die persönlichen Standard-Dienstzeiten je Wochentag. */
     class ShiftDefaults {
         constructor(options) {
-            this.container = document.getElementById('adc-shift-defaults');
-            this.form = document.getElementById('adc-shift-defaults-form');
+            this.container = document.getElementById('flz-calendar-shift-defaults');
+            this.form = document.getElementById('flz-calendar-shift-defaults-form');
             this.onSave = options.onSave;
             this.weekdays = ['',
                 l10n.t('Monday'), l10n.t('Tuesday'), l10n.t('Wednesday'), l10n.t('Thursday'),
@@ -20,8 +20,8 @@
         }
 
         row(weekday, value) {
-            const row = document.createElement('div'); row.className = 'adc-shift-default-row'; row.dataset.weekday = String(weekday);
-            const enabledLabel = document.createElement('label'); enabledLabel.className = 'adc-shift-default-day';
+            const row = document.createElement('div'); row.className = 'flz-calendar-shift-default-row'; row.dataset.weekday = String(weekday);
+            const enabledLabel = document.createElement('label'); enabledLabel.className = 'flz-calendar-shift-default-day';
             const enabled = document.createElement('input'); enabled.type = 'checkbox'; enabled.checked = value.enabled !== false; enabled.dataset.field = 'enabled';
             enabledLabel.append(enabled, document.createTextNode(` ${this.weekdays[weekday]}`));
             const start = this.timeField('Beginn', 'start', value.start || '08:00');
@@ -49,7 +49,7 @@
         async submit(event) { event.preventDefault(); if (this.form.reportValidity()) await this.onSave(this.collect()); }
     }
 
-    window.AdCalendar = window.AdCalendar || {};
-    window.AdCalendar.components = window.AdCalendar.components || {};
-    window.AdCalendar.components.ShiftDefaults = ShiftDefaults;
+    window.FlzCalendar = window.FlzCalendar || {};
+    window.FlzCalendar.components = window.FlzCalendar.components || {};
+    window.FlzCalendar.components.ShiftDefaults = ShiftDefaults;
 })();

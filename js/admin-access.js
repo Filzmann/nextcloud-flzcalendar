@@ -1,12 +1,12 @@
 (function() {
     'use strict';
 
-    const form = document.getElementById('adc-full-access-form');
-    const history = document.getElementById('adc-full-access-history');
-    const status = document.getElementById('adc-full-access-status');
+    const form = document.getElementById('flz-calendar-full-access-form');
+    const history = document.getElementById('flz-calendar-full-access-history');
+    const status = document.getElementById('flz-calendar-full-access-status');
     if (!form || !history || !status) return;
 
-    const client = new window.LocalBase.api.ApiClient({ appId: 'adcalendar' });
+    const client = new window.LocalBase.api.ApiClient({ appId: 'flzcalendar' });
     const showStatus = (message, error = false) => {
         status.textContent = message;
         status.className = error ? 'is-error' : 'is-success';

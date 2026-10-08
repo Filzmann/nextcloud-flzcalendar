@@ -3,7 +3,7 @@ import { fileURLToPath } from 'node:url';
 import { runInNewContext } from 'node:vm';
 
 const source = readFileSync(new URL('../../js/admin.js', import.meta.url), 'utf8');
-if (!source.includes('window.AdCalendar.l10n') || !source.includes("l10n.t('The calendar defaults were saved.")) {
+if (!source.includes('window.FlzCalendar.l10n') || !source.includes("l10n.t('The calendar defaults were saved.")) {
     throw new Error('Admininteraktionen verwenden nicht den zentralen L10N-Adapter.');
 }
 const element = (value = '') => ({
@@ -30,24 +30,24 @@ const defaultsName = element('Team & Dienst');
 const defaultsStatus = element();
 const defaultsSubmit = element();
 const elements = {
-    'adc-google-oauth-form': form,
-    'adc-google-client-id': clientId,
-    'adc-google-client-secret': secret,
-    'adc-google-oauth-status': status,
-    'adc-google-oauth-remove': remove,
-    'adc-google-copy-redirect': copy,
-    'adc-google-redirect-uri': redirect,
-    'adc-kopano-test-form': calDavForm,
-    'adc-kopano-test-url': calDavUrl,
-    'adc-kopano-test-username': calDavUsername,
-    'adc-kopano-test-password': calDavPassword,
-    'adc-kopano-test-status': calDavStatus,
-    'adc-kopano-test-submit': calDavSubmit,
-    'adc-calendar-defaults-form': defaultsForm,
-    'adc-calendar-default-kopano-url': defaultsUrl,
-    'adc-calendar-default-name': defaultsName,
-    'adc-calendar-defaults-status': defaultsStatus,
-    'adc-calendar-defaults-submit': defaultsSubmit,
+    'flz-calendar-google-oauth-form': form,
+    'flz-calendar-google-client-id': clientId,
+    'flz-calendar-google-client-secret': secret,
+    'flz-calendar-google-oauth-status': status,
+    'flz-calendar-google-oauth-remove': remove,
+    'flz-calendar-google-copy-redirect': copy,
+    'flz-calendar-google-redirect-uri': redirect,
+    'flz-calendar-kopano-test-form': calDavForm,
+    'flz-calendar-kopano-test-url': calDavUrl,
+    'flz-calendar-kopano-test-username': calDavUsername,
+    'flz-calendar-kopano-test-password': calDavPassword,
+    'flz-calendar-kopano-test-status': calDavStatus,
+    'flz-calendar-kopano-test-submit': calDavSubmit,
+    'flz-calendar-calendar-defaults-form': defaultsForm,
+    'flz-calendar-calendar-default-kopano-url': defaultsUrl,
+    'flz-calendar-calendar-default-name': defaultsName,
+    'flz-calendar-calendar-defaults-status': defaultsStatus,
+    'flz-calendar-calendar-defaults-submit': defaultsSubmit,
 };
 const calls = [];
 let failCalDav = false;
@@ -74,7 +74,7 @@ const l10n = { t(key, parameters = {}) {
     return `translated:${key}`.replace(/\{(\w+)\}/g, (_, name) => String(parameters[name] ?? `{${name}}`));
 } };
 const context = {
-    window: { LocalBase: { api: { ApiClient } }, AdCalendar: { l10n }, confirm: () => true },
+    window: { LocalBase: { api: { ApiClient } }, FlzCalendar: { l10n }, confirm: () => true },
     document: { getElementById: id => elements[id] || null },
     navigator: { clipboard: { writeText: async value => { copied = value; } } },
 };

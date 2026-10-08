@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace OCA\AdCalendar\CalendarSync;
+namespace OCA\FlzCalendar\CalendarSync;
 
-use OCA\AdCalendar\Model\CalendarEntry;
-use OCA\AdCalendar\Service\CalendarTargetConfig;
+use OCA\FlzCalendar\Model\CalendarEntry;
+use OCA\FlzCalendar\Service\CalendarTargetConfig;
 use OCP\Http\Client\IClientService;
 use OCP\IL10N;
 use RuntimeException;
@@ -80,7 +80,7 @@ final class GoogleCalendarClient {
             $this->request($uid, $connection, 'POST', self::API . '/calendars/' . $calendarId . '/events', $payload);
             return;
         }
-        if (($existing['extendedProperties']['private']['adcalendarSource'] ?? '') !== 'adcalendar') {
+        if (($existing['extendedProperties']['private']['flzcalendarSource'] ?? '') !== 'flzcalendar') {
             throw new RuntimeException('Die reservierte Google-Dienstkennung ist bereits fremd belegt.');
         }
         $this->request($uid, $connection, 'PUT', $eventUrl, $payload);
@@ -88,7 +88,7 @@ final class GoogleCalendarClient {
 
     public function remove(string $uid, array $connection, int $shiftId): void {
         if (trim((string)($connection['calendarId'] ?? '')) === '') return;
-        $this->deleteEvent($uid, $connection, 'adcalendarshift' . $shiftId);
+        $this->deleteEvent($uid, $connection, 'flzcalendarshift' . $shiftId);
     }
 
     public function removeCalendar(string $uid, array $connection): void {
@@ -100,7 +100,7 @@ final class GoogleCalendarClient {
     private function ownedEvents(string $uid, array $connection): array {
         $calendarId = rawurlencode((string)$connection['calendarId']);
         $url = self::API . '/calendars/' . $calendarId . '/events?' . http_build_query([
-            'privateExtendedProperty' => 'adcalendarSource=adcalendar',
+            'privateExtendedProperty' => 'flzcalendarSource=flzcalendar',
             'showDeleted' => 'false',
             'maxResults' => 2500,
         ], '', '&', PHP_QUERY_RFC3986);
@@ -112,7 +112,7 @@ final class GoogleCalendarClient {
             }
             $page = trim((string)($response['nextPageToken'] ?? ''));
             $url = $page === '' ? '' : self::API . '/calendars/' . $calendarId . '/events?' . http_build_query([
-                'privateExtendedProperty' => 'adcalendarSource=adcalendar', 'showDeleted' => 'false', 'maxResults' => 2500, 'pageToken' => $page,
+                'privateExtendedProperty' => 'flzcalendarSource=flzcalendar', 'showDeleted' => 'false', 'maxResults' => 2500, 'pageToken' => $page,
             ], '', '&', PHP_QUERY_RFC3986);
         } while ($url !== '');
         return array_values(array_unique($ids));
@@ -122,7 +122,7 @@ final class GoogleCalendarClient {
         $url = self::API . '/calendars/' . rawurlencode((string)$connection['calendarId']) . '/events/' . rawurlencode($eventId);
         $existing = $this->request($uid, $connection, 'GET', $url, null, [404]);
         if (($existing['_status'] ?? 200) === 404) return;
-        if (($existing['extendedProperties']['private']['adcalendarSource'] ?? '') !== 'adcalendar') {
+        if (($existing['extendedProperties']['private']['flzcalendarSource'] ?? '') !== 'flzcalendar') {
             throw new RuntimeException('Die reservierte Google-Dienstkennung ist bereits fremd belegt.');
         }
         $this->request($uid, $connection, 'DELETE', $url, null, [404]);
@@ -159,17 +159,17 @@ final class GoogleCalendarClient {
         return [
             'id' => $eventId,
             'summary' => $shift->title() !== '' ? $shift->title() : $this->l10n->t('Shift'),
-            'description' => $this->l10n->t('Automatically synchronised from AD Calendar. Please make changes there.'),
+            'description' => $this->l10n->t('Automatically synchronised from Filzmann Calendar. Please make changes there.'),
             'start' => ['dateTime' => $shift->start()->format(DATE_RFC3339)],
             'end' => ['dateTime' => $shift->end()->format(DATE_RFC3339)],
             'transparency' => 'opaque',
             'visibility' => 'private',
-            'extendedProperties' => ['private' => ['adcalendarSource' => 'adcalendar', 'adcalendarEntryId' => (string)$shift->id()]],
+            'extendedProperties' => ['private' => ['flzcalendarSource' => 'flzcalendar', 'flzcalendarEntryId' => (string)$shift->id()]],
         ];
     }
 
     private function eventId(CalendarEntry $shift): string {
         if ($shift->type() !== CalendarEntry::TYPE_SHIFT || $shift->id() === null) throw new RuntimeException('Nur persistierte Dienste können zu Google übertragen werden.');
-        return 'adcalendarshift' . $shift->id();
+        return 'flzcalendarshift' . $shift->id();
     }
 }

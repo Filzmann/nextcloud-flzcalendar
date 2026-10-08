@@ -23,7 +23,7 @@
         }
     }
 
-    window.AdCalendar = window.AdCalendar || {};
-    window.AdCalendar.modules = window.AdCalendar.modules || {};
-    window.AdCalendar.modules.MeetingCapabilities = MeetingCapabilities;
+    window.FlzCalendar = window.FlzCalendar || {};
+    window.FlzCalendar.modules = window.FlzCalendar.modules || {};
+    window.FlzCalendar.modules.MeetingCapabilities = MeetingCapabilities;
 })();

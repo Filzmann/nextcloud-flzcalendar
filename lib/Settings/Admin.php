@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace OCA\AdCalendar\Settings;
+namespace OCA\FlzCalendar\Settings;
 
-use OCA\AdCalendar\AppInfo\Application;
-use OCA\AdCalendar\CalendarSync\GoogleOAuthService;
-use OCA\AdCalendar\Service\ShiftCalendarReconciliationStatusService;
-use OCA\AdCalendar\Service\CalendarTargetConfig;
+use OCA\FlzCalendar\AppInfo\Application;
+use OCA\FlzCalendar\CalendarSync\GoogleOAuthService;
+use OCA\FlzCalendar\Service\ShiftCalendarReconciliationStatusService;
+use OCA\FlzCalendar\Service\CalendarTargetConfig;
 use OCP\AppFramework\Http\TemplateResponse;
 use OCP\IDateTimeFormatter;
 use OCP\IL10N;

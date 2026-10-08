@@ -2,17 +2,17 @@
 
 declare(strict_types=1);
 
-namespace OCA\AdCalendar\Service;
+namespace OCA\FlzCalendar\Service;
 
-use OCA\LocalBase\Organization\AdOrganizationDefinition;
-use OCA\LocalBase\Organization\AdOrganizationSettingsService;
-use OCA\LocalBase\Organization\AdSuiteAdminSettingsService;
+use OCA\LocalBase\Organization\FlzOrganizationDefinition;
+use OCA\LocalBase\Organization\FlzOrganizationSettingsService;
+use OCA\LocalBase\Organization\FlzSuiteAdminSettingsService;
 
 /** Zweck: Stellt dem Kalender den gemeinsamen Organisations- und Rechtevertrag read-only bereit. */
 final class CalendarSettingsService {
     public function __construct(
-        private AdSuiteAdminSettingsService $adminSettings,
-        private ?AdOrganizationSettingsService $organization = null,
+        private FlzSuiteAdminSettingsService $adminSettings,
+        private ?FlzOrganizationSettingsService $organization = null,
     ) {}
 
     /** @return array<string,bool> */
@@ -25,5 +25,5 @@ final class CalendarSettingsService {
 
     public function organization(): array { return $this->definition()->toArray(); }
 
-    private function definition(): AdOrganizationDefinition { return $this->organization?->definition() ?? AdOrganizationDefinition::defaults(); }
+    private function definition(): FlzOrganizationDefinition { return $this->organization?->definition() ?? FlzOrganizationDefinition::defaults(); }
 }

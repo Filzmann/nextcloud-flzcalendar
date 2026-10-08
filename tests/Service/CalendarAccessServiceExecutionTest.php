@@ -14,7 +14,7 @@ namespace OCP {
 }
 
 namespace OCA\LocalBase\Organization {
-    final class AdOrganizationDefinition {
+    final class FlzOrganizationDefinition {
         public static function defaults(): self { return new self(); }
         public function roleGroupIds(callable $filter): array {
             $roles = [
@@ -25,10 +25,10 @@ namespace OCA\LocalBase\Organization {
             return array_keys(array_filter($roles, $filter));
         }
     }
-    final class AdOrganizationSettingsService { public function definition(): AdOrganizationDefinition { return AdOrganizationDefinition::defaults(); } }
+    final class FlzOrganizationSettingsService { public function definition(): FlzOrganizationDefinition { return FlzOrganizationDefinition::defaults(); } }
 }
 
-namespace OCA\AdCalendar\Service {
+namespace OCA\FlzCalendar\Service {
     final class TemporaryAdminAccessChecker {
         public bool $active = false;
         public function hasActiveGrant(string $uid): bool { return $this->active; }
@@ -52,12 +52,12 @@ namespace OCA\AdCalendar\Service {
 
 namespace {
 
-    use OCA\AdCalendar\Service\CalendarAccessService;
-    use OCA\AdCalendar\Service\CalendarGroupProfile;
-    use OCA\AdCalendar\Service\CalendarPermissionPolicy;
-    use OCA\AdCalendar\Service\CalendarSettingsService;
-    use OCA\AdCalendar\Service\TemporaryAdminAccessChecker;
-    use OCA\LocalBase\Organization\AdOrganizationSettingsService;
+    use OCA\FlzCalendar\Service\CalendarAccessService;
+    use OCA\FlzCalendar\Service\CalendarGroupProfile;
+    use OCA\FlzCalendar\Service\CalendarPermissionPolicy;
+    use OCA\FlzCalendar\Service\CalendarSettingsService;
+    use OCA\FlzCalendar\Service\TemporaryAdminAccessChecker;
+    use OCA\LocalBase\Organization\FlzOrganizationSettingsService;
     use OCP\IGroupManager;
     use OCP\IUser;
     use OCP\IUserManager;
@@ -106,7 +106,7 @@ namespace {
         new CalendarSettingsService(),
         new CalendarGroupProfile(),
         $adminAccess,
-        new AdOrganizationSettingsService(),
+        new FlzOrganizationSettingsService(),
     );
 
     if ($access->currentUser() !== null || $access->canView() || $access->canManage('alpha')

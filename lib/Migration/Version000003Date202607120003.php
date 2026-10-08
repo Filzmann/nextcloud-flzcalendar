@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OCA\AdCalendar\Migration;
+namespace OCA\FlzCalendar\Migration;
 
 use Closure;
 use OCP\DB\QueryBuilder\IQueryBuilder;
@@ -19,13 +19,13 @@ final class Version000003Date202607120003 extends SimpleMigrationStep {
 
     public function postSchemaChange(IOutput $output, Closure $schemaClosure, array $options): void {
         $qb = $this->db->getQueryBuilder();
-        $appointments = $qb->select('id', 'employee_uid', 'start_at', 'end_at')->from('adc_entries')
+        $appointments = $qb->select('id', 'employee_uid', 'start_at', 'end_at')->from('flz_calendar_entries')
             ->where($qb->expr()->eq('entry_type', $qb->createNamedParameter('appointment')))
             ->andWhere($qb->expr()->isNull('parent_entry_id'))->executeQuery()->fetchAllAssociative();
         $linked = 0;
         foreach ($appointments as $appointment) {
             $find = $this->db->getQueryBuilder();
-            $shifts = $find->select('id')->from('adc_entries')
+            $shifts = $find->select('id')->from('flz_calendar_entries')
                 ->where($find->expr()->eq('employee_uid', $find->createNamedParameter($appointment['employee_uid'])))
                 ->andWhere($find->expr()->eq('entry_type', $find->createNamedParameter('shift')))
                 ->andWhere($find->expr()->lte('start_at', $find->createNamedParameter($appointment['start_at'])))
@@ -33,7 +33,7 @@ final class Version000003Date202607120003 extends SimpleMigrationStep {
                 ->executeQuery()->fetchAllAssociative();
             if (count($shifts) !== 1) continue;
             $update = $this->db->getQueryBuilder();
-            $update->update('adc_entries')->set('parent_entry_id', $update->createNamedParameter((int)$shifts[0]['id'], IQueryBuilder::PARAM_INT))
+            $update->update('flz_calendar_entries')->set('parent_entry_id', $update->createNamedParameter((int)$shifts[0]['id'], IQueryBuilder::PARAM_INT))
                 ->where($update->expr()->eq('id', $update->createNamedParameter((int)$appointment['id'], IQueryBuilder::PARAM_INT)))->executeStatement();
             $linked++;
         }

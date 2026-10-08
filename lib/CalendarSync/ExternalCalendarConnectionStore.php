@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace OCA\AdCalendar\CalendarSync;
+namespace OCA\FlzCalendar\CalendarSync;
 
 use InvalidArgumentException;
-use OCA\AdCalendar\AppInfo\Application;
+use OCA\FlzCalendar\AppInfo\Application;
 use OCP\Config\IUserConfig;
 use OCP\Security\ICrypto;
 use RuntimeException;

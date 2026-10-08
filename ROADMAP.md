@@ -1,4 +1,4 @@
-# Roadmap – AD Kalender
+# Roadmap – Filzmann Kalender
 
 Diese Datei enthält ausschließlich offene Arbeit, zurückgestellte Vorhaben
 und Freigabegates. Der aktuelle Funktionsumfang steht in `README.md`,
@@ -7,7 +7,7 @@ erledigte Änderungen in `CHANGELOG.md` und geltende Architektur in
 
 ## Offene Abnahmen
 
-### ADC-STAGING-ACCEPTANCE – bestehenden Kernumfang fachlich abnehmen
+### FLZC-STAGING-ACCEPTANCE – bestehenden Kernumfang fachlich abnehmen
 
 - Wochen- und Monatsplanung, Meeting-Lückensuche, persönliche Standards,
   Rollen-/Bereichsfilter und Urlaubsmarkierungen auf Staging prüfen.
@@ -19,7 +19,7 @@ erledigte Änderungen in `CHANGELOG.md` und geltende Architektur in
   Ablauf, Widerruf, Rollenverlust, CSRF und Tastaturbedienung einschließen.
 - Ergebnisse ausschließlich in `docs/manual-acceptance.md` dokumentieren.
 
-### ADC-STAGING-FOLLOWUP – Abweichungen der laufenden Abnahme schließen
+### FLZC-STAGING-FOLLOWUP – Abweichungen der laufenden Abnahme schließen
 
 - Den geöffneten Filter als überlagerndes Panel ausführen, damit er die
   Kalendermatrix auch bei kleinen Viewports nicht verdrängt; Fokus,
@@ -36,7 +36,7 @@ erledigte Änderungen in `CHANGELOG.md` und geltende Architektur in
   `DP-11` im Parent-Zukunftsplan; die app-lokalen Rechte- und Auditgrenzen
   bleiben unverändert.
 
-### ADC-L10N-ACCEPTANCE – deutsche und englische Oberfläche prüfen
+### FLZC-L10N-ACCEPTANCE – deutsche und englische Oberfläche prüfen
 
 - Deutsche und englische Kalender-/Adminoberfläche mit langen
   Beschriftungen, Pluralen und veröffentlichten DAV-/Google-Ereignistexten
@@ -44,7 +44,7 @@ erledigte Änderungen in `CHANGELOG.md` und geltende Architektur in
 - Technische IDs, Statuscodes, Rechteentscheidungen und Secrets bleiben von
   Übersetzungen unabhängig.
 
-### ADC-MOBILE-ACCEPTANCE – reale Smartphone-Browserabnahme
+### FLZC-MOBILE-ACCEPTANCE – reale Smartphone-Browserabnahme
 
 - Kleine Viewports, beide Matrixausrichtungen, Filter, Menübedienung,
   eigene und berechtigte fremde Einträge, Zoom, Sticky-Kontext und

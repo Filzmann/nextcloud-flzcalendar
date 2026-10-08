@@ -11,8 +11,8 @@ namespace OCP\AppFramework\Http\Attribute {
     #[\Attribute] final class NoAdminRequired {}
     #[\Attribute] final class NoCSRFRequired {}
 }
-namespace OCA\AdCalendar\AppInfo { final class Application { public const APP_ID = 'adcalendar'; } }
-namespace OCA\AdCalendar\Service {
+namespace OCA\FlzCalendar\AppInfo { final class Application { public const APP_ID = 'flzcalendar'; } }
+namespace OCA\FlzCalendar\Service {
     final class CalendarTargetConfig { public function adminStatus(): array { return ['kopanoUrl' => 'https://default.example.test/', 'calendarName' => 'Team & Dienst']; } }
     final class TemporaryAdminAccessService {
         public function __construct(public bool $canManage, public bool $needsGrant) {}
@@ -23,13 +23,13 @@ namespace OCA\AdCalendar\Service {
 
 namespace {
 
-    use OCA\AdCalendar\Controller\PageController;
-    use OCA\AdCalendar\Service\CalendarTargetConfig;
-    use OCA\AdCalendar\Service\TemporaryAdminAccessService;
+    use OCA\FlzCalendar\Controller\PageController;
+    use OCA\FlzCalendar\Service\CalendarTargetConfig;
+    use OCA\FlzCalendar\Service\TemporaryAdminAccessService;
     use OCP\IRequest;
 
     $response = (new PageController(new class implements IRequest {}, new CalendarTargetConfig(), new TemporaryAdminAccessService(true, true)))->index();
-    if ($response->app !== 'adcalendar' || $response->template !== 'index'
+    if ($response->app !== 'flzcalendar' || $response->template !== 'index'
         || $response->params !== [
             'calendarDefaults' => ['kopanoUrl' => 'https://default.example.test/', 'calendarName' => 'Team & Dienst'],
             'canManageAdminAccess' => true,

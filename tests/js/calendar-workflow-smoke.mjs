@@ -3,8 +3,8 @@ import { fileURLToPath } from 'node:url';
 import { runInNewContext } from 'node:vm';
 
 const execute = (relativePath, source, context) => {
-    context.window.AdCalendar ||= {};
-    context.window.AdCalendar.l10n ||= {
+    context.window.FlzCalendar ||= {};
+    context.window.FlzCalendar.l10n ||= {
         locale: 'de-DE',
         date: (value, options = {}) => new Intl.DateTimeFormat('de-DE', options).format(value),
         time: (value, options = {}) => new Intl.DateTimeFormat('de-DE', { hour: '2-digit', minute: '2-digit', timeZone: 'UTC', ...options }).format(value),
@@ -47,7 +47,7 @@ for (const contract of [
     'repository.saveShiftDefaults(defaults)',
     'shiftCalendarSync.set(state.data.calendarSync || {})',
     'repository.saveCalendarSync(enabled)',
-    'new window.AdCalendar.components.ExternalCalendars',
+    'new window.FlzCalendar.components.ExternalCalendars',
     'externalCalendars.load()',
     'meetingFinder.open(CalendarDate.isoDay(state.monday)',
     'repository.range(range.start, range.end)',
@@ -69,7 +69,7 @@ if (!entryWorkflow.includes("button.closest('[data-employee-uid][data-day]')")) 
 }
 const workflowContext = { window: { confirm: () => true }, document: {}, Element: class {}, Date, Number, Promise };
 execute('../../js/modules/entry-workflow.js', entryWorkflow, workflowContext);
-const workflow = Object.create(workflowContext.window.AdCalendar.modules.EntryWorkflow.prototype);
+const workflow = Object.create(workflowContext.window.FlzCalendar.modules.EntryWorkflow.prototype);
 let deletionError = null;
 workflow.repository = { remove: async () => { throw new Error('Löschen fehlgeschlagen'); } };
 workflow.show = (error, isError) => { if (isError) deletionError = error; };
@@ -78,7 +78,7 @@ await workflow.remove({ id: 7, type: 'appointment', meetingUid: null });
 if (deletionError?.message !== 'Löschen fehlgeschlagen') throw new Error('Fehler beim abschließenden Löschen wird nicht angezeigt.');
 const capabilitiesContext = { window: {}, Map };
 execute('../../js/modules/meeting-capabilities.js', meetingCapabilities, capabilitiesContext);
-const capabilities = new capabilitiesContext.window.AdCalendar.modules.MeetingCapabilities();
+const capabilities = new capabilitiesContext.window.FlzCalendar.modules.MeetingCapabilities();
 const mixedMeeting = [{ employeeUid: 'a', meetingUid: 'meeting-1' }, { employeeUid: 'b', meetingUid: 'meeting-1' }];
 capabilities.apply(mixedMeeting, [{ uid: 'a', canManage: true }, { uid: 'b', canManage: false }]);
 if (mixedMeeting.some(entry => entry.canManageMeeting !== false)) throw new Error('Meeting mit nicht bearbeitbarer Person wurde in der UI freigegeben.');
@@ -91,12 +91,12 @@ for (const contract of ['class CalendarFilters', 'this.renderLeadershipStaffChec
 for (const contract of ['class TabNavigation', "addEventListener('click'", "this.show('settings')", "this.onChange(active)"]) {
     if (!tabNavigation.includes(contract)) throw new Error(`Tab-Komponentenvertrag fehlt: ${contract}`);
 }
-for (const contract of ['class WeekTable', 'adc-group-heading', 'adc-period-matrix', 'adc-mobile-calendar', 'adc-mobile-day', 'adc-mobile-person', 'adc-outside-month', 'state.data.planningConflicts || []', 'this.calendarCell.render(entries, employee, absences, layout, day, this.timeline, planningConflicts)', 'this.calendarCell.render(entries, employee, absences, null, day, null, planningConflicts)', 'this.timeline.layout([...employeeEntries, ...employeePlanningConflicts], days)', 'this.timeline.layout([...dayEntries, ...dayPlanningConflicts], [day])', 'organization.staffBlockLabel', 'organization.roleShortLabel(value)', 'organization.areaShortLabel(value)', 'this.daysInRange(range.start, range.end)', 'groupCell.colSpan = days.length + 1', 'this.orderedEmployees(employees)', 'this.staffRank(a) - this.staffRank(b)', 'roleNames.slice(1)', "join('/')"]) {
+for (const contract of ['class WeekTable', 'flz-calendar-group-heading', 'flz-calendar-period-matrix', 'flz-calendar-mobile-calendar', 'flz-calendar-mobile-day', 'flz-calendar-mobile-person', 'flz-calendar-outside-month', 'state.data.planningConflicts || []', 'this.calendarCell.render(entries, employee, absences, layout, day, this.timeline, planningConflicts)', 'this.calendarCell.render(entries, employee, absences, null, day, null, planningConflicts)', 'this.timeline.layout([...employeeEntries, ...employeePlanningConflicts], days)', 'this.timeline.layout([...dayEntries, ...dayPlanningConflicts], [day])', 'organization.staffBlockLabel', 'organization.roleShortLabel(value)', 'organization.areaShortLabel(value)', 'this.daysInRange(range.start, range.end)', 'groupCell.colSpan = days.length + 1', 'this.orderedEmployees(employees)', 'this.staffRank(a) - this.staffRank(b)', 'roleNames.slice(1)', "join('/')"]) {
     if (!weekTable.includes(contract)) throw new Error(`Wochenmatrix-Komponentenvertrag fehlt: ${contract}`);
 }
 const timelineContext = { window: {}, Date, Set, Math };
 execute('../../js/modules/calendar-timeline.js', timelineSource, timelineContext);
-const CalendarTimeline = timelineContext.window.AdCalendar.modules.CalendarTimeline;
+const CalendarTimeline = timelineContext.window.FlzCalendar.modules.CalendarTimeline;
 const calendarTimeline = new CalendarTimeline();
 const timelineDay = new Date(2026, 6, 6);
 const timelineEntries = [
@@ -113,13 +113,13 @@ for (const contract of ['class WeekNavigation', "this.setPeriod('week')", "this.
 const navigationContext = { window: {}, document: {}, Date, Number, String };
 execute('../../js/modules/calendar-date.js', dateSource, navigationContext);
 execute('../../js/components/week-navigation.js', weekNavigation, navigationContext);
-const navigation = Object.create(navigationContext.window.AdCalendar.components.WeekNavigation.prototype);
+const navigation = Object.create(navigationContext.window.FlzCalendar.components.WeekNavigation.prototype);
 let navigationPersisted = false; let navigationLoaded = false;
 navigation.state = { monday: new Date(2026, 0, 5), persist: () => { navigationPersisted = true; } };
 navigation.render = () => {};
 navigation.onWeekChange = () => { navigationLoaded = true; };
 navigation.select('2026-W29');
-if (navigationContext.window.AdCalendar.modules.CalendarDate.isoWeekValue(navigation.state.monday) !== '2026-W29' || !navigationPersisted || !navigationLoaded) {
+if (navigationContext.window.FlzCalendar.modules.CalendarDate.isoWeekValue(navigation.state.monday) !== '2026-W29' || !navigationPersisted || !navigationLoaded) {
     throw new Error('Ausgewählte Kalenderwoche wird nicht korrekt berechnet, persistiert und geladen.');
 }
 navigation.state = {
@@ -136,7 +136,7 @@ if (navigation.state.period !== 'week' || navigation.state.monday.getDay() !== 1
     throw new Error('Umschalter stellt beim Wechsel zur Woche keinen gültigen Wochenanfang her.');
 }
 const navigationElement = () => ({ hidden: null, value: '', textContent: '', attributes: {}, setAttribute(name, value) { this.attributes[name] = value; } });
-const monthNavigation = Object.create(navigationContext.window.AdCalendar.components.WeekNavigation.prototype);
+const monthNavigation = Object.create(navigationContext.window.FlzCalendar.components.WeekNavigation.prototype);
 monthNavigation.state = { monday: new Date(2026, 6, 13), month: new Date(2026, 6, 1), period: 'month', vertical: false };
 for (const property of ['label', 'weekNumber', 'monthNumber', 'weekPicker', 'monthPicker', 'previous', 'next', 'weekButton', 'monthButton', 'toggleView', 'heading']) monthNavigation[property] = navigationElement();
 monthNavigation.render();
@@ -160,7 +160,7 @@ execute('../../js/modules/calendar-date.js', dateSource, tableContext);
 execute('../../js/modules/holiday-calendar.js', publicHolidaysSource, tableContext);
 execute('../../js/modules/calendar-timeline.js', timelineSource, tableContext);
 execute('../../js/components/week-table.js', weekTable, tableContext);
-const publicHolidays = new tableContext.window.AdCalendar.modules.HolidayCalendar([{
+const publicHolidays = new tableContext.window.FlzCalendar.modules.HolidayCalendar([{
     year: 2026,
     publicHolidays: [
         { name: 'Karfreitag', startDate: '2026-04-03', endDate: '2026-04-03' },
@@ -176,38 +176,38 @@ if (publicHolidays.name(new Date(2026, 4, 1)) !== 'Tag der Arbeit'
     || publicHolidays.name(new Date(2026, 4, 2)) !== '') {
     throw new Error('Gemeinsame gesetzliche Feiertage werden nicht vollständig und datumsstabil gelesen.');
 }
-const clusterTable = Object.create(tableContext.window.AdCalendar.components.WeekTable.prototype);
+const clusterTable = Object.create(tableContext.window.FlzCalendar.components.WeekTable.prototype);
 clusterTable.organization = () => ({
-    staffRoleGroups: () => ['ad-IT'], leadershipStaffRoleGroups: () => [], staffBlockLabel: 'Leitungen',
-    roleLabel: value => ({'ad-EB':'Einsatzbegleitung','ad-StvBL':'Stellvertretende Büroleitung','ad-Buero':'Büroorganisation'}[value] || value),
-    areaLabel: value => ({'ad-Bereich-Nordost':'Nordost','ad-Bereich-West':'West'}[value] || value),
-    roleShortLabel: value => ({'ad-EB':'EB','ad-StvBL':'Stellvertretende Büroleitung','ad-Buero':'BO','ad-PFK':'PFK','ad-Bueroorganisation-Pflege':'BO-Pflege','ad-IT':'IT'}[value] || value),
-    areaShortLabel: value => ({'ad-Bereich-Nordost':'NO','ad-Bereich-West':'W'}[value] || value),
-    roleOrder: value => ({'ad-EB':10,'ad-Buero':20,'ad-StvBL':30}[value] ?? 999),
-    areaOrder: value => ({'ad-Bereich-West':10,'ad-Bereich-Nordost':20}[value] ?? 999),
+    staffRoleGroups: () => ['flz-IT'], leadershipStaffRoleGroups: () => [], staffBlockLabel: 'Leitungen',
+    roleLabel: value => ({'flz-EB':'Einsatzbegleitung','flz-StvBL':'Stellvertretende Büroleitung','flz-Buero':'Büroorganisation'}[value] || value),
+    areaLabel: value => ({'flz-Bereich-Nordost':'Nordost','flz-Bereich-West':'West'}[value] || value),
+    roleShortLabel: value => ({'flz-EB':'EB','flz-StvBL':'Stellvertretende Büroleitung','flz-Buero':'BO','flz-PFK':'PFK','flz-Bueroorganisation-Pflege':'BO-Pflege','flz-IT':'IT'}[value] || value),
+    areaShortLabel: value => ({'flz-Bereich-Nordost':'NO','flz-Bereich-West':'W'}[value] || value),
+    roleOrder: value => ({'flz-EB':10,'flz-Buero':20,'flz-StvBL':30}[value] ?? 999),
+    areaOrder: value => ({'flz-Bereich-West':10,'flz-Bereich-Nordost':20}[value] ?? 999),
 });
-if (clusterTable.clusterLabel({ roles: ['ad-StvBL', 'ad-EB'], areas: ['ad-Bereich-Nordost', 'ad-Bereich-West'] }) !== 'EB (Stellvertretende Büroleitung)-W/NO') {
+if (clusterTable.clusterLabel({ roles: ['flz-StvBL', 'flz-EB'], areas: ['flz-Bereich-Nordost', 'flz-Bereich-West'] }) !== 'EB (Stellvertretende Büroleitung)-W/NO') {
     throw new Error('Mehrfachrollen und -bereiche folgen im Gruppentitel nicht der Backend-Reihenfolge.');
 }
 for (const [employee, expected] of [
-    [{ roles: ['ad-Buero'], areas: ['ad-Bereich-Nordost'] }, 'BO-NO'],
-    [{ roles: ['ad-EB'], areas: ['ad-Bereich-West'] }, 'EB-W'],
-    [{ roles: ['ad-PFK'], areas: [] }, 'PFK'],
-    [{ roles: ['ad-Bueroorganisation-Pflege'], areas: [] }, 'BO-Pflege'],
-    [{ roles: ['ad-IT'], areas: [] }, 'IT'],
+    [{ roles: ['flz-Buero'], areas: ['flz-Bereich-Nordost'] }, 'BO-NO'],
+    [{ roles: ['flz-EB'], areas: ['flz-Bereich-West'] }, 'EB-W'],
+    [{ roles: ['flz-PFK'], areas: [] }, 'PFK'],
+    [{ roles: ['flz-Bueroorganisation-Pflege'], areas: [] }, 'BO-Pflege'],
+    [{ roles: ['flz-IT'], areas: [] }, 'IT'],
 ]) {
     if (clusterTable.clusterLabel(employee) !== expected) throw new Error(`Kalenderkürzel ${expected} fehlt in der Übersicht.`);
 }
 const backendOrderedEmployees = clusterTable.orderedEmployees([
-    { uid: 'office-ne', displayName: 'Büro Nordost', roles: ['ad-Buero'], areas: ['ad-Bereich-Nordost'] },
-    { uid: 'eb-ne', displayName: 'EB Nordost', roles: ['ad-EB'], areas: ['ad-Bereich-Nordost'] },
-    { uid: 'eb-west', displayName: 'EB West', roles: ['ad-EB'], areas: ['ad-Bereich-West'] },
+    { uid: 'office-ne', displayName: 'Büro Nordost', roles: ['flz-Buero'], areas: ['flz-Bereich-Nordost'] },
+    { uid: 'eb-ne', displayName: 'EB Nordost', roles: ['flz-EB'], areas: ['flz-Bereich-Nordost'] },
+    { uid: 'eb-west', displayName: 'EB West', roles: ['flz-EB'], areas: ['flz-Bereich-West'] },
 ]);
 if (backendOrderedEmployees.map(employee => employee.uid).join(',') !== 'eb-west,eb-ne,office-ne') {
     throw new Error('Kalendergruppen folgen nicht der im Backend festgelegten Rollen- und Bereichsreihenfolge.');
 }
 const monthContainer = new FakeNode();
-const monthTable = new tableContext.window.AdCalendar.components.WeekTable({
+const monthTable = new tableContext.window.FlzCalendar.components.WeekTable({
     container: monthContainer,
     calendarCell: { render: (entries, employee) => employee.canManage ? '<button data-action="add-entry">Add</button>' : '<span>read-only</span>' },
     organization: clusterTable.organization,
@@ -219,8 +219,8 @@ monthTable.setHolidays([{
         { name: 'Beispieltag', startDate: '2026-07-01', endDate: '2026-07-01' },
     ],
 }]);
-const monthDate = tableContext.window.AdCalendar.modules.CalendarDate;
-monthTable.render([{ uid: 'person-a', displayName: 'Person A', roles: ['ad-Buero'], areas: ['ad-Bereich-West'] }], {
+const monthDate = tableContext.window.FlzCalendar.modules.CalendarDate;
+monthTable.render([{ uid: 'person-a', displayName: 'Person A', roles: ['flz-Buero'], areas: ['flz-Bereich-West'] }], {
     period: 'month', month: new Date(2026, 6, 1), vertical: false, selected: new Set(),
     data: { entries: [], absences: [] },
     visibleRange: () => monthDate.monthRange(new Date(2026, 6, 1)),
@@ -229,55 +229,55 @@ const flattenNodes = node => [node, ...node.children.flatMap(flattenNodes)];
 const renderedNodes = flattenNodes(monthContainer);
 if (monthContainer.children.length !== 1
     || renderedNodes.filter(node => node.tagName === 'TABLE').length !== 1
-    || renderedNodes.filter(node => node.className.includes('adc-mobile-day')).length !== 35) {
+    || renderedNodes.filter(node => node.className.includes('flz-calendar-mobile-day')).length !== 35) {
     throw new Error('Monatsansicht wird nicht als eine durchgehende Planungsmatrix gerendert.');
 }
-const mobilePeople = renderedNodes.filter(node => node.className.split(' ').includes('adc-mobile-person'));
-const julyMobileCell = renderedNodes.find(node => node.className.includes('adc-mobile-cell') && node.dataset.employeeUid === 'person-a' && node.dataset.day === '2026-07-01');
+const mobilePeople = renderedNodes.filter(node => node.className.split(' ').includes('flz-calendar-mobile-person'));
+const julyMobileCell = renderedNodes.find(node => node.className.includes('flz-calendar-mobile-cell') && node.dataset.employeeUid === 'person-a' && node.dataset.day === '2026-07-01');
 if (mobilePeople.length !== 35 || !julyMobileCell) {
     throw new Error(`Mobile Monatsansicht ordnet nicht jeden sichtbaren Tag verständlich einer Person zu (${mobilePeople.length} Personentage, Juli-Zelle: ${Boolean(julyMobileCell)}).`);
 }
 if (julyMobileCell.innerHTML.includes('data-action') || !julyMobileCell.innerHTML.includes('read-only')) {
     throw new Error('Mobile Darstellung erteilt einer nicht berechtigten Person eigene Eintragsaktionen.');
 }
-if (!renderedNodes.some(node => node.className.includes('adc-mobile-holiday') && node.textContent === 'Beispieltag')) {
+if (!renderedNodes.some(node => node.className.includes('flz-calendar-mobile-holiday') && node.textContent === 'Beispieltag')) {
     throw new Error('Feiertagsname ist mobil weiterhin nur per Hover statt sichtbar zugänglich.');
 }
-if (renderedNodes.filter(node => node.tagName === 'TH' && node.scope === 'row' && !node.className.includes('adc-person-heading')).length !== 35) {
+if (renderedNodes.filter(node => node.tagName === 'TH' && node.scope === 'row' && !node.className.includes('flz-calendar-person-heading')).length !== 35) {
     throw new Error('Tage-als-Zeilen-Monatsansicht bildet den sichtbaren Zeitraum nicht als fortlaufende Tageszeilen ab.');
 }
-if (!renderedNodes.some(node => node.className.includes('adc-outside-month'))) throw new Error('Randtage der Monatsansicht werden nicht gekennzeichnet.');
-if (!renderedNodes.some(node => node.tagName === 'TD' && node.className.includes('adc-holiday') && node.dataset.holiday === 'Beispieltag')) throw new Error('Feiertage bleiben in der durchgehenden Monatsmatrix nicht an den Kalenderzellen gekennzeichnet.');
-if (!renderedNodes.some(node => node.tagName === 'TD' && node.dataset.day === '2026-07-01' && node.className.includes('adc-compact-day'))
-    || !renderedNodes.some(node => node.tagName === 'TD' && node.dataset.day === '2026-07-04' && node.className.includes('adc-compact-day'))) {
+if (!renderedNodes.some(node => node.className.includes('flz-calendar-outside-month'))) throw new Error('Randtage der Monatsansicht werden nicht gekennzeichnet.');
+if (!renderedNodes.some(node => node.tagName === 'TD' && node.className.includes('flz-calendar-holiday') && node.dataset.holiday === 'Beispieltag')) throw new Error('Feiertage bleiben in der durchgehenden Monatsmatrix nicht an den Kalenderzellen gekennzeichnet.');
+if (!renderedNodes.some(node => node.tagName === 'TD' && node.dataset.day === '2026-07-01' && node.className.includes('flz-calendar-compact-day'))
+    || !renderedNodes.some(node => node.tagName === 'TD' && node.dataset.day === '2026-07-04' && node.className.includes('flz-calendar-compact-day'))) {
     throw new Error('Leere Feiertage und Wochenenden werden nicht als kompakte Kalendertage gerendert.');
 }
-if (!renderedNodes.some(node => node.tagName === 'TH' && node.scope === 'col' && node.className.includes('adc-person-heading') && node.textContent === 'Person A')) throw new Error('Monatsansicht übernimmt die gewählte Ausrichtung mit Personen als Spalten nicht.');
+if (!renderedNodes.some(node => node.tagName === 'TH' && node.scope === 'col' && node.className.includes('flz-calendar-person-heading') && node.textContent === 'Person A')) throw new Error('Monatsansicht übernimmt die gewählte Ausrichtung mit Personen als Spalten nicht.');
 if (renderedNodes.some(node => node.tagName === 'TH' && node.scope === 'row' && node.textContent === 'Person A')) throw new Error('Monatsansicht erzwingt trotz Umschaltung weiterhin Personen als Zeilen.');
-if (!renderedNodes.some(node => node.tagName === 'TH' && node.scope === 'row' && node.className.includes('adc-weekend') && node.textContent.includes('Samstag'))) throw new Error('Samstage werden nicht über den Wochentagsnamen gekennzeichnet.');
+if (!renderedNodes.some(node => node.tagName === 'TH' && node.scope === 'row' && node.className.includes('flz-calendar-weekend') && node.textContent.includes('Samstag'))) throw new Error('Samstage werden nicht über den Wochentagsnamen gekennzeichnet.');
 if (renderedNodes.some(node => node.textContent.includes('Wochenende'))) throw new Error('Wochenendtage tragen weiterhin das redundante Zusatzwort „Wochenende“.');
-if (!renderedNodes.some(node => node.tagName === 'TD' && node.className.includes('adc-weekend'))) throw new Error('Wochenendspalten oder -zeilen werden in der Kalendermatrix nicht markiert.');
-monthTable.render([{ uid: 'person-a', displayName: 'Person A', roles: ['ad-Buero'], areas: ['ad-Bereich-West'] }], {
+if (!renderedNodes.some(node => node.tagName === 'TD' && node.className.includes('flz-calendar-weekend'))) throw new Error('Wochenendspalten oder -zeilen werden in der Kalendermatrix nicht markiert.');
+monthTable.render([{ uid: 'person-a', displayName: 'Person A', roles: ['flz-Buero'], areas: ['flz-Bereich-West'] }], {
     period: 'month', month: new Date(2026, 6, 1), vertical: true, selected: new Set(),
     data: { entries: [], absences: [] },
     visibleRange: () => monthDate.monthRange(new Date(2026, 6, 1)),
 });
 const verticalMonthNodes = flattenNodes(monthContainer);
-if (verticalMonthNodes.filter(node => node.tagName === 'TH' && node.scope === 'col' && !node.className.includes('adc-person-heading')).length !== 35) {
+if (verticalMonthNodes.filter(node => node.tagName === 'TH' && node.scope === 'col' && !node.className.includes('flz-calendar-person-heading')).length !== 35) {
     throw new Error('Personen-als-Zeilen-Monatsansicht bildet den sichtbaren Zeitraum nicht als fortlaufende Tagesspalten ab.');
 }
-if (!verticalMonthNodes.some(node => node.className.includes('adc-group-heading') && node.colSpan === 36)) {
+if (!verticalMonthNodes.some(node => node.className.includes('flz-calendar-group-heading') && node.colSpan === 36)) {
     throw new Error('Gruppenüberschriften überspannen nicht die vollständige monatliche Tagesachse.');
 }
-if (!verticalMonthNodes.some(node => node.tagName === 'TH' && node.scope === 'row' && node.className.includes('adc-person-heading') && node.textContent === 'Person A')) throw new Error('Personenspalte der Monatsansicht ist nicht als fixierter Personenbezug gekennzeichnet.');
-if (!verticalMonthNodes.some(node => node.tagName === 'TH' && node.scope === 'col' && node.className.includes('adc-weekend') && node.className.includes('adc-compact-day') && node.textContent.includes('Sa'))) throw new Error('Leere Samstage werden in der Tages-Spalten-Ansicht nicht kompakt gekennzeichnet.');
+if (!verticalMonthNodes.some(node => node.tagName === 'TH' && node.scope === 'row' && node.className.includes('flz-calendar-person-heading') && node.textContent === 'Person A')) throw new Error('Personenspalte der Monatsansicht ist nicht als fixierter Personenbezug gekennzeichnet.');
+if (!verticalMonthNodes.some(node => node.tagName === 'TH' && node.scope === 'col' && node.className.includes('flz-calendar-weekend') && node.className.includes('flz-calendar-compact-day') && node.textContent.includes('Sa'))) throw new Error('Leere Samstage werden in der Tages-Spalten-Ansicht nicht kompakt gekennzeichnet.');
 if (verticalMonthNodes.some(node => node.textContent.includes('Wochenende'))) throw new Error('Wochenendspalten tragen weiterhin das redundante Zusatzwort „Wochenende“.');
 if (monthTable.dayLabel(new Date(2026, 4, 1), { weekday: 'long', day: '2-digit', month: '2-digit' }).includes('Tag der Arbeit')
-    || !monthTable.dayClasses(new Date(2026, 4, 1), null).includes('adc-holiday')
+    || !monthTable.dayClasses(new Date(2026, 4, 1), null).includes('flz-calendar-holiday')
     || !renderedNodes.some(node => node.tagName === 'TH' && node.title === 'Beispieltag')) {
     throw new Error('Feiertage müssen kompakt bleiben und ihren Namen außerhalb der Spaltenbreite als Tooltip tragen.');
 }
-monthTable.render([{ uid: 'person-a', displayName: 'Person A', roles: ['ad-Buero'], areas: ['ad-Bereich-West'] }], {
+monthTable.render([{ uid: 'person-a', displayName: 'Person A', roles: ['flz-Buero'], areas: ['flz-Bereich-West'] }], {
     period: 'month', month: new Date(2026, 6, 1), vertical: false, selected: new Set(),
     data: {
         entries: [{ employeeUid: 'person-a', type: 'shift', start: '2026-07-04T08:00:00', end: '2026-07-04T12:00:00' }],
@@ -293,13 +293,13 @@ monthTable.render([{ uid: 'person-a', displayName: 'Person A', roles: ['ad-Buero
     visibleRange: () => monthDate.monthRange(new Date(2026, 6, 1)),
 });
 const occupiedWeekendNodes = flattenNodes(monthContainer);
-if (occupiedWeekendNodes.some(node => node.tagName === 'TD' && node.dataset.day === '2026-07-04' && node.className.includes('adc-compact-day'))) {
+if (occupiedWeekendNodes.some(node => node.tagName === 'TD' && node.dataset.day === '2026-07-04' && node.className.includes('flz-calendar-compact-day'))) {
     throw new Error('Ein Sondertag mit Dienst wechselt nicht auf Normalgröße zurück.');
 }
-if (!occupiedWeekendNodes.some(node => node.tagName === 'TD' && node.dataset.day === '2026-07-05' && node.className.includes('adc-compact-day'))) {
+if (!occupiedWeekendNodes.some(node => node.tagName === 'TD' && node.dataset.day === '2026-07-05' && node.className.includes('flz-calendar-compact-day'))) {
     throw new Error('Ein Urlaubsmarker verhindert die Kompaktklasse eines ansonsten leeren Sondertags.');
 }
-monthTable.render([{ uid: 'person-a', displayName: 'Person A', roles: ['ad-Buero'], areas: ['ad-Bereich-West'] }], {
+monthTable.render([{ uid: 'person-a', displayName: 'Person A', roles: ['flz-Buero'], areas: ['flz-Bereich-West'] }], {
     period: 'week', month: new Date(2026, 6, 1), vertical: false, selected: new Set(),
     data: { entries: [], absences: [] },
     visibleRange: () => ({
@@ -309,7 +309,7 @@ monthTable.render([{ uid: 'person-a', displayName: 'Person A', roles: ['ad-Buero
     }),
 });
 const weekNodes = flattenNodes(monthContainer);
-if (weekNodes.filter(node => node.tagName === 'TH' && node.scope === 'row' && !node.className.includes('adc-person-heading')).length !== 7) {
+if (weekNodes.filter(node => node.tagName === 'TH' && node.scope === 'row' && !node.className.includes('flz-calendar-person-heading')).length !== 7) {
     throw new Error('Die gemeinsame Periodenmatrix verändert die siebentägige Wochenansicht.');
 }
 for (const contract of ["params.set('people'", "params.set('roles'", "params.set('areas'", "params.set('period', 'month')", 'this.data.defaultFilters ||', 'this.data.currentUserProfile?.roles', 'if (this.selected.size) return this.selected.has(employee.uid)', 'showLeadershipStaff: this.showLeadershipStaff', 'period: this.period']) {
@@ -325,38 +325,38 @@ for (const contract of ['class Organization extends BaseModel', 'roleLabel(group
 }
 const organizationContext = { window: { LocalBase: { models: { Model: class {} } } }, Number, String, JSON };
 execute('../../js/models/organization.js', organizationModel, organizationContext);
-const sortableOrganization = new organizationContext.window.AdCalendar.models.Organization({
+const sortableOrganization = new organizationContext.window.FlzCalendar.models.Organization({
     roles: {
-        pdl: { groupId: 'ad-PDL', label: 'PDL', sortOrder: 10, staffBlock: true },
-        staff_hr: { groupId: 'ad-Stab-HR', label: 'HR', sortOrder: 20, staffBlock: true },
-        finance: { groupId: 'ad-Finanzen', label: 'Finanzen', sortOrder: 30, staffBlock: true },
-        payroll: { groupId: 'ad-Lohn', label: 'Lohn', sortOrder: 40, staffBlock: true },
-        it: { groupId: 'ad-IT', label: 'IT', sortOrder: 50, staffBlock: true },
-        secretariat: { groupId: 'ad-Sekretariat', label: 'Sekretariat', sortOrder: 60, staffBlock: true },
-        office: { groupId: 'ad-Buero', label: 'Büro', shortLabel: 'BO', sortOrder: 70 },
+        pdl: { groupId: 'flz-PDL', label: 'PDL', sortOrder: 10, staffBlock: true },
+        staff_hr: { groupId: 'flz-Stab-HR', label: 'HR', sortOrder: 20, staffBlock: true },
+        finance: { groupId: 'flz-Finanzen', label: 'Finanzen', sortOrder: 30, staffBlock: true },
+        payroll: { groupId: 'flz-Lohn', label: 'Lohn', sortOrder: 40, staffBlock: true },
+        it: { groupId: 'flz-IT', label: 'IT', sortOrder: 50, staffBlock: true },
+        secretariat: { groupId: 'flz-Sekretariat', label: 'Sekretariat', sortOrder: 60, staffBlock: true },
+        office: { groupId: 'flz-Buero', label: 'Büro', shortLabel: 'BO', sortOrder: 70 },
     },
-    areas: { northeast: { groupId: 'ad-Bereich-Nordost', label: 'Nordost', shortLabel: 'NO', sortOrder: 30 } },
+    areas: { northeast: { groupId: 'flz-Bereich-Nordost', label: 'Nordost', shortLabel: 'NO', sortOrder: 30 } },
 });
-if (sortableOrganization.roleOrder('ad-Buero') !== 70 || sortableOrganization.areaOrder('ad-Bereich-Nordost') !== 30) {
+if (sortableOrganization.roleOrder('flz-Buero') !== 70 || sortableOrganization.areaOrder('flz-Bereich-Nordost') !== 30) {
     throw new Error('Das Kalender-Organisationsmodell übernimmt die Backend-Reihenfolge nicht.');
 }
-if (sortableOrganization.roleShortLabel('ad-Buero') !== 'BO' || sortableOrganization.areaShortLabel('ad-Bereich-Nordost') !== 'NO') {
+if (sortableOrganization.roleShortLabel('flz-Buero') !== 'BO' || sortableOrganization.areaShortLabel('flz-Bereich-Nordost') !== 'NO') {
     throw new Error('Das Kalender-Organisationsmodell übernimmt die zentralen Kürzel nicht.');
 }
-const legacyOrganization = new organizationContext.window.AdCalendar.models.Organization({
+const legacyOrganization = new organizationContext.window.FlzCalendar.models.Organization({
     roles: { office: { groupId: 'legacy-office', label: 'Altes Büro' } },
     areas: { north: { groupId: 'legacy-north', label: 'Alter Norden' } },
 });
 if (legacyOrganization.roleShortLabel('legacy-office') !== 'Altes Büro' || legacyOrganization.areaShortLabel('legacy-north') !== 'Alter Norden') {
     throw new Error('Ältere Organisationsdefinitionen ohne Kürzelfelder fallen nicht auf ihre Langnamen zurück.');
 }
-if (sortableOrganization.leadershipStaffRoleGroups().join(',') !== 'ad-PDL,ad-Stab-HR') {
+if (sortableOrganization.leadershipStaffRoleGroups().join(',') !== 'flz-PDL,flz-Stab-HR') {
     throw new Error('IT, Sekretariat und Finanzen/Lohn bleiben ungewollt Teil des gemeinsamen Leitungs-/Stabsfilters.');
 }
 for (const contract of ['window.LocalBase.models.Model', 'extends BaseModel', 'toArray()', 'this.defaultDate', 'this.defaultModified', 'this.defaultDeleted', 'this.meetingUid', 'this.seriesUid', 'this.seriesTimezone', 'this.canManageMeeting']) {
     if (!model.includes(contract)) throw new Error(`Modell-Vertrag fehlt: ${contract}`);
 }
-for (const contract of ['class CalendarCell', 'adc-cell-actions', 'adc-entry__children', 'grid-template-rows:', 'grid-row:', 'entry.parentEntryId === shift.id', 'entry.canManageMeeting !== false', 'adc-entry__blocked-marker', 'adc-entry__series-marker', 'adc-entry--assistance', 'adc-assistance-label--full', 'adc-assistance-label--short', 'aria-hidden="true">🔒', "data-action=\"add-entry\"", "l10n.t('Create shift')", 'icon-calendar-dark']) {
+for (const contract of ['class CalendarCell', 'flz-calendar-cell-actions', 'flz-calendar-entry__children', 'grid-template-rows:', 'grid-row:', 'entry.parentEntryId === shift.id', 'entry.canManageMeeting !== false', 'flz-calendar-entry__blocked-marker', 'flz-calendar-entry__series-marker', 'flz-calendar-entry--assistance', 'flz-calendar-assistance-label--full', 'flz-calendar-assistance-label--short', 'aria-hidden="true">🔒', "data-action=\"add-entry\"", "l10n.t('Create shift')", 'icon-calendar-dark']) {
     if (!calendarCell.includes(contract)) throw new Error(`Kalenderzellen-Vertrag fehlt: ${contract}`);
 }
 for (const contract of ['const previousWrap = this.container.querySelector', 'previousWrap?.scrollLeft', 'wrap.scrollLeft = previousScroll.left', 'wrap.scrollTop = previousScroll.top']) {
@@ -371,15 +371,15 @@ for (const contract of ['class ShiftDefaults', 'Array.from({ length: 7 }', 'data
 for (const contract of ['class ShiftCalendarSync', 'this.onSave(this.input.checked)', 'status.calendarName', "l10n.t('Calendar is active: {calendar}.'"]) {
     if (!shiftCalendarSync.includes(contract)) throw new Error(`Dienstkalender-Komponentenvertrag fehlt: ${contract}`);
 }
-for (const contract of ['class ExternalCalendars', 'this.returnFocus', "provider === 'google'", 'window.location.assign(response.authorizationUrl)', 'this.dialog.showModal()', 'this.repository.connectCalDav', 'this.repository.disconnectExternalCalendar', 'window.confirm(', 'this.password.value = \'\'', 'https://mail.adberlin.org', 'the Kopano provider must allow CalDAV']) {
+for (const contract of ['class ExternalCalendars', 'this.returnFocus', "provider === 'google'", 'window.location.assign(response.authorizationUrl)', 'this.dialog.showModal()', 'this.repository.connectCalDav', 'this.repository.disconnectExternalCalendar', 'window.confirm(', 'this.password.value = \'\'', 'the Kopano provider must allow CalDAV']) {
     if (!externalCalendars.includes(contract)) throw new Error(`Externe-Kalender-Komponentenvertrag fehlt: ${contract}`);
 }
 const externalElements = {};
 const externalElement = id => externalElements[id] ||= { id, value: '', textContent: '', hidden: false, disabled: false, listeners: {}, addEventListener(type, listener) { this.listeners[type] = listener; }, focus() { this.focused = true; } };
 const providerButtons = ['kopano', 'google', 'apple', 'manual'].map(provider => ({ ...externalElement(`connect-${provider}`), dataset: { externalConnect: provider } }));
 const disconnectButtons = ['kopano', 'google', 'apple', 'manual'].map(provider => ({ ...externalElement(`disconnect-${provider}`), dataset: { externalDisconnect: provider } }));
-const externalDialog = externalElement('adc-external-calendar-dialog'); externalDialog.dataset = { kopanoDefault: 'https://default.example.test/', calendarName: 'Team & Dienst' }; externalDialog.showModal = () => { externalDialog.open = true; }; externalDialog.close = () => { externalDialog.open = false; };
-const externalForm = externalElement('adc-external-calendar-form'); externalForm.reportValidity = () => true; const externalSubmit = { disabled: false }; externalForm.querySelector = () => externalSubmit;
+const externalDialog = externalElement('flz-calendar-external-calendar-dialog'); externalDialog.dataset = { kopanoDefault: 'https://default.example.test/', calendarName: 'Team & Dienst' }; externalDialog.showModal = () => { externalDialog.open = true; }; externalDialog.close = () => { externalDialog.open = false; };
+const externalForm = externalElement('flz-calendar-external-calendar-form'); externalForm.reportValidity = () => true; const externalSubmit = { disabled: false }; externalForm.querySelector = () => externalSubmit;
 const externalRepository = {
     externalCalendars: async () => ({ externalCalendars: { kopano: { connected: false, available: true, calendarName: 'Team & Dienst' } } }),
     connectCalDav: async (...args) => { externalRepository.connected = args; return { externalCalendars: { kopano: { connected: true, available: true, calendarName: 'Team & Dienst' } } }; },
@@ -390,7 +390,7 @@ let assignedAuthorizationUrl = '';
 const externalContext = {
     window: { confirm: () => true, location: { assign: value => { assignedAuthorizationUrl = value; } } },
     document: {
-        getElementById: id => id === 'adc-external-calendar-dialog' ? externalDialog : id === 'adc-external-calendar-form' ? externalForm : externalElement(id),
+        getElementById: id => id === 'flz-calendar-external-calendar-dialog' ? externalDialog : id === 'flz-calendar-external-calendar-form' ? externalForm : externalElement(id),
         querySelectorAll: selector => selector === '[data-external-connect]' ? providerButtons : disconnectButtons,
         querySelector: selector => {
             const match = selector.match(/data-external-(connect|disconnect)="([^"]+)"/);
@@ -400,29 +400,29 @@ const externalContext = {
     Object, Promise,
 };
 execute('../../js/components/external-calendars.js', externalCalendars, externalContext);
-const externalComponent = new externalContext.window.AdCalendar.components.ExternalCalendars({ repository: externalRepository, onMessage() {} });
+const externalComponent = new externalContext.window.FlzCalendar.components.ExternalCalendars({ repository: externalRepository, onMessage() {} });
 await externalComponent.load();
 await externalComponent.connect('kopano');
-if (!externalDialog.open || externalElement('adc-external-server-url').value !== 'https://default.example.test/' || !externalElement('adc-external-server-url').focused) throw new Error('Kopano-Dialog verwendet nicht die administrierte Vorgabe oder setzt keinen Fokus.');
-externalElement('adc-external-username').value = 'person-a'; externalElement('adc-external-password').value = 'secret';
+if (!externalDialog.open || externalElement('flz-calendar-external-server-url').value !== 'https://default.example.test/' || !externalElement('flz-calendar-external-server-url').focused) throw new Error('Kopano-Dialog verwendet nicht die administrierte Vorgabe oder setzt keinen Fokus.');
+externalElement('flz-calendar-external-username').value = 'person-a'; externalElement('flz-calendar-external-password').value = 'secret';
 await externalComponent.submit({ preventDefault() {} });
-if (externalRepository.connected?.[0] !== 'kopano' || externalElement('adc-external-password').value !== '' || !externalElement('adc-external-kopano-status').textContent.includes('Team & Dienst')) throw new Error('CalDAV-Verbindung zeigt den administrierten Zielnamen nicht oder behält das Passwort im DOM.');
+if (externalRepository.connected?.[0] !== 'kopano' || externalElement('flz-calendar-external-password').value !== '' || !externalElement('flz-calendar-external-kopano-status').textContent.includes('Team & Dienst')) throw new Error('CalDAV-Verbindung zeigt den administrierten Zielnamen nicht oder behält das Passwort im DOM.');
 await externalComponent.connect('google');
 if (assignedAuthorizationUrl !== 'https://accounts.google.test/oauth') throw new Error('Google-Verbindung startet keinen Top-Level-OAuth-Redirect.');
 const syncInput = { checked: false };
 const syncStatus = { textContent: '' };
 const syncForm = { listener: null, addEventListener(type, listener) { this.listener = listener; }, reportValidity: () => true };
 const syncContext = { window: {}, document: { getElementById: id => ({
-    'adc-calendar-sync-form': syncForm,
-    'adc-calendar-sync-enabled': syncInput,
-    'adc-calendar-sync-status': syncStatus,
+    'flz-calendar-calendar-sync-form': syncForm,
+    'flz-calendar-calendar-sync-enabled': syncInput,
+    'flz-calendar-calendar-sync-status': syncStatus,
 }[id]) } };
 execute('../../js/components/shift-calendar-sync.js', shiftCalendarSync, syncContext);
 let savedSync = null;
-const syncComponent = new syncContext.window.AdCalendar.components.ShiftCalendarSync({ onSave: async enabled => { savedSync = enabled; } });
-syncComponent.set({ enabled: true, calendarName: 'AD Dienste' });
+const syncComponent = new syncContext.window.FlzCalendar.components.ShiftCalendarSync({ onSave: async enabled => { savedSync = enabled; } });
+syncComponent.set({ enabled: true, calendarName: 'Filzmann Dienste' });
 await syncForm.listener({ preventDefault() {} });
-if (!syncInput.checked || !syncStatus.textContent.includes('AD Dienste') || savedSync !== true) throw new Error('Persönliche Kalenderaktivierung ist nicht tastaturbedienbar oder zeigt ihren Zustand nicht an.');
+if (!syncInput.checked || !syncStatus.textContent.includes('Filzmann Dienste') || savedSync !== true) throw new Error('Persönliche Kalenderaktivierung ist nicht tastaturbedienbar oder zeigt ihren Zustand nicht an.');
 for (const contract of ['class EntryDialog', 'this.returnFocus', 'this.dialog.showModal()', 'this.showEmployee(', 'this.updateType()', 'this.updateRecurrence()', 'recurrenceFrequency:', 'recurrenceWeekdays:', 'recurrenceTimezone: this.timezone()', "typeof configured === 'string'", 'this.nextFreeShift', 'setCustomValidity(message)', "entry.type === 'shift'", 'start < new Date(entry.end)', 'end > new Date(entry.start)']) {
     if (!entryDialog.includes(contract)) throw new Error(`Eintragsdialog-Vertrag fehlt: ${contract}`);
 }
@@ -432,12 +432,12 @@ const componentContext = {
     Date,
 };
 execute('../../js/components/calendar-cell.js', calendarCell, componentContext);
-const cell = new componentContext.window.AdCalendar.components.CalendarCell();
+const cell = new componentContext.window.FlzCalendar.components.CalendarCell();
 const cellHtml = cell.render([
     { id: 1, type: 'shift', start: '2026-07-06T08:00:00Z', end: '2026-07-06T16:00:00Z', title: '', parentEntryId: null },
     { id: 2, type: 'appointment', start: '2026-07-06T10:00:00Z', end: '2026-07-06T11:00:00Z', title: 'Teamtermin', parentEntryId: 1 },
 ], { canManage: true });
-if (!cellHtml.includes('adc-entry__children') || cellHtml.indexOf('Teamtermin') < cellHtml.indexOf('adc-entry--shift')) {
+if (!cellHtml.includes('flz-calendar-entry__children') || cellHtml.indexOf('Teamtermin') < cellHtml.indexOf('flz-calendar-entry--shift')) {
     throw new Error('Termin wurde nicht sichtbar innerhalb des Dienstes gerendert.');
 }
 if ((cellHtml.match(/Teamtermin/g) || []).length !== 1) throw new Error('Enthaltener Termin wurde mehrfach gerendert.');
@@ -466,11 +466,11 @@ if (!timedCellHtml.includes('grid-template-rows:') || !timedCellHtml.includes('g
 const blockedHtml = cell.render([
     { id: 3, type: 'appointment', start: '2026-07-06T18:00:00Z', end: '2026-07-06T19:00:00Z', title: 'Blockiert', parentEntryId: null },
 ], { canManage: true });
-if (!blockedHtml.includes('adc-entry--blocked') || !blockedHtml.includes('adc-entry__blocked-marker') || !blockedHtml.includes('Blocked time')) throw new Error('Sperrtermin wird nicht kräftig und textlich als Sperre gekennzeichnet.');
+if (!blockedHtml.includes('flz-calendar-entry--blocked') || !blockedHtml.includes('flz-calendar-entry__blocked-marker') || !blockedHtml.includes('Blocked time')) throw new Error('Sperrtermin wird nicht kräftig und textlich als Sperre gekennzeichnet.');
 const seriesHtml = cell.render([
     { id: 4, type: 'appointment', start: '2026-07-06T10:00:00Z', end: '2026-07-06T11:00:00Z', title: 'Serie', parentEntryId: null, seriesUid: 'series-demo' },
 ], { canManage: true });
-if (!seriesHtml.includes('adc-entry__series-marker') || !seriesHtml.includes('Recurring appointment')) throw new Error('Serientermin wird nicht zusätzlich zur visuellen Markierung textlich gekennzeichnet.');
+if (!seriesHtml.includes('flz-calendar-entry__series-marker') || !seriesHtml.includes('Recurring appointment')) throw new Error('Serientermin wird nicht zusätzlich zur visuellen Markierung textlich gekennzeichnet.');
 const vacationHtml = cell.render([
     { id: 5, type: 'appointment', start: '2026-07-06T10:00:00Z', end: '2026-07-06T11:00:00Z', title: 'Erlaubter Sperrtermin', parentEntryId: null },
 ], { canManage: true }, [{ status: 'planned', marker: 'U?', blocks: false }]);
@@ -488,11 +488,11 @@ const assistanceHtml = cell.render([], { canManage: true }, [], null, new Date('
     end: '2026-07-06T18:00:00Z',
     type: 'shift',
     label: 'Assistenz',
-    sourceAppId: 'adplaner',
+    sourceAppId: 'flzplaner',
 }]);
-if (!assistanceHtml.includes('adc-entry--assistance')
-    || !assistanceHtml.includes('adc-assistance-label--full">Assistenz<')
-    || !assistanceHtml.includes('adc-assistance-label--short')
+if (!assistanceHtml.includes('flz-calendar-entry--assistance')
+    || !assistanceHtml.includes('flz-calendar-assistance-label--full">Assistenz<')
+    || !assistanceHtml.includes('flz-calendar-assistance-label--short')
     || !assistanceHtml.includes('>AS<')
     || assistanceHtml.includes('data-entry-id')
     || assistanceHtml.includes('edit-entry')
@@ -503,7 +503,7 @@ if (!assistanceHtml.includes('adc-entry--assistance')
 const maliciousTranslation = '<img src=x onerror=alert(1)>';
 const escapingContext = {
     window: {
-        AdCalendar: {
+        FlzCalendar: {
             l10n: {
                 time: () => '10:00',
                 t: () => maliciousTranslation,
@@ -522,7 +522,7 @@ const escapingContext = {
     Date,
 };
 execute('../../js/components/calendar-cell.js', calendarCell, escapingContext);
-const escapingCell = new escapingContext.window.AdCalendar.components.CalendarCell();
+const escapingCell = new escapingContext.window.FlzCalendar.components.CalendarCell();
 const escapedTranslationHtml = escapingCell.render([], { canManage: true });
 if (escapedTranslationHtml.includes(maliciousTranslation) || !escapedTranslationHtml.includes('&lt;img')) {
     throw new Error('Übersetzungstexte werden in der HTML-erzeugenden Kalenderzelle nicht sicher escaped.');
@@ -533,7 +533,7 @@ execute('../../js/components/tab-navigation.js', tabNavigation, tabContext);
 const fakeButton = () => ({ listeners: {}, attributes: {}, addEventListener(type, listener) { this.listeners[type] = listener; }, setAttribute(name, value) { this.attributes[name] = value; }, click() { this.listeners.click(); } });
 const calendarButton = fakeButton(); const settingsButton = fakeButton();
 const calendarPanel = { hidden: false }; const settingsPanel = { hidden: true }; const tabChanges = [];
-new tabContext.window.AdCalendar.components.TabNavigation({ calendarButton, settingsButton, calendarPanel, settingsPanel, onChange: tab => tabChanges.push(tab) });
+new tabContext.window.FlzCalendar.components.TabNavigation({ calendarButton, settingsButton, calendarPanel, settingsPanel, onChange: tab => tabChanges.push(tab) });
 settingsButton.click();
 if (!calendarPanel.hidden || settingsPanel.hidden || settingsButton.attributes['aria-selected'] !== 'true' || tabChanges[0] !== 'settings') {
     throw new Error('Klick auf den Einstellungs-Tab schaltet die Panels nicht um.');
@@ -543,8 +543,8 @@ const stateContext = { window: {}, Date, Set, URLSearchParams, Number };
 execute('../../js/modules/calendar-date.js', dateSource, stateContext);
 execute('../../js/modules/calendar-state.js', stateSource, stateContext);
 const historyCalls = [];
-const CalendarState = stateContext.window.AdCalendar.modules.CalendarState;
-const CalendarDate = stateContext.window.AdCalendar.modules.CalendarDate;
+const CalendarState = stateContext.window.FlzCalendar.modules.CalendarState;
+const CalendarDate = stateContext.window.FlzCalendar.modules.CalendarDate;
 const julyRange = CalendarDate.monthRange(new Date(2026, 6, 1));
 if (CalendarDate.isoDay(julyRange.start) !== '2026-06-29' || CalendarDate.isoDay(julyRange.end) !== '2026-08-03' || julyRange.weeks.length !== 5) {
     throw new Error('Der sichtbare Monatsbereich behält vorhandene Randtage innerhalb der Drei-Tage-Grenze bei.');
@@ -576,17 +576,17 @@ for (let month = 0; month < 12; month += 1) {
     }
 }
 const monthHistoryCalls = [];
-const monthState = new CalendarState(new Set(), { search: '?period=month&month=2026-07', pathname: '/apps/adcalendar/' }, { replaceState: (...args) => monthHistoryCalls.push(args) }).restore();
+const monthState = new CalendarState(new Set(), { search: '?period=month&month=2026-07', pathname: '/apps/flzcalendar/' }, { replaceState: (...args) => monthHistoryCalls.push(args) }).restore();
 if (monthState.period !== 'month' || CalendarDate.monthValue(monthState.month) !== '2026-07') throw new Error('Monatsansicht wird nicht aus der URL wiederhergestellt.');
 monthState.persist();
 if (!monthHistoryCalls.at(-1)[2].includes('period=month') || !monthHistoryCalls.at(-1)[2].includes('month=2026-07')) throw new Error('Monatsansicht wird nicht in der URL persistiert.');
-const filterState = new CalendarState(new Set(['ad-PDL']), { search: '', pathname: '/apps/adcalendar/' }, { replaceState: (...args) => historyCalls.push(args) }).restore();
+const filterState = new CalendarState(new Set(['flz-PDL']), { search: '', pathname: '/apps/flzcalendar/' }, { replaceState: (...args) => historyCalls.push(args) }).restore();
 filterState.data = {
     defaultFilters: null,
-    currentUserProfile: { roles: ['ad-Buero'], areas: ['ad-Bereich-Sued'] },
+    currentUserProfile: { roles: ['flz-Buero'], areas: ['flz-Bereich-Sued'] },
     employees: [
-        { uid: 'bo', roles: ['ad-Buero'], areas: ['ad-Bereich-Sued'] },
-        { uid: 'pdl', roles: ['ad-PDL'], areas: [] },
+        { uid: 'bo', roles: ['flz-Buero'], areas: ['flz-Bereich-Sued'] },
+        { uid: 'pdl', roles: ['flz-PDL'], areas: [] },
     ],
 };
 filterState.applyInitialFilters();
@@ -596,10 +596,10 @@ if (filterState.availableEmployees().map(employee => employee.uid).join(',') !==
 filterState.showLeadershipStaff = false; filterState.persist();
 if (filterState.availableEmployees().some(employee => employee.uid === 'pdl') || !historyCalls.at(-1)[2].includes('staff=hidden')) throw new Error('Stabsfilter oder URL-Persistenz wurde beim Refactoring verändert.');
 
-const staffDefaultState = new CalendarState(new Set(['ad-PDL']), { search: '', pathname: '/apps/adcalendar/' }, { replaceState() {} }).restore();
+const staffDefaultState = new CalendarState(new Set(['flz-PDL']), { search: '', pathname: '/apps/flzcalendar/' }, { replaceState() {} }).restore();
 staffDefaultState.data = {
     defaultFilters: null,
-    currentUserProfile: { roles: ['ad-PDL'], areas: [] },
+    currentUserProfile: { roles: ['flz-PDL'], areas: [] },
     employees: filterState.data.employees,
 };
 staffDefaultState.applyInitialFilters();
@@ -608,23 +608,23 @@ const staffUrlCalls = [];
 staffDefaultState.history = { replaceState: (...args) => staffUrlCalls.push(args) };
 staffDefaultState.persist();
 if (!staffUrlCalls.at(-1)[2].includes('staffOnly=1')) throw new Error('Reiner Leitungs-/Stabsfilter wird nicht in der URL persistiert.');
-const restoredStaffState = new CalendarState(new Set(['ad-PDL']), { search: '?staff=visible&staffOnly=1', pathname: '/apps/adcalendar/' }, { replaceState() {} }).restore();
+const restoredStaffState = new CalendarState(new Set(['flz-PDL']), { search: '?staff=visible&staffOnly=1', pathname: '/apps/flzcalendar/' }, { replaceState() {} }).restore();
 restoredStaffState.data = staffDefaultState.data;
 restoredStaffState.applyInitialFilters();
 if (!restoredStaffState.leadershipStaffOnly || restoredStaffState.availableEmployees().map(employee => employee.uid).join(',') !== 'pdl') throw new Error('Reiner Leitungs-/Stabsfilter geht beim Seiten-Reload verloren.');
 
 const officeEmployees = [
-    { uid: 'bl-now', roles: ['ad-BL', 'ad-Buero'], areas: ['ad-Bereich-Nordost', 'ad-Bereich-West'] },
-    { uid: 'bl-south', roles: ['ad-BL', 'ad-Buero'], areas: ['ad-Bereich-Sued'] },
-    { uid: 'deputy-west', roles: ['ad-StvBL', 'ad-EB'], areas: ['ad-Bereich-West'] },
-    { uid: 'office-west', roles: ['ad-Buero'], areas: ['ad-Bereich-West'] },
-    { uid: 'eb-west', roles: ['ad-EB'], areas: ['ad-Bereich-West'] },
-    { uid: 'pfk', roles: ['ad-PFK'], areas: [] },
-    { uid: 'pdl', roles: ['ad-PDL'], areas: [] },
+    { uid: 'bl-now', roles: ['flz-BL', 'flz-Buero'], areas: ['flz-Bereich-Nordost', 'flz-Bereich-West'] },
+    { uid: 'bl-south', roles: ['flz-BL', 'flz-Buero'], areas: ['flz-Bereich-Sued'] },
+    { uid: 'deputy-west', roles: ['flz-StvBL', 'flz-EB'], areas: ['flz-Bereich-West'] },
+    { uid: 'office-west', roles: ['flz-Buero'], areas: ['flz-Bereich-West'] },
+    { uid: 'eb-west', roles: ['flz-EB'], areas: ['flz-Bereich-West'] },
+    { uid: 'pfk', roles: ['flz-PFK'], areas: [] },
+    { uid: 'pdl', roles: ['flz-PDL'], areas: [] },
 ];
-const westState = new CalendarState(new Set(['ad-PDL']), { search: '', pathname: '/apps/adcalendar/' }, { replaceState() {} }).restore();
+const westState = new CalendarState(new Set(['flz-PDL']), { search: '', pathname: '/apps/flzcalendar/' }, { replaceState() {} }).restore();
 westState.data = {
-    defaultFilters: { people: [], roles: [], areas: ['ad-Bereich-West'], vertical: true, showLeadershipStaff: false },
+    defaultFilters: { people: [], roles: [], areas: ['flz-Bereich-West'], vertical: true, showLeadershipStaff: false },
     currentUserProfile: { roles: [], areas: [] },
     employees: officeEmployees,
 };
@@ -633,9 +633,9 @@ if (westState.availableEmployees().map(employee => employee.uid).join(',') !== '
     throw new Error('Ein reiner Buerobereichsfilter zeigt nicht BL, Stv. BL, BO und EB des gewaehlten Bueros.');
 }
 
-const officeRoleState = new CalendarState(new Set(['ad-PDL']), { search: '', pathname: '/apps/adcalendar/' }, { replaceState() {} }).restore();
+const officeRoleState = new CalendarState(new Set(['flz-PDL']), { search: '', pathname: '/apps/flzcalendar/' }, { replaceState() {} }).restore();
 officeRoleState.data = {
-    defaultFilters: { people: [], roles: ['ad-Buero'], areas: [], vertical: true, showLeadershipStaff: false },
+    defaultFilters: { people: [], roles: ['flz-Buero'], areas: [], vertical: true, showLeadershipStaff: false },
     currentUserProfile: { roles: [], areas: [] },
     employees: officeEmployees,
 };
@@ -644,9 +644,9 @@ if (officeRoleState.availableEmployees().map(employee => employee.uid).join(',')
     throw new Error('Der reine Büromitarbeiter*innen-Filter zeigt Personen mit vorrangiger Büroleitungsrolle.');
 }
 
-const ebRoleState = new CalendarState(new Set(['ad-PDL']), { search: '', pathname: '/apps/adcalendar/' }, { replaceState() {} }).restore();
+const ebRoleState = new CalendarState(new Set(['flz-PDL']), { search: '', pathname: '/apps/flzcalendar/' }, { replaceState() {} }).restore();
 ebRoleState.data = {
-    defaultFilters: { people: [], roles: ['ad-EB'], areas: [], vertical: true, showLeadershipStaff: false },
+    defaultFilters: { people: [], roles: ['flz-EB'], areas: [], vertical: true, showLeadershipStaff: false },
     currentUserProfile: { roles: [], areas: [] },
     employees: officeEmployees,
 };
@@ -655,7 +655,7 @@ if (ebRoleState.availableEmployees().map(employee => employee.uid).join(',') !==
     throw new Error('Der reine Einsatzbegleitungsfilter zeigt Personen mit vorrangiger Stellvertretungsrolle.');
 }
 
-const emptyFilterState = new CalendarState(new Set(['ad-PDL']), { search: '', pathname: '/apps/adcalendar/' }, { replaceState() {} }).restore();
+const emptyFilterState = new CalendarState(new Set(['flz-PDL']), { search: '', pathname: '/apps/flzcalendar/' }, { replaceState() {} }).restore();
 emptyFilterState.data = {
     defaultFilters: null,
     currentUserProfile: { roles: [], areas: [] },
@@ -671,7 +671,7 @@ if (emptyFilterState.toPreference().period !== 'month') throw new Error('Der Ans
 
 const dialogContext = { window: {}, document: {}, Date };
 execute('../../js/components/entry-dialog.js', entryDialog, dialogContext);
-const dialog = Object.create(dialogContext.window.AdCalendar.components.EntryDialog.prototype);
+const dialog = Object.create(dialogContext.window.FlzCalendar.components.EntryDialog.prototype);
 dialog.fields = { employee: { value: '' }, 'employee-name': { textContent: '' } };
 dialog.setEmployees([{ uid: 'demo', displayName: 'Demo Person' }, { uid: 'other', displayName: 'Other Person' }]);
 dialog.showEmployee('demo');

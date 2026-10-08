@@ -4,19 +4,19 @@ declare(strict_types=1);
 
 require dirname(__DIR__, 4) . '/lib/base.php';
 
-use OCA\AdCalendar\Repository\CalendarEntryRepository;
-use OCA\AdCalendar\Service\AbsenceService;
-use OCA\AdCalendar\Service\CalendarService;
-use OCA\AdCalendar\Service\CalendarPreferenceService;
-use OCA\AdCalendar\Service\DefaultShiftMaterializer;
-use OCA\AdUrlaub\Model\Vacation;
-use OCA\AdUrlaub\Repository\VacationRepository;
-use OCA\AdUrlaub\Service\VacationService;
+use OCA\FlzCalendar\Repository\CalendarEntryRepository;
+use OCA\FlzCalendar\Service\AbsenceService;
+use OCA\FlzCalendar\Service\CalendarService;
+use OCA\FlzCalendar\Service\CalendarPreferenceService;
+use OCA\FlzCalendar\Service\DefaultShiftMaterializer;
+use OCA\FlzUrlaub\Model\Vacation;
+use OCA\FlzUrlaub\Repository\VacationRepository;
+use OCA\FlzUrlaub\Service\VacationService;
 use OCP\IUserManager;
 
 /**
  * Zweck: Prüft Standarddienst-Tombstones und die optionale Urlaubsintegration gegen die reale Nextcloud-Datenbank.
- * Zusammenspiel: AdCalendar-Materializer -> LocalBase-Events -> AdUrlaub-Listener/Repository.
+ * Zusammenspiel: FlzCalendar-Materializer -> LocalBase-Events -> FlzUrlaub-Listener/Repository.
  * Vertrag: Der Test verwendet ein temporäres Konto und entfernt alle erzeugten Daten auch nach einem Fehler.
  */
 
@@ -33,7 +33,7 @@ $calendar = \OCP\Server::get(CalendarService::class);
 $vacations = \OCP\Server::get(VacationService::class);
 $vacationRepository = \OCP\Server::get(VacationRepository::class);
 
-$uid = 'adc-integration-' . bin2hex(random_bytes(5));
+$uid = 'flz-calendar-integration-' . bin2hex(random_bytes(5));
 $user = $users->createUser($uid, bin2hex(random_bytes(24)));
 if ($user === null) throw new RuntimeException('Temporäres Integrationskonto konnte nicht angelegt werden.');
 
@@ -110,7 +110,7 @@ try {
     $materializer->syncWeek($weekStart, [$uid], $approvedAbsences);
     $assert($entries->findDefaultOccurrence($uid, $date) === null, 'Genehmigter Urlaub blockiert den Standarddienst nicht.');
 
-    echo "AD Kalender/Urlaub DDEV-Integration: OK\n";
+    echo "Filzmann Kalender/Urlaub DDEV-Integration: OK\n";
 } finally {
     if ($appointmentId !== null) $entries->delete($appointmentId);
     $remaining = $entries->findDefaultOccurrence($uid, $date);

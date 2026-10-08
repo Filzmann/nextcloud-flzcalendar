@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace OCA\AdCalendar\Controller;
+namespace OCA\FlzCalendar\Controller;
 
-use OCA\AdCalendar\AppInfo\Application;
-use OCA\AdCalendar\Service\CalendarTargetConfig;
-use OCA\AdCalendar\Service\TemporaryAdminAccessService;
+use OCA\FlzCalendar\AppInfo\Application;
+use OCA\FlzCalendar\Service\CalendarTargetConfig;
+use OCA\FlzCalendar\Service\TemporaryAdminAccessService;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http\Attribute\NoAdminRequired;
 use OCP\AppFramework\Http\Attribute\NoCSRFRequired;

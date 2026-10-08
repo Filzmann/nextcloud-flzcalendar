@@ -8,8 +8,8 @@ $root = dirname(__DIR__);
 
 spl_autoload_register(static function (string $class) use ($root): void {
     foreach ([
-        'OCA\\AdCalendar\\' => $root . '/lib/',
-        'OCA\\FilzmannDataProtection\\' => $root . '/tests/stubs/FilzmannDataProtection/',
+        'OCA\\FlzCalendar\\' => $root . '/lib/',
+        'OCA\\FlzDataProtection\\' => $root . '/tests/stubs/FlzDataProtection/',
     ] as $prefix => $directory) {
         if (!str_starts_with($class, $prefix)) continue;
         $relative = str_replace('\\', '/', substr($class, strlen($prefix)));

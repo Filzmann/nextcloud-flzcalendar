@@ -6,7 +6,7 @@ namespace OCP\EventDispatcher {
     class Event {}
     interface IEventListener { public function handle(Event $event): void; }
 }
-namespace OCA\FilzmannPermissionMatrix\PublicApi\V1 {
+namespace OCA\FlzPermissionMatrix\PublicApi\V1 {
     interface PermissionProvider { public function descriptor(): PermissionProviderDescriptor; public function collect(): PermissionProviderResult; }
     final class PermissionProviderDescriptor { public function __construct(public string $appId, public string $name, public string $version, public array $capabilities) {} }
     final class PermissionCondition {
@@ -25,16 +25,16 @@ namespace OCA\FilzmannPermissionMatrix\PublicApi\V1 {
 }
 
 namespace {
-    use OCA\AdCalendar\Permission\CalendarPermissionProvider;
-    use OCA\AdCalendar\Permission\CalendarPermissionProviderListener;
-    use OCA\AdCalendar\Permission\CalendarPermissionSourceInterface;
-    use OCA\FilzmannPermissionMatrix\PublicApi\V1\RegisterPermissionProvidersEvent;
-    use OCA\LocalBase\Organization\AdOrganizationDefinition;
+    use OCA\FlzCalendar\Permission\CalendarPermissionProvider;
+    use OCA\FlzCalendar\Permission\CalendarPermissionProviderListener;
+    use OCA\FlzCalendar\Permission\CalendarPermissionSourceInterface;
+    use OCA\FlzPermissionMatrix\PublicApi\V1\RegisterPermissionProvidersEvent;
+    use OCA\LocalBase\Organization\FlzOrganizationDefinition;
     use OCP\EventDispatcher\IEventListener;
 
     $source = new class implements CalendarPermissionSourceInterface {
-        public function definition(): AdOrganizationDefinition { return AdOrganizationDefinition::defaults(); }
-        public function peerGroups(): array { return ['ad-EB']; }
+        public function definition(): FlzOrganizationDefinition { return FlzOrganizationDefinition::defaults(); }
+        public function peerGroups(): array { return ['flz-EB']; }
     };
     $provider = new CalendarPermissionProvider($source);
     $result = $provider->collect();
@@ -51,7 +51,7 @@ namespace {
         throw new RuntimeException('Vollzugriff muss native Administration und aktive app-lokale Freigabe verlangen.');
     }
     $peerGroups = array_map(static fn($rule) => $rule->condition->groupId, $byPermission['calendar.entry.manage-peer'] ?? []);
-    if ($peerGroups !== ['ad-EB']) throw new RuntimeException('Nur tatsächlich konfigurierte Peer-Gruppen dürfen projiziert werden.');
+    if ($peerGroups !== ['flz-EB']) throw new RuntimeException('Nur tatsächlich konfigurierte Peer-Gruppen dürfen projiziert werden.');
     if (($byPermission['calendar.entry.manage-subordinate'] ?? []) === []) throw new RuntimeException('Die kanonische Hierarchie muss als Detailrecht projiziert werden.');
 
     $event = new RegisterPermissionProvidersEvent();

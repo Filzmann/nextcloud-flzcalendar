@@ -8,15 +8,15 @@ namespace OCP\Http\Client {
     interface IClient { public function request(string $method, string $uri, array $options = []): IResponse; public function getResponseFromThrowable(\Throwable $error): IResponse; }
     interface IClientService { public function newClient(): IClient; }
 }
-namespace OCA\AdCalendar\Service { final class CalendarTargetConfig { public function calendarName(): string { return 'AD & Team'; } } }
+namespace OCA\FlzCalendar\Service { final class CalendarTargetConfig { public function calendarName(): string { return 'FLZ & Team'; } } }
 
 namespace {
 
-    use OCA\AdCalendar\CalendarSync\CalDavClient;
-    use OCA\AdCalendar\CalendarSync\ExternalCalendarUrlValidator;
-    use OCA\AdCalendar\CalendarSync\ShiftCalendarEventSerializer;
-    use OCA\AdCalendar\Model\CalendarEntry;
-    use OCA\AdCalendar\Service\CalendarTargetConfig;
+    use OCA\FlzCalendar\CalendarSync\CalDavClient;
+    use OCA\FlzCalendar\CalendarSync\ExternalCalendarUrlValidator;
+    use OCA\FlzCalendar\CalendarSync\ShiftCalendarEventSerializer;
+    use OCA\FlzCalendar\Model\CalendarEntry;
+    use OCA\FlzCalendar\Service\CalendarTargetConfig;
     use OCP\Http\Client\IClient;
     use OCP\Http\Client\IClientService;
     use OCP\Http\Client\IResponse;
@@ -71,7 +71,7 @@ namespace {
         . '</d:prop></d:propstat></d:response>');
     $listing = $multistatus(
         $resource('/caldav/home/person-a/', 'Home')
-        . $resource('team/', 'AD & Team', true)
+        . $resource('team/', 'FLZ & Team', true)
     );
     $discoverClient = $clientFor([$response(207, $principalDiscovery), $response(207, $principal), $response(207, $listing)]);
     $discovered = $davFor($discoverClient)->connect($connection);
@@ -85,20 +85,20 @@ namespace {
         . '<c:calendar-home-set><d:href>/caldav/home/person-a/</d:href></c:calendar-home-set>'
         . '</d:prop></d:propstat></d:response>');
     $emptyListing = $multistatus($resource('/caldav/home/person-a/', 'Home'));
-    $verified = $multistatus($resource('/caldav/home/person-a/ad-dienste/', 'AD & Team', true));
+    $verified = $multistatus($resource('/caldav/home/person-a/flz-dienste/', 'FLZ & Team', true));
     $createClient = $clientFor([
         $response(207, $homeDiscovery), $response(207, $emptyListing), $response(201), $response(207, $verified),
     ]);
     $created = $davFor($createClient)->connect($connection);
-    if ($created !== 'https://calendar.example.test/caldav/home/person-a/ad-dienste/'
+    if ($created !== 'https://calendar.example.test/caldav/home/person-a/flz-dienste/'
         || array_column($createClient->calls, 0) !== ['PROPFIND', 'PROPFIND', 'MKCALENDAR', 'PROPFIND']
-        || !str_contains((string)($createClient->calls[2][2]['body'] ?? ''), 'AD &amp; Team')) {
+        || !str_contains((string)($createClient->calls[2][2]['body'] ?? ''), 'FLZ &amp; Team')) {
         throw new RuntimeException('Fehlender CalDAV-Zielkalender wird nicht reserviert, escaped und verifiziert.');
     }
 
     $collisionClient = $clientFor([
         $response(207, $homeDiscovery), $response(207, $emptyListing), $response(405),
-        $response(207, $multistatus($resource('/caldav/home/person-a/ad-dienste/', 'Privat', true))),
+        $response(207, $multistatus($resource('/caldav/home/person-a/flz-dienste/', 'Privat', true))),
     ]);
     try {
         $davFor($collisionClient)->connect($connection);
@@ -107,7 +107,7 @@ namespace {
         if ($error->getMessage() === 'Fremd belegte reservierte CalDAV-Adresse wurde akzeptiert.') throw $error;
     }
 
-    $directConnection = $connection + ['calendarUrl' => 'https://calendar.example.test/caldav/home/person-a/ad-dienste/'];
+    $directConnection = $connection + ['calendarUrl' => 'https://calendar.example.test/caldav/home/person-a/flz-dienste/'];
     $directClient = $clientFor([$response(207)]);
     if ($davFor($directClient)->connect($directConnection) !== $directConnection['calendarUrl']) {
         throw new RuntimeException('Gespeicherte CalDAV-Adresse wird nicht read-only verifiziert.');
@@ -119,9 +119,9 @@ namespace {
     } catch (RuntimeException $error) {
         if ($error->getMessage() === 'CalDAV-Umbenennung ohne gespeicherte Kalenderadresse wurde akzeptiert.') throw $error;
     }
-    $notCalendar = $multistatus($resource('/caldav/home/person-a/ad-dienste/', 'AD & Team', false));
+    $notCalendar = $multistatus($resource('/caldav/home/person-a/flz-dienste/', 'FLZ & Team', false));
     try {
-        $davFor($clientFor([$response(207, $notCalendar)]))->renameCalendar($directConnection + ['calendarName' => 'AD & Team']);
+        $davFor($clientFor([$response(207, $notCalendar)]))->renameCalendar($directConnection + ['calendarName' => 'FLZ & Team']);
         throw new RuntimeException('Nicht-Kalender wurde als CalDAV-Ziel umbenannt.');
     } catch (RuntimeException $error) {
         if ($error->getMessage() === 'Nicht-Kalender wurde als CalDAV-Ziel umbenannt.') throw $error;
@@ -154,15 +154,15 @@ namespace {
     }
 
     $objects = $multistatus(
-        $resource('/caldav/home/person-a/ad-dienste/', 'AD & Team', true)
-        . $resource('/caldav/home/person-a/ad-dienste/adcalendar-shift-72.ics')
-        . $resource('/caldav/home/person-a/ad-dienste/private.ics')
+        $resource('/caldav/home/person-a/flz-dienste/', 'FLZ & Team', true)
+        . $resource('/caldav/home/person-a/flz-dienste/flzcalendar-shift-72.ics')
+        . $resource('/caldav/home/person-a/flz-dienste/private.ics')
     );
-    $ownedData = "BEGIN:VCALENDAR\r\nX-AD-CALENDAR-SOURCE:adcalendar\r\nX-AD-CALENDAR-ENTRY-ID:72\r\nEND:VCALENDAR\r\n";
+    $ownedData = "BEGIN:VCALENDAR\r\nX-FLZ-CALENDAR-SOURCE:flzcalendar\r\nX-FLZ-CALENDAR-ENTRY-ID:72\r\nEND:VCALENDAR\r\n";
     $removeClient = $clientFor([$response(207), $response(207, $objects), $response(200, $ownedData), $response(204)]);
     $davFor($removeClient)->removeCalendar($directConnection);
     if (array_column($removeClient->calls, 0) !== ['PROPFIND', 'PROPFIND', 'GET', 'DELETE']
-        || !str_ends_with($removeClient->calls[3][1], 'adcalendar-shift-72.ics')) {
+        || !str_ends_with($removeClient->calls[3][1], 'flzcalendar-shift-72.ics')) {
         throw new RuntimeException('CalDAV-Bereinigung löscht nicht ausschließlich nachgewiesene App-Objekte.');
     }
 

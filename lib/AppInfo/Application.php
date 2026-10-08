@@ -2,26 +2,26 @@
 
 declare(strict_types=1);
 
-namespace OCA\AdCalendar\AppInfo;
+namespace OCA\FlzCalendar\AppInfo;
 
-use OCA\AdCalendar\CalendarSync\NextcloudDavShiftCalendarPublisher;
-use OCA\AdCalendar\CalendarSync\PersonalCalendarPublisher;
-use OCA\AdCalendar\CalendarSync\ShiftCalendarPublisher;
-use OCA\AdCalendar\Listener\IntegrationCapabilityQueryListener;
-use OCA\AdCalendar\Listener\ScheduleConflictQueryListener;
-use OCA\AdCalendar\Listener\StandaloneNavigationListener;
-use OCA\AdCalendar\Privacy\CalendarProcessingMetadataProviderListener;
-use OCA\AdCalendar\Privacy\CalendarPrivacyProviderListener;
-use OCA\AdCalendar\Permission\CalendarPermissionProviderListener;
-use OCA\AdCalendar\Permission\CalendarPermissionSourceInterface;
-use OCA\AdCalendar\Permission\NextcloudCalendarPermissionSource;
-use OCA\AdCalendar\Repository\TemporaryAdminAccessRepository;
-use OCA\AdCalendar\Repository\TemporaryAdminAccessRepositoryInterface;
-use OCA\AdCalendar\Service\TemporaryAdminAccessChecker;
-use OCA\AdCalendar\Service\TemporaryAdminAccessService;
-use OCA\FilzmannDataProtection\PublicApi\V1\RegisterPersonalDataProvidersEvent;
-use OCA\FilzmannDataProtection\PublicApi\V1\RegisterProcessingMetadataProvidersEvent;
-use OCA\FilzmannPermissionMatrix\PublicApi\V1\RegisterPermissionProvidersEvent;
+use OCA\FlzCalendar\CalendarSync\NextcloudDavShiftCalendarPublisher;
+use OCA\FlzCalendar\CalendarSync\PersonalCalendarPublisher;
+use OCA\FlzCalendar\CalendarSync\ShiftCalendarPublisher;
+use OCA\FlzCalendar\Listener\IntegrationCapabilityQueryListener;
+use OCA\FlzCalendar\Listener\ScheduleConflictQueryListener;
+use OCA\FlzCalendar\Listener\StandaloneNavigationListener;
+use OCA\FlzCalendar\Privacy\CalendarProcessingMetadataProviderListener;
+use OCA\FlzCalendar\Privacy\CalendarPrivacyProviderListener;
+use OCA\FlzCalendar\Permission\CalendarPermissionProviderListener;
+use OCA\FlzCalendar\Permission\CalendarPermissionSourceInterface;
+use OCA\FlzCalendar\Permission\NextcloudCalendarPermissionSource;
+use OCA\FlzCalendar\Repository\TemporaryAdminAccessRepository;
+use OCA\FlzCalendar\Repository\TemporaryAdminAccessRepositoryInterface;
+use OCA\FlzCalendar\Service\TemporaryAdminAccessChecker;
+use OCA\FlzCalendar\Service\TemporaryAdminAccessService;
+use OCA\FlzDataProtection\PublicApi\V1\RegisterPersonalDataProvidersEvent;
+use OCA\FlzDataProtection\PublicApi\V1\RegisterProcessingMetadataProvidersEvent;
+use OCA\FlzPermissionMatrix\PublicApi\V1\RegisterPermissionProvidersEvent;
 use OCA\LocalBase\Calendar\ScheduleConflictQueryEvent;
 use OCA\LocalBase\Integration\IntegrationCapabilityQueryEvent;
 use OCP\AppFramework\App;

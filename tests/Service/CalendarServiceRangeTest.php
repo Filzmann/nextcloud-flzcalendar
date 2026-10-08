@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OCA\AdCalendar\Repository {
+namespace OCA\FlzCalendar\Repository {
     final class CalendarEntryRepository {
         public array $ranges = [];
         public function findRange(\DateTimeImmutable $start, \DateTimeImmutable $end, array $uids): array {
@@ -12,7 +12,7 @@ namespace OCA\AdCalendar\Repository {
     }
 }
 
-namespace OCA\AdCalendar\Service {
+namespace OCA\FlzCalendar\Service {
     final class DefaultShiftMaterializer {
         public array $weeks = [];
         public function syncWeek(\DateTimeImmutable $start, array $uids, array $absences = [], ?array $planningConflicts = null, string $planningConflictStatus = 'available'): void {
@@ -32,7 +32,7 @@ namespace OCA\AdCalendar\Service {
             $this->queries[] = [$start->format('Y-m-d'), $end->format('Y-m-d'), $uids];
             return ['status' => 'available', 'conflicts' => [[
                 'employeeUid' => $uids[0], 'start' => '2026-07-10T08:00:00Z', 'end' => '2026-07-10T16:00:00Z',
-                'type' => 'shift', 'label' => 'Assistenz', 'sourceAppId' => 'adplaner',
+                'type' => 'shift', 'label' => 'Assistenz', 'sourceAppId' => 'flzplaner',
             ]]];
         }
     }
@@ -42,13 +42,13 @@ namespace OCA\AdCalendar\Service {
 
 namespace {
 
-    use OCA\AdCalendar\Repository\CalendarEntryRepository;
-    use OCA\AdCalendar\Service\AbsenceService;
-    use OCA\AdCalendar\Service\CalendarService;
-    use OCA\AdCalendar\Service\ContainingShiftAssignment;
-    use OCA\AdCalendar\Service\DefaultShiftMaterializer;
-    use OCA\AdCalendar\Service\PlanningConflictService;
-    use OCA\AdCalendar\Service\ShiftCalendarSyncService;
+    use OCA\FlzCalendar\Repository\CalendarEntryRepository;
+    use OCA\FlzCalendar\Service\AbsenceService;
+    use OCA\FlzCalendar\Service\CalendarService;
+    use OCA\FlzCalendar\Service\ContainingShiftAssignment;
+    use OCA\FlzCalendar\Service\DefaultShiftMaterializer;
+    use OCA\FlzCalendar\Service\PlanningConflictService;
+    use OCA\FlzCalendar\Service\ShiftCalendarSyncService;
 
     $repository = new CalendarEntryRepository();
     $materializer = new DefaultShiftMaterializer();
@@ -64,7 +64,7 @@ namespace {
     if (array_column($materializer->weeks, 0) !== ['2026-06-29', '2026-07-06', '2026-07-13', '2026-07-20', '2026-07-27']) {
         throw new RuntimeException('Standarddienste werden nicht für jede sichtbare Monatswoche materialisiert.');
     }
-    if (($materializer->weeks[0][3][0]['sourceAppId'] ?? null) !== 'adplaner' || ($materializer->weeks[0][4] ?? null) !== 'available') {
+    if (($materializer->weeks[0][3][0]['sourceAppId'] ?? null) !== 'flzplaner' || ($materializer->weeks[0][4] ?? null) !== 'available') {
         throw new RuntimeException('Die einmalige Bereichsabfrage wird nicht an die Standarddienstmaterialisierung weitergereicht.');
     }
     if ($repository->ranges !== [['2026-06-29', '2026-08-03', ['person-a']]] || $absences->queries !== [['2026-06-29', '2026-08-03', ['person-a']]]) {

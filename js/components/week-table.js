@@ -1,7 +1,7 @@
 (function() {
     'use strict';
-    const CalendarDate = window.AdCalendar.modules.CalendarDate;
-    const l10n = window.AdCalendar.l10n;
+    const CalendarDate = window.FlzCalendar.modules.CalendarDate;
+    const l10n = window.FlzCalendar.l10n;
 
     /**
      * Zweck: Rendert die Wochen- oder Monatsmatrix in beiden Ausrichtungen inklusive Fachgruppen- und Hierarchiesortierung.
@@ -12,14 +12,14 @@
             this.container = options.container;
             this.calendarCell = options.calendarCell;
             this.organization = options.organization;
-            this.timeline = new window.AdCalendar.modules.CalendarTimeline();
-            this.holidays = options.holidays || new window.AdCalendar.modules.HolidayCalendar();
+            this.timeline = new window.FlzCalendar.modules.CalendarTimeline();
+            this.holidays = options.holidays || new window.FlzCalendar.modules.HolidayCalendar();
         }
 
         setHolidays(calendars) { this.holidays.set(calendars); }
 
         render(employees, state) {
-            const previousWrap = this.container.querySelector?.('.adc-table-wrap');
+            const previousWrap = this.container.querySelector?.('.flz-calendar-table-wrap');
             const previousScroll = { left: previousWrap?.scrollLeft || 0, top: previousWrap?.scrollTop || 0 };
             const orderedEmployees = this.orderedEmployees(employees);
             const range = state.visibleRange();
@@ -33,11 +33,11 @@
 
         periodMatrix(employees, state, days) {
             const block = document.createElement('section');
-            block.className = 'adc-period-matrix';
+            block.className = 'flz-calendar-period-matrix';
             const wrap = document.createElement('div');
-            wrap.className = 'adc-table-wrap';
+            wrap.className = 'flz-calendar-table-wrap';
             const table = document.createElement('table');
-            table.className = 'adc-calendar';
+            table.className = 'flz-calendar-calendar';
             const caption = this.node('caption', l10n.t('Scheduled shifts and appointments per employee'));
             const head = document.createElement('thead');
             const body = document.createElement('tbody');
@@ -56,21 +56,21 @@
 
         mobileCalendar(employees, state, days, activeMonth = null) {
             const list = document.createElement('div');
-            list.className = 'adc-mobile-calendar';
+            list.className = 'flz-calendar-mobile-calendar';
             if (employees.length === 0) {
-                list.append(this.node('p', l10n.t('No people match the current filters.'), 'adc-mobile-empty'));
+                list.append(this.node('p', l10n.t('No people match the current filters.'), 'flz-calendar-mobile-empty'));
                 return list;
             }
             for (const day of days) {
                 const section = document.createElement('details');
-                section.className = this.classes('adc-mobile-day', this.dayClasses(day, activeMonth));
+                section.className = this.classes('flz-calendar-mobile-day', this.dayClasses(day, activeMonth));
                 section.open = state.period === 'week'
                     || (activeMonth !== null && day.getDate() === 1 && !this.outsideMonth(day, activeMonth));
                 const summary = this.node('summary', this.dayLabel(day, { weekday: 'long', day: '2-digit', month: 'long' }));
                 const holiday = this.holidays.name(day);
                 if (holiday) {
                     summary.title = holiday;
-                    summary.append(this.node('span', holiday, 'adc-mobile-holiday'));
+                    summary.append(this.node('span', holiday, 'flz-calendar-mobile-holiday'));
                 }
                 section.append(summary);
                 for (const employee of employees) section.append(this.mobilePerson(employee, day, state));
@@ -81,10 +81,10 @@
 
         mobilePerson(employee, day, state) {
             const article = document.createElement('article');
-            article.className = 'adc-mobile-person';
+            article.className = 'flz-calendar-mobile-person';
             article.append(
                 this.node('h3', employee.displayName),
-                this.node('p', this.clusterLabel(employee), 'adc-mobile-person-context'),
+                this.node('p', this.clusterLabel(employee), 'flz-calendar-mobile-person-context'),
             );
             const dayEnd = new Date(day); dayEnd.setDate(dayEnd.getDate() + 1);
             const overlaps = value => value.employeeUid === employee.uid
@@ -94,7 +94,7 @@
             const absences = (state.data.absences || []).filter(overlaps);
             const planningConflicts = (state.data.planningConflicts || []).filter(overlaps);
             const cell = document.createElement('div');
-            cell.className = 'adc-mobile-cell';
+            cell.className = 'flz-calendar-mobile-cell';
             cell.dataset.employeeUid = employee.uid;
             cell.dataset.day = CalendarDate.isoDay(day);
             cell.innerHTML = this.calendarCell.render(entries, employee, absences, null, day, null, planningConflicts);
@@ -118,11 +118,11 @@
                 const cluster = this.clusterLabel(employee);
                 if (!state.selected.size && cluster !== previousCluster) {
                     const groupRow = document.createElement('tr');
-                    const groupCell = this.node('th', cluster, 'adc-group-heading');
+                    const groupCell = this.node('th', cluster, 'flz-calendar-group-heading');
                     groupCell.colSpan = days.length + 1; groupRow.append(groupCell); rows.push(groupRow); previousCluster = cluster;
                 }
                 const row = document.createElement('tr');
-                const name = this.node('th', employee.displayName, this.classes('adc-person-heading', state.selected.has(employee.uid) ? 'adc-selected' : ''));
+                const name = this.node('th', employee.displayName, this.classes('flz-calendar-person-heading', state.selected.has(employee.uid) ? 'flz-calendar-selected' : ''));
                 name.scope = 'row'; row.append(name);
                 const employeeEntries = state.data.entries.filter(entry => entry.employeeUid === employee.uid);
                 const employeePlanningConflicts = (state.data.planningConflicts || []).filter(conflict => conflict.employeeUid === employee.uid);
@@ -138,7 +138,7 @@
         horizontal(employees, state, days, head, body, activeMonth = null, compactDays = new Set()) {
             const header = document.createElement('tr'); header.append(this.node('th', l10n.t('Day')));
             for (const employee of employees) {
-                const name = this.node('th', employee.displayName, this.classes('adc-person-heading', state.selected.has(employee.uid) ? 'adc-selected' : ''));
+                const name = this.node('th', employee.displayName, this.classes('flz-calendar-person-heading', state.selected.has(employee.uid) ? 'flz-calendar-selected' : ''));
                 name.scope = 'col'; header.append(name);
             }
             head.replaceChildren(header);
@@ -167,12 +167,12 @@
             const planningConflicts = allPlanningConflicts.filter(conflict => conflict.employeeUid === employee.uid && new Date(conflict.start) < dayEnd && new Date(conflict.end) > day);
             cell.dataset.employeeUid = employee.uid;
             cell.dataset.day = CalendarDate.isoDay(day);
-            if (compact) cell.classList.add('adc-compact-day');
-            if (this.outsideMonth(day, activeMonth)) cell.classList.add('adc-outside-month');
-            if (this.isWeekend(day)) cell.classList.add('adc-weekend');
+            if (compact) cell.classList.add('flz-calendar-compact-day');
+            if (this.outsideMonth(day, activeMonth)) cell.classList.add('flz-calendar-outside-month');
+            if (this.isWeekend(day)) cell.classList.add('flz-calendar-weekend');
             const holiday = this.holidays.name(day);
             if (holiday) {
-                cell.classList.add('adc-holiday');
+                cell.classList.add('flz-calendar-holiday');
                 cell.dataset.holiday = holiday;
             }
             cell.innerHTML = this.calendarCell.render(entries, employee, absences, layout, day, this.timeline, planningConflicts);
@@ -185,10 +185,10 @@
 
         dayClasses(day, activeMonth, compact = false) {
             return this.classes(
-                compact ? 'adc-compact-day' : '',
-                this.outsideMonth(day, activeMonth) ? 'adc-outside-month' : '',
-                this.isWeekend(day) ? 'adc-weekend' : '',
-                this.holidays.name(day) ? 'adc-holiday' : '',
+                compact ? 'flz-calendar-compact-day' : '',
+                this.outsideMonth(day, activeMonth) ? 'flz-calendar-outside-month' : '',
+                this.isWeekend(day) ? 'flz-calendar-weekend' : '',
+                this.holidays.name(day) ? 'flz-calendar-holiday' : '',
             );
         }
 
@@ -272,7 +272,7 @@
         node(tag, value, className) { const result = document.createElement(tag); result.textContent = value; if (className) result.className = className; return result; }
     }
 
-    window.AdCalendar = window.AdCalendar || {};
-    window.AdCalendar.components = window.AdCalendar.components || {};
-    window.AdCalendar.components.WeekTable = WeekTable;
+    window.FlzCalendar = window.FlzCalendar || {};
+    window.FlzCalendar.components = window.FlzCalendar.components || {};
+    window.FlzCalendar.components.WeekTable = WeekTable;
 })();

@@ -25,8 +25,8 @@ namespace OCP\AppFramework\Http {
     }
 }
 namespace Psr\Log { interface LoggerInterface { public function error(string|\Stringable $message, array $context = []): void; } }
-namespace OCA\AdCalendar\AppInfo { final class Application { public const APP_ID = 'adcalendar'; } }
-namespace OCA\AdCalendar\Service {
+namespace OCA\FlzCalendar\AppInfo { final class Application { public const APP_ID = 'flzcalendar'; } }
+namespace OCA\FlzCalendar\Service {
     use OCP\IUser;
     final class CalendarAccessService {
         public bool $view = false;
@@ -53,11 +53,11 @@ namespace OCA\AdCalendar\Service {
 
 namespace {
 
-    use OCA\AdCalendar\Controller\MeetingController;
-    use OCA\AdCalendar\Exception\MeetingSlotUnavailableException;
-    use OCA\AdCalendar\Http\LocalizedErrorResponseFactory;
-    use OCA\AdCalendar\Service\CalendarAccessService;
-    use OCA\AdCalendar\Service\MeetingService;
+    use OCA\FlzCalendar\Controller\MeetingController;
+    use OCA\FlzCalendar\Exception\MeetingSlotUnavailableException;
+    use OCA\FlzCalendar\Http\LocalizedErrorResponseFactory;
+    use OCA\FlzCalendar\Service\CalendarAccessService;
+    use OCA\FlzCalendar\Service\MeetingService;
     use OCP\IL10N;
     use OCP\IRequest;
     use OCP\IUser;

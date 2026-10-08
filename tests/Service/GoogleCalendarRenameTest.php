@@ -8,20 +8,20 @@ namespace OCP\Http\Client {
     interface IClient { public function request(string $method, string $uri, array $options = []): IResponse; public function getResponseFromThrowable(\Throwable $error): IResponse; }
     interface IClientService { public function newClient(): IClient; }
 }
-namespace OCA\AdCalendar\CalendarSync {
+namespace OCA\FlzCalendar\CalendarSync {
     final class GoogleOAuthService { public function accessToken(string $uid, array $connection): string { return 'access-token'; } }
     final class ExternalCalendarConnectionStore { public function save(string $uid, string $provider, array $connection): void {} }
 }
-namespace OCA\AdCalendar\Service {
+namespace OCA\FlzCalendar\Service {
     final class CalendarTargetConfig { public function calendarName(): string { return 'Team & Dienst'; } }
 }
 
 namespace {
 
-    use OCA\AdCalendar\CalendarSync\ExternalCalendarConnectionStore;
-    use OCA\AdCalendar\CalendarSync\GoogleCalendarClient;
-    use OCA\AdCalendar\CalendarSync\GoogleOAuthService;
-    use OCA\AdCalendar\Service\CalendarTargetConfig;
+    use OCA\FlzCalendar\CalendarSync\ExternalCalendarConnectionStore;
+    use OCA\FlzCalendar\CalendarSync\GoogleCalendarClient;
+    use OCA\FlzCalendar\CalendarSync\GoogleOAuthService;
+    use OCA\FlzCalendar\Service\CalendarTargetConfig;
     use OCP\Http\Client\IClient;
     use OCP\Http\Client\IClientService;
     use OCP\Http\Client\IResponse;
@@ -44,9 +44,9 @@ namespace {
         public function __construct(private IClient $client) {}
         public function newClient(): IClient { return $this->client; }
     };
-    $connection = ['calendarId' => 'calendar@example.test', 'calendarName' => 'AD Dienste', 'refreshToken' => 'refresh'];
+    $connection = ['calendarId' => 'calendar@example.test', 'calendarName' => 'Filzmann Dienste', 'refreshToken' => 'refresh'];
 
-    $client = $clientFor([$response(200, ['id' => 'calendar@example.test', 'summary' => 'AD Dienste']), $response(200, ['id' => 'calendar@example.test', 'summary' => 'Team & Dienst'])]);
+    $client = $clientFor([$response(200, ['id' => 'calendar@example.test', 'summary' => 'Filzmann Dienste']), $response(200, ['id' => 'calendar@example.test', 'summary' => 'Team & Dienst'])]);
     $google = new GoogleCalendarClient($serviceFor($client), new GoogleOAuthService(), new ExternalCalendarConnectionStore(), new CalendarTargetConfig(), $l10n);
     $renamed = $google->renameCalendar('person-a', $connection);
     $body = json_decode((string)($client->calls[1][2]['body'] ?? ''), true);

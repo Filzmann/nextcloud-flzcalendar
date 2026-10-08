@@ -26,7 +26,7 @@
   eigenen Source- und Runtime-Kompatibilitätsnachweis gebunden.
 - Dokumentations- und Steuerungsstruktur vereinheitlicht; die Roadmap auf
   verbleibende Abnahmen, Freigaben und Erweiterungen reduziert.
-- AdPlaner-Schichten als responsive read-only Sperrzeiten `Assistenz`/`AS`
+- FlzPlaner-Schichten als responsive read-only Sperrzeiten `Assistenz`/`AS`
   eingeblendet und überlappende manuelle sowie regelmäßige Dienste über den
   versionierten LocalBase-Konfliktvertrag verhindert.
 
@@ -52,7 +52,7 @@
 ## 0.14.0-rc.1
 
 - Präzisierte Urlaubslogik umgesetzt: geplanter und genehmigter Urlaub blockieren Dienste und Standardmaterialisierung, während Sperrtermine möglich und bearbeitbar bleiben.
-- Urlaubsmarker auf kompakte, schreibgeschützte `U?`-/`U`-Hinweise reduziert und ihre Wirkung gegen die reale AD-Urlaub-Integration geprüft.
+- Urlaubsmarker auf kompakte, schreibgeschützte `U?`-/`U`-Hinweise reduziert und ihre Wirkung gegen die reale Filzmann-Urlaubsplanung-Integration geprüft.
 - Fokus-, Kontrast-, Sticky-, Scrollpositions-, Feiertags- und Eintragshöhen-Verträge für die Kalenderoberfläche nachgeschärft; den redundanten Typwähler entfernt.
 - Gemeinsamen Leitungs-/Stabsfilter von IT, Sekretariat sowie Finanzen/Lohn getrennt.
 - Direkten serverseitigen Mehrfachrollen-Deny und den administrativen Speicherweg mit selbstbereinigenden DDEV-Smokes abgesichert.
@@ -66,7 +66,7 @@
 
 ## 0.12.0-rc.9
 
-- Google-OAuth-Konfiguration im Nextcloud-Adminabschnitt von AD Kalender ergänzt.
+- Google-OAuth-Konfiguration im Nextcloud-Adminabschnitt von Filzmann Kalender ergänzt.
 - Client-ID, nur schreibbares sensitives Secret, automatisch erzeugte Redirect-URI, Konfigurationsstatus und Entfernen-Funktion umgesetzt.
 - Aufklappbare Schritt-für-Schritt-Anleitung für Google-Cloud-Projekt, API, Zielgruppe, Scope, Webclient und exakte Redirect-URI im Adminbereich ergänzt.
 - Speicherung und Entfernung zusätzlich zur Nextcloud-Adminroute serverseitig auf aktive Administrator*innen begrenzt und CSRF-geschützt.
@@ -83,7 +83,7 @@
 
 - Persönliche Verbindungen zu Kopano, Google, Apple und generischem CalDAV im Einstellungs-Tab ergänzt.
 - Zugangsdaten und OAuth-Tokens mit Nextcloud verschlüsselt und als sensible Benutzerwerte gespeichert.
-- Sichtbare externe Zielkalender „AD Dienste“, einseitige Mehranbieter-Synchronisierung, Verbindungstest und sicheres Trennen umgesetzt.
+- Sichtbare externe Zielkalender „Filzmann Dienste“, einseitige Mehranbieter-Synchronisierung, Verbindungstest und sicheres Trennen umgesetzt.
 - Kopano mit der änderbaren Vorgabe `https://mail.adberlin.org` sowie Apple-/CalDAV-Anleitungen im barrierefreien Dialog ergänzt.
 - Google-Webserver-OAuth mit engem Kalender-Scope, einmaligem Statuswert, Offline-Refresh und sicherer Widerrufsstrecke vorbereitet.
 - CalDAV-, OAuth-, Geheimnis-, SSRF-/Origin-, Controller-, UI- und Mehranbieter-Verträge getestet.

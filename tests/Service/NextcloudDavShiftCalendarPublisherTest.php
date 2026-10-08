@@ -74,20 +74,20 @@ namespace OCA\DAV\CalDAV {
     }
 }
 
-namespace OCA\AdCalendar\Service {
+namespace OCA\FlzCalendar\Service {
     final class CalendarTargetConfig {
         public function __construct(private string $name = 'Team & Dienst') {}
         public function calendarName(): string { return $this->name; }
-        public function acceptedCalendarNames(): array { return ['AD Dienste', $this->name]; }
+        public function acceptedCalendarNames(): array { return ['Filzmann Dienste', $this->name]; }
     }
 }
 
 namespace {
 
-    use OCA\AdCalendar\CalendarSync\NextcloudDavShiftCalendarPublisher;
-    use OCA\AdCalendar\CalendarSync\ShiftCalendarEventSerializer;
-    use OCA\AdCalendar\Model\CalendarEntry;
-    use OCA\AdCalendar\Service\CalendarTargetConfig;
+    use OCA\FlzCalendar\CalendarSync\NextcloudDavShiftCalendarPublisher;
+    use OCA\FlzCalendar\CalendarSync\ShiftCalendarEventSerializer;
+    use OCA\FlzCalendar\Model\CalendarEntry;
+    use OCA\FlzCalendar\Service\CalendarTargetConfig;
     use OCA\LocalBase\Calendar\AbsenceInterval;
     use OCA\DAV\CalDAV\CalDavBackend;
     use OCP\IL10N;
@@ -127,23 +127,23 @@ namespace {
     );
     $publisher->replaceAllContent('sync-person', [$shift(7), $appointment], [$absence]);
     $absenceUri = (new ShiftCalendarEventSerializer($l10n))->absenceObjectUri($absence);
-    if (isset($backend->objects[$calendarId]['adcalendar-shift-8.ics'])
-        || !isset($backend->objects[$calendarId]['adcalendar-appointment-9.ics'], $backend->objects[$calendarId][$absenceUri])) {
+    if (isset($backend->objects[$calendarId]['flzcalendar-shift-8.ics'])
+        || !isset($backend->objects[$calendarId]['flzcalendar-appointment-9.ics'], $backend->objects[$calendarId][$absenceUri])) {
         throw new RuntimeException('Vollständiger persönlicher Abgleich enthält nicht exakt Dienste, Termine und Urlaube.');
     }
 
     $publisher->publish($shift(7, 'Geändert'));
-    if (($backend->updatedObjects[0][1] ?? '') !== 'adcalendar-shift-7.ics') throw new RuntimeException('Bestehender Dienst wurde nicht idempotent aktualisiert.');
+    if (($backend->updatedObjects[0][1] ?? '') !== 'flzcalendar-shift-7.ics') throw new RuntimeException('Bestehender Dienst wurde nicht idempotent aktualisiert.');
 
     $backend->objects[$calendarId]['privat.ics'] = ['uri' => 'privat.ics', 'calendardata' => 'privat'];
-    $backend->objects[$calendarId]['adcalendar-shift-99.ics'] = ['uri' => 'adcalendar-shift-99.ics', 'calendardata' => 'fremd'];
+    $backend->objects[$calendarId]['flzcalendar-shift-99.ics'] = ['uri' => 'flzcalendar-shift-99.ics', 'calendardata' => 'fremd'];
     $backend->metadataOnly = true;
     $publisher->replaceAllContent('sync-person', [$shift(7)], []);
-    if (isset($backend->objects[$calendarId]['adcalendar-shift-8.ics'])
-        || isset($backend->objects[$calendarId]['adcalendar-appointment-9.ics'], $backend->objects[$calendarId][$absenceUri])
+    if (isset($backend->objects[$calendarId]['flzcalendar-shift-8.ics'])
+        || isset($backend->objects[$calendarId]['flzcalendar-appointment-9.ics'], $backend->objects[$calendarId][$absenceUri])
         || !isset($backend->objects[$calendarId]['privat.ics'])
-        || !isset($backend->objects[$calendarId]['adcalendar-shift-99.ics'])) {
-        throw new RuntimeException('Abgleich entfernt fremde Einträge oder bewahrt veraltete AD-Dienste.');
+        || !isset($backend->objects[$calendarId]['flzcalendar-shift-99.ics'])) {
+        throw new RuntimeException('Abgleich entfernt fremde Einträge oder bewahrt veraltete FLZ-Dienste.');
     }
     try {
         $publisher->publish($shift(99));
@@ -151,24 +151,24 @@ namespace {
     } catch (RuntimeException $error) {
         if ($error->getMessage() === 'Fremdes Objekt mit reservierter Dienst-URI wurde überschrieben.') throw $error;
     }
-    if (($backend->objects[$calendarId]['adcalendar-shift-99.ics']['calendardata'] ?? '') !== 'fremd') {
+    if (($backend->objects[$calendarId]['flzcalendar-shift-99.ics']['calendardata'] ?? '') !== 'fremd') {
         throw new RuntimeException('Fremdes Objekt mit reservierter Dienst-URI wurde verändert.');
     }
 
     $publisher->remove('sync-person', 7);
-    if (isset($backend->objects[$calendarId]['adcalendar-shift-7.ics'])) throw new RuntimeException('Gelöschter Dienst bleibt im Zielkalender.');
+    if (isset($backend->objects[$calendarId]['flzcalendar-shift-7.ics'])) throw new RuntimeException('Gelöschter Dienst bleibt im Zielkalender.');
     $publisher->removeCalendar('sync-person');
     if (!isset($backend->calendars[$calendarId]) || !isset($backend->objects[$calendarId]['privat.ics'])) {
         throw new RuntimeException('Deaktivierung löscht einen Kalender mit fremden Einträgen.');
     }
-    unset($backend->objects[$calendarId]['privat.ics'], $backend->objects[$calendarId]['adcalendar-shift-99.ics']);
+    unset($backend->objects[$calendarId]['privat.ics'], $backend->objects[$calendarId]['flzcalendar-shift-99.ics']);
     $publisher->removeCalendar('sync-person');
     if (isset($backend->calendars[$calendarId]) || ($backend->deletedCalendars[0][1] ?? null) !== true) {
         throw new RuntimeException('Leerer app-eigener Kalender wurde nicht dauerhaft entfernt.');
     }
 
     $collisionBackend = new CalDavBackend();
-    $uri = 'adcalendar-dienste-' . substr(hash('sha256', 'sync-person'), 0, 16);
+    $uri = 'flzcalendar-dienste-' . substr(hash('sha256', 'sync-person'), 0, 16);
     $collisionBackend->calendars[42] = ['id' => 42, 'uri' => $uri, 'principaluri' => 'principals/users/sync-person', '{DAV:}displayname' => 'Privat'];
     $collisionBackend->objects[42] = [];
     try {
@@ -179,7 +179,7 @@ namespace {
     }
 
     $legacyBackend = new CalDavBackend();
-    $legacyBackend->calendars[71] = ['id' => 71, 'uri' => $uri, 'principaluri' => 'principals/users/sync-person', '{DAV:}displayname' => 'AD Dienste'];
+    $legacyBackend->calendars[71] = ['id' => 71, 'uri' => $uri, 'principaluri' => 'principals/users/sync-person', '{DAV:}displayname' => 'Filzmann Dienste'];
     $legacyBackend->objects[71] = [];
     (new NextcloudDavShiftCalendarPublisher($legacyBackend, new ShiftCalendarEventSerializer($l10n), $targets))->replaceAll('sync-person', [$shift(7)]);
     if (($legacyBackend->calendars[71]['{DAV:}displayname'] ?? '') !== 'Team & Dienst'
@@ -197,7 +197,7 @@ namespace {
         'id' => 72,
         'principaluri' => 'principals/users/sync-person',
         'uri' => $uri,
-        '{DAV:}displayname' => 'AD Dienste',
+        '{DAV:}displayname' => 'Filzmann Dienste',
     ];
     try {
         (new NextcloudDavShiftCalendarPublisher($failedBackend, new ShiftCalendarEventSerializer($l10n), $targets))->replaceAll('sync-person', [$shift(8)]);
@@ -207,7 +207,7 @@ namespace {
     } finally {
         \Sabre\DAV\PropPatch::$commitResult = true;
     }
-    if (($failedBackend->calendars[72]['{DAV:}displayname'] ?? '') !== 'AD Dienste') {
+    if (($failedBackend->calendars[72]['{DAV:}displayname'] ?? '') !== 'Filzmann Dienste') {
         throw new RuntimeException('Fehlgeschlagener DAV-PropPatch-Commit hat den Kalendernamen verändert.');
     }
 

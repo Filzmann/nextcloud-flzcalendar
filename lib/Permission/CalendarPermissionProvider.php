@@ -2,19 +2,19 @@
 
 declare(strict_types=1);
 
-namespace OCA\AdCalendar\Permission;
+namespace OCA\FlzCalendar\Permission;
 
-use OCA\FilzmannPermissionMatrix\PublicApi\V1\PermissionCondition;
-use OCA\FilzmannPermissionMatrix\PublicApi\V1\PermissionProvider;
-use OCA\FilzmannPermissionMatrix\PublicApi\V1\PermissionProviderDescriptor;
-use OCA\FilzmannPermissionMatrix\PublicApi\V1\PermissionProviderResult;
-use OCA\FilzmannPermissionMatrix\PublicApi\V1\PermissionRule;
+use OCA\FlzPermissionMatrix\PublicApi\V1\PermissionCondition;
+use OCA\FlzPermissionMatrix\PublicApi\V1\PermissionProvider;
+use OCA\FlzPermissionMatrix\PublicApi\V1\PermissionProviderDescriptor;
+use OCA\FlzPermissionMatrix\PublicApi\V1\PermissionProviderResult;
+use OCA\FlzPermissionMatrix\PublicApi\V1\PermissionRule;
 
 final class CalendarPermissionProvider implements PermissionProvider {
     public function __construct(private CalendarPermissionSourceInterface $source) {}
 
     public function descriptor(): PermissionProviderDescriptor {
-        return new PermissionProviderDescriptor('adcalendar', 'AD Kalender', '1.0', ['permissions']);
+        return new PermissionProviderDescriptor('flzcalendar', 'Filzmann Kalender', '1.0', ['permissions']);
     }
 
     public function collect(): PermissionProviderResult {
@@ -50,6 +50,6 @@ final class CalendarPermissionProvider implements PermissionProvider {
     }
 
     private function rule(string $type, string $name, string $detail, string $permission, string $label, string $scope, PermissionCondition $condition): PermissionRule {
-        return new PermissionRule($type, $name, $detail, $permission, $label, 'allow', $scope, $condition, 'adcalendar:CalendarPermissionPolicy', 'high');
+        return new PermissionRule($type, $name, $detail, $permission, $label, 'allow', $scope, $condition, 'flzcalendar:CalendarPermissionPolicy', 'high');
     }
 }

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OCA\AdCalendar\Service;
+namespace OCA\FlzCalendar\Service;
 
 use DateTimeImmutable;
 use InvalidArgumentException;
@@ -16,8 +16,8 @@ use Psr\Log\LoggerInterface;
  * Vertrag: Fehlende Listener ergeben eine leere, gültige Antwort; Providerfehler werden lesend sichtbar und schreibend fail-closed behandelt.
  */
 final class PlanningConflictService {
-    private const REQUESTER_APP_ID = 'adcalendar';
-    private const PROVIDER_APP_ID = 'adplaner';
+    private const REQUESTER_APP_ID = 'flzcalendar';
+    private const PROVIDER_APP_ID = 'flzplaner';
 
     public function __construct(
         private IEventDispatcher $events,

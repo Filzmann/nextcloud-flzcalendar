@@ -28,7 +28,7 @@ function load(locale, translations = true) {
         Date,
     };
     runInNewContext(source, context, { filename: fileURLToPath(localizationUrl) });
-    return { l10n: window.AdCalendar.l10n, calls };
+    return { l10n: window.FlzCalendar.l10n, calls };
 }
 
 const german = load('de-DE');
@@ -47,7 +47,7 @@ if (nextcloudGerman.locale !== 'de-DE'
     throw new Error('Nextcloud-Locale de_DE wird nicht als deutsches Datumsformat normalisiert.');
 }
 const translated = german.l10n.t('Calendar week from {date}', { date: '<31.07.>' });
-if (translated !== 'de-DE:Calendar week from <31.07.>' || german.calls[0][1] !== 'adcalendar' || german.calls[0][3].date !== '<31.07.>') {
+if (translated !== 'de-DE:Calendar week from <31.07.>' || german.calls[0][1] !== 'flzcalendar' || german.calls[0][3].date !== '<31.07.>') {
     throw new Error('Übersetzung delegiert App-ID oder typisierte Platzhalter nicht unverändert an Nextcloud.');
 }
 if (german.l10n.n('{count} person', '{count} people', 2, { count: 2 }) !== '2 people' || german.calls[1][4] !== 2) {
@@ -102,7 +102,7 @@ for (const locale of ['de', 'en_GB']) {
     const declaredKeys = [...catalogSource.matchAll(/^\s*"([^"]+)"\s*:/gm)].map(match => match[1]);
     if (new Set(declaredKeys).size !== declaredKeys.length) throw new Error(`JavaScript-Katalog ${locale} enthält doppelte Schlüssel.`);
     runInNewContext(catalogSource, {
-        OC: { L10N: { register(app, translations) { if (app === 'adcalendar') registered = translations; } } },
+        OC: { L10N: { register(app, translations) { if (app === 'flzcalendar') registered = translations; } } },
     });
     for (const key of clientKeys) {
         if (!(key in json) || !(key in registered)) throw new Error(`Client-L10N-Schlüssel fehlt im ${locale}-Katalog: ${key}`);

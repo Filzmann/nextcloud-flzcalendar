@@ -2,23 +2,23 @@
 
 declare(strict_types=1);
 
-namespace OCA\AdCalendar\Privacy;
+namespace OCA\FlzCalendar\Privacy;
 
 use DateTimeImmutable;
 use DateTimeZone;
 use InvalidArgumentException;
-use OCA\AdCalendar\AppInfo\AppId;
-use OCA\AdCalendar\CalendarSync\ExternalCalendarConnectionStore;
-use OCA\AdCalendar\Model\CalendarEntry;
-use OCA\AdCalendar\Repository\CalendarEntryRepository;
-use OCA\AdCalendar\Repository\TemporaryAdminAccessRepository;
-use OCA\AdCalendar\Service\CalendarPreferenceService;
+use OCA\FlzCalendar\AppInfo\AppId;
+use OCA\FlzCalendar\CalendarSync\ExternalCalendarConnectionStore;
+use OCA\FlzCalendar\Model\CalendarEntry;
+use OCA\FlzCalendar\Repository\CalendarEntryRepository;
+use OCA\FlzCalendar\Repository\TemporaryAdminAccessRepository;
+use OCA\FlzCalendar\Service\CalendarPreferenceService;
 use OCA\LocalBase\Calendar\CalendarContextSettingsService;
-use OCA\FilzmannDataProtection\PublicApi\V1\PersonalDataEntry;
-use OCA\FilzmannDataProtection\PublicApi\V1\PersonalDataPage;
-use OCA\FilzmannDataProtection\PublicApi\V1\PersonalDataProvider;
-use OCA\FilzmannDataProtection\PublicApi\V1\PersonalDataRequest;
-use OCA\FilzmannDataProtection\PublicApi\V1\ProviderDescriptor;
+use OCA\FlzDataProtection\PublicApi\V1\PersonalDataEntry;
+use OCA\FlzDataProtection\PublicApi\V1\PersonalDataPage;
+use OCA\FlzDataProtection\PublicApi\V1\PersonalDataProvider;
+use OCA\FlzDataProtection\PublicApi\V1\PersonalDataRequest;
+use OCA\FlzDataProtection\PublicApi\V1\ProviderDescriptor;
 
 final class CalendarPersonalDataProvider implements PersonalDataProvider {
     public function __construct(
@@ -30,12 +30,12 @@ final class CalendarPersonalDataProvider implements PersonalDataProvider {
     ) {}
 
     public function descriptor(): ProviderDescriptor {
-        return new ProviderDescriptor(AppId::VALUE, 'AD Kalender', '1.0', ['nextcloud-user'], ['personal-data'], 500);
+        return new ProviderDescriptor(AppId::VALUE, 'Filzmann Kalender', '1.0', ['nextcloud-user'], ['personal-data'], 500);
     }
 
     public function collect(PersonalDataRequest $request): PersonalDataPage {
         if ($request->subject()->subjectType() !== 'nextcloud-user') return new PersonalDataPage('not_applicable');
-        if ($request->cursor() !== null) throw new InvalidArgumentException('AD Kalender does not support cursor paging.');
+        if ($request->cursor() !== null) throw new InvalidArgumentException('Filzmann Kalender does not support cursor paging.');
         $timezone = $this->calendarContext->context()->timezone();
         $subjectUid = $request->subject()->subjectId();
         $entries = $this->entries->findByEmployeeUid($subjectUid, $request->pageLimit() + 1);
@@ -72,7 +72,7 @@ final class CalendarPersonalDataProvider implements PersonalDataProvider {
                 summary: 'Bewusst gespeicherter Standard für die Kalenderansicht',
                 purpose: 'Persönliche Vorauswahl und Darstellung der Dienstplanung',
                 source: 'Persönliche Nextcloud-Benutzerkonfiguration der betroffenen Person',
-                recipientCategories: ['Die betroffene Person innerhalb der AD-Kalender-Oberfläche'],
+                recipientCategories: ['Die betroffene Person innerhalb der Filzmann-Kalender-Oberfläche'],
                 retention: 'Bis zur Änderung des persönlichen Standards oder zur Bereinigung der Nextcloud-Benutzerkonfiguration.',
                 thirdCountryTransfer: 'Durch diese persönliche Filtereinstellung ist keine Drittlandübermittlung vorgesehen.',
                 automatedDecision: 'Die Einstellung steuert nur die Vorauswahl der Ansicht und trifft keine Entscheidung über Personen.',
@@ -108,7 +108,7 @@ final class CalendarPersonalDataProvider implements PersonalDataProvider {
                 source: 'Persönliche Nextcloud-Benutzerkonfiguration der betroffenen Person',
                 recipientCategories: ['Angemeldete Nutzer*innen der Instanz nach Materialisierung als normaler Dienst', 'Berechtigte planende Personen'],
                 retention: 'Bis zur Änderung der persönlichen Standard-Dienstzeiten oder zur Bereinigung der Nextcloud-Benutzerkonfiguration.',
-                thirdCountryTransfer: 'AD Kalender selbst sieht für diese Standardwerte keine Drittlandübermittlung vor.',
+                thirdCountryTransfer: 'Filzmann Kalender selbst sieht für diese Standardwerte keine Drittlandübermittlung vor.',
                 automatedDecision: 'Aktivierte Standardzeiten können Dienste vorschlagen oder materialisieren; Urlaubs- und Konfliktregeln bleiben wirksam.',
                 thirdPartyContentNotice: null,
                 attributes: $attributes,
@@ -127,8 +127,8 @@ final class CalendarPersonalDataProvider implements PersonalDataProvider {
                 recipientCategories: ['Die betroffene Person im privaten Nextcloud-Kalender'],
                 retention: 'Bis zur Änderung der persönlichen Einstellung oder zur Bereinigung der Nextcloud-Benutzerkonfiguration.',
                 thirdCountryTransfer: 'Der interne Nextcloud-Kalenderabgleich sieht keine zusätzliche Drittlandübermittlung vor.',
-                automatedDecision: 'Der Abgleich erzeugt nur eine abgeleitete Kalenderdarstellung und verändert die führenden AD-Kalenderdaten nicht.',
-                thirdPartyContentNotice: 'Die abgeleiteten Kalenderobjekte werden nicht erneut ausgegeben; Dienste und Termine stammen aus den bereits aufgeführten AD-Kalendereinträgen, Urlaube aus der zuständigen Abwesenheits-App.',
+                automatedDecision: 'Der Abgleich erzeugt nur eine abgeleitete Kalenderdarstellung und verändert die führenden Filzmann-Kalenderdaten nicht.',
+                thirdPartyContentNotice: 'Die abgeleiteten Kalenderobjekte werden nicht erneut ausgegeben; Dienste und Termine stammen aus den bereits aufgeführten Filzmann-Kalendereinträgen, Urlaube aus der zuständigen Abwesenheits-App.',
                 attributes: ['Privater Nextcloud-Kalender' => $enabled ? 'aktiviert' : 'deaktiviert'],
             );
         }
@@ -147,10 +147,10 @@ final class CalendarPersonalDataProvider implements PersonalDataProvider {
             $items[] = new PersonalDataEntry(
                 categoryId: 'admin-access', categoryLabel: 'Zeitlich begrenzter Admin-Vollzugriff', reference: 'admin-access:' . (string)$grant['id'],
                 summary: sprintf('%s bis %s', self::germanDateTime($grant['startsAt']->setTimezone($timezone)), self::germanDateTime($actualEnd->setTimezone($timezone))),
-                purpose: 'Nachweis einer zeitlich begrenzten administrativen Kalenderfreigabe', source: 'App-lokale Freigabesteuerung im AD Kalender',
+                purpose: 'Nachweis einer zeitlich begrenzten administrativen Kalenderfreigabe', source: 'App-lokale Freigabesteuerung im Filzmann Kalender',
                 recipientCategories: ['Betroffene Person und ausdrücklich berechtigte Datenschutz-Prüfrolle'],
                 retention: 'Keine feste Löschfrist festgelegt; die sicherheitsrelevante Freigabehistorie bleibt bis zu einer gesonderten Aufbewahrungsentscheidung erhalten.',
-                thirdCountryTransfer: 'Durch AD Kalender sind keine Drittlandübermittlungen für diese Freigabehistorie vorgesehen.',
+                thirdCountryTransfer: 'Durch Filzmann Kalender sind keine Drittlandübermittlungen für diese Freigabehistorie vorgesehen.',
                 automatedDecision: 'Der Server beendet den Vollzugriff spätestens nach 24 Stunden automatisch.',
                 thirdPartyContentNotice: 'Kennungen anderer beteiligter Personen werden in dieser subjectgebundenen Auskunft nicht ausgegeben.',
                 attributes: ['Eigene Rolle im Vorgang' => implode(', ', $roles), 'Beginn' => self::germanDateTime($grant['startsAt']->setTimezone($timezone)), 'Geplantes Ende' => self::germanDateTime($grant['endsAt']->setTimezone($timezone)), 'Tatsächliches Ende' => self::germanDateTime($actualEnd->setTimezone($timezone)), 'Status' => $grant['revokedAt'] === null ? 'planmäßig beendet oder noch aktiv' : 'widerrufen'],
@@ -208,7 +208,7 @@ final class CalendarPersonalDataProvider implements PersonalDataProvider {
             source: 'Eingaben der betroffenen oder einer berechtigten planenden Person sowie materialisierte persönliche Standarddienste',
             recipientCategories: ['Angemeldete Nutzer*innen der Instanz', 'Berechtigte planende Personen', 'Bei aktiviertem persönlichen Abgleich die von der betroffenen Person verbundenen Kalenderdienste'],
             retention: 'Keine feste Löschfrist festgelegt; gespeichert bis zur fachlich oder gesetzlich veranlassten Löschung.',
-            thirdCountryTransfer: 'AD Kalender selbst sieht keine Drittlandübermittlung vor. Bei persönlich verbundenen externen Kalenderdiensten hängt sie von der gewählten Verbindung und deren Betreiber ab.',
+            thirdCountryTransfer: 'Filzmann Kalender selbst sieht keine Drittlandübermittlung vor. Bei persönlich verbundenen externen Kalenderdiensten hängt sie von der gewählten Verbindung und deren Betreiber ab.',
             automatedDecision: 'Konflikt-, Verfügbarkeits- und Zuordnungsprüfungen unterstützen die Planung; sie treffen keine Entscheidung mit rechtlicher oder vergleichbar erheblicher Wirkung.',
             thirdPartyContentNotice: $thirdPartyNote,
             attributes: [

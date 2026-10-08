@@ -3,8 +3,8 @@
 declare(strict_types=1);
 
 
-use OCA\AdCalendar\Model\CalendarEntry;
-use OCA\AdCalendar\Service\MeetingAvailabilityService;
+use OCA\FlzCalendar\Model\CalendarEntry;
+use OCA\FlzCalendar\Service\MeetingAvailabilityService;
 use OCA\LocalBase\Calendar\AbsenceInterval;
 
 $entry = static fn(string $uid, string $start, string $end, string $type, string $title = ''): CalendarEntry => CalendarEntry::get(compact('uid', 'start', 'end', 'type', 'title') + ['employeeUid' => $uid]);

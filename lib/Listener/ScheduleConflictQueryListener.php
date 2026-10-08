@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace OCA\AdCalendar\Listener;
+namespace OCA\FlzCalendar\Listener;
 
-use OCA\AdCalendar\Model\CalendarEntry;
-use OCA\AdCalendar\Repository\CalendarEntryRepository;
+use OCA\FlzCalendar\Model\CalendarEntry;
+use OCA\FlzCalendar\Repository\CalendarEntryRepository;
 use OCA\LocalBase\Calendar\ScheduleConflict;
 use OCA\LocalBase\Calendar\ScheduleConflictQueryEvent;
 use OCP\EventDispatcher\Event;
@@ -13,7 +13,7 @@ use OCP\EventDispatcher\IEventListener;
 
 /**
  * Zweck: Meldet bestehende Dienste und Termine read-only als Konflikte an Abwesenheitsprovider.
- * Zusammenspiel: AdUrlaub sendet ScheduleConflictQueryEvent; dieser Listener liest ausschließlich aus dem Kalender-Repository.
+ * Zusammenspiel: FlzUrlaub sendet ScheduleConflictQueryEvent; dieser Listener liest ausschließlich aus dem Kalender-Repository.
  * Vertrag: Der Listener verändert keine Kalendereinträge und liefert sichere, knappe Konfliktbezeichnungen.
  */
 final class ScheduleConflictQueryListener implements IEventListener {
@@ -29,7 +29,7 @@ final class ScheduleConflictQueryListener implements IEventListener {
                 $entry->start(),
                 $entry->end(),
                 $label,
-                'adcalendar',
+                'flzcalendar',
             ));
         }
     }

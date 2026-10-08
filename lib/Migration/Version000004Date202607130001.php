@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OCA\AdCalendar\Migration;
+namespace OCA\FlzCalendar\Migration;
 
 use Closure;
 use OCP\DB\ISchemaWrapper;
@@ -15,7 +15,7 @@ final class Version000004Date202607130001 extends SimpleMigrationStep {
     public function changeSchema(IOutput $output, Closure $schemaClosure, array $options): ?ISchemaWrapper {
         /** @var ISchemaWrapper $schema */
         $schema = $schemaClosure();
-        $table = $schema->getTable('adc_entries');
+        $table = $schema->getTable('flz_calendar_entries');
         $changed = false;
 
         if (!$table->hasColumn('default_date')) {
@@ -30,8 +30,8 @@ final class Version000004Date202607130001 extends SimpleMigrationStep {
             $table->addColumn('default_deleted', Types::BOOLEAN, ['notnull' => true, 'default' => false]);
             $changed = true;
         }
-        if (!$table->hasIndex('adc_default_date')) {
-            $table->addUniqueIndex(['employee_uid', 'default_date'], 'adc_default_date');
+        if (!$table->hasIndex('flz_calendar_default_date')) {
+            $table->addUniqueIndex(['employee_uid', 'default_date'], 'flz_calendar_default_date');
             $changed = true;
         }
 

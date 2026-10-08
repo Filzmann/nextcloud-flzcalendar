@@ -21,7 +21,7 @@ namespace OCP {
 }
 namespace {
 
-    use OCA\AdCalendar\Migration\Version000008Date202608080001;
+    use OCA\FlzCalendar\Migration\Version000008Date202608080001;
     use OCP\IDBConnection;
     use OCP\Migration\IOutput;
 

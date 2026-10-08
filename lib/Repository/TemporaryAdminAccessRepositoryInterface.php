@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OCA\AdCalendar\Repository;
+namespace OCA\FlzCalendar\Repository;
 
 use DateTimeImmutable;
 

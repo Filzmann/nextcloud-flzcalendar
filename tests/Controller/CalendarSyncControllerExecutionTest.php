@@ -24,9 +24,9 @@ namespace OCP\AppFramework\Http {
     }
 }
 namespace Psr\Log { interface LoggerInterface { public function error(string|\Stringable $message, array $context = []): void; } }
-namespace OCA\AdCalendar\AppInfo { final class Application { public const APP_ID = 'adcalendar'; } }
+namespace OCA\FlzCalendar\AppInfo { final class Application { public const APP_ID = 'flzcalendar'; } }
 namespace OCA\LocalBase\Calendar { class HolidayCalendarService {} }
-namespace OCA\AdCalendar\Service {
+namespace OCA\FlzCalendar\Service {
     class CalendarAccessService {
         public ?\OCP\IUser $user = null;
         public function currentUser(): ?\OCP\IUser { return $this->user; }
@@ -41,21 +41,21 @@ namespace OCA\AdCalendar\Service {
         public function configure(string $uid, bool $enabled): array {
             if ($this->fail) throw new \RuntimeException('intern');
             $this->configured[] = [$uid, $enabled];
-            return ['enabled' => $enabled, 'calendarName' => 'AD Dienste'];
+            return ['enabled' => $enabled, 'calendarName' => 'Filzmann Dienste'];
         }
     }
 }
 
 namespace {
 
-    use OCA\AdCalendar\Controller\ApiController;
-    use OCA\AdCalendar\Http\LocalizedErrorResponseFactory;
-    use OCA\AdCalendar\Service\CalendarAccessService;
-    use OCA\AdCalendar\Service\CalendarPreferenceService;
-    use OCA\AdCalendar\Service\CalendarService;
-    use OCA\AdCalendar\Service\CalendarSettingsService;
-    use OCA\AdCalendar\Service\RecurringAppointmentService;
-    use OCA\AdCalendar\Service\ShiftCalendarSyncService;
+    use OCA\FlzCalendar\Controller\ApiController;
+    use OCA\FlzCalendar\Http\LocalizedErrorResponseFactory;
+    use OCA\FlzCalendar\Service\CalendarAccessService;
+    use OCA\FlzCalendar\Service\CalendarPreferenceService;
+    use OCA\FlzCalendar\Service\CalendarService;
+    use OCA\FlzCalendar\Service\CalendarSettingsService;
+    use OCA\FlzCalendar\Service\RecurringAppointmentService;
+    use OCA\FlzCalendar\Service\ShiftCalendarSyncService;
     use OCA\LocalBase\Calendar\HolidayCalendarService;
     use OCP\IRequest;
     use OCP\IL10N;

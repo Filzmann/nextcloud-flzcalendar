@@ -1,7 +1,7 @@
 (function() {
     'use strict';
 
-    const appId = 'adcalendar';
+    const appId = 'flzcalendar';
     const root = document.documentElement;
     const defaultLocale = 'de-DE';
     const requestedLocale = root.dataset?.locale || root.lang || defaultLocale;
@@ -41,6 +41,6 @@
         },
     };
 
-    window.AdCalendar = window.AdCalendar || {};
-    window.AdCalendar.l10n = l10n;
+    window.FlzCalendar = window.FlzCalendar || {};
+    window.FlzCalendar.l10n = l10n;
 })();

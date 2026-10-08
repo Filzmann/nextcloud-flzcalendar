@@ -4,8 +4,8 @@
     const BaseModel = window.LocalBase.models.Model;
 
     /**
-     * Zweck: Stellt den serverseitig konfigurierten AD-Organisationsvertrag für Filter, Gruppierung und Einstellungen bereit.
-     * Spiegelung: PHP: OCA\LocalBase\Organization\AdOrganizationDefinition.
+     * Zweck: Stellt den serverseitig konfigurierten FLZ-Organisationsvertrag für Filter, Gruppierung und Einstellungen bereit.
+     * Spiegelung: PHP: OCA\LocalBase\Organization\FlzOrganizationDefinition.
      */
     class Organization extends BaseModel {
         constructor(data = {}) {
@@ -76,7 +76,7 @@
         }
     }
 
-    window.AdCalendar = window.AdCalendar || {};
-    window.AdCalendar.models = window.AdCalendar.models || {};
-    window.AdCalendar.models.Organization = Organization;
+    window.FlzCalendar = window.FlzCalendar || {};
+    window.FlzCalendar.models = window.FlzCalendar.models || {};
+    window.FlzCalendar.models.Organization = Organization;
 })();

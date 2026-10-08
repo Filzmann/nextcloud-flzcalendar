@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace OCA\AdCalendar\Service;
+namespace OCA\FlzCalendar\Service;
 
 use DateTimeImmutable;
 use DateTimeZone;
-use OCA\AdCalendar\Model\CalendarEntry;
+use OCA\FlzCalendar\Model\CalendarEntry;
 
 /** Zweck: Baut aus einer gespeicherten Wochentagsregel genau einen lokalen Standarddienst. */
 final class DefaultShiftOccurrenceFactory {

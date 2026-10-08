@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OCA\AdCalendar\Model;
+namespace OCA\FlzCalendar\Model;
 
 use DateTimeImmutable;
 use DateTimeZone;

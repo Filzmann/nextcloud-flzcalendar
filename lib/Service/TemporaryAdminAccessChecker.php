@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OCA\AdCalendar\Service;
+namespace OCA\FlzCalendar\Service;
 
 /** App-lokale, read-only Grenze für einen aktuell gültigen Admin-Vollzugriff. */
 interface TemporaryAdminAccessChecker {

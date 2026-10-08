@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace OCA\AdCalendar\Controller;
+namespace OCA\FlzCalendar\Controller;
 
 use DateTimeInterface;
 use InvalidArgumentException;
-use OCA\AdCalendar\AppInfo\AppId;
-use OCA\AdCalendar\Service\TemporaryAdminAccessDeniedException;
-use OCA\AdCalendar\Service\TemporaryAdminAccessService;
+use OCA\FlzCalendar\AppInfo\AppId;
+use OCA\FlzCalendar\Service\TemporaryAdminAccessDeniedException;
+use OCA\FlzCalendar\Service\TemporaryAdminAccessService;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\Attribute\NoAdminRequired;

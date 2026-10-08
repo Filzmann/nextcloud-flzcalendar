@@ -1,7 +1,7 @@
-# L10N-Inventar – AD Kalender
+# L10N-Inventar – Filzmann Kalender
 
 Stand: 31. Juli 2026. Dieses Inventar ist die Arbeitsgrundlage für
-`ADC-L10N`. Es trennt sichtbare Texte von technischen oder bewusst stabilen
+`FLZC-L10N`. Es trennt sichtbare Texte von technischen oder bewusst stabilen
 Werten. Das abschließende Rohtext- und Katalog-Gate ist für die unten
 aufgeführten Oberflächen verbindlich.
 
@@ -101,6 +101,6 @@ HTML-/Script-Sonderzeichen, DST, Jahresgrenze und längere englische Labels.
 - PHP verwendet ausschließlich `OCP\IL10N`; Templates verwenden `$l->t()`.
 - JavaScript verwendet Nextclouds globales `t()`/`n()` über einen kleinen
   app-lokalen Adapter für Übersetzung und `Intl`-Formatierung.
-- `translation('adcalendar')` lädt den Clientkatalog auf Haupt- und
+- `translation('flzcalendar')` lädt den Clientkatalog auf Haupt- und
   Adminoberfläche. Übersetzte Werte werden nur über `textContent`, normale
   DOM-Attribute oder die bestehenden escaped Templateausgaben eingesetzt.

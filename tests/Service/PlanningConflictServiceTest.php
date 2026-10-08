@@ -11,7 +11,7 @@ namespace Psr\Log {
 }
 
 namespace {
-    use OCA\AdCalendar\Service\PlanningConflictService;
+    use OCA\FlzCalendar\Service\PlanningConflictService;
     use OCA\LocalBase\Calendar\ScheduleConflict;
     use OCA\LocalBase\Calendar\ScheduleConflictQueryEvent;
     use OCP\EventDispatcher\Event;
@@ -32,7 +32,7 @@ namespace {
                     new DateTimeImmutable('2026-08-10T08:00:00Z'),
                     new DateTimeImmutable('2026-08-10T16:00:00Z'),
                     'Assistenz',
-                    'adplaner',
+                    'flzplaner',
                 ));
             }
             return $event;
@@ -50,10 +50,10 @@ namespace {
     if (($result['status'] ?? null) !== 'available'
         || ($result['conflicts'][0]['employeeUid'] ?? null) !== 'person-a'
         || ($result['conflicts'][0]['label'] ?? null) !== 'Assistenz'
-        || ($result['conflicts'][0]['sourceAppId'] ?? null) !== 'adplaner') {
+        || ($result['conflicts'][0]['sourceAppId'] ?? null) !== 'flzplaner') {
         throw new RuntimeException('Assistenzkonflikte werden nicht als datensparsamer Kalendervertrag projiziert.');
     }
-    if ($events->requesters !== ['adcalendar']) throw new RuntimeException('Der Consumer grenzt Eigenmeldungen nicht über die App-ID aus.');
+    if ($events->requesters !== ['flzcalendar']) throw new RuntimeException('Der Consumer grenzt Eigenmeldungen nicht über die App-ID aus.');
 
     try {
         $service->assertShiftWritable('person-a', $start, $end);

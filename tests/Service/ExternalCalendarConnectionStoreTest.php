@@ -14,11 +14,11 @@ namespace OCP\Config {
 namespace OCP\Security {
     interface ICrypto { public function encrypt(string $plaintext, string $password = ''): string; public function decrypt(string $authenticatedCiphertext, string $password = ''): string; }
 }
-namespace OCA\AdCalendar\AppInfo { final class Application { public const APP_ID = 'adcalendar'; } }
+namespace OCA\FlzCalendar\AppInfo { final class Application { public const APP_ID = 'flzcalendar'; } }
 
 namespace {
 
-    use OCA\AdCalendar\CalendarSync\ExternalCalendarConnectionStore;
+    use OCA\FlzCalendar\CalendarSync\ExternalCalendarConnectionStore;
     use OCP\Config\IUserConfig;
     use OCP\Security\ICrypto;
 
@@ -36,10 +36,10 @@ namespace {
     };
     $store = new ExternalCalendarConnectionStore($config, $crypto);
     $store->save('person-a', 'kopano', [
-        'serverUrl' => 'https://mail.adberlin.org/',
+        'serverUrl' => 'https://calendar.example.test/',
         'username' => 'person-a',
         'password' => 'nicht-ausgeben',
-        'calendarUrl' => 'https://mail.adberlin.org/caldav/person-a/ad-dienste/',
+        'calendarUrl' => 'https://calendar.example.test/caldav/person-a/flz-dienste/',
     ]);
     $raw = json_encode($config->values, JSON_THROW_ON_ERROR);
     if (str_contains($raw, 'nicht-ausgeben') || ($config->flags['person-a']['external_calendar_kopano'] ?? 0) !== IUserConfig::FLAG_SENSITIVE) {

@@ -8,8 +8,8 @@ namespace OCP {
 namespace OCP\Config {
     interface IUserConfig { public function getValueString(string $uid, string $app, string $key, string $default = ''): string; }
 }
-namespace OCA\AdCalendar\Repository {
-    use OCA\AdCalendar\Model\CalendarEntry;
+namespace OCA\FlzCalendar\Repository {
+    use OCA\FlzCalendar\Model\CalendarEntry;
     final class CalendarEntryRepository {
         public array $existing = [];
         public array $removed = [];
@@ -26,8 +26,8 @@ namespace OCA\AdCalendar\Repository {
         }
     }
 }
-namespace OCA\AdCalendar\Service {
-    use OCA\AdCalendar\Model\CalendarEntry;
+namespace OCA\FlzCalendar\Service {
+    use OCA\FlzCalendar\Model\CalendarEntry;
     final class CalendarPreferenceService {
         public array $defaults = [];
         public function storedShiftDefaults(string $uid): ?array { return $this->defaults[$uid] ?? null; }
@@ -62,13 +62,13 @@ namespace OCA\AdCalendar\Service {
 
 namespace {
 
-    use OCA\AdCalendar\Model\CalendarEntry;
-    use OCA\AdCalendar\Repository\CalendarEntryRepository;
-    use OCA\AdCalendar\Service\CalendarPreferenceService;
-    use OCA\AdCalendar\Service\DefaultShiftMaterializer;
-    use OCA\AdCalendar\Service\DefaultShiftOccurrenceFactory;
-    use OCA\AdCalendar\Service\PlanningConflictService;
-    use OCA\AdCalendar\Service\ShiftCalendarSyncService;
+    use OCA\FlzCalendar\Model\CalendarEntry;
+    use OCA\FlzCalendar\Repository\CalendarEntryRepository;
+    use OCA\FlzCalendar\Service\CalendarPreferenceService;
+    use OCA\FlzCalendar\Service\DefaultShiftMaterializer;
+    use OCA\FlzCalendar\Service\DefaultShiftOccurrenceFactory;
+    use OCA\FlzCalendar\Service\PlanningConflictService;
+    use OCA\FlzCalendar\Service\ShiftCalendarSyncService;
     use OCP\Config\IUserConfig;
     use OCP\IConfig;
 

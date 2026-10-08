@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-base_url="${ADC_BASE_URL:-https://nextcloud-dev.ddev.site}"
-ddev_project="${ADC_DDEV_PROJECT:-$(cd "$(dirname "$0")/../../nextcloud-dev" && pwd)}"
+base_url="${FLZC_BASE_URL:-https://nextcloud-dev.ddev.site}"
+ddev_project="${FLZC_DDEV_PROJECT:-$(cd "$(dirname "$0")/../../nextcloud-dev" && pwd)}"
 suffix="$(date +%s)-$$"
 # Nur im Arbeitsspeicher vorhandenes Einmalpasswort für alle temporären Matrix-Konten.
 password="$(php -r 'echo bin2hex(random_bytes(24));')"
@@ -35,11 +35,11 @@ assert_access() {
     local uid="$1"
     local expected="$2"
     local denied_target="${3:-}"
-    ADC_BASE_URL="$base_url" ADC_USER="$uid" ADC_PASSWORD="$password" ADC_EXPECTED="$expected" ADC_DENIED_TARGET="$denied_target" \
+    FLZC_BASE_URL="$base_url" FLZC_USER="$uid" FLZC_PASSWORD="$password" FLZC_EXPECTED="$expected" FLZC_DENIED_TARGET="$denied_target" \
         "$(dirname "$0")/access-http-smoke.sh"
 }
 
-prefix="adc-smoke-${suffix}"
+prefix="flz-calendar-smoke-${suffix}"
 pdl="${prefix}-pdl"
 bl_now="${prefix}-bl-now"
 bo_actor="${prefix}-bo-actor"
@@ -54,19 +54,19 @@ bl_target="${prefix}-bl-target"
 eb_south="${prefix}-eb-south"
 deputy_bl_eb_south="${prefix}-stvbl-eb-south"
 
-create_user "$pdl" ad-PDL
-create_user "$bl_now" ad-BL ad-Bereich-Nordost ad-Bereich-West
-create_user "$bo_actor" ad-Buero ad-Bereich-Nordost
-create_user "$pfk_actor" ad-PFK
-create_user "$pfk_target" ad-PFK
-create_user "$eb_west" ad-EB ad-Bereich-West
-create_user "$bo_no" ad-Buero ad-Bereich-Nordost
-create_user "$bo_west" ad-Buero ad-Bereich-West
-create_user "$bo_south" ad-Buero ad-Bereich-Sued
-create_user "$pdl_target" ad-PDL
-create_user "$bl_target" ad-BL ad-Bereich-Nordost ad-Bereich-West
-create_user "$eb_south" ad-EB ad-Bereich-Sued
-create_user "$deputy_bl_eb_south" ad-StvBL ad-EB ad-Bereich-Sued
+create_user "$pdl" flz-PDL
+create_user "$bl_now" flz-BL flz-Bereich-Nordost flz-Bereich-West
+create_user "$bo_actor" flz-Buero flz-Bereich-Nordost
+create_user "$pfk_actor" flz-PFK
+create_user "$pfk_target" flz-PFK
+create_user "$eb_west" flz-EB flz-Bereich-West
+create_user "$bo_no" flz-Buero flz-Bereich-Nordost
+create_user "$bo_west" flz-Buero flz-Bereich-West
+create_user "$bo_south" flz-Buero flz-Bereich-Sued
+create_user "$pdl_target" flz-PDL
+create_user "$bl_target" flz-BL flz-Bereich-Nordost flz-Bereich-West
+create_user "$eb_south" flz-EB flz-Bereich-Sued
+create_user "$deputy_bl_eb_south" flz-StvBL flz-EB flz-Bereich-Sued
 
 assert_access "$pdl" "$pdl=true,$pfk_target=true,$eb_west=false"
 assert_access "$bl_now" "$bl_now=true,$bo_no=true,$bo_west=true,$bo_south=false,$pfk_target=false"
@@ -74,4 +74,4 @@ assert_access "$bo_actor" "$bo_actor=true,$bl_target=false,$pdl_target=false"
 assert_access "$pfk_actor" "$pfk_actor=true,$pdl_target=false,$bl_target=false"
 assert_access "$eb_south" "$eb_south=true,$deputy_bl_eb_south=false" "$deputy_bl_eb_south"
 
-echo "AD Calendar DDEV access matrix smoke: OK"
+echo "Filzmann Calendar DDEV access matrix smoke: OK"

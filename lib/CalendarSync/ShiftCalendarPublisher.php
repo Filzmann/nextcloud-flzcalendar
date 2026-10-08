@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
-namespace OCA\AdCalendar\CalendarSync;
+namespace OCA\FlzCalendar\CalendarSync;
 
-use OCA\AdCalendar\Model\CalendarEntry;
+use OCA\FlzCalendar\Model\CalendarEntry;
 
 /**
- * Zweck: Kapselt die ausgehende Veröffentlichung von AD-Diensten hinter einer providerneutralen Grenze.
- * Vertrag: Implementierungen verändern ausschließlich app-eigene Dienstobjekte; AD Kalender bleibt Quelle der Wahrheit.
+ * Zweck: Kapselt die ausgehende Veröffentlichung von FLZ-Diensten hinter einer providerneutralen Grenze.
+ * Vertrag: Implementierungen verändern ausschließlich app-eigene Dienstobjekte; Filzmann Kalender bleibt Quelle der Wahrheit.
  */
 interface ShiftCalendarPublisher {
-    public const CALENDAR_NAME = 'AD Dienste';
+    public const CALENDAR_NAME = 'Filzmann Dienste';
 
     /** @param list<CalendarEntry> $shifts */
     public function replaceAll(string $employeeUid, array $shifts): void;

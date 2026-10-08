@@ -23,8 +23,8 @@ namespace OCP {
 
 namespace {
 
-    use OCA\AdCalendar\Model\CalendarEntry;
-    use OCA\AdCalendar\Repository\CalendarEntryRepository;
+    use OCA\FlzCalendar\Model\CalendarEntry;
+    use OCA\FlzCalendar\Repository\CalendarEntryRepository;
     use OCP\IDBConnection;
 
     final class FakeResult {
@@ -133,7 +133,7 @@ namespace {
     ]);
     if ($repository->save($newShift, 'planner') !== 501) throw new RuntimeException('Insert liefert nicht die neue Datenbank-ID.');
     $insertCalls = $db->builders[array_key_last($db->builders)]->calls;
-    if (!in_array(['insert', ['adc_entries']], $insertCalls, true)
+    if (!in_array(['insert', ['flz_calendar_entries']], $insertCalls, true)
         || !array_filter($insertCalls, static fn(array $call): bool => $call[0] === 'setValue' && $call[1][0] === 'created_by_uid')) {
         throw new RuntimeException('Insert bindet Auditfelder nicht explizit.');
     }
@@ -144,7 +144,7 @@ namespace {
     $persistedShift = CalendarEntry::get(array_replace($newShift->toArray(), ['id' => 42]));
     if ($repository->save($persistedShift, 'planner') !== 42) throw new RuntimeException('Update verliert die vorhandene ID.');
     $updateCalls = $db->builders[array_key_last($db->builders)]->calls;
-    if (!in_array(['update', ['adc_entries']], $updateCalls, true)
+    if (!in_array(['update', ['flz_calendar_entries']], $updateCalls, true)
         || array_filter($updateCalls, static fn(array $call): bool => $call[0] === 'set' && $call[1][0] === 'created_by_uid')) {
         throw new RuntimeException('Update verändert unveränderliche Erstellungsfelder.');
     }

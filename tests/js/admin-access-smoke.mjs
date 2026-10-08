@@ -7,7 +7,7 @@ const element=()=>({checked:false,disabled:false,textContent:'',listeners:{},dat
 const form=element();const history=element();const status=element();const requests=[];
 const context={
     FormData:class{get(name){return {enabled:'on',targetUid:' admin-target ',durationMinutes:'60'}[name]??null;}},
-    document:{getElementById(id){return {'adc-full-access-form':form,'adc-full-access-history':history,'adc-full-access-status':status}[id]||null;},createElement(){return element();}},
+    document:{getElementById(id){return {'flz-calendar-full-access-form':form,'flz-calendar-full-access-history':history,'flz-calendar-full-access-status':status}[id]||null;},createElement(){return element();}},
     window:{LocalBase:{api:{ApiClient:class{async request(path,options={}){requests.push({path,options});return path==='/api/admin/full-access'&&!options.method?{history:[]}:{};}}}}},Intl,Date,encodeURIComponent,JSON,Promise,console,
 };
 runInNewContext(source,context,{filename:fileURLToPath(new URL('../../js/admin-access.js',import.meta.url))});

@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-namespace OCA\AdCalendar\Repository {
-    use OCA\AdCalendar\Model\CalendarEntry;
+namespace OCA\FlzCalendar\Repository {
+    use OCA\FlzCalendar\Model\CalendarEntry;
 
     final class CalendarEntryRepository {
         public ?CalendarEntry $found = null;
@@ -22,8 +22,8 @@ namespace OCA\AdCalendar\Repository {
     }
 }
 
-namespace OCA\AdCalendar\Service {
-    use OCA\AdCalendar\Model\CalendarEntry;
+namespace OCA\FlzCalendar\Service {
+    use OCA\FlzCalendar\Model\CalendarEntry;
 
     final class DefaultShiftMaterializer { public function syncWeek(\DateTimeImmutable $start, array $uids, array $absences = []): void {} }
     final class AbsenceService {
@@ -47,14 +47,14 @@ namespace OCA\AdCalendar\Service {
 
 namespace {
 
-    use OCA\AdCalendar\Model\CalendarEntry;
-    use OCA\AdCalendar\Repository\CalendarEntryRepository;
-    use OCA\AdCalendar\Service\AbsenceService;
-    use OCA\AdCalendar\Service\CalendarService;
-    use OCA\AdCalendar\Service\ContainingShiftAssignment;
-    use OCA\AdCalendar\Service\DefaultShiftMaterializer;
-    use OCA\AdCalendar\Service\PlanningConflictService;
-    use OCA\AdCalendar\Service\ShiftCalendarSyncService;
+    use OCA\FlzCalendar\Model\CalendarEntry;
+    use OCA\FlzCalendar\Repository\CalendarEntryRepository;
+    use OCA\FlzCalendar\Service\AbsenceService;
+    use OCA\FlzCalendar\Service\CalendarService;
+    use OCA\FlzCalendar\Service\ContainingShiftAssignment;
+    use OCA\FlzCalendar\Service\DefaultShiftMaterializer;
+    use OCA\FlzCalendar\Service\PlanningConflictService;
+    use OCA\FlzCalendar\Service\ShiftCalendarSyncService;
 
     $repository = new CalendarEntryRepository();
     $sync = new ShiftCalendarSyncService();

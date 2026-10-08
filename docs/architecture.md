@@ -1,4 +1,4 @@
-# Fach- und Integrationsarchitektur von AD Kalender
+# Fach- und Integrationsarchitektur von Filzmann Kalender
 
 Diese Datei dokumentiert den geltenden Ist-Vertrag. Zukünftige Ziele und
 offene Entscheidungen stehen ausschließlich in `ROADMAP.md`; kurze harte
@@ -27,7 +27,7 @@ globalen Lifecycle-Löschlauf. Rechtsgrundlagen bleiben rechtlich zu prüfen.
 
 ## Kalendereinträge und Ansichten
 
-AD Kalender unterscheidet Dienste und Termine in einem gemeinsamen
+Filzmann Kalender unterscheidet Dienste und Termine in einem gemeinsamen
 Kalendereintragsmodell mit explizitem Typ. Dienste besitzen Mitarbeiter*in,
 Beginn und Ende; ihr Titel ist optional. Termine besitzen einen sprechenden
 Titel. Termine innerhalb eines Dienstes referenzieren ihn über
@@ -107,20 +107,20 @@ Erhalt als Sperrtermine gewählt.
 
 ## Persönlicher Kalenderabgleich
 
-AD Kalender ist alleinige Quelle der Wahrheit. Der standardmäßig aktive
+Filzmann Kalender ist alleinige Quelle der Wahrheit. Der standardmäßig aktive
 persönliche Abgleich veröffentlicht ausschließlich eigene Dienste, Termine und
 Urlaube in einem privaten Nextcloud-Kalender mit dem administrativ
 konfigurierten sichtbaren Namen. Ohne gesetzten AppConfig-Wert bleibt
-„AD Dienste“ der Bestandsdefault. Urlaube kommen read-only und ohne Notizen
+„Filzmann Dienste“ der Bestandsdefault. Urlaube kommen read-only und ohne Notizen
 über LocalBase aus einem optionalen Provider. Ihr halboffener Horizont reicht
 vom Beginn des laufenden fachlichen Kalenderjahres bis zum Beginn des dritten
 Folgejahres. Ohne Provider bleibt der Urlaubsbestand leer.
 Ein bewusstes Opt-out entfernt nur die
-von AD Kalender erzeugten Objekte; fremde Objekte bleiben unangetastet und der
+von Filzmann Kalender erzeugten Objekte; fremde Objekte bleiben unangetastet und der
 Kalender wird nur gelöscht, wenn er danach leer ist.
 
 Deterministische Kalender-, Objekt- und Ereigniskennungen machen Wiederholungen
-idempotent. DAV-Fehler rollen führende AD-Daten nicht zurück, sondern werden
+idempotent. DAV-Fehler rollen führende FLZ-Daten nicht zurück, sondern werden
 sicher protokolliert. Der nicht parallele Hintergrundjob wird alle 15 Minuten
 fällig, gleicht vorhandene Dienste vollständig ab, respektiert Opt-outs und
 isoliert Fehler je Konto. Sein Adminstatus enthält nur Zeitpunkt, Richtung und
@@ -180,13 +180,13 @@ Kopano, Google, Apple und generisches CalDAV können parallel verbunden werden.
 Sie erhalten einen sichtbaren, app-eigenen Kalender mit dem administrativ
 konfigurierten Namen und
 exportieren ebenfalls ausschließlich Dienste. Providerinhalte werden nicht in
-AD Kalender eingeblendet oder zurückimportiert.
+Filzmann Kalender eingeblendet oder zurückimportiert.
 
 Die administrativ konfigurierte Kopano-Adresse ist nur die Vorgabe für neue
 persönliche Verbindungen. Bereits gespeicherte persönliche Server- und
 Kalenderadressen werden durch eine spätere Defaultänderung nicht ersetzt.
 Fehlschläge bei einer fälligen Bestandsumbenennung verändern weder den
-globalen Default noch führende AD-Daten und blockieren keine anderen Provider;
+globalen Default noch führende FLZ-Daten und blockieren keine anderen Provider;
 der nächste ausgehende Abgleich versucht sie erneut.
 
 Persönliche CalDAV-Zugangsdaten und Google-Tokens werden mit Nextclouds
@@ -199,7 +199,7 @@ Provideradapter verwenden ausschließlich den Nextcloud-HTTP-Client.
 Nutzerkonfigurierte CalDAV-Adressen müssen HTTPS verwenden, auf demselben
 Ursprung bleiben und unterliegen Nextclouds SSRF-Schutz. Zugangsdaten werden
 nie an einen Discovery-Ursprung auf einem anderen Host weitergereicht.
-Providerfehler bleiben voneinander und von der führenden AD-Mutation isoliert.
+Providerfehler bleiben voneinander und von der führenden FLZ-Mutation isoliert.
 
 ## Organisation, Rechte und optionale Urlaube und Planungskonflikte
 
@@ -212,19 +212,19 @@ den erlaubten Personenkreis begrenzt.
 
 Rollen, Bereiche, sichtbare Bezeichnungen, Reihenfolge, Peer-Fähigkeit,
 Assistenzteam-Konventionen und Hierarchiekanten stammen aus
-`AdOrganizationDefinition`. Fachcode führt kein paralleles Rollenregister.
+`FlzOrganizationDefinition`. Fachcode führt kein paralleles Rollenregister.
 Eine Änderung technischer Gruppen-IDs verschiebt keine bestehenden
 Nextcloud-Mitgliedschaften.
 
-Ist AD Urlaub aktiv, erscheinen geplante Urlaube als read-only `U?` und
+Ist Filzmann Urlaubsplanung aktiv, erscheinen geplante Urlaube als read-only `U?` und
 genehmigte Urlaube als `U`. Beide Status blockieren neue und materialisierte
-Standarddienste, lassen Sperrtermine zu und sind ausschließlich im AD Urlaub
+Standarddienste, lassen Sperrtermine zu und sind ausschließlich im Filzmann Urlaubsplanung
 bearbeitbar. Nur genehmigter Urlaub wird aus Meetinglücken entfernt. Im
 persönlichen DAV-Kalender bleibt geplanter Urlaub davon unabhängig tentative
-und transparent, genehmigter Urlaub confirmed und opaque. Ohne AD Urlaub
+und transparent, genehmigter Urlaub confirmed und opaque. Ohne Filzmann Urlaubsplanung
 bleiben manuelle Sperrtermine der gültige Standalone-Weg.
 
-Ist AdPlaner aktiv, konsumiert AD Kalender dessen belegte Schichten über den
+Ist FlzPlaner aktiv, konsumiert Filzmann Kalender dessen belegte Schichten über den
 versionierten `ScheduleConflictQueryEvent` ausschließlich read-only. Die
 Kalenderantwort projiziert sie mit sicherem Label `Assistenz`, Provider-ID und
 Verfügbarkeitsstatus; die UI zeigt sie ohne Bearbeitungsaktionen als
@@ -232,7 +232,7 @@ Verfügbarkeitsstatus; die UI zeigt sie ohne Bearbeitungsaktionen als
 manuelle und materialisierte Standarddienste, direkte Randberührungen nicht.
 Fehlende Listener bilden den Standalone-Zustand. Providerfehler werden in der
 Leseantwort als `unavailable` ausgewiesen und verhindern neue Dienste, statt
-Konfliktfreiheit zu behaupten. Umgekehrt publiziert AD Kalender seine Dienste
+Konfliktfreiheit zu behaupten. Umgekehrt publiziert Filzmann Kalender seine Dienste
 datensparsam als `Dienst/Büro`; private Termintitel verlassen die App nicht.
 
 ## Zeitlich begrenzter fachlicher Admin-Vollzugriff
@@ -244,7 +244,7 @@ Mitglieder der kanonischen Nextcloud-Gruppe `Datenschutzbeauftragte` dürfen
 Freigaben erteilen, widerrufen und deren Historie lesen; ein nativer Admin ohne
 diese Rolle und gewöhnliche Konten werden ohne Zustandsänderung abgewiesen.
 
-Die Steuerung liegt im authentifizierten AD-Kalender-Hauptbereich und bleibt
+Die Steuerung liegt im authentifizierten Filzmann-Kalender-Hauptbereich und bleibt
 außerhalb der technischen Nextcloud-Administration. Schreibende Requests
 verwenden den Nextcloud-CSRF-Schutz. Ein natives Administrationskonto ohne
 aktive Freigabe sieht eine sichere Hinweismeldung; der Direktlink zur

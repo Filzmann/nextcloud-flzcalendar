@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace OCA\AdCalendar\Service;
+namespace OCA\FlzCalendar\Service;
 
 use InvalidArgumentException;
-use OCA\AdCalendar\CalendarSync\CalDavClient;
-use OCA\AdCalendar\CalendarSync\ExternalCalendarConnectionStore;
-use OCA\AdCalendar\CalendarSync\ExternalCalendarUrlValidator;
-use OCA\AdCalendar\CalendarSync\ExternalShiftCalendarPublisher;
-use OCA\AdCalendar\CalendarSync\GoogleOAuthService;
-use OCA\AdCalendar\Repository\CalendarEntryRepository;
+use OCA\FlzCalendar\CalendarSync\CalDavClient;
+use OCA\FlzCalendar\CalendarSync\ExternalCalendarConnectionStore;
+use OCA\FlzCalendar\CalendarSync\ExternalCalendarUrlValidator;
+use OCA\FlzCalendar\CalendarSync\ExternalShiftCalendarPublisher;
+use OCA\FlzCalendar\CalendarSync\GoogleOAuthService;
+use OCA\FlzCalendar\Repository\CalendarEntryRepository;
 
 /** Orchestriert persönliche Verbindungen; Zugangsdaten verlassen diese Backend-Grenze nie. */
 final class ExternalCalendarService {

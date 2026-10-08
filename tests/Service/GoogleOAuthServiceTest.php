@@ -15,8 +15,8 @@ namespace OCP\Http\Client {
     interface IClient { public function post(string $uri, array $options = []): IResponse; }
     interface IClientService { public function newClient(): IClient; }
 }
-namespace OCA\AdCalendar\AppInfo { final class Application { public const APP_ID = 'adcalendar'; } }
-namespace OCA\AdCalendar\CalendarSync {
+namespace OCA\FlzCalendar\AppInfo { final class Application { public const APP_ID = 'flzcalendar'; } }
+namespace OCA\FlzCalendar\CalendarSync {
     final class ExternalCalendarConnectionStore {
         public string $state = '';
         public bool $consumed = false;
@@ -29,8 +29,8 @@ namespace OCA\AdCalendar\CalendarSync {
 
 namespace {
 
-    use OCA\AdCalendar\CalendarSync\ExternalCalendarConnectionStore;
-    use OCA\AdCalendar\CalendarSync\GoogleOAuthService;
+    use OCA\FlzCalendar\CalendarSync\ExternalCalendarConnectionStore;
+    use OCA\FlzCalendar\CalendarSync\GoogleOAuthService;
     use OCP\Http\Client\IClient;
     use OCP\Http\Client\IClientService;
     use OCP\Http\Client\IResponse;
@@ -44,7 +44,7 @@ namespace {
         public function setValueString(string $app, string $key, string $value, bool $lazy = false, bool $sensitive = false): bool { $this->values[$key] = $value; $this->writes[] = [$key, $value, $lazy, $sensitive]; return true; }
         public function deleteKey(string $app, string $key): void { unset($this->values[$key]); }
     };
-    $urls = new class implements IURLGenerator { public function linkToRouteAbsolute(string $routeName, array $arguments = []): string { return 'https://cloud.example.test/apps/adcalendar/oauth/google/callback'; } };
+    $urls = new class implements IURLGenerator { public function linkToRouteAbsolute(string $routeName, array $arguments = []): string { return 'https://cloud.example.test/apps/flzcalendar/oauth/google/callback'; } };
     $response = static fn(array $data): IResponse => new class($data) implements IResponse {
         public function __construct(private array $data) {}
         public function getBody(): string { return json_encode($this->data, JSON_THROW_ON_ERROR); }
@@ -75,7 +75,7 @@ namespace {
     if (!str_contains($requests, 'authorization_code') || !str_contains($requests, 'refresh_token')) throw new RuntimeException('Google-Tokenflows sind unvollständig.');
 
     $status = $oauth->adminStatus();
-    if (!$status['configured'] || !$status['secretConfigured'] || $status['clientId'] !== 'client-id' || $status['redirectUri'] !== 'https://cloud.example.test/apps/adcalendar/oauth/google/callback' || str_contains(json_encode($status), 'client-secret')) {
+    if (!$status['configured'] || !$status['secretConfigured'] || $status['clientId'] !== 'client-id' || $status['redirectUri'] !== 'https://cloud.example.test/apps/flzcalendar/oauth/google/callback' || str_contains(json_encode($status), 'client-secret')) {
         throw new RuntimeException('Google-Adminstatus fehlt oder gibt das Client-Secret aus.');
     }
     $oauth->saveConfiguration('client-id', '');

@@ -12,8 +12,8 @@ namespace OCA\LocalBase\Service {
     }
 }
 
-namespace OCA\AdCalendar\Repository {
-    use OCA\AdCalendar\Model\CalendarEntry;
+namespace OCA\FlzCalendar\Repository {
+    use OCA\FlzCalendar\Model\CalendarEntry;
     final class CalendarEntryRepository {
         public array $saved = [];
         public array $existing = ['demo-a' => true];
@@ -28,7 +28,7 @@ namespace OCA\AdCalendar\Repository {
     }
 }
 
-namespace OCA\AdCalendar\Service {
+namespace OCA\FlzCalendar\Service {
     final class DemoFixtureCatalog {
         public function all(): array {
             return [
@@ -41,9 +41,9 @@ namespace OCA\AdCalendar\Service {
 
 namespace {
 
-    use OCA\AdCalendar\Repository\CalendarEntryRepository;
-    use OCA\AdCalendar\Service\CalendarDemoPackService;
-    use OCA\AdCalendar\Service\DemoFixtureCatalog;
+    use OCA\FlzCalendar\Repository\CalendarEntryRepository;
+    use OCA\FlzCalendar\Service\CalendarDemoPackService;
+    use OCA\FlzCalendar\Service\DemoFixtureCatalog;
     use OCA\LocalBase\Service\DemoAccountProvisioningService;
 
     $accounts = new DemoAccountProvisioningService();
@@ -51,7 +51,7 @@ namespace {
     $result = (new CalendarDemoPackService($accounts, $entries, new DemoFixtureCatalog()))->install();
 
     if ($accounts->calls !== [[
-        'ad-suite-demo',
+        'flz-full-suite-demo',
         [
             ['uid' => 'demo-a', 'displayName' => 'Demo A', 'groups' => ['role-a']],
             ['uid' => 'demo-b', 'displayName' => 'Demo B', 'groups' => ['role-b', 'area-b']],

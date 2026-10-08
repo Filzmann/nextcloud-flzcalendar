@@ -9,7 +9,7 @@ namespace OCP\App { interface IAppManager { public function isEnabledForUser($ap
 
 namespace {
 
-    use OCA\AdCalendar\Listener\StandaloneNavigationListener;
+    use OCA\FlzCalendar\Listener\StandaloneNavigationListener;
     use OCA\LocalBase\Service\StandaloneAppNavigationService;
     use OCP\App\IAppManager;
     use OCP\INavigationManager;
@@ -28,6 +28,6 @@ namespace {
     $listener = new StandaloneNavigationListener(new StandaloneAppNavigationService($session, $apps, $nav, $url), $l10n);
     $listener->handle(new LoadAdditionalEntriesEvent());
     $entry = ($nav->entries[0] ?? static fn(): array => [])();
-    if (($entry['id'] ?? '') !== 'adcalendar' || ($entry['name'] ?? '') !== 'translated:Calendar' || ($entry['href'] ?? '') !== 'adcalendar.page.index' || $l10n->calls !== [['Calendar', []]]) throw new RuntimeException('Standalone-Kalendernavigation ist nicht lokalisiert oder technisch stabil.');
-    echo "AD Kalender standalone navigation test passed\n";
+    if (($entry['id'] ?? '') !== 'flzcalendar' || ($entry['name'] ?? '') !== 'translated:Calendar' || ($entry['href'] ?? '') !== 'flzcalendar.page.index' || $l10n->calls !== [['Calendar', []]]) throw new RuntimeException('Standalone-Kalendernavigation ist nicht lokalisiert oder technisch stabil.');
+    echo "Filzmann Kalender standalone navigation test passed\n";
 }

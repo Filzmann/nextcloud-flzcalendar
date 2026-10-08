@@ -9,15 +9,15 @@ set_exception_handler(static function (Throwable $error): never {
     exit(1);
 });
 
-use OCA\AdCalendar\CalendarSync\PersonalCalendarPublisher;
-use OCA\AdCalendar\Repository\CalendarEntryRepository;
-use OCA\AdCalendar\Service\CalendarService;
-use OCA\AdCalendar\Service\CalendarTargetConfig;
-use OCA\AdCalendar\Service\ShiftCalendarReconciliationService;
-use OCA\AdCalendar\Service\ShiftCalendarSyncService;
+use OCA\FlzCalendar\CalendarSync\PersonalCalendarPublisher;
+use OCA\FlzCalendar\Repository\CalendarEntryRepository;
+use OCA\FlzCalendar\Service\CalendarService;
+use OCA\FlzCalendar\Service\CalendarTargetConfig;
+use OCA\FlzCalendar\Service\ShiftCalendarReconciliationService;
+use OCA\FlzCalendar\Service\ShiftCalendarSyncService;
 use OCA\DAV\CalDAV\CalDavBackend;
-use OCA\AdUrlaub\Model\Vacation;
-use OCA\AdUrlaub\Repository\VacationRepository;
+use OCA\FlzUrlaub\Model\Vacation;
+use OCA\FlzUrlaub\Repository\VacationRepository;
 use OCP\IUserManager;
 use Sabre\VObject\Reader;
 
@@ -41,7 +41,7 @@ $backend = \OCP\Server::get(CalDavBackend::class);
 $targets = \OCP\Server::get(CalendarTargetConfig::class);
 $vacations = \OCP\Server::get(VacationRepository::class);
 
-$uid = 'adc-dav-smoke-' . bin2hex(random_bytes(5));
+$uid = 'flz-calendar-dav-smoke-' . bin2hex(random_bytes(5));
 $user = $users->createUser($uid, bin2hex(random_bytes(24)));
 if ($user === null) throw new RuntimeException('Temporäres DAV-Integrationskonto konnte nicht angelegt werden.');
 
@@ -76,9 +76,9 @@ try {
     $assert($createdCalendar !== null, 'Der standardmäßig aktive private Kalender mit dem konfigurierten Namen wurde nicht angelegt.');
     $calendarId = (int)$createdCalendar['id'];
 
-    $uri = 'adcalendar-shift-' . $entryId . '.ics';
+    $uri = 'flzcalendar-shift-' . $entryId . '.ics';
     $object = $backend->getCalendarObject($calendarId, $uri);
-    $assert($object !== null, 'Der vorhandene AD-Dienst wurde beim standardmäßig aktiven Abgleich nicht veröffentlicht.');
+    $assert($object !== null, 'Der vorhandene FLZ-Dienst wurde beim standardmäßig aktiven Abgleich nicht veröffentlicht.');
     $vcalendar = Reader::read((string)$object['calendardata']);
     $assert((string)$vcalendar->VEVENT->SUMMARY === 'Synthetischer DAV-Dienst', 'Der veröffentlichte DAV-Titel ist falsch.');
 
@@ -89,7 +89,7 @@ try {
         'type' => 'appointment',
         'title' => 'Synthetischer DAV-Termin',
     ], null, $uid);
-    $appointmentUri = 'adcalendar-appointment-' . $appointmentId . '.ics';
+    $appointmentUri = 'flzcalendar-appointment-' . $appointmentId . '.ics';
     $appointmentObject = $backend->getCalendarObject($calendarId, $appointmentUri);
     $assert($appointmentObject !== null, 'Der eigene Termin wurde nicht im privaten DAV-Kalender veröffentlicht.');
     $appointmentCalendar = Reader::read((string)$appointmentObject['calendardata']);
@@ -107,7 +107,7 @@ try {
     $assert($reconciliation->reconcileEmployee($uid), 'Der Urlaub wurde vom gezielten Vollabgleich nicht verarbeitet.');
     $absenceObjects = array_values(array_filter(
         $backend->getCalendarObjects($calendarId),
-        static fn(array $candidate): bool => str_starts_with((string)($candidate['uri'] ?? ''), 'adcalendar-absence-'),
+        static fn(array $candidate): bool => str_starts_with((string)($candidate['uri'] ?? ''), 'flzcalendar-absence-'),
     ));
     $assert(count($absenceObjects) === 1, 'Der geplante Urlaub wurde nicht als genau ein DAV-Objekt veröffentlicht.');
     $absenceUri = (string)$absenceObjects[0]['uri'];
@@ -147,7 +147,7 @@ try {
         'title' => 'Aktualisierter DAV-Dienst',
     ], $entryId, $uid);
     $updated = $backend->getCalendarObject($calendarId, $uri);
-    $assert($updated !== null, 'Der aktualisierte AD-Dienst fehlt im DAV-Kalender.');
+    $assert($updated !== null, 'Der aktualisierte FLZ-Dienst fehlt im DAV-Kalender.');
     $vcalendar = Reader::read((string)$updated['calendardata']);
     $assert((string)$vcalendar->VEVENT->SUMMARY === 'Aktualisierter DAV-Dienst', 'Die DAV-Aktualisierung wurde nicht übernommen.');
 
@@ -173,9 +173,9 @@ try {
     $backend->deleteCalendarObject($calendarId, $foreignUri, CalDavBackend::CALENDAR_TYPE_CALENDAR, true);
     $status = $sync->configure($uid, false);
     $calendarId = null;
-    $assert(($status['enabled'] ?? true) === false && $findCalendar() === null, 'Der leere private AD-Kalender wurde beim abschließenden Opt-out nicht entfernt.');
+    $assert(($status['enabled'] ?? true) === false && $findCalendar() === null, 'Der leere private Filzmann-Kalender wurde beim abschließenden Opt-out nicht entfernt.');
 
-    echo "AD Kalender/DAV DDEV-Integration: OK\n";
+    echo "Filzmann Kalender/DAV DDEV-Integration: OK\n";
 } finally {
     if ($entryId !== null && $entries->find($entryId) !== null) $entries->delete($entryId);
     if ($appointmentId !== null && $entries->find($appointmentId) !== null) $entries->delete($appointmentId);

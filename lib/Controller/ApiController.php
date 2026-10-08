@@ -2,18 +2,18 @@
 
 declare(strict_types=1);
 
-namespace OCA\AdCalendar\Controller;
+namespace OCA\FlzCalendar\Controller;
 
 use DateTimeImmutable;
 use InvalidArgumentException;
-use OCA\AdCalendar\AppInfo\Application;
-use OCA\AdCalendar\Http\LocalizedErrorResponseFactory;
-use OCA\AdCalendar\Service\CalendarAccessService;
-use OCA\AdCalendar\Service\CalendarService;
-use OCA\AdCalendar\Service\CalendarSettingsService;
-use OCA\AdCalendar\Service\CalendarPreferenceService;
-use OCA\AdCalendar\Service\RecurringAppointmentService;
-use OCA\AdCalendar\Service\ShiftCalendarSyncService;
+use OCA\FlzCalendar\AppInfo\Application;
+use OCA\FlzCalendar\Http\LocalizedErrorResponseFactory;
+use OCA\FlzCalendar\Service\CalendarAccessService;
+use OCA\FlzCalendar\Service\CalendarService;
+use OCA\FlzCalendar\Service\CalendarSettingsService;
+use OCA\FlzCalendar\Service\CalendarPreferenceService;
+use OCA\FlzCalendar\Service\RecurringAppointmentService;
+use OCA\FlzCalendar\Service\ShiftCalendarSyncService;
 use OCA\LocalBase\Calendar\HolidayCalendarService;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http;

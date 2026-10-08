@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace OCA\AdCalendar\BackgroundJob;
+namespace OCA\FlzCalendar\BackgroundJob;
 
-use OCA\AdCalendar\Service\ShiftCalendarReconciliationService;
-use OCA\AdCalendar\Service\ShiftCalendarReconciliationStatusService;
+use OCA\FlzCalendar\Service\ShiftCalendarReconciliationService;
+use OCA\FlzCalendar\Service\ShiftCalendarReconciliationStatusService;
 use OCP\AppFramework\Utility\ITimeFactory;
 use OCP\BackgroundJob\IJob;
 use OCP\BackgroundJob\TimedJob;

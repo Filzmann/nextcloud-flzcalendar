@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace OCA\AdCalendar\Permission;
+namespace OCA\FlzCalendar\Permission;
 
-use OCA\LocalBase\Organization\AdOrganizationDefinition;
+use OCA\LocalBase\Organization\FlzOrganizationDefinition;
 
 interface CalendarPermissionSourceInterface {
-    public function definition(): AdOrganizationDefinition;
+    public function definition(): FlzOrganizationDefinition;
     public function peerGroups(): array;
 }

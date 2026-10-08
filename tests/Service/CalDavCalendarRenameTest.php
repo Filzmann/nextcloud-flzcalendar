@@ -8,16 +8,16 @@ namespace OCP\Http\Client {
     interface IClient { public function request(string $method, string $uri, array $options = []): IResponse; public function getResponseFromThrowable(\Throwable $error): IResponse; }
     interface IClientService { public function newClient(): IClient; }
 }
-namespace OCA\AdCalendar\Service {
-    final class CalendarTargetConfig { public const DEFAULT_CALENDAR_NAME = 'AD Dienste'; public function calendarName(): string { return 'Team & Dienst'; } }
+namespace OCA\FlzCalendar\Service {
+    final class CalendarTargetConfig { public const DEFAULT_CALENDAR_NAME = 'Filzmann Dienste'; public function calendarName(): string { return 'Team & Dienst'; } }
 }
 
 namespace {
 
-    use OCA\AdCalendar\CalendarSync\CalDavClient;
-    use OCA\AdCalendar\CalendarSync\ExternalCalendarUrlValidator;
-    use OCA\AdCalendar\CalendarSync\ShiftCalendarEventSerializer;
-    use OCA\AdCalendar\Service\CalendarTargetConfig;
+    use OCA\FlzCalendar\CalendarSync\CalDavClient;
+    use OCA\FlzCalendar\CalendarSync\ExternalCalendarUrlValidator;
+    use OCA\FlzCalendar\CalendarSync\ShiftCalendarEventSerializer;
+    use OCA\FlzCalendar\Service\CalendarTargetConfig;
     use OCP\Http\Client\IClient;
     use OCP\Http\Client\IClientService;
     use OCP\Http\Client\IResponse;
@@ -25,7 +25,7 @@ namespace {
 
     $l10n = new class implements IL10N { public function t(string $text, array $parameters = []): string { return strtr($text, $parameters); } };
 
-    $calendarXml = static fn(string $name): string => '<?xml version="1.0"?><d:multistatus xmlns:d="DAV:" xmlns:c="urn:ietf:params:xml:ns:caldav"><d:response><d:href>/caldav/person/ad-dienste/</d:href><d:propstat><d:prop><d:displayname>' . htmlspecialchars($name, ENT_XML1 | ENT_QUOTES, 'UTF-8') . '</d:displayname><d:resourcetype><c:calendar/></d:resourcetype></d:prop></d:propstat></d:response></d:multistatus>';
+    $calendarXml = static fn(string $name): string => '<?xml version="1.0"?><d:multistatus xmlns:d="DAV:" xmlns:c="urn:ietf:params:xml:ns:caldav"><d:response><d:href>/caldav/person/flz-dienste/</d:href><d:propstat><d:prop><d:displayname>' . htmlspecialchars($name, ENT_XML1 | ENT_QUOTES, 'UTF-8') . '</d:displayname><d:resourcetype><c:calendar/></d:resourcetype></d:prop></d:propstat></d:response></d:multistatus>';
     $response = static fn(int $status, string $body = ''): IResponse => new class($status, $body) implements IResponse {
         public function __construct(private int $status, private string $body) {}
         public function getBody(): string { return $this->body; }
@@ -44,13 +44,13 @@ namespace {
     };
     $connection = [
         'serverUrl' => 'https://calendar.example.test/',
-        'calendarUrl' => 'https://calendar.example.test/caldav/person/ad-dienste/',
-        'calendarName' => 'AD Dienste',
+        'calendarUrl' => 'https://calendar.example.test/caldav/person/flz-dienste/',
+        'calendarName' => 'Filzmann Dienste',
         'username' => 'person-a',
         'password' => 'secret',
     ];
 
-    $client = $clientFor([$response(207, $calendarXml('AD Dienste')), $response(207), $response(207, $calendarXml('Team & Dienst'))]);
+    $client = $clientFor([$response(207, $calendarXml('Filzmann Dienste')), $response(207), $response(207, $calendarXml('Team & Dienst'))]);
     $dav = new CalDavClient($serviceFor($client), new ExternalCalendarUrlValidator(), new ShiftCalendarEventSerializer($l10n), new CalendarTargetConfig());
     $renamed = $dav->renameCalendar($connection);
     if (($renamed['calendarName'] ?? '') !== 'Team & Dienst' || ($renamed['calendarUrl'] ?? '') !== $connection['calendarUrl']

@@ -3,19 +3,19 @@
 declare(strict_types=1);
 
 namespace Psr\Log { interface LoggerInterface { public function error(string|\Stringable $message, array $context = []): void; } }
-namespace OCA\AdCalendar\CalendarSync {
-    final class ExternalCalendarConnectionStore { public array $saved = []; public function connections(string $uid): array { return ['kopano' => ['serverUrl' => 'fail', 'calendarName' => 'AD Dienste'], 'manual' => ['serverUrl' => 'ok', 'calendarName' => 'AD Dienste']]; } public function connection(string $uid, string $provider): ?array { return $this->connections($uid)[$provider] ?? null; } public function save(string $uid, string $provider, array $connection): void { $this->saved[] = [$uid, $provider, $connection]; } }
-    final class CalDavClient { public array $renamed = []; public array $published = []; public bool $failRename = false; public bool $failPublish = true; public function renameCalendar(array $connection): array { $this->renamed[] = $connection['serverUrl']; if ($this->failRename && $connection['serverUrl'] === 'fail') throw new \RuntimeException('Umbenennungsfehler an https://secret.example.test/calendar/internal-id'); $connection['calendarName'] = 'Team & Dienst'; return $connection; } public function publish(array $connection, \OCA\AdCalendar\Model\CalendarEntry $shift): void { $this->published[] = [$connection['serverUrl'], $connection['calendarName']]; if ($this->failPublish && $connection['serverUrl'] === 'fail') throw new \RuntimeException('Providerfehler an https://secret.example.test/calendar/internal-id'); } public function replaceAll(array $connection, array $shifts): void {} public function remove(array $connection, int $id): void {} public function removeCalendar(array $connection): void {} }
-    final class GoogleCalendarClient { public function renameCalendar(string $uid, array $connection): array { return $connection; } public function publish(string $uid, array $connection, \OCA\AdCalendar\Model\CalendarEntry $shift): void {} public function replaceAll(string $uid, array $connection, array $shifts): void {} public function remove(string $uid, array $connection, int $id): void {} public function removeCalendar(string $uid, array $connection): void {} }
+namespace OCA\FlzCalendar\CalendarSync {
+    final class ExternalCalendarConnectionStore { public array $saved = []; public function connections(string $uid): array { return ['kopano' => ['serverUrl' => 'fail', 'calendarName' => 'Filzmann Dienste'], 'manual' => ['serverUrl' => 'ok', 'calendarName' => 'Filzmann Dienste']]; } public function connection(string $uid, string $provider): ?array { return $this->connections($uid)[$provider] ?? null; } public function save(string $uid, string $provider, array $connection): void { $this->saved[] = [$uid, $provider, $connection]; } }
+    final class CalDavClient { public array $renamed = []; public array $published = []; public bool $failRename = false; public bool $failPublish = true; public function renameCalendar(array $connection): array { $this->renamed[] = $connection['serverUrl']; if ($this->failRename && $connection['serverUrl'] === 'fail') throw new \RuntimeException('Umbenennungsfehler an https://secret.example.test/calendar/internal-id'); $connection['calendarName'] = 'Team & Dienst'; return $connection; } public function publish(array $connection, \OCA\FlzCalendar\Model\CalendarEntry $shift): void { $this->published[] = [$connection['serverUrl'], $connection['calendarName']]; if ($this->failPublish && $connection['serverUrl'] === 'fail') throw new \RuntimeException('Providerfehler an https://secret.example.test/calendar/internal-id'); } public function replaceAll(array $connection, array $shifts): void {} public function remove(array $connection, int $id): void {} public function removeCalendar(array $connection): void {} }
+    final class GoogleCalendarClient { public function renameCalendar(string $uid, array $connection): array { return $connection; } public function publish(string $uid, array $connection, \OCA\FlzCalendar\Model\CalendarEntry $shift): void {} public function replaceAll(string $uid, array $connection, array $shifts): void {} public function remove(string $uid, array $connection, int $id): void {} public function removeCalendar(string $uid, array $connection): void {} }
 }
 
 namespace {
 
-    use OCA\AdCalendar\CalendarSync\CalDavClient;
-    use OCA\AdCalendar\CalendarSync\ExternalCalendarConnectionStore;
-    use OCA\AdCalendar\CalendarSync\ExternalShiftCalendarPublisher;
-    use OCA\AdCalendar\CalendarSync\GoogleCalendarClient;
-    use OCA\AdCalendar\Model\CalendarEntry;
+    use OCA\FlzCalendar\CalendarSync\CalDavClient;
+    use OCA\FlzCalendar\CalendarSync\ExternalCalendarConnectionStore;
+    use OCA\FlzCalendar\CalendarSync\ExternalShiftCalendarPublisher;
+    use OCA\FlzCalendar\CalendarSync\GoogleCalendarClient;
+    use OCA\FlzCalendar\Model\CalendarEntry;
     use Psr\Log\LoggerInterface;
 
     $dav = new CalDavClient();

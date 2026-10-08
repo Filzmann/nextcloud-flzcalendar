@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace OCA\AdCalendar\Migration;
+namespace OCA\FlzCalendar\Migration;
 
 use Closure;
-use OCA\AdCalendar\BackgroundJob\ReconcileShiftCalendarsJob;
+use OCA\FlzCalendar\BackgroundJob\ReconcileShiftCalendarsJob;
 use OCP\BackgroundJob\IJobList;
 use OCP\Migration\IOutput;
 use OCP\Migration\SimpleMigrationStep;

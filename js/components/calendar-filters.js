@@ -1,6 +1,6 @@
 (function() {
     'use strict';
-    const l10n = window.AdCalendar.l10n;
+    const l10n = window.FlzCalendar.l10n;
 
     /**
      * Zweck: Rendert Rollen-, Bereichs- und Personenfilter und bindet deren Interaktionen.
@@ -13,12 +13,12 @@
             this.organization = options.organization;
             this.leadershipStaffRoles = options.leadershipStaffRoles;
             this.onChange = options.onChange;
-            this.roles = document.getElementById('adc-role-filters');
-            this.areas = document.getElementById('adc-area-filters');
-            this.search = document.getElementById('adc-person-search');
-            this.searchResults = document.getElementById('adc-search-results');
-            this.selectedPeople = document.getElementById('adc-selected-people');
-            this.reset = document.getElementById('adc-reset-selection');
+            this.roles = document.getElementById('flz-calendar-role-filters');
+            this.areas = document.getElementById('flz-calendar-area-filters');
+            this.search = document.getElementById('flz-calendar-person-search');
+            this.searchResults = document.getElementById('flz-calendar-search-results');
+            this.selectedPeople = document.getElementById('flz-calendar-selected-people');
+            this.reset = document.getElementById('flz-calendar-reset-selection');
             this.search.addEventListener('input', event => this.renderSearch(event.target.value));
             this.reset.addEventListener('click', () => this.resetSelection());
         }
@@ -136,7 +136,7 @@
         }
     }
 
-    window.AdCalendar = window.AdCalendar || {};
-    window.AdCalendar.components = window.AdCalendar.components || {};
-    window.AdCalendar.components.CalendarFilters = CalendarFilters;
+    window.FlzCalendar = window.FlzCalendar || {};
+    window.FlzCalendar.components = window.FlzCalendar.components || {};
+    window.FlzCalendar.components.CalendarFilters = CalendarFilters;
 })();

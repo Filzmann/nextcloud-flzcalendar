@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace OCA\AdCalendar\Controller;
+namespace OCA\FlzCalendar\Controller;
 
-use OCA\AdCalendar\AppInfo\Application;
-use OCA\AdCalendar\CalendarSync\ExternalCalendarConnectionException;
-use OCA\AdCalendar\Http\LocalizedErrorResponseFactory;
-use OCA\AdCalendar\Service\ExternalCalendarService;
+use OCA\FlzCalendar\AppInfo\Application;
+use OCA\FlzCalendar\CalendarSync\ExternalCalendarConnectionException;
+use OCA\FlzCalendar\Http\LocalizedErrorResponseFactory;
+use OCA\FlzCalendar\Service\ExternalCalendarService;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\JSONResponse;

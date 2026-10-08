@@ -15,7 +15,7 @@ namespace OCP\AppFramework\Http {
 
 namespace {
 
-    use OCA\AdCalendar\Http\LocalizedErrorResponseFactory;
+    use OCA\FlzCalendar\Http\LocalizedErrorResponseFactory;
     use OCP\IL10N;
 
     $l10n = new class implements IL10N {

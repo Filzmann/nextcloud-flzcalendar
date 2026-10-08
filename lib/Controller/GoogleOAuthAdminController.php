@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace OCA\AdCalendar\Controller;
+namespace OCA\FlzCalendar\Controller;
 
-use OCA\AdCalendar\AppInfo\Application;
-use OCA\AdCalendar\CalendarSync\GoogleOAuthService;
-use OCA\AdCalendar\Http\LocalizedErrorResponseFactory;
+use OCA\FlzCalendar\AppInfo\Application;
+use OCA\FlzCalendar\CalendarSync\GoogleOAuthService;
+use OCA\FlzCalendar\Http\LocalizedErrorResponseFactory;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\JSONResponse;

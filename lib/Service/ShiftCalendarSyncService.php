@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace OCA\AdCalendar\Service;
+namespace OCA\FlzCalendar\Service;
 
 use InvalidArgumentException;
-use OCA\AdCalendar\CalendarSync\ExternalCalendarConnectionStore;
-use OCA\AdCalendar\CalendarSync\ExternalShiftCalendarPublisher;
-use OCA\AdCalendar\CalendarSync\PersonalCalendarPublisher;
-use OCA\AdCalendar\Model\CalendarEntry;
-use OCA\AdCalendar\Repository\CalendarEntryRepository;
+use OCA\FlzCalendar\CalendarSync\ExternalCalendarConnectionStore;
+use OCA\FlzCalendar\CalendarSync\ExternalShiftCalendarPublisher;
+use OCA\FlzCalendar\CalendarSync\PersonalCalendarPublisher;
+use OCA\FlzCalendar\Model\CalendarEntry;
+use OCA\FlzCalendar\Repository\CalendarEntryRepository;
 use Psr\Log\LoggerInterface;
 
 /** Zweck: Orchestriert den standardmäßig aktiven persönlichen Abgleich, Opt-out und die fehlertolerante ausgehende Dienstveröffentlichung. */

@@ -8,14 +8,14 @@ namespace Psr\Log {
     }
 }
 
-namespace OCA\AdCalendar\Repository {
+namespace OCA\FlzCalendar\Repository {
     final class CalendarEntryRepository {
         public array $entries = [];
         public function findEntriesForEmployee(string $uid): array { return $this->entries[$uid] ?? []; }
     }
 }
 
-namespace OCA\AdCalendar\Service {
+namespace OCA\FlzCalendar\Service {
     final class CalendarPreferenceService {
         public array $enabled = [];
         public function shiftCalendarSyncEnabled(string $uid): bool { return $this->enabled[$uid] ?? true; }
@@ -31,27 +31,27 @@ namespace OCA\AdCalendar\Service {
         public function range(): array { return [new \DateTimeImmutable('2026-01-01T00:00:00+01:00'), new \DateTimeImmutable('2029-01-01T00:00:00+01:00')]; }
     }
 }
-namespace OCA\AdCalendar\CalendarSync {
+namespace OCA\FlzCalendar\CalendarSync {
     final class ExternalCalendarConnectionStore { public bool $connected = false; public function hasConnections(string $uid): bool { return $this->connected; } }
     final class ExternalShiftCalendarPublisher {
         public array $published = []; public array $removed = [];
-        public function publish(\OCA\AdCalendar\Model\CalendarEntry $entry): void { $this->published[] = $entry; }
+        public function publish(\OCA\FlzCalendar\Model\CalendarEntry $entry): void { $this->published[] = $entry; }
         public function remove(string $uid, int $id): void { $this->removed[] = [$uid, $id]; }
     }
 }
 
 namespace {
 
-    use OCA\AdCalendar\CalendarSync\PersonalCalendarPublisher;
-    use OCA\AdCalendar\CalendarSync\ExternalCalendarConnectionStore;
-    use OCA\AdCalendar\CalendarSync\ExternalShiftCalendarPublisher;
-    use OCA\AdCalendar\Model\CalendarEntry;
-    use OCA\AdCalendar\Repository\CalendarEntryRepository;
-    use OCA\AdCalendar\Service\CalendarPreferenceService;
-    use OCA\AdCalendar\Service\CalendarTargetConfig;
-    use OCA\AdCalendar\Service\AbsenceService;
-    use OCA\AdCalendar\Service\CalendarSyncHorizon;
-    use OCA\AdCalendar\Service\ShiftCalendarSyncService;
+    use OCA\FlzCalendar\CalendarSync\PersonalCalendarPublisher;
+    use OCA\FlzCalendar\CalendarSync\ExternalCalendarConnectionStore;
+    use OCA\FlzCalendar\CalendarSync\ExternalShiftCalendarPublisher;
+    use OCA\FlzCalendar\Model\CalendarEntry;
+    use OCA\FlzCalendar\Repository\CalendarEntryRepository;
+    use OCA\FlzCalendar\Service\CalendarPreferenceService;
+    use OCA\FlzCalendar\Service\CalendarTargetConfig;
+    use OCA\FlzCalendar\Service\AbsenceService;
+    use OCA\FlzCalendar\Service\CalendarSyncHorizon;
+    use OCA\FlzCalendar\Service\ShiftCalendarSyncService;
     use Psr\Log\LoggerInterface;
 
     $shift = CalendarEntry::get(['id' => 9, 'employeeUid' => 'sync-person', 'start' => '2026-07-20T08:00:00+02:00', 'end' => '2026-07-20T16:00:00+02:00', 'type' => CalendarEntry::TYPE_SHIFT, 'title' => '']);
@@ -87,7 +87,7 @@ namespace {
     if (!$service->remove($appointment) || $publisher->removed[1] !== ['sync-person', 10]) throw new RuntimeException('Eigener Termin wurde nicht aus dem privaten Zielkalender entfernt.');
 
     $publisher->fail = true;
-    if ($service->publish($shift) || $logger->errors === []) throw new RuntimeException('DAV-Fehler gefährdet die führenden AD-Daten oder wird nicht protokolliert.');
+    if ($service->publish($shift) || $logger->errors === []) throw new RuntimeException('DAV-Fehler gefährdet die führenden FLZ-Daten oder wird nicht protokolliert.');
     $publisher->fail = false;
     $disabled = $service->configure('sync-person', false);
     if ($disabled['enabled'] || $publisher->removedCalendars !== ['sync-person'] || $preferences->enabled['sync-person']) throw new RuntimeException('Opt-out entfernt den app-eigenen Kalender nicht vor dem Deaktivieren.');

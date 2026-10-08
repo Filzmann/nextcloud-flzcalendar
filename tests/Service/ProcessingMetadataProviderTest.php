@@ -10,18 +10,18 @@ namespace OCP\EventDispatcher {
 namespace {
     require_once dirname(__DIR__) . '/bootstrap.php';
 
-    use OCA\AdCalendar\Privacy\CalendarProcessingMetadataProvider;
-    use OCA\AdCalendar\Privacy\CalendarProcessingMetadataProviderListener;
-    use OCA\FilzmannDataProtection\PublicApi\V1\RegisterProcessingMetadataProvidersEvent;
+    use OCA\FlzCalendar\Privacy\CalendarProcessingMetadataProvider;
+    use OCA\FlzCalendar\Privacy\CalendarProcessingMetadataProviderListener;
+    use OCA\FlzDataProtection\PublicApi\V1\RegisterProcessingMetadataProvidersEvent;
     use OCP\EventDispatcher\Event;
 
     $provider = new CalendarProcessingMetadataProvider();
     $catalog = $provider->catalog();
     $descriptor = $provider->descriptor();
-    if ($descriptor->appId() !== 'adcalendar' || $descriptor->displayName() !== 'AD Kalender' || $descriptor->contractVersion() !== '1.0') {
-        throw new RuntimeException('Der Processing-Metadata-Provider beschreibt AD Kalender nicht korrekt.');
+    if ($descriptor->appId() !== 'flzcalendar' || $descriptor->displayName() !== 'Filzmann Kalender' || $descriptor->contractVersion() !== '1.0') {
+        throw new RuntimeException('Der Processing-Metadata-Provider beschreibt Filzmann Kalender nicht korrekt.');
     }
-    if ($catalog->appId() !== 'adcalendar') {
+    if ($catalog->appId() !== 'flzcalendar') {
         throw new RuntimeException('Processing-Metadata-Provider und Katalog verwenden nicht die kanonische App-ID.');
     }
     if ($catalog->processingIds() !== [
@@ -37,7 +37,7 @@ namespace {
         throw new RuntimeException('Der Processing-Katalog enthält personenbezogene Laufzeitdaten.');
     }
     $encodedCatalog=json_encode($catalog->toArray(),JSON_THROW_ON_ERROR|JSON_UNESCAPED_UNICODE);
-    if(!str_contains($encodedCatalog,'App-lokaler Freigabevorgang durch Datenschutzbeauftragte im AD Kalender')||str_contains($encodedCatalog,'Laufzeitdurchsetzung der Ziel- und Gruppenbedingungen sowie Allow-, Deny- und Manipulationsprüfungen stehen aus'))throw new RuntimeException('Der Processing-Katalog projiziert den umgesetzten DPO-Freigabevertrag nicht korrekt.');
+    if(!str_contains($encodedCatalog,'App-lokaler Freigabevorgang durch Datenschutzbeauftragte im Filzmann Kalender')||str_contains($encodedCatalog,'Laufzeitdurchsetzung der Ziel- und Gruppenbedingungen sowie Allow-, Deny- und Manipulationsprüfungen stehen aus'))throw new RuntimeException('Der Processing-Katalog projiziert den umgesetzten DPO-Freigabevertrag nicht korrekt.');
 
     $registration = new RegisterProcessingMetadataProvidersEvent();
     $listener = new CalendarProcessingMetadataProviderListener($provider);
@@ -46,7 +46,7 @@ namespace {
         throw new RuntimeException('Ein fremdes Event registriert den Processing-Metadata-Provider.');
     }
     $listener->handle($registration);
-    if (($registration->providers()['adcalendar'] ?? null) !== $provider) {
+    if (($registration->providers()['flzcalendar'] ?? null) !== $provider) {
         throw new RuntimeException('Der Processing-Metadata-Provider wird nicht lazy registriert.');
     }
 
@@ -55,5 +55,5 @@ namespace {
         throw new RuntimeException('Der Bootstrap registriert den Processing-Metadata-Provider nicht am öffentlichen V1-Event.');
     }
 
-    echo "AD Kalender processing metadata provider test passed\n";
+    echo "Filzmann Kalender processing metadata provider test passed\n";
 }

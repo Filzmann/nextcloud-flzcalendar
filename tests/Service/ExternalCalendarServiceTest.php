@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-namespace OCA\AdCalendar\Repository { final class CalendarEntryRepository { public array $shifts = []; public function findShiftsForEmployee(string $uid): array { return $this->shifts[$uid] ?? []; } } }
-namespace OCA\AdCalendar\CalendarSync {
+namespace OCA\FlzCalendar\Repository { final class CalendarEntryRepository { public array $shifts = []; public function findShiftsForEmployee(string $uid): array { return $this->shifts[$uid] ?? []; } } }
+namespace OCA\FlzCalendar\CalendarSync {
     final class ExternalCalendarConnectionStore {
         public const CALDAV_PROVIDERS = ['kopano', 'apple', 'manual'];
         public array $data = [];
@@ -13,24 +13,24 @@ namespace OCA\AdCalendar\CalendarSync {
         public function delete(string $uid, string $provider): void { unset($this->data[$uid][$provider]); }
     }
     final class ExternalCalendarUrlValidator { public function normalize(string $url): string { if (!str_starts_with($url, 'https://')) throw new \InvalidArgumentException('HTTPS erforderlich.'); return rtrim($url, '/') . '/'; } }
-    final class CalDavClient { public array $connected = []; public array $probed = []; public function connect(array $connection): string { $this->connected[] = $connection; return $connection['serverUrl'] . 'calendars/ad-dienste/'; } public function probe(array $connection): int { $this->probed[] = $connection; return 207; } }
+    final class CalDavClient { public array $connected = []; public array $probed = []; public function connect(array $connection): string { $this->connected[] = $connection; return $connection['serverUrl'] . 'calendars/flz-dienste/'; } public function probe(array $connection): int { $this->probed[] = $connection; return 207; } }
     final class ExternalShiftCalendarPublisher { public array $replaced = []; public array $removed = []; public bool $fail = false; public function replaceProvider(string $uid, string $provider, array $shifts): void { $this->replaced[] = [$uid, $provider, $shifts]; if ($this->fail) throw new \RuntimeException('Providerfehler'); } public function removeProviderCalendar(string $uid, string $provider, array $connection): void { $this->removed[] = [$uid, $provider, $connection]; } }
     final class GoogleOAuthService { public bool $configured = false; public function configured(): bool { return $this->configured; } }
 }
-namespace OCA\AdCalendar\Service {
+namespace OCA\FlzCalendar\Service {
     final class CalendarTargetConfig { public function kopanoUrl(): string { return 'https://default.example.test/'; } public function calendarName(): string { return 'Team & Dienst'; } }
 }
 
 namespace {
 
-    use OCA\AdCalendar\CalendarSync\CalDavClient;
-    use OCA\AdCalendar\CalendarSync\ExternalCalendarConnectionStore;
-    use OCA\AdCalendar\CalendarSync\ExternalCalendarUrlValidator;
-    use OCA\AdCalendar\CalendarSync\ExternalShiftCalendarPublisher;
-    use OCA\AdCalendar\CalendarSync\GoogleOAuthService;
-    use OCA\AdCalendar\Repository\CalendarEntryRepository;
-    use OCA\AdCalendar\Service\ExternalCalendarService;
-    use OCA\AdCalendar\Service\CalendarTargetConfig;
+    use OCA\FlzCalendar\CalendarSync\CalDavClient;
+    use OCA\FlzCalendar\CalendarSync\ExternalCalendarConnectionStore;
+    use OCA\FlzCalendar\CalendarSync\ExternalCalendarUrlValidator;
+    use OCA\FlzCalendar\CalendarSync\ExternalShiftCalendarPublisher;
+    use OCA\FlzCalendar\CalendarSync\GoogleOAuthService;
+    use OCA\FlzCalendar\Repository\CalendarEntryRepository;
+    use OCA\FlzCalendar\Service\ExternalCalendarService;
+    use OCA\FlzCalendar\Service\CalendarTargetConfig;
 
     $entries = new CalendarEntryRepository();
     $entries->shifts['person-a'] = ['shift-a'];

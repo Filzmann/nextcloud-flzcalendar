@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace OCA\AdCalendar\Service;
+namespace OCA\FlzCalendar\Service;
 
 use DateTimeImmutable;
 use InvalidArgumentException;
-use OCA\AdCalendar\Model\CalendarEntry;
-use OCA\AdCalendar\Repository\CalendarEntryRepository;
+use OCA\FlzCalendar\Model\CalendarEntry;
+use OCA\FlzCalendar\Repository\CalendarEntryRepository;
 
 /**
  * Zweck: Orchestriert Wochenansicht, Persistenz und Dienst-Termin-Zuordnung einzelner Kalendereinträge.

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OCA\AdCalendar\Migration;
+namespace OCA\FlzCalendar\Migration;
 
 use Closure;
 use DateTimeImmutable;
@@ -20,7 +20,7 @@ final class Version000008Date202608080001 extends SimpleMigrationStep {
     public function postSchemaChange(IOutput $output, Closure $schemaClosure, array $options): void {
         $qb = $this->db->getQueryBuilder();
         $qb->select('id', 'start_at', 'end_at', 'series_timezone')
-            ->from('adc_entries')
+            ->from('flz_calendar_entries')
             ->where($qb->expr()->isNotNull('series_uid'))
             ->andWhere($qb->expr()->isNotNull('series_timezone'));
 
@@ -42,7 +42,7 @@ final class Version000008Date202608080001 extends SimpleMigrationStep {
 
             $utc = new DateTimeZone('UTC');
             $update = $this->db->getQueryBuilder();
-            $update->update('adc_entries')
+            $update->update('flz_calendar_entries')
                 ->set('start_at', $update->createNamedParameter($start->setTimezone($utc), IQueryBuilder::PARAM_DATETIME_IMMUTABLE))
                 ->set('end_at', $update->createNamedParameter($end->setTimezone($utc), IQueryBuilder::PARAM_DATETIME_IMMUTABLE))
                 ->where($update->expr()->eq('id', $update->createNamedParameter((int)$row['id'], IQueryBuilder::PARAM_INT)))

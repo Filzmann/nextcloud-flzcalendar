@@ -1,7 +1,7 @@
 (function() {
     'use strict';
-    const CalendarDate = window.AdCalendar.modules.CalendarDate;
-    const l10n = window.AdCalendar.l10n;
+    const CalendarDate = window.FlzCalendar.modules.CalendarDate;
+    const l10n = window.FlzCalendar.l10n;
 
     /**
      * Zweck: Kapselt Personenauswahl, wochenweise Lückensuche und gemeinsame Terminblockierung.
@@ -12,20 +12,20 @@
             this.repository = options.repository;
             this.onError = options.onError;
             this.onBlocked = options.onBlocked || (() => {});
-            this.dialog = document.getElementById('adc-meeting-dialog');
-            this.form = document.getElementById('adc-meeting-form');
-            this.search = document.getElementById('adc-meeting-search');
-            this.people = document.getElementById('adc-meeting-people');
-            this.duration = document.getElementById('adc-meeting-duration');
-            this.title = document.getElementById('adc-meeting-title');
-            this.results = document.getElementById('adc-meeting-results');
-            this.week = document.getElementById('adc-meeting-week');
+            this.dialog = document.getElementById('flz-calendar-meeting-dialog');
+            this.form = document.getElementById('flz-calendar-meeting-form');
+            this.search = document.getElementById('flz-calendar-meeting-search');
+            this.people = document.getElementById('flz-calendar-meeting-people');
+            this.duration = document.getElementById('flz-calendar-meeting-duration');
+            this.title = document.getElementById('flz-calendar-meeting-title');
+            this.results = document.getElementById('flz-calendar-meeting-results');
+            this.week = document.getElementById('flz-calendar-meeting-week');
             this.employees = [];
             this.selected = new Set();
             this.start = '';
             this.returnFocus = null;
-            document.getElementById('adc-meeting-close').addEventListener('click', () => this.close());
-            document.getElementById('adc-meeting-cancel').addEventListener('click', () => this.close());
+            document.getElementById('flz-calendar-meeting-close').addEventListener('click', () => this.close());
+            document.getElementById('flz-calendar-meeting-cancel').addEventListener('click', () => this.close());
             this.dialog.addEventListener('cancel', event => { event.preventDefault(); this.close(); });
             this.search.addEventListener('input', () => this.renderPeople());
             this.form.addEventListener('submit', event => this.submit(event));
@@ -101,7 +101,7 @@
             }
             const heading = document.createElement('h3'); heading.textContent = l10n.n('{count} matching gap', '{count} matching gaps', gaps.length, { count: gaps.length });
             const list = document.createElement('ul');
-            list.className = 'adc-meeting-gap-list';
+            list.className = 'flz-calendar-meeting-gap-list';
             for (const gap of gaps) {
                 const start = new Date(gap.start);
                 const end = new Date(start.getTime() + Number(this.duration.value) * 60000);
@@ -130,7 +130,7 @@
             const message = document.createElement('p');
             message.textContent = l10n.t('No matching common gap was found in this calendar week.');
             const actions = document.createElement('div');
-            actions.className = 'adc-meeting-result-actions';
+            actions.className = 'flz-calendar-meeting-result-actions';
             const nextWeek = document.createElement('button');
             nextWeek.type = 'button'; nextWeek.textContent = l10n.t('Search in the next week');
             nextWeek.addEventListener('click', async () => {
@@ -175,7 +175,7 @@
         time(date) { return l10n.time(date); }
     }
 
-    window.AdCalendar = window.AdCalendar || {};
-    window.AdCalendar.components = window.AdCalendar.components || {};
-    window.AdCalendar.components.MeetingFinder = MeetingFinder;
+    window.FlzCalendar = window.FlzCalendar || {};
+    window.FlzCalendar.components = window.FlzCalendar.components || {};
+    window.FlzCalendar.components.MeetingFinder = MeetingFinder;
 })();

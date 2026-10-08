@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace OCA\AdCalendar\CalendarSync;
+namespace OCA\FlzCalendar\CalendarSync;
 
 use InvalidArgumentException;
-use OCA\AdCalendar\AppInfo\Application;
+use OCA\FlzCalendar\AppInfo\Application;
 use OCP\Http\Client\IClientService;
 use OCP\IAppConfig;
 use OCP\IURLGenerator;
@@ -160,7 +160,7 @@ final class GoogleOAuthService {
     }
 
     private function redirectUri(): string {
-        return $this->urls->linkToRouteAbsolute('adcalendar.external_calendar.googleCallback');
+        return $this->urls->linkToRouteAbsolute('flzcalendar.external_calendar.googleCallback');
     }
 
     private function clientId(): string {

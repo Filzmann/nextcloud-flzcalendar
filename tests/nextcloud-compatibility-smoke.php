@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-use OCA\AdCalendar\Service\CalendarAccessService;
-use OCA\AdCalendar\CalendarSync\PersonalCalendarPublisher;
-use OCA\AdCalendar\Repository\CalendarEntryRepository;
-use OCA\AdCalendar\Model\CalendarEntry;
-use OCA\AdCalendar\Service\CalendarService;
-use OCA\AdCalendar\Service\ShiftCalendarReconciliationService;
-use OCA\AdCalendar\Service\TemporaryAdminAccessService;
+use OCA\FlzCalendar\Service\CalendarAccessService;
+use OCA\FlzCalendar\CalendarSync\PersonalCalendarPublisher;
+use OCA\FlzCalendar\Repository\CalendarEntryRepository;
+use OCA\FlzCalendar\Model\CalendarEntry;
+use OCA\FlzCalendar\Service\CalendarService;
+use OCA\FlzCalendar\Service\ShiftCalendarReconciliationService;
+use OCA\FlzCalendar\Service\TemporaryAdminAccessService;
 use OCA\DAV\CalDAV\CalDavBackend;
 
 $objectStorageCalendarTitle = 'FR-08 horizontaler Dienstabgleich';
@@ -17,15 +17,15 @@ $postgresqlRollbackTitle = 'FR-04 PostgreSQL Rollback darf nicht bestehen';
 
 return [
     'providerRegistrations' => [
-        'filzmann_data_protection' => [
-            OCA\FilzmannDataProtection\PublicApi\V1\RegisterPersonalDataProvidersEvent::class,
-            OCA\FilzmannDataProtection\PublicApi\V1\RegisterProcessingMetadataProvidersEvent::class,
+        'flz_data_protection' => [
+            OCA\FlzDataProtection\PublicApi\V1\RegisterPersonalDataProvidersEvent::class,
+            OCA\FlzDataProtection\PublicApi\V1\RegisterProcessingMetadataProvidersEvent::class,
         ],
-        'filzmann_permission_matrix' => [
-            OCA\FilzmannPermissionMatrix\PublicApi\V1\RegisterPermissionProvidersEvent::class,
+        'flz_permission_matrix' => [
+            OCA\FlzPermissionMatrix\PublicApi\V1\RegisterPermissionProvidersEvent::class,
         ],
     ],
-    'uiPath' => '/index.php/apps/adcalendar/',
+    'uiPath' => '/index.php/apps/flzcalendar/',
     'preGrantUiStatuses' => [200],
     'postGrantUiStatuses' => [200],
     'grantService' => TemporaryAdminAccessService::class,
@@ -33,7 +33,7 @@ return [
     'permissionProbe' => static fn(string $uid): bool => OCP\Server::get(CalendarAccessService::class)
         ->canManage('compat-target'),
     'apiSmokes' => [
-        ['/index.php/apps/adcalendar/api/week?start=2035-01-01', [200]],
+        ['/index.php/apps/flzcalendar/api/week?start=2035-01-01', [200]],
     ],
     'postgresqlUpgradeSeed' => static function (string $uid) use ($postgresqlCalendarTitle, $postgresqlRollbackTitle): void {
         $repository = OCP\Server::get(CalendarEntryRepository::class);
@@ -46,7 +46,7 @@ return [
         ]);
         $entryId = $repository->save($entry, $uid);
         if ($repository->find($entryId)?->title() !== $postgresqlCalendarTitle) {
-            throw new RuntimeException('Der synthetische AD-Kalender-PostgreSQL-Bestand wurde nicht korrekt angelegt.');
+            throw new RuntimeException('Der synthetische Filzmann-Kalender-PostgreSQL-Bestand wurde nicht korrekt angelegt.');
         }
 
         $rollbackEntry = CalendarEntry::get([
@@ -58,7 +58,7 @@ return [
         ]);
         try {
             $repository->saveMany([$rollbackEntry, new stdClass()], $uid);
-            throw new RuntimeException('Der AD-Kalender-Rollbackfall hat unerwartet committed.');
+            throw new RuntimeException('Der Filzmann-Kalender-Rollbackfall hat unerwartet committed.');
         } catch (TypeError $error) {
             if (!str_contains($error->getMessage(), stdClass::class)) {
                 throw $error;
@@ -67,7 +67,7 @@ return [
         }
         foreach ($repository->findEntriesForEmployee('compat-target') as $stored) {
             if ($stored->title() === $postgresqlRollbackTitle) {
-                throw new RuntimeException('Der AD-Kalender-Rollback hinterließ einen Datensatz.');
+                throw new RuntimeException('Der Filzmann-Kalender-Rollback hinterließ einen Datensatz.');
             }
         }
     },
@@ -79,11 +79,11 @@ return [
             static fn(CalendarEntry $entry): bool => $entry->title() === $postgresqlCalendarTitle,
         ));
         if (count($matches) !== 1 || $matches[0]->id() === null || $matches[0]->durationMinutes() !== 480) {
-            throw new RuntimeException('Der AD-Kalender-Bestand wurde beim PostgreSQL-Upgrade nicht unverändert erhalten.');
+            throw new RuntimeException('Der Filzmann-Kalender-Bestand wurde beim PostgreSQL-Upgrade nicht unverändert erhalten.');
         }
         foreach ($entries as $entry) {
             if ($entry->title() === $postgresqlRollbackTitle) {
-                throw new RuntimeException('Der zurückgerollte AD-Kalender-Datensatz erschien nach dem Upgrade.');
+                throw new RuntimeException('Der zurückgerollte Filzmann-Kalender-Datensatz erschien nach dem Upgrade.');
             }
         }
         $repository->delete((int)$matches[0]->id());
@@ -104,22 +104,22 @@ return [
             static fn($entry): bool => $entry->title() === $objectStorageCalendarTitle,
         ));
         if (count($entries) !== 1 || $entries[0]->id() === null) {
-            throw new RuntimeException('Der Jobprozess sieht den im Webprozess gespeicherten AD-Kalenderdienst nicht eindeutig.');
+            throw new RuntimeException('Der Jobprozess sieht den im Webprozess gespeicherten Filzmann-Kalenderdienst nicht eindeutig.');
         }
         $entry = $entries[0];
         $publisher = OCP\Server::get(PersonalCalendarPublisher::class);
         $backend = OCP\Server::get(CalDavBackend::class);
         $calendarId = null;
         foreach ($backend->getCalendarsForUser('principals/users/' . $employeeUid) as $calendar) {
-            if (str_starts_with((string)($calendar['uri'] ?? ''), 'adcalendar-dienste-')) {
+            if (str_starts_with((string)($calendar['uri'] ?? ''), 'flzcalendar-dienste-')) {
                 $calendarId = (int)$calendar['id'];
                 break;
             }
         }
         if ($calendarId === null) {
-            throw new RuntimeException('Der Webprozess hat keinen privaten AD-Kalender angelegt.');
+            throw new RuntimeException('Der Webprozess hat keinen privaten Filzmann-Kalender angelegt.');
         }
-        $uri = 'adcalendar-shift-' . $entry->id() . '.ics';
+        $uri = 'flzcalendar-shift-' . $entry->id() . '.ics';
         $publisher->removeEntry($entry);
         if ($backend->getCalendarObject($calendarId, $uri) !== null) {
             throw new RuntimeException('Der negative DAV-Reparaturfall konnte nicht hergestellt werden.');

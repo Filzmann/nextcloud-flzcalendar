@@ -2,22 +2,22 @@
 
 declare(strict_types=1);
 
-namespace OCA\AdCalendar\CalendarSync;
+namespace OCA\FlzCalendar\CalendarSync;
 
 use DateTimeImmutable;
 use DateTimeZone;
 use InvalidArgumentException;
-use OCA\AdCalendar\Model\CalendarEntry;
+use OCA\FlzCalendar\Model\CalendarEntry;
 use OCA\LocalBase\Calendar\AbsenceInterval;
 use OCP\IL10N;
 
-/** Zweck: Serialisiert eigene persistierte AD-Einträge und datensparsame Urlaube als private VEVENTs. */
+/** Zweck: Serialisiert eigene persistierte FLZ-Einträge und datensparsame Urlaube als private VEVENTs. */
 final class ShiftCalendarEventSerializer {
     public function __construct(private IL10N $l10n) {}
 
     public function objectUri(CalendarEntry $entry): string {
         $this->assertPublishable($entry);
-        return 'adcalendar-' . $entry->type() . '-' . $entry->id() . '.ics';
+        return 'flzcalendar-' . $entry->type() . '-' . $entry->id() . '.ics';
     }
 
     public function serialize(CalendarEntry $entry, ?string $dateStamp = null): string {
@@ -29,20 +29,20 @@ final class ShiftCalendarEventSerializer {
         $lines = [
             'BEGIN:VCALENDAR',
             'VERSION:2.0',
-            'PRODID:-//AD Suite//AD Kalender//DE',
+            'PRODID:-//Filzmann Nextcloud Plugins//Filzmann Kalender//DE',
             'CALSCALE:GREGORIAN',
             'BEGIN:VEVENT',
-            'UID:adcalendar-' . $entry->type() . '-' . $entry->id() . '@local',
+            'UID:flzcalendar-' . $entry->type() . '-' . $entry->id() . '@local',
             'DTSTAMP:' . $dateStamp,
             'DTSTART:' . $this->utc($entry->start()),
             'DTEND:' . $this->utc($entry->end()),
             'SUMMARY:' . $this->text($title),
-            'DESCRIPTION:' . $this->text($this->l10n->t('Automatically synchronised from AD Calendar. Please make changes there.')),
+            'DESCRIPTION:' . $this->text($this->l10n->t('Automatically synchronised from Filzmann Calendar. Please make changes there.')),
             'CLASS:PRIVATE',
             'TRANSP:OPAQUE',
-            'X-AD-CALENDAR-SOURCE:adcalendar',
-            'X-AD-CALENDAR-ENTRY-ID:' . $entry->id(),
-            'X-AD-CALENDAR-ENTRY-TYPE:' . $entry->type(),
+            'X-FLZ-CALENDAR-SOURCE:flzcalendar',
+            'X-FLZ-CALENDAR-ENTRY-ID:' . $entry->id(),
+            'X-FLZ-CALENDAR-ENTRY-TYPE:' . $entry->type(),
             'END:VEVENT',
             'END:VCALENDAR',
         ];
@@ -50,7 +50,7 @@ final class ShiftCalendarEventSerializer {
     }
 
     public function absenceObjectUri(AbsenceInterval $absence): string {
-        return 'adcalendar-absence-' . $this->absenceId($absence) . '.ics';
+        return 'flzcalendar-absence-' . $this->absenceId($absence) . '.ics';
     }
 
     public function serializeAbsence(AbsenceInterval $absence, ?string $dateStamp = null): string {
@@ -61,20 +61,20 @@ final class ShiftCalendarEventSerializer {
         $lines = [
             'BEGIN:VCALENDAR',
             'VERSION:2.0',
-            'PRODID:-//AD Suite//AD Kalender//DE',
+            'PRODID:-//Filzmann Nextcloud Plugins//Filzmann Kalender//DE',
             'CALSCALE:GREGORIAN',
             'BEGIN:VEVENT',
-            'UID:adcalendar-absence-' . $absenceId . '@local',
+            'UID:flzcalendar-absence-' . $absenceId . '@local',
             'DTSTAMP:' . $dateStamp,
             'DTSTART;VALUE=DATE:' . $absence->start()->format('Ymd'),
             'DTEND;VALUE=DATE:' . $absence->end()->format('Ymd'),
             'SUMMARY:' . $this->text($planned ? $this->l10n->t('Planned vacation') : $this->l10n->t('Vacation')),
-            'DESCRIPTION:' . $this->text($this->l10n->t('Automatically synchronised from AD Calendar. Please make changes there.')),
+            'DESCRIPTION:' . $this->text($this->l10n->t('Automatically synchronised from Filzmann Calendar. Please make changes there.')),
             'CLASS:PRIVATE',
             'STATUS:' . ($planned ? 'TENTATIVE' : 'CONFIRMED'),
             'TRANSP:' . ($planned ? 'TRANSPARENT' : 'OPAQUE'),
-            'X-AD-CALENDAR-SOURCE:adcalendar',
-            'X-AD-CALENDAR-ABSENCE-ID:' . $absenceId,
+            'X-FLZ-CALENDAR-SOURCE:flzcalendar',
+            'X-FLZ-CALENDAR-ABSENCE-ID:' . $absenceId,
             'END:VEVENT',
             'END:VCALENDAR',
         ];

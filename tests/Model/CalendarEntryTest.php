@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 
-use OCA\AdCalendar\Model\CalendarEntry;
+use OCA\FlzCalendar\Model\CalendarEntry;
 
 $shift = CalendarEntry::get([
     'employeeUid' => 'test-person-1',

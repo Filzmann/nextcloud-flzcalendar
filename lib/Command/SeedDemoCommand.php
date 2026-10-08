@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace OCA\AdCalendar\Command;
+namespace OCA\FlzCalendar\Command;
 
-use OCA\AdCalendar\Service\CalendarDemoPackService;
+use OCA\FlzCalendar\Service\CalendarDemoPackService;
 use OCP\IL10N;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -18,7 +18,7 @@ final class SeedDemoCommand extends Command {
     ) { parent::__construct(); }
 
     protected function configure(): void {
-        $this->setName('adcalendar:demo:seed')->setDescription($this->l10n->t('Creates complete AD Calendar demo accounts and demo data.'));
+        $this->setName('flzcalendar:demo:seed')->setDescription($this->l10n->t('Creates complete Filzmann Calendar demo accounts and demo data.'));
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int {

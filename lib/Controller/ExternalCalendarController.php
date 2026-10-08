@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace OCA\AdCalendar\Controller;
+namespace OCA\FlzCalendar\Controller;
 
-use OCA\AdCalendar\AppInfo\Application;
-use OCA\AdCalendar\CalendarSync\ExternalCalendarConnectionException;
-use OCA\AdCalendar\CalendarSync\GoogleOAuthService;
-use OCA\AdCalendar\Http\LocalizedErrorResponseFactory;
-use OCA\AdCalendar\Service\CalendarAccessService;
-use OCA\AdCalendar\Service\ExternalCalendarService;
+use OCA\FlzCalendar\AppInfo\Application;
+use OCA\FlzCalendar\CalendarSync\ExternalCalendarConnectionException;
+use OCA\FlzCalendar\CalendarSync\GoogleOAuthService;
+use OCA\FlzCalendar\Http\LocalizedErrorResponseFactory;
+use OCA\FlzCalendar\Service\CalendarAccessService;
+use OCA\FlzCalendar\Service\ExternalCalendarService;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\Attribute\NoAdminRequired;
@@ -98,7 +98,7 @@ final class ExternalCalendarController extends Controller {
         } catch (\Throwable $exception) {
             $this->logger->error('Google-Kalenderverbindung konnte nicht abgeschlossen werden.', ['exception' => $exception]);
         }
-        return new RedirectResponse($this->urls->linkToRoute('adcalendar.page.index') . '?calendarConnection=' . $result);
+        return new RedirectResponse($this->urls->linkToRoute('flzcalendar.page.index') . '?calendarConnection=' . $result);
     }
 
     private function uid(): ?string {

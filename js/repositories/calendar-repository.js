@@ -3,7 +3,7 @@
 
     const BaseRepository = window.LocalBase.repositories.Repository;
 
-    /** Zweck: Kapselt alle AD-Kalender-API-Pfade hinter dem gemeinsamen LocalBase-Client. */
+    /** Zweck: Kapselt alle Filzmann-Kalender-API-Pfade hinter dem gemeinsamen LocalBase-Client. */
     class CalendarRepository extends BaseRepository {
         week(start) {
             return this.request(`/api/week?start=${this.encode(start)}`);
@@ -83,7 +83,7 @@
         }
     }
 
-    window.AdCalendar = window.AdCalendar || {};
-    window.AdCalendar.repositories = window.AdCalendar.repositories || {};
-    window.AdCalendar.repositories.CalendarRepository = CalendarRepository;
+    window.FlzCalendar = window.FlzCalendar || {};
+    window.FlzCalendar.repositories = window.FlzCalendar.repositories || {};
+    window.FlzCalendar.repositories.CalendarRepository = CalendarRepository;
 })();

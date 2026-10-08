@@ -17,8 +17,8 @@ namespace OCP\AppFramework\Http {
     class JSONResponse { public function __construct(private array $data = [], private int $status = 200) {} public function getData(): array { return $this->data; } public function getStatus(): int { return $this->status; } }
 }
 namespace Psr\Log { interface LoggerInterface { public function error(string|\Stringable $message, array $context = []): void; } }
-namespace OCA\AdCalendar\AppInfo { final class Application { public const APP_ID = 'adcalendar'; } }
-namespace OCA\AdCalendar\Service {
+namespace OCA\FlzCalendar\AppInfo { final class Application { public const APP_ID = 'flzcalendar'; } }
+namespace OCA\FlzCalendar\Service {
     final class CalendarTargetConfig {
         public array $calls = [];
         public string $failure = '';
@@ -33,9 +33,9 @@ namespace OCA\AdCalendar\Service {
 
 namespace {
 
-    use OCA\AdCalendar\Controller\CalendarDefaultsAdminController;
-    use OCA\AdCalendar\Http\LocalizedErrorResponseFactory;
-    use OCA\AdCalendar\Service\CalendarTargetConfig;
+    use OCA\FlzCalendar\Controller\CalendarDefaultsAdminController;
+    use OCA\FlzCalendar\Http\LocalizedErrorResponseFactory;
+    use OCA\FlzCalendar\Service\CalendarTargetConfig;
     use OCP\IGroupManager;
     use OCP\IL10N;
     use OCP\IRequest;
