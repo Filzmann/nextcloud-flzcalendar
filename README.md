@@ -6,8 +6,8 @@ Die Monatsansicht stellt den vollständigen sichtbaren Monatszeitraum in einer e
 
 ## Staging-Kompatibilität
 
-- Nextcloud 33 und 34
-- PHP 8.3 oder neuer innerhalb des von Nextcloud 33/34 unterstützten Bereichs
+- Nextcloud 33 bis 35
+- PHP 8.3 oder neuer innerhalb des von Nextcloud 33 bis 35 unterstützten Bereichs
 - Laufzeitbasis: `localbase`; `orgsuite` ist ab zwei FLZ-Fachprodukten optional aktiv
 - App-ID und Installationsordner: `flzcalendar`
 
