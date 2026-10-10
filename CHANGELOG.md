@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+- Nextcloud 35.0.1 durch Fresh Install, Upgrade 34→35 sowie Provider-,
+  Berechtigungs-, Runtime-, UI-/API- und Asset-Smokes nachgewiesen und den
+  unterstützten Bereich auf die lückenlosen Hauptversionen 33 bis 35
+  erweitert. Der gekapselte private DAV-Adapter ist zusätzlich mit dem
+  nativen Nextcloud-35-Backend für Erstellen, Lesen, Aktualisieren, Löschen,
+  Reparaturabgleich, Opt-out und Fremdobjektschutz geprüft; Nextcloud 36
+  bleibt ungeprüft.
 - Die zeitlich begrenzte fachliche Adminfreigabe auf Mitglieder der
   Nextcloud-Gruppe `Datenschutzbeauftragte` begrenzt, die Steuerung aus dem
   technischen Adminbereich in den rollenabhängigen Hauptbereich verschoben
