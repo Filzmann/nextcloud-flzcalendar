@@ -7,8 +7,9 @@
      * Zusammenspiel: main.js mutiert fachliche UI-Aktionen und delegiert Persistenz sowie Personenfilter an diese Klasse.
      */
     class CalendarState {
-        constructor(leadershipStaffRoles, location = window.location, history = window.history) {
+        constructor(leadershipStaffRoles, location = window.location, history = window.history, roleIsAreaScoped = () => false) {
             this.leadershipStaffRoles = leadershipStaffRoles;
+            this.roleIsAreaScoped = roleIsAreaScoped;
             this.location = location;
             this.history = history;
             this.monday = CalendarDate.startOfWeek(new Date());
@@ -76,7 +77,7 @@
                 this.period = filters.period === 'month' ? 'month' : 'week';
                 const profileContainsLeadershipStaff = filterRoles.some(role => this.leadershipStaffRoles.has(role));
                 this.showLeadershipStaff = usesOwnProfile
-                    ? profileContainsLeadershipStaff
+                    ? profileContainsLeadershipStaff || (filterRoles.length === 0 && this.areas.size === 0 && this.selected.size === 0)
                     : filters.showLeadershipStaff !== false;
                 this.leadershipStaffOnly = this.showLeadershipStaff && (filters.leadershipStaffOnly === true
                     || (usesOwnProfile && profileContainsLeadershipStaff && this.roles.size === 0 && this.areas.size === 0));
@@ -92,8 +93,10 @@
                 if (this.selected.size) return this.selected.has(employee.uid) && (!isLeadershipStaff || this.showLeadershipStaff);
                 if (this.leadershipStaffOnly) return isLeadershipStaff;
                 if (isLeadershipStaff) return this.showLeadershipStaff;
-                if (this.roles.size && !this.roles.has(employee.roles[0] || '')) return false;
-                if (this.areas.size && !employee.areas.some(area => this.areas.has(area))) return false;
+                const primaryRole = employee.roles[0] || '';
+                if (this.roles.size && !this.roles.has(primaryRole)) return false;
+                if (this.areas.size && this.roleIsAreaScoped(primaryRole)
+                    && !employee.areas.some(area => this.areas.has(area))) return false;
                 return true;
             });
         }
@@ -108,7 +111,10 @@
             };
         }
 
-        isUnfiltered() { return this.selected.size === 0 && this.roles.size === 0 && this.areas.size === 0 && !this.leadershipStaffOnly; }
+        isUnfiltered() {
+            return this.selected.size === 0 && this.roles.size === 0 && this.areas.size === 0
+                && this.showLeadershipStaff && !this.leadershipStaffOnly;
+        }
 
         visibleRange() {
             if (this.period === 'month') return CalendarDate.monthRange(this.month);

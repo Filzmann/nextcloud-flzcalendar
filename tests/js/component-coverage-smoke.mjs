@@ -153,6 +153,7 @@ if (savedDefaults.length !== 1 || savedDefaults[0]['1'].start !== '09:00' || sav
 // CalendarFilters: ordered facets, leadership switch, search selection and reset.
 const filterElements = Object.fromEntries([
     'flz-calendar-role-filters', 'flz-calendar-area-filters', 'flz-calendar-person-search', 'flz-calendar-search-results', 'flz-calendar-selected-people', 'flz-calendar-reset-selection',
+    'flz-calendar-filters', 'flz-calendar-filter-heading', 'flz-calendar-filter-panel', 'flz-calendar-close-filters',
 ].map(id => [id, new FakeNode()]));
 const filterState = {
     data: { employees: [
@@ -161,7 +162,7 @@ const filterState = {
     ] },
     roles: new Set(['staff']), areas: new Set(), selected: new Set(),
     showLeadershipStaff: true, leadershipStaffOnly: true, persisted: 0,
-    isUnfiltered: () => false,
+    isUnfiltered: () => true,
     persist() { this.persisted += 1; },
 };
 const organization = {
@@ -182,6 +183,7 @@ if (filterElements['flz-calendar-role-filters'].children.length !== 3
     throw new Error('Rollenfilter werden nicht ohne Stabsrollen in Organisationsreihenfolge gerendert.');
 }
 const leadershipInput = filterElements['flz-calendar-role-filters'].children[2].children[0];
+if (leadershipInput.disabled) throw new Error('Der Leitungs-/Stabsschalter setzt weiterhin eine weitere Filterauswahl voraus.');
 leadershipInput.checked = false;
 await leadershipInput.fire('change');
 if (filterState.roles.has('staff') || filterState.leadershipStaffOnly || filterState.showLeadershipStaff) {
@@ -197,6 +199,13 @@ await removeAlpha.fire('click');
 filterState.selected.add('b');
 await filterElements['flz-calendar-reset-selection'].fire('click');
 if (filterState.selected.size !== 0 || filterState.persisted < 4 || filterChanges < 4) throw new Error('Filteränderungen werden nicht persistiert und gemeldet.');
+filterElements['flz-calendar-filters'].open = true;
+await filterElements['flz-calendar-filters'].fire('toggle');
+if (!filterElements['flz-calendar-person-search'].focused) throw new Error('Das geöffnete Filterpanel erhält keinen definierten Tastaturfokus.');
+await filterElements['flz-calendar-filters'].fire('keydown', { key: 'Escape' });
+if (filterElements['flz-calendar-filters'].open || !filterElements['flz-calendar-filter-heading'].focused) {
+    throw new Error('Escape schließt das Filterpanel nicht mit Fokus-Rückgabe an den Auslöser.');
+}
 
 // MeetingFinder: validation, search, permission note, week advance, deselection and blocking.
 const meetingIds = [

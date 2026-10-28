@@ -68,9 +68,9 @@ translation('flzcalendar');
         <button type="button" id="flz-calendar-tab-settings" role="tab" aria-controls="flz-calendar-settings-view" aria-selected="false"><?php p($l->t('Settings')); ?></button>
     </nav>
     <section id="flz-calendar-calendar-view" role="tabpanel" aria-labelledby="flz-calendar-tab-calendar">
-      <details class="flz-calendar-filters">
-        <summary id="flz-calendar-filter-heading"><?php p($l->t('Filter and compare people')); ?> <span id="flz-calendar-filter-status" class="flz-calendar-filter-status"><?php p($l->t('All people')); ?></span></summary>
-        <div class="flz-calendar-filter-grid" aria-labelledby="flz-calendar-filter-heading">
+      <details id="flz-calendar-filters" class="flz-calendar-filters">
+        <summary id="flz-calendar-filter-heading" aria-controls="flz-calendar-filter-panel"><?php p($l->t('Filter and compare people')); ?> <span id="flz-calendar-filter-status" class="flz-calendar-filter-status"><?php p($l->t('All people')); ?></span></summary>
+        <div id="flz-calendar-filter-panel" class="flz-calendar-filter-grid" role="group" aria-labelledby="flz-calendar-filter-heading">
             <fieldset><legend><?php p($l->t('Roles')); ?></legend><div id="flz-calendar-role-filters"></div></fieldset>
             <fieldset><legend><?php p($l->t('Areas')); ?></legend><div id="flz-calendar-area-filters"></div></fieldset>
             <div class="flz-calendar-person-filter">
@@ -88,6 +88,7 @@ translation('flzcalendar');
             </div>
             <div class="flz-calendar-filter-actions">
                 <button type="button" id="flz-calendar-save-default"><?php p($l->t('Make default')); ?></button>
+                <button type="button" id="flz-calendar-close-filters"><?php p($l->t('Close')); ?></button>
             </div>
         </div>
       </details>

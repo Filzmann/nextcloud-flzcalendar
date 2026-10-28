@@ -51,6 +51,10 @@
                 .map(([, role]) => role.groupId);
         }
 
+        roleIsAreaScoped(groupId) {
+            return Boolean(Object.values(this.roles).find(role => role.groupId === groupId)?.areaScoped);
+        }
+
         roleOrder(groupId) {
             const role = Object.values(this.roles).find(item => item.groupId === groupId);
             return role ? Number(role.sortOrder) : Number.MAX_SAFE_INTEGER;

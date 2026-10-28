@@ -28,10 +28,10 @@
 .flz-calendar-period-matrix { display: flex; min-width: 0; overflow: hidden; }
 .flz-calendar-mobile-calendar { display: none; }
 .flz-calendar-back-to-top { display: none; }
-.flz-calendar-filters { margin: 8px 0 10px; border: 1px solid var(--color-border); border-radius: var(--border-radius-large); background: var(--color-main-background); }
+.flz-calendar-filters { position: relative; z-index: 40; margin: 8px 0 10px; border: 1px solid var(--color-border); border-radius: var(--border-radius-large); background: var(--color-main-background); }
 .flz-calendar-filters > summary { min-height: 34px; box-sizing: border-box; padding: 6px 10px; cursor: pointer; font-weight: 700; }
 .flz-calendar-filter-status { margin-inline-start: 8px; color: var(--color-text-maxcontrast); font-size: var(--font-size-small); font-weight: 400; }
-.flz-calendar-filter-grid { display: grid; grid-template-columns: minmax(260px, 1.4fr) minmax(220px, 1fr); gap: 6px 10px; padding: 0 10px 8px; }
+.flz-calendar-filter-grid { position: absolute; z-index: 40; inset-block-start: calc(100% + 4px); inset-inline: 0; display: grid; grid-template-columns: minmax(260px, 1.4fr) minmax(220px, 1fr); gap: 6px 10px; max-height: min(32rem, calc(100dvh - var(--header-height, 50px) - 8rem)); overflow: auto; box-sizing: border-box; padding: 10px; border: 1px solid var(--color-border); border-radius: var(--border-radius-large); background: var(--color-main-background); box-shadow: 0 8px 24px rgba(0, 0, 0, .24); }
 .flz-calendar-filters fieldset { min-width: 0; margin: 0; padding: 3px 8px 5px; border: 1px solid var(--color-border); border-radius: var(--border-radius); }
 .flz-calendar-filters fieldset div { display: flex; flex-wrap: wrap; gap: 4px 12px; }
 .flz-calendar-filters fieldset label { white-space: nowrap; }
@@ -42,7 +42,7 @@
 .flz-calendar-selection-actions { display: flex; grid-column: 2; justify-self: start; align-items: center; gap: 4px; flex-wrap: wrap; }
 .flz-calendar-selection-actions button { display: inline-flex; align-items: center; gap: 6px; margin: 0 !important; white-space: nowrap; }
 .flz-calendar-button-icon { display: inline-block; flex: 0 0 16px; width: 16px; height: 16px; background-position: center; background-repeat: no-repeat; }
-.flz-calendar-filter-actions { grid-column: 1 / -1; display: flex; justify-content: flex-end; }
+.flz-calendar-filter-actions { grid-column: 1 / -1; display: flex; justify-content: flex-end; gap: 6px; }
 .flz-calendar-search-results, .flz-calendar-selected-people { display: flex; flex-wrap: wrap; gap: 4px; list-style: none; margin: 0; padding: 0; }
 .flz-calendar-notice--error { color: var(--color-error); font-weight: 600; }
 .flz-calendar-settings { margin-top: 18px; padding-top: 10px; border-top: 1px solid var(--color-border); }

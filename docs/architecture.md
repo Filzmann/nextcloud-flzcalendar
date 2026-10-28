@@ -65,10 +65,20 @@ noch Rechte.
 
 Filter nach Personen, Rollen und Bereichen verwenden den konfigurierten
 Organisationsvertrag. Rollen und Bereiche werden jeweils als ODER-Auswahl und
-miteinander als Schnittmenge ausgewertet. Die im Organisationsvertrag erste
-passende Rolle ist die vorrangige Kalenderrolle. Persönliche Filter-,
-Zeitraum- und Ausrichtungskonfigurationen werden nur durch „Zum Standard
-machen“ als Nextcloud-Benutzerwert gespeichert.
+bei einer bereichsgebundenen vorrangigen Rolle miteinander als Schnittmenge
+ausgewertet. Globale Rollen ohne natürliche Bereichszuordnung bleiben von
+einer Bereichsauswahl unberührt; auch eine versehentliche Bereichsmitgliedschaft
+macht sie nicht bereichsgebunden. Die im Organisationsvertrag erste passende
+Rolle ist die vorrangige Kalenderrolle. Der Leitungs-/Stabsblock lässt sich
+ohne weitere Rollen- oder Bereichsauswahl ein- und ausblenden. Persönliche
+Filter-, Zeitraum- und Ausrichtungskonfigurationen werden nur durch „Zum
+Standard machen“ als Nextcloud-Benutzerwert gespeichert.
+
+Der geöffnete Filterinhalt liegt als begrenztes, selbst scrollbar bleibendes
+Panel über der Kalenderübersicht und verändert deren verfügbaren Matrixraum
+nicht. Beim Öffnen erhält ein Bedienelement im Panel den Fokus; „Escape“ und die
+Schließen-Aktion schließen das Panel und geben den Fokus an den Auslöser
+zurück.
 
 Gruppenüberschriften und der mobile Organisationskontext verwenden die vom
 LocalBase-Organisationsvertrag gelieferten Kürzel. Bereichsrollen verbinden

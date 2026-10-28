@@ -14,7 +14,12 @@
     let loadSequence = 0;
     let organization = new OrganizationModel({});
     const elements = Object.fromEntries(['calendar-tables','filter-status'].map(id => [id, document.getElementById(`flz-calendar-${id}`)]));
-    const state = new window.FlzCalendar.modules.CalendarState(leadershipStaffRoles).restore();
+    const state = new window.FlzCalendar.modules.CalendarState(
+        leadershipStaffRoles,
+        window.location,
+        window.history,
+        role => organization.roleIsAreaScoped(role),
+    ).restore();
     const meetingCapabilities = new window.FlzCalendar.modules.MeetingCapabilities();
     const tabs = new window.FlzCalendar.components.TabNavigation({
         calendarButton: document.getElementById('flz-calendar-tab-calendar'),

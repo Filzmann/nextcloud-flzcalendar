@@ -19,8 +19,20 @@
             this.searchResults = document.getElementById('flz-calendar-search-results');
             this.selectedPeople = document.getElementById('flz-calendar-selected-people');
             this.reset = document.getElementById('flz-calendar-reset-selection');
+            this.container = document.getElementById('flz-calendar-filters');
+            this.summary = document.getElementById('flz-calendar-filter-heading');
+            this.close = document.getElementById('flz-calendar-close-filters');
             this.search.addEventListener('input', event => this.renderSearch(event.target.value));
             this.reset.addEventListener('click', () => this.resetSelection());
+            this.close.addEventListener('click', () => this.closePanel());
+            this.container.addEventListener('toggle', () => {
+                if (this.container.open) this.search.focus();
+            });
+            this.container.addEventListener('keydown', event => {
+                if (event.key !== 'Escape' || !this.container.open) return;
+                event.preventDefault();
+                this.closePanel();
+            });
         }
 
         render() {
@@ -45,7 +57,6 @@
             const unfiltered = this.state.isUnfiltered();
             input.type = 'checkbox';
             input.checked = unfiltered || this.state.showLeadershipStaff;
-            input.disabled = unfiltered;
             input.addEventListener('change', () => {
                 this.state.showLeadershipStaff = input.checked;
                 if (!input.checked) this.state.leadershipStaffOnly = false;
@@ -127,6 +138,11 @@
         clearSearch() {
             this.search.value = '';
             this.searchResults.replaceChildren();
+        }
+
+        closePanel() {
+            this.container.open = false;
+            this.summary.focus();
         }
 
         node(tag, value) {

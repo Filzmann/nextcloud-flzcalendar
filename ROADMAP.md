@@ -21,14 +21,9 @@ erledigte Änderungen in `CHANGELOG.md` und geltende Architektur in
 
 ### FLZC-STAGING-FOLLOWUP – Abweichungen der laufenden Abnahme schließen
 
-- Den geöffneten Filter als überlagerndes Panel ausführen, damit er die
-  Kalendermatrix auch bei kleinen Viewports nicht verdrängt; Fokus,
-  Escape-Verhalten und erreichbare Scrollleisten mitprüfen.
-- Den gemeinsamen Leitungs-/Stabs-Schalter ohne vorausgesetzte zusätzliche
-  Bereichsauswahl bedienbar machen.
-- Bereichsfilter für bereichsgebundene Rollen weiterhin als Schnittmenge
-  anwenden, globale Rollen ohne natürliche Bereichszuordnung jedoch nicht
-  allein wegen einer Bereichsauswahl ausblenden.
+- Die lokal automatisiert abgesicherte Nacharbeit für Filter-Overlay,
+  Fokus/Escape, Leitungs-/Stabsschalter und bereichsabhängige Filtersemantik
+  auf Staging über die Fälle A5, B7 und C1 erneut prüfen.
 - Neutrale Testkonten für jeden konfigurierten Bereich und die relevanten
   Hierarchiepfade bereitstellen, damit Rollen-, Bereichs- und Deny-Fälle
   vollständig abgenommen werden können.

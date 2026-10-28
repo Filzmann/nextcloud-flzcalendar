@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Den Personenfilter als überlagerndes, begrenzt scrollbar bleibendes Panel
+  mit definiertem Öffnungsfokus, Escape-Schließen und Fokus-Rückgabe
+  umgesetzt. Der Leitungs-/Stabsblock ist ohne Zusatzfilter schaltbar;
+  Bereichsauswahlen schneiden nur bereichsgebundene Rollen und blenden
+  globale Rollen nicht mehr aus.
 - Nextcloud 35.0.1 durch Fresh Install, Upgrade 34→35 sowie Provider-,
   Berechtigungs-, Runtime-, UI-/API- und Asset-Smokes nachgewiesen und den
   unterstützten Bereich auf die lückenlosen Hauptversionen 33 bis 35
