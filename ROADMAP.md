@@ -14,9 +14,9 @@ erledigte Änderungen in `CHANGELOG.md` und geltende Architektur in
 - Globale Rollen, Backend-Reihenfolge und Hierarchie sichtbar abnehmen.
 - Internen DAV-Abgleich, administrativen Zielkalendernamen,
   Bestandsumbenennung und datensparsame Jobstatusanzeige prüfen.
-- Die DPO-gesteuerte Adminfreigabe mit getrennten Konten für DPO, nativen
-  Admin ohne DPO-Rolle und gewöhnliche Nutzung in DDEV oder Staging prüfen;
-  Ablauf, Widerruf, Rollenverlust, CSRF und Tastaturbedienung einschließen.
+- Die ausdrücklich entschiedene native Kalender-Adminausnahme mit einem
+  neutralen Admin- und einem Nichtadmin-Konto in DDEV oder Staging prüfen;
+  direkte API-Aufrufe, Rollenverlust und ausbleibende Seiteneffekte einschließen.
 - Ergebnisse ausschließlich in `docs/manual-acceptance.md` dokumentieren.
 
 ### FLZC-STAGING-FOLLOWUP – Abweichungen der laufenden Abnahme schließen
@@ -27,9 +27,6 @@ erledigte Änderungen in `CHANGELOG.md` und geltende Architektur in
 - Neutrale Testkonten für jeden konfigurierten Bereich und die relevanten
   Hierarchiepfade bereitstellen, damit Rollen-, Bereichs- und Deny-Fälle
   vollständig abgenommen werden können.
-- Die systemweite UI-Nacharbeit der temporären Adminfreigabe folgt
-  `DP-11` im Parent-Zukunftsplan; die app-lokalen Rechte- und Auditgrenzen
-  bleiben unverändert.
 
 ### FLZC-L10N-ACCEPTANCE – deutsche und englische Oberfläche prüfen
 

@@ -17,8 +17,10 @@ festgestellter Kontolöschung. Abgeleitete Kalender führen keine unabhängige
 Historie und werden bei Quelländerung, Opt-out oder Trennung abgeglichen oder
 entfernt. Externe Kalenderanbieter bleiben in Produktion deaktiviert, bis der
 jeweilige Anbieter einzeln fachlich und datenschutzrechtlich freigegeben ist.
-Adminfreigabehistorien werden sechs Monate nach ihrem tatsächlichen Ende
-vollständig gelöscht und durch Restore nie reaktiviert.
+Historische Adminfreigaben aus dem abgelösten Freigabeverfahren werden sechs
+Monate nach ihrem tatsächlichen Ende vollständig gelöscht und durch Restore
+nie reaktiviert. Sie besitzen keinen schreibenden oder autorisierenden
+Laufzeitpfad mehr.
 
 Die Regeln sind Policy, kein Implementierungs- oder Rechtsnachweis. Löschung,
 Restore, Holds, Backups und Providerverträge müssen app-lokal getestet werden;
@@ -213,10 +215,12 @@ Providerfehler bleiben voneinander und von der führenden FLZ-Mutation isoliert.
 
 ## Organisation, Rechte und optionale Urlaube und Planungskonflikte
 
-Alle angemeldeten Nutzer*innen dürfen Kalenderdaten lesen und eigene Einträge
-bearbeiten. Fremdbearbeitung folgt ausschließlich der konfigurierten
-Organisationshierarchie und freigegebenen Peergrenzen; Nextcloud-Admins dürfen
-alle Einträge verwalten. Jeder API-Endpunkt erzwingt dies serverseitig über
+Personen mit einer Rolle im kanonischen Organigramm dürfen Kalenderdaten lesen,
+eigene Einträge bearbeiten und Meetinglücken suchen. Assistenzteam-Zugehörigkeit
+allein reicht nicht. Fremdbearbeitung folgt ausschließlich direkten Kanten der
+konfigurierten Organisationshierarchie und freigegebenen Peergrenzen;
+Nextcloud-Admins dürfen aufgrund der ausdrücklich dokumentierten
+Kalenderausnahme alle Einträge verwalten. Jeder API-Endpunkt erzwingt dies serverseitig über
 den zentralen `CalendarAccessService`. Listen werden bereits serverseitig auf
 den erlaubten Personenkreis begrenzt.
 
@@ -245,22 +249,22 @@ Leseantwort als `unavailable` ausgewiesen und verhindern neue Dienste, statt
 Konfliktfreiheit zu behaupten. Umgekehrt publiziert Filzmann Kalender seine Dienste
 datensparsam als `Dienst/Büro`; private Termintitel verlassen die App nicht.
 
-## Zeitlich begrenzter fachlicher Admin-Vollzugriff
+## Native Adminausnahme und historische Freigaben
 
-Native Nextcloud-Administration bleibt von fachlicher Kalenderberechtigung
-getrennt. Vollzugriff entsteht nur für ein aktuell natives Administrationskonto
-mit aktiver app-lokaler Freigabe und endet spätestens nach 24 Stunden. Nur
-Mitglieder der kanonischen Nextcloud-Gruppe `Datenschutzbeauftragte` dürfen
-Freigaben erteilen, widerrufen und deren Historie lesen; ein nativer Admin ohne
-diese Rolle und gewöhnliche Konten werden ohne Zustandsänderung abgewiesen.
+Filzmann Kalender ist die eng begrenzte, ausdrücklich entschiedene Ausnahme
+zum systemweiten temporären Adminvertrag: Ein bei jedem Zugriff aktuell
+bestätigtes natives Nextcloud-Administrationskonto darf alle Kalendereinträge
+verwalten und das ausschließlich synthetische Demo-Pack installieren. Die
+Ausnahme gilt weder für andere Apps noch für deren Daten, Freigaben oder
+Adminbereiche. Serverprüfungen bleiben zentral in `CalendarAccessService` und
+den technischen Admincontrollern; UI-Sichtbarkeit erteilt keine Rechte.
 
-Die Steuerung liegt im authentifizierten Filzmann-Kalender-Hauptbereich und bleibt
-außerhalb der technischen Nextcloud-Administration. Schreibende Requests
-verwenden den Nextcloud-CSRF-Schutz. Ein natives Administrationskonto ohne
-aktive Freigabe sieht eine sichere Hinweismeldung; der Direktlink zur
-Freigabesteuerung erscheint nur bei gleichzeitiger DPO-Rolle. Audit- und
-Art.-15-Projektionen geben ausschließlich die subjectgebundene Beteiligung und
-Zeitpunkte aus und neutralisieren Kennungen anderer beteiligter Personen.
+Die frühere app-lokale Freigabesteuerung ist entfernt. Es existieren keine
+Freigabe-, Widerrufs- oder Historienrouten und keine daraus abgeleitete
+Kalenderberechtigung mehr. Bereits vorhandene Historieneinträge werden nicht
+destruktiv gelöscht, nicht reaktiviert und ausschließlich subjectgebunden über
+den PersonalDataProvider ausgegeben; Kennungen anderer Beteiligter bleiben
+neutralisiert.
 
 ## Processing-Metadaten
 
@@ -268,7 +272,7 @@ Der zusätzliche `ProcessingMetadataProvider` veröffentlicht den app-eigenen
 Katalog `resources/privacy-processing.json` lazy über den öffentlichen
 Standalone-V1-Vertrag des Datenschutz-Centers. Er trennt führende
 Kalendereinträge, persönliche UserConfig-Werte, verschlüsselte externe
-Verbindungen, abgeleitete Zielkalender und temporäre Adminfreigaben. Der
+Verbindungen, abgeleitete Zielkalender und historische Adminfreigaben. Der
 Katalog enthält keine personenbezogenen Laufzeitdaten oder entschlüsselten
 Secrets und ersetzt fehlende fachliche Entscheidungen nicht durch technische
 Defaults.

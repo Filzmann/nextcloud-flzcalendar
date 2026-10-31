@@ -145,15 +145,15 @@ final class CalendarPersonalDataProvider implements PersonalDataProvider {
             if ($grant['revokedBy'] === $subjectUid) $roles[] = 'Widerrufendes Mitglied von Datenschutzbeauftragte';
             $actualEnd = $grant['revokedAt'] ?? $grant['endsAt'];
             $items[] = new PersonalDataEntry(
-                categoryId: 'admin-access', categoryLabel: 'Zeitlich begrenzter Admin-Vollzugriff', reference: 'admin-access:' . (string)$grant['id'],
+                categoryId: 'admin-access', categoryLabel: 'Historische Adminfreigabe', reference: 'admin-access:' . (string)$grant['id'],
                 summary: sprintf('%s bis %s', self::germanDateTime($grant['startsAt']->setTimezone($timezone)), self::germanDateTime($actualEnd->setTimezone($timezone))),
-                purpose: 'Nachweis einer zeitlich begrenzten administrativen Kalenderfreigabe', source: 'App-lokale Freigabesteuerung im Filzmann Kalender',
-                recipientCategories: ['Betroffene Person und ausdrücklich berechtigte Datenschutz-Prüfrolle'],
+                purpose: 'Subjectgebundener Nachweis einer früheren zeitlich begrenzten administrativen Kalenderfreigabe', source: 'Frühere app-lokale Freigabesteuerung im Filzmann Kalender',
+                recipientCategories: ['Betroffene Person in der eigenen Datenschutz-Auskunft'],
                 retention: 'Keine feste Löschfrist festgelegt; die sicherheitsrelevante Freigabehistorie bleibt bis zu einer gesonderten Aufbewahrungsentscheidung erhalten.',
                 thirdCountryTransfer: 'Durch Filzmann Kalender sind keine Drittlandübermittlungen für diese Freigabehistorie vorgesehen.',
-                automatedDecision: 'Der Server beendet den Vollzugriff spätestens nach 24 Stunden automatisch.',
+                automatedDecision: 'Die frühere Freigabe wird nicht mehr als Berechtigungsquelle ausgewertet und kann nicht reaktiviert werden.',
                 thirdPartyContentNotice: 'Kennungen anderer beteiligter Personen werden in dieser subjectgebundenen Auskunft nicht ausgegeben.',
-                attributes: ['Eigene Rolle im Vorgang' => implode(', ', $roles), 'Beginn' => self::germanDateTime($grant['startsAt']->setTimezone($timezone)), 'Geplantes Ende' => self::germanDateTime($grant['endsAt']->setTimezone($timezone)), 'Tatsächliches Ende' => self::germanDateTime($actualEnd->setTimezone($timezone)), 'Status' => $grant['revokedAt'] === null ? 'planmäßig beendet oder noch aktiv' : 'widerrufen'],
+                attributes: ['Eigene Rolle im Vorgang' => implode(', ', $roles), 'Beginn' => self::germanDateTime($grant['startsAt']->setTimezone($timezone)), 'Geplantes Ende' => self::germanDateTime($grant['endsAt']->setTimezone($timezone)), 'Tatsächliches Ende' => self::germanDateTime($actualEnd->setTimezone($timezone)), 'Status' => 'Historischer Nachweis; keine erneute Aktivierung'],
             );
         }
         return $items;

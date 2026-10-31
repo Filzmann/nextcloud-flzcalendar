@@ -1,7 +1,6 @@
 <?php
 translation('flzcalendar');
 \OCP\Util::addScript('localbase', 'api/api-client');
-\OCP\Util::addScript('flzcalendar', 'admin-access');
 \OCP\Util::addScript('localbase', 'models/model');
 \OCP\Util::addScript('localbase', 'repositories/repository');
 \OCP\Util::addScript('localbase', 'ui/ui');
@@ -33,35 +32,9 @@ translation('flzcalendar');
     <header class="flz-calendar-header">
         <div class="flz-calendar-title-row">
             <h1><?php p($l->t('Filzmann Calendar')); ?></h1>
-            <?php if ($_['showMissingAdminGrant'] ?? false): ?>
-                <details class="flz-calendar-admin-access-warning">
-                    <summary aria-label="<?php p($l->t('Informationen zum fehlenden fachlichen Admin-Vollzugriff')); ?>"><span aria-hidden="true">⚠</span></summary>
-                    <div class="flz-calendar-admin-access-warning__panel">
-                        <strong><?php p($l->t('Kein fachlicher Admin-Vollzugriff aktiv.')); ?></strong>
-                        <p><?php p($l->t('Native Nextcloud-Administration erteilt keinen fachlichen Vollzugriff. Mitglieder der Gruppe Datenschutzbeauftragte können eine app-lokale Freigabe von höchstens 24 Stunden erteilen.')); ?></p>
-                        <?php if ($_['showAdminAccessLink'] ?? false): ?><a href="#flz-calendar-full-access" target="_blank" rel="noopener noreferrer"><?php p($l->t('Freigabesteuerung in neuem Tab öffnen')); ?></a><?php endif; ?>
-                    </div>
-                </details>
-            <?php endif; ?>
             <p><?php p($l->t('Shifts, appointments and blocked times in a weekly or monthly overview')); ?></p>
         </div>
     </header>
-    <?php if ($_['canManageAdminAccess'] ?? false): ?>
-        <section id="flz-calendar-full-access" class="flz-calendar-admin-access" aria-labelledby="flz-calendar-full-access-heading">
-            <h2 id="flz-calendar-full-access-heading"><?php p($l->t('Zeitlich begrenzter Admin-Vollzugriff')); ?></h2>
-            <p><?php p($l->t('Nur Mitglieder der Nextcloud-Gruppe Datenschutzbeauftragte dürfen Freigaben für aktive native Administrationskonten verwalten. Maximal 24 Stunden sind zulässig.')); ?></p>
-            <form id="flz-calendar-full-access-form">
-                <label><?php p($l->t('Admin-Benutzerkennung')); ?> <input name="targetUid" required maxlength="64" autocomplete="off"></label>
-                <label><?php p($l->t('Dauer')); ?> <select name="durationMinutes" required><option value="60"><?php p($l->t('1 Stunde')); ?></option><option value="240"><?php p($l->t('4 Stunden')); ?></option><option value="480"><?php p($l->t('8 Stunden')); ?></option><option value="1440"><?php p($l->t('24 Stunden')); ?></option></select></label>
-                <label><input id="flz-calendar-full-access-enabled" name="enabled" type="checkbox" required> <?php p($l->t('Vollzugriff für diesen Zeitraum aktivieren')); ?></label>
-                <button type="submit" class="primary"><?php p($l->t('Freigabe aktivieren')); ?></button>
-            </form>
-            <p id="flz-calendar-full-access-status" role="status" aria-live="polite"></p>
-            <div class="flz-calendar-table-wrap">
-                <table><caption><?php p($l->t('Protokollierte Admin-Vollzugriffszeiträume')); ?></caption><thead><tr><th><?php p($l->t('Ziel-Admin')); ?></th><th><?php p($l->t('Freigegeben von')); ?></th><th><?php p($l->t('Von')); ?></th><th><?php p($l->t('Geplant bis')); ?></th><th><?php p($l->t('Tatsächlich bis / Status')); ?></th><th><?php p($l->t('Aktion')); ?></th></tr></thead><tbody id="flz-calendar-full-access-history"><tr><td colspan="6"><?php p($l->t('Freigaben werden geladen.')); ?></td></tr></tbody></table>
-            </div>
-        </section>
-    <?php endif; ?>
     <div id="flz-calendar-notice" role="status" aria-live="polite"></div>
     <nav class="flz-calendar-tabs" role="tablist" aria-label="<?php p($l->t('Filzmann Calendar sections')); ?>">
         <button type="button" id="flz-calendar-tab-calendar" role="tab" aria-controls="flz-calendar-calendar-view" aria-selected="true"><?php p($l->t('Calendar')); ?></button>

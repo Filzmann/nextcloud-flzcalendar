@@ -15,10 +15,6 @@ use OCA\FlzCalendar\Privacy\CalendarPrivacyProviderListener;
 use OCA\FlzCalendar\Permission\CalendarPermissionProviderListener;
 use OCA\FlzCalendar\Permission\CalendarPermissionSourceInterface;
 use OCA\FlzCalendar\Permission\NextcloudCalendarPermissionSource;
-use OCA\FlzCalendar\Repository\TemporaryAdminAccessRepository;
-use OCA\FlzCalendar\Repository\TemporaryAdminAccessRepositoryInterface;
-use OCA\FlzCalendar\Service\TemporaryAdminAccessChecker;
-use OCA\FlzCalendar\Service\TemporaryAdminAccessService;
 use OCA\FlzDataProtection\PublicApi\V1\RegisterPersonalDataProvidersEvent;
 use OCA\FlzDataProtection\PublicApi\V1\RegisterProcessingMetadataProvidersEvent;
 use OCA\FlzPermissionMatrix\PublicApi\V1\RegisterPermissionProvidersEvent;
@@ -46,8 +42,6 @@ class Application extends App implements IBootstrap {
         $context->registerEventListener(RegisterProcessingMetadataProvidersEvent::class, CalendarProcessingMetadataProviderListener::class);
         $context->registerEventListener(RegisterPermissionProvidersEvent::class, CalendarPermissionProviderListener::class);
         $context->registerServiceAlias(CalendarPermissionSourceInterface::class, NextcloudCalendarPermissionSource::class);
-        $context->registerServiceAlias(TemporaryAdminAccessChecker::class, TemporaryAdminAccessService::class);
-        $context->registerServiceAlias(TemporaryAdminAccessRepositoryInterface::class, TemporaryAdminAccessRepository::class);
         $context->registerEventListener(LoadAdditionalEntriesEvent::class, StandaloneNavigationListener::class);
     }
     public function boot(IBootContext $context): void {}

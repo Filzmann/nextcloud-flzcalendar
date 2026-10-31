@@ -14,7 +14,8 @@ use OCP\IUserSession;
 /**
  * Zweck: Erzwingt den gemeinsamen Rollen-/Bereichsvertrag serverseitig.
  * Zusammenspiel: Controller -> CalendarAccessService -> zentrale Organisationspolicy und dynamische Gruppenprofile.
- * Vertrag: Alle angemeldeten Nutzer*innen lesen; eigene Einträge und fachlich delegierte Ziele werden bearbeitet.
+ * Vertrag: Organigrammmitglieder lesen und bearbeiten eigene Einträge; direkte Vorgesetzte,
+ * freigeschaltete Peers und native Nextcloud-Admins bearbeiten fremde Einträge.
  */
 final class CalendarAccessService {
     public function __construct(
@@ -24,7 +25,6 @@ final class CalendarAccessService {
         private CalendarPermissionPolicy $policy,
         private CalendarSettingsService $settings,
         private CalendarGroupProfile $profiles,
-        private TemporaryAdminAccessChecker $temporaryAdminAccess,
         private ?FlzOrganizationSettingsService $organization = null,
     ) {}
 
@@ -34,7 +34,8 @@ final class CalendarAccessService {
 
     public function canView(): bool {
         $user = $this->currentUser();
-        return $user !== null;
+        if ($user === null) return false;
+        return $this->groups->isAdmin($user->getUID()) || $this->isOrganizationMember($this->groupIds($user));
     }
 
     public function canManage(string $employeeUid): bool {
@@ -44,11 +45,13 @@ final class CalendarAccessService {
         if ($target === null) return false;
 
         $actorGroups = $this->groupIds($user);
+        $isAdmin = $this->groups->isAdmin($user->getUID());
+        if (!$isAdmin && !$this->isOrganizationMember($actorGroups)) return false;
         $targetGroups = $this->groupIds($target);
 
         return $this->policy->canManage(
             $user->getUID(),
-            $this->groups->isAdmin($user->getUID()) && $this->temporaryAdminAccess->hasActiveGrant($user->getUID()),
+            $isAdmin,
             $actorGroups,
             $employeeUid,
             $targetGroups,
@@ -99,6 +102,10 @@ final class CalendarAccessService {
     /** @return list<string> */
     private function groupIds(IUser $user): array {
         return array_map('strval', $this->groups->getUserGroupIds($user));
+    }
+
+    private function isOrganizationMember(array $groupIds): bool {
+        return array_intersect($groupIds, $this->definition()->roleGroupIds()) !== [];
     }
 
     private function definition(): FlzOrganizationDefinition {

@@ -19,22 +19,34 @@ final class CalendarPermissionProvider implements PermissionProvider {
 
     public function collect(): PermissionProviderResult {
         $definition = $this->source->definition();
+        $organizationConditions = array_map(
+            static fn(string $groupId): PermissionCondition => PermissionCondition::group($groupId),
+            $definition->roleGroupIds(),
+        );
         $rules = [
-            $this->rule('Kalender', 'Alle Kalenderdaten', 'Lesen', 'calendar.read', 'Lesen', 'all-calendars', PermissionCondition::authenticated()),
-            $this->rule('Kalendereintrag', 'Eigene Einträge', 'Anlegen, ändern und löschen', 'calendar.entry.manage-own', 'Eigene Einträge verwalten', 'own-entry', PermissionCondition::self()),
-            $this->rule('Kalendereintrag', 'Alle Einträge', 'Native Nextcloud-Administration mit aktiver app-lokaler Freigabe (maximal 24 Stunden)', 'calendar.entry.manage-all', 'Alle Einträge verwalten', 'all-entries', PermissionCondition::all([PermissionCondition::nextcloudAdmin(), PermissionCondition::temporaryAppAdminGrant()])),
+            $this->rule('Kalendereintrag', 'Eigene Einträge', 'Selbstbezug innerhalb des Organigramms', 'calendar.entry.manage-own', 'Eigene Einträge verwalten', 'own-entry', PermissionCondition::all([PermissionCondition::self(), PermissionCondition::any($organizationConditions)])),
+            $this->rule('Kalendereintrag', 'Alle Einträge', 'Ausdrücklich entschiedene app-spezifische Ausnahme für native Nextcloud-Administration', 'calendar.entry.manage-all', 'Alle Einträge verwalten', 'all-entries', PermissionCondition::nextcloudAdmin()),
+            $this->rule('Kalenderintegration', 'Eigene externe Kalenderverbindungen', 'Nur das angemeldete Konto', 'calendar.connector.manage-own', 'Eigene Kalenderverbindungen verwalten', 'own-connectors', PermissionCondition::self()),
+            $this->rule('Kalenderintegration', 'OAuth, CalDAV und Systemvorgaben', 'Technische App-Konfiguration', 'calendar.integration.manage-system', 'Kalenderintegration administrieren', 'system-integration', PermissionCondition::nextcloudAdmin()),
+            $this->rule('Demodaten', 'Kalender-Demo-Pack', 'Nur synthetische Demodaten', 'calendar.demo.install', 'Kalender-Demodaten installieren', 'demo-data', PermissionCondition::nextcloudAdmin()),
         ];
+
+        foreach ($organizationConditions as $condition) {
+            $rules[] = $this->rule('Kalender', 'Alle Kalenderdaten', 'Mitgliedschaft in einer Organigrammrolle', 'calendar.read', 'Lesen', 'all-calendars', $condition);
+            $rules[] = $this->rule('Besprechungslücken', 'Gemeinsame freie Zeiten', 'Suche aus bereits sichtbaren Kalenderdaten', 'calendar.meeting.search', 'Besprechungslücken suchen', 'visible-calendars', $condition);
+        }
+        $rules[] = $this->rule('Kalender', 'Alle Kalenderdaten', 'Native Adminausnahme für fachliche Gesamtverwaltung', 'calendar.read', 'Lesen', 'all-calendars', PermissionCondition::nextcloudAdmin());
+        $rules[] = $this->rule('Besprechungslücken', 'Gemeinsame freie Zeiten', 'Native Adminausnahme für fachliche Gesamtverwaltung', 'calendar.meeting.search', 'Besprechungslücken suchen', 'visible-calendars', PermissionCondition::nextcloudAdmin());
 
         foreach ($definition->hierarchy() as $actorKey => $directTargets) {
             $actorGroup = $definition->roleGroupId((string)$actorKey);
             if ($actorGroup === null) continue;
-            foreach (array_keys($definition->roles()) as $targetKey) {
-                if (!$definition->managesRole((string)$actorKey, (string)$targetKey)) continue;
+            foreach ($directTargets as $targetKey) {
                 $area = $definition->roleManagementIsAreaScoped((string)$actorKey) ? '; gemeinsamer Bürobereich erforderlich' : '';
                 $rules[] = $this->rule(
                     'Kalendereintrag',
                     'Unterstellte Rolle ' . $definition->roleLabel((string)$targetKey),
-                    'Transitive Organisationshierarchie' . $area,
+                    'Direkte Organisationshierarchie' . $area,
                     'calendar.entry.manage-subordinate',
                     'Unterstellte Einträge verwalten',
                     'target-role:' . $targetKey,

@@ -42,17 +42,31 @@ namespace {
     $byPermission = [];
     foreach ($rules as $rule) $byPermission[$rule->permission][] = $rule;
 
-    if (($byPermission['calendar.read'][0]->condition->operator ?? null) !== 'authenticated') throw new RuntimeException('Lesen muss als Anmeldebedingung ausgewiesen werden.');
-    if (($byPermission['calendar.entry.manage-own'][0]->condition->operator ?? null) !== 'self') throw new RuntimeException('Eigene Bearbeitung darf kein Gruppenrecht werden.');
+    $readConditions = array_map(static fn($rule) => $rule->condition, $byPermission['calendar.read'] ?? []);
+    if (!in_array('nextcloud-admin', array_map(static fn($condition) => $condition->operator, $readConditions), true)
+        || !in_array('group', array_map(static fn($condition) => $condition->operator, $readConditions), true)) {
+        throw new RuntimeException('Lesen muss auf Organigrammrollen und die ausdrückliche native Adminausnahme begrenzt sein.');
+    }
+    $ownCondition = $byPermission['calendar.entry.manage-own'][0]->condition ?? null;
+    if (($ownCondition->operator ?? null) !== 'all'
+        || ($ownCondition->children[0]->operator ?? null) !== 'self'
+        || ($ownCondition->children[1]->operator ?? null) !== 'any') {
+        throw new RuntimeException('Eigene Bearbeitung muss Selbstbezug und Organigrammrolle gemeinsam verlangen.');
+    }
     $adminCondition = $byPermission['calendar.entry.manage-all'][0]->condition ?? null;
-    if (($adminCondition->operator ?? null) !== 'all'
-        || ($adminCondition->children[0]->operator ?? null) !== 'nextcloud-admin'
-        || ($adminCondition->children[1]->operator ?? null) !== 'app-admin-grant') {
-        throw new RuntimeException('Vollzugriff muss native Administration und aktive app-lokale Freigabe verlangen.');
+    if (($adminCondition->operator ?? null) !== 'nextcloud-admin') {
+        throw new RuntimeException('Die ausdrücklich entschiedene Kalenderausnahme muss native Administration ohne app-lokale Freigabe ausweisen.');
+    }
+    if (($byPermission['calendar.connector.manage-own'][0]->condition->operator ?? null) !== 'self') {
+        throw new RuntimeException('Persönliche Kalenderkonnektoren müssen als reiner Selbstbezug ausgewiesen werden.');
     }
     $peerGroups = array_map(static fn($rule) => $rule->condition->groupId, $byPermission['calendar.entry.manage-peer'] ?? []);
     if ($peerGroups !== ['flz-EB']) throw new RuntimeException('Nur tatsächlich konfigurierte Peer-Gruppen dürfen projiziert werden.');
-    if (($byPermission['calendar.entry.manage-subordinate'] ?? []) === []) throw new RuntimeException('Die kanonische Hierarchie muss als Detailrecht projiziert werden.');
+    $subordinateScopes = array_column($byPermission['calendar.entry.manage-subordinate'] ?? [], 'scope');
+    if (!in_array('target-role:pdl', $subordinateScopes, true) || in_array('target-role:pfk', array_slice($subordinateScopes, 0, 1), true)) {
+        throw new RuntimeException('Die Rechteprojektion muss direkte statt transitive Hierarchiekanten ausweisen.');
+    }
+    if (($byPermission['calendar.meeting.search'][0]->condition->operator ?? null) !== 'group') throw new RuntimeException('Die Lückensuche muss als Organigrammrecht projiziert werden.');
 
     $event = new RegisterPermissionProvidersEvent();
     $listener = new CalendarPermissionProviderListener($provider);

@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+- Kalenderrechte von Organisationsgruppen getrennt: Lesen, Eigenbearbeitung
+  und Meetinglückensuche auf Organigrammrollen begrenzt, Fremdbearbeitung auf
+  direkte Hierarchiekanten und konfigurierte Peer-Berechtigungen reduziert.
+- Die ausdrücklich entschiedene native Kalender-Adminausnahme serverseitig
+  umgesetzt und die frühere temporäre Freigabe-UI, API und schreibende
+  Laufzeitverwendung entfernt; vorhandene Historie bleibt read-only in der
+  subjectgebundenen Datenschutzprojektion.
+- Technische OAuth-/CalDAV-/Kalenderdefault-Rechte und persönliche
+  Konnektoren im PermissionProvider getrennt ausgewiesen.
+
 - Den Personenfilter als überlagerndes, begrenzt scrollbar bleibendes Panel
   mit definiertem Öffnungsfokus, Escape-Schließen und Fokus-Rückgabe
   umgesetzt. Der Leitungs-/Stabsblock ist ohne Zusatzfilter schaltbar;

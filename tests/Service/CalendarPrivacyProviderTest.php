@@ -138,9 +138,10 @@ namespace {
     $syncPreference = array_values(array_filter($items, static fn(array $item): bool => $item['categoryId'] === 'calendar_sync_preference'))[0] ?? null;
     $externalConnections = array_values(array_filter($items, static fn(array $item): bool => $item['categoryId'] === 'external_calendar_connections'))[0] ?? null;
     $adminGrant = array_values(array_filter($items, static fn(array $item): bool => $item['categoryId'] === 'admin-access'))[0] ?? null;
-    if ($adminGrant === null || str_contains(json_encode($adminGrant), 'other-admin')) throw new RuntimeException('App-lokale Adminfreigabe fehlt oder legt fremde Admin-IDs offen.');
+    if ($adminGrant === null || str_contains(json_encode($adminGrant), 'other-admin')) throw new RuntimeException('Historische Adminfreigabe fehlt oder legt fremde Admin-IDs offen.');
     $adminGrantJson=json_encode($adminGrant,JSON_THROW_ON_ERROR|JSON_UNESCAPED_UNICODE);
-    foreach(['Freigebendes Mitglied von Datenschutzbeauftragte','App-lokale Freigabesteuerung im Filzmann Kalender','Datenschutz-Prüfrolle'] as $expected)if(!str_contains($adminGrantJson,$expected))throw new RuntimeException("Adminfreigabe projiziert Rolle oder Quelle nicht korrekt: {$expected}");
+    foreach(['Freigebendes Mitglied von Datenschutzbeauftragte','Frühere app-lokale Freigabesteuerung im Filzmann Kalender','Historischer Nachweis; keine erneute Aktivierung'] as $expected)if(!str_contains($adminGrantJson,$expected))throw new RuntimeException("Historische Adminfreigabe projiziert Rolle oder Quelle nicht korrekt: {$expected}");
+    if(str_contains($adminGrantJson,'Datenschutz-Prüfrolle'))throw new RuntimeException('Die entfernte administrative Historienansicht wird noch als Empfänger behauptet.');
     if ($appointment === null || $shift === null) throw new RuntimeException('Termin und Dienst sind nicht getrennt ausgewiesen.');
     if (array_key_exists('Art', $appointment['attributes']) || array_key_exists('Art', $shift['attributes'])) throw new RuntimeException('Der bereits als Tabellenabschnitt ausgewiesene Datentyp wird redundant als Art-Spalte ausgegeben.');
     foreach (['Termin', 'Gemeinsamer Termin', '12.08.26, 10:00 bis 11:00 Uhr', 'Termin- und Verfügbarkeitsplanung', 'Keine feste Löschfrist'] as $expected) {

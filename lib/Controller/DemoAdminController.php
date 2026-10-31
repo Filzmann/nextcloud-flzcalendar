@@ -7,7 +7,6 @@ namespace OCA\FlzCalendar\Controller;
 use OCA\FlzCalendar\AppInfo\Application;
 use OCA\FlzCalendar\Http\LocalizedErrorResponseFactory;
 use OCA\FlzCalendar\Service\CalendarDemoPackService;
-use OCA\FlzCalendar\Service\TemporaryAdminAccessChecker;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\JSONResponse;
@@ -18,7 +17,7 @@ use Psr\Log\LoggerInterface;
 
 /**
  * Zweck: Installiert das Kalender-Demo-Pack ausschließlich nach einer bestätigten Adminaktion.
- * Vertrag: Nextcloud-Admin- und CSRF-Schutz bleiben aktiv; zusätzlich wird die aktive Sitzung serverseitig geprüft.
+ * Vertrag: Nextcloud-Admin- und CSRF-Schutz bleiben aktiv; die aktive Sitzung wird serverseitig geprüft.
  */
 final class DemoAdminController extends Controller {
     public function __construct(
@@ -28,7 +27,6 @@ final class DemoAdminController extends Controller {
         private CalendarDemoPackService $demoPack,
         private LoggerInterface $logger,
         private LocalizedErrorResponseFactory $errors,
-        private TemporaryAdminAccessChecker $temporaryAdminAccess,
     ) {
         parent::__construct(Application::APP_ID, $request);
     }
@@ -45,8 +43,6 @@ final class DemoAdminController extends Controller {
 
     private function isAdmin(): bool {
         $user = $this->session->getUser();
-        return $user !== null
-            && $this->groups->isAdmin($user->getUID())
-            && $this->temporaryAdminAccess->hasActiveGrant($user->getUID());
+        return $user !== null && $this->groups->isAdmin($user->getUID());
     }
 }

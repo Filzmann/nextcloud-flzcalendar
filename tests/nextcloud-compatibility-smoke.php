@@ -2,13 +2,11 @@
 
 declare(strict_types=1);
 
-use OCA\FlzCalendar\Service\CalendarAccessService;
 use OCA\FlzCalendar\CalendarSync\PersonalCalendarPublisher;
 use OCA\FlzCalendar\Repository\CalendarEntryRepository;
 use OCA\FlzCalendar\Model\CalendarEntry;
 use OCA\FlzCalendar\Service\CalendarService;
 use OCA\FlzCalendar\Service\ShiftCalendarReconciliationService;
-use OCA\FlzCalendar\Service\TemporaryAdminAccessService;
 use OCA\DAV\CalDAV\CalDavBackend;
 
 $objectStorageCalendarTitle = 'FR-08 horizontaler Dienstabgleich';
@@ -28,10 +26,9 @@ return [
     'uiPath' => '/index.php/apps/flzcalendar/',
     'preGrantUiStatuses' => [200],
     'postGrantUiStatuses' => [200],
-    'grantService' => TemporaryAdminAccessService::class,
-    'grantManagerGroups' => ['Datenschutzbeauftragte'],
-    'permissionProbe' => static fn(string $uid): bool => OCP\Server::get(CalendarAccessService::class)
-        ->canManage('compat-target'),
+    'grantService' => null,
+    'grantManagerGroups' => [],
+    'permissionProbe' => null,
     'apiSmokes' => [
         ['/index.php/apps/flzcalendar/api/week?start=2035-01-01', [200]],
     ],

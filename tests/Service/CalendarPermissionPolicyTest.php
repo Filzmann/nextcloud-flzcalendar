@@ -30,8 +30,9 @@ $assert(false, $policy->canManage('pfk', false, ['flz-PFK'], 'bo', ['flz-Buero']
 $assert(false, $policy->canManage('eb', false, ['flz-EB', 'flz-Bereich-Sued'], 'stv', ['flz-EB', 'flz-StvBL', 'flz-Bereich-Sued'], ['flz-EB']), 'EB darf StvBL trotz gemeinsamer EB-Rolle nicht bearbeiten.');
 $assert(false, $policy->canManage('pfk', false, ['flz-PFK'], 'pdl', ['flz-PDL']), 'PFK darf PDL nicht bearbeiten.');
 $assert(false, $policy->canManage('hr', false, ['flz-Stab-HR'], 'gf', ['flz-GF-AS']), 'HR darf GF-AS nicht bearbeiten.');
-$assert(true, $policy->canManage('gf', false, ['flz-GF-AS'], 'pfk', ['flz-PFK']), 'GF-AS muss indirekt PFK bearbeiten duerfen.');
-$assert(true, $policy->canManage('gf', false, ['flz-GF-Digi'], 'it', ['flz-IT']), 'GF-Digi muss indirekt IT bearbeiten duerfen.');
+$assert(false, $policy->canManage('gf', false, ['flz-GF-AS'], 'pfk', ['flz-PFK']), 'Nur indirekt unterstellte Rollen dürfen nicht bearbeitet werden.');
+$assert(true, $policy->canManage('gf', false, ['flz-GF-AS'], 'pdl', ['flz-PDL']), 'Direkt unterstellte Rollen müssen bearbeitbar sein.');
+$assert(false, $policy->canManage('gf', false, ['flz-GF-Digi'], 'it', ['flz-IT']), 'GF-Digi darf die nur indirekt unterstellte IT nicht bearbeiten.');
 $assert(false, $policy->canManage('gf-as', false, ['flz-GF-AS'], 'it', ['flz-IT']), 'GF-AS darf IT nicht ohne Zuordnung bearbeiten.');
 $assert(true, $policy->canManage('asdgf', false, ['flz-AsdGF-Digi'], 'it', ['flz-IT']), 'Assistenz GF-Digi muss IT bearbeiten duerfen.');
 $assert(true, $policy->canManage('finlead', false, ['flz-Leitung-Finanzen-Lohn'], 'fin', ['flz-Finanzen-Lohn']), 'Leitung Finanzen und Lohn muss den Bereich bearbeiten duerfen.');

@@ -66,8 +66,7 @@ Die folgenden Gruppen-IDs beschreiben ausschließlich die initiale Standardkonfi
 - Kombinierte Gruppen sind abgeleitete Schnittmengen, zum Beispiel Mitgliedschaft in `flz-EB` und `flz-Bereich-Nordost`; es werden keine Kombinationsgruppen dupliziert.
 - `flz-EB` und `flz-PFK` sind Zielrollen im Kalender; die EB-Rolle allein verleiht keine globale Fremdbearbeitung.
 - `flz-EB` und `flz-Bereich-*` sind derselbe kanonische Rollen-/Bereichsvertrag wie im FlzPlaner; kombinierte Altgruppen wie `flz-EB-*` werden nicht als Rollenquelle verwendet.
-- Alle angemeldeten Nutzer*innen duerfen alle Kalenderdaten lesen; alle duerfen eigene Eintraege bearbeiten.
-- Alle angemeldeten Nutzer*innen duerfen aus den ohnehin sichtbaren Kalenderdaten gemeinsame Meetingluecken berechnen.
+- Alle Personen mit einer Rolle im kanonischen Organigramm dürfen alle Kalenderdaten lesen, eigene Einträge bearbeiten und aus den ohnehin sichtbaren Kalenderdaten gemeinsame Meetinglücken berechnen. Assistenzteam-Mitgliedschaften allein eröffnen den Kalender nicht.
 - Das gemeinsame Blockieren nutzt ausschließlich bestehende Bearbeitungsrechte für jede einzelne ausgewählte Person; fehlt eines davon, wird kein Teil des Meetings gespeichert.
 - `flz-PDL` führt `flz-StvPDL`, `flz-Bueroorganisation-Pflege` und `flz-PFK`. `flz-StvPDL` führt Büroorganisation Pflege sowie Pflegefachkräfte und steht im Pflegebereich des Kalenders an erster Stelle.
 - Bueroleitungen werden wie BO dynamisch aus `flz-BL` plus `flz-Bereich-*` gebildet. BL NOW ist Mitglied in `flz-BL`, `flz-Bereich-Nordost` und `flz-Bereich-West` und wird dadurch in BL-NO sowie BL-W gefunden.
@@ -76,20 +75,20 @@ Die folgenden Gruppen-IDs beschreiben ausschließlich die initiale Standardkonfi
 - Fahrzeugverwaltung folgt initial auf IT und ist GF-Digi unterstellt. Empfang folgt auf das Sekretariat und ist diesem direkt unterstellt. Beide Teams bleiben außerhalb des gemeinsamen Leitungs-/Stabsblocks.
 - Die Zahl der Bueroleitungen und Stellvertretungen wird nicht festgeschrieben. Eine bereichsuebergreifende BL erscheint als eine Person mit allen zugeordneten Bereichen und wird durch jeden passenden Bereichsfilter gefunden; sie wird nicht als doppelte Kalenderzeile dargestellt.
 - `flz-Stab-HR` und `flz-Stab-QMB` sind sichtbare Stabsstellen; gegenseitige Bearbeitung innerhalb der jeweiligen Gruppe wird ueber den Peer-Schalter gesteuert.
-- Peer-Bearbeitung kann im Nextcloud-Adminbereich der OrgSuite getrennt fuer die peer-fähigen Fachrollen aktiviert werden. Sie ist standardmaessig aus. Bei BO und EB gilt sie nur innerhalb mindestens eines gemeinsamen Buerobereichs; PFK und Stabsstellen bleiben mangels Buerobereich innerhalb ihrer Fachgruppe berechtigt.
+- Peer-Bearbeitung wird im Nextcloud-Adminbereich der OrgSuite getrennt für die peer-fähigen Fachrollen konfiguriert. BO, EB und PFK sind standardmäßig aktiviert; HR, QMB und alle weiteren peer-fähigen Rollen standardmäßig deaktiviert. Bei BO und EB gilt sie nur innerhalb mindestens eines gemeinsamen Bürobereichs; PFK und Stabsstellen bleiben mangels Bürobereich innerhalb ihrer Fachgruppe berechtigt.
 - Assistent*innen erscheinen nicht in dieser App; ihre Planung bleibt im FlzPlaner.
 - Nextcloud-Admins duerfen alle Eintraege verwalten.
 
 Hierarchie fuer Fremdbearbeitung:
 
-- `flz-GF-AS` fuehrt PDL, beide Bueroleitungen, deren Stellvertretungen, PFK, BO, EB, HR, QMB und das Sekretariat direkt oder indirekt.
-- `flz-GF-Digi` führt `flz-AsdGF-Digi`, `flz-Leitung-Finanzen-Lohn`, `flz-Finanzen-Lohn`, IT, Fahrzeugverwaltung, das Sekretariat und darüber den Empfang direkt oder indirekt.
+- `flz-GF-AS` führt PDL, Büroleitungen, HR, QMB und das Sekretariat direkt. Die daraus folgenden indirekten Hierarchiebeziehungen erteilen im Kalender kein Bearbeitungsrecht.
+- `flz-GF-Digi` führt `flz-AsdGF-Digi`, `flz-Leitung-Finanzen-Lohn`, Fahrzeugverwaltung und das Sekretariat direkt. IT, Finanzen, Lohn und Empfang sind nur indirekt zugeordnet und werden dadurch nicht bearbeitbar.
 - `flz-AsdGF-Digi` fuehrt `flz-IT`; `flz-Leitung-Finanzen-Lohn` fuehrt `flz-Finanzen-Lohn`.
 - `flz-PDL` führt die stellvertretende PDL, Büroorganisation Pflege und PFK; die stellvertretende PDL führt Büroorganisation Pflege und PFK.
 - Bueroleitungen und ihre bereichsbezogenen Stellvertretungen fuehren ausschliesslich BO und EB im passenden Buerobereich, nicht PFK.
 - `flz-Sekretariat` ist beiden Geschaeftsfuehrungen direkt zugeordnet.
 - Leitungsrollen schuetzen immer vor Peer-Bearbeitung durch unterstellte Hauptberufsgruppen. Eine StvBL kann zum Beispiel zugleich EB sein, darf aber niemals durch normale EBs bearbeitet werden.
-- Vorgesetzte duerfen Kalenderdaten aller direkt und indirekt unterstellten Personen bearbeiten; Untergebene duerfen keine uebergeordneten Rollen bearbeiten.
+- Vorgesetzte dürfen Kalenderdaten ausschließlich direkt unterstellter Personen bearbeiten; Untergebene und nur indirekt Vorgesetzte erhalten daraus kein Bearbeitungsrecht.
 
 Offene Fachentscheidungen:
 - Dienste derselben Person duerfen sich nicht ueberschneiden; dadurch bleibt die Terminzuordnung eindeutig.
@@ -208,10 +207,10 @@ Geplante Checks:
 - Das Template stellt den optionalen Menühost mit `data-suite="flz"` und `data-current-app="flzcalendar"` bereit, lädt aber keine OrgSuite-Assets direkt.
 - Ohne Filzmann Urlaubsplanung bleiben Sperrtermine der manuelle Abwesenheitsweg; fehlende optionale Provider dürfen die Wochenansicht nicht verhindern.
 - Fachliche Lese- und Bearbeitungsrechte bleiben ausschliesslich serverseitig im Filzmann Kalender; Menuesichtbarkeit ist keine Berechtigung.
-- Native Nextcloud-Administration erteilt keinen fachlichen Kalender-Vollzugriff. Er setzt pro Administrationskonto eine aktive, app-lokale Freigabe von höchstens 24 Stunden voraus; Beginn, geplantes Ende und Widerruf bleiben historisch protokolliert. Ausschließlich Mitglieder der Nextcloud-Gruppe `Datenschutzbeauftragte` verwalten Freigaben und Historie im Filzmann-Kalender-Hauptbereich; native Administration allein genügt weder für die Steuerung noch für den fachlichen Zugriff.
-- Ein natives Administrationskonto ohne aktive Freigabe erhält im Hauptbereich eine sichere Hinweismeldung. Der Direktlink zur Freigabesteuerung erscheint nur, wenn dasselbe Konto zugleich Mitglied von `Datenschutzbeauftragte` ist.
-- Technische Appkonfiguration wie OAuth und CalDAV bleibt native Administration. Das Installieren fachlicher Demodaten benötigt dagegen die aktive app-lokale Vollzugriffsfreigabe.
-- Änderungen an Freigabehistorie oder Kalenderrechten werden gleichzeitig im PersonalDataProvider und PermissionProvider nachgeführt.
+- Filzmann Kalender ist die ausdrücklich dokumentierte Ausnahme zu ADR 0004: Ein aktuell bestätigtes natives Nextcloud-Administrationskonto darf alle Kalendereinträge verwalten und synthetische Demodaten installieren, ohne app-lokale temporäre Freigabe. Diese Ausnahme gilt ausschließlich in dieser App und erweitert keine Rechte in anderen Fachapps.
+- Die frühere Freigabesteuerung besitzt keine Route, UI oder schreibende Laufzeitverwendung mehr. Bereits vorhandene Historieneinträge bleiben unverändert und ausschließlich subjectgebunden read-only im PersonalDataProvider sichtbar; sie erteilen und reaktivieren keine Rechte.
+- Technische Appkonfiguration wie OAuth, CalDAV und Kalenderdefaults bleibt native Administration. Persönliche Konnektoren können ausschließlich für das eigene angemeldete Konto verwaltet werden.
+- Änderungen an Kalenderrechten und historischen Freigabedaten werden gleichzeitig im PersonalDataProvider, Processing-Katalog und PermissionProvider nachgeführt.
 
 ## Dokumentenverantwortung
 

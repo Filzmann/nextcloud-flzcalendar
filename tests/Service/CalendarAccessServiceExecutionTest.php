@@ -16,23 +16,19 @@ namespace OCP {
 namespace OCA\LocalBase\Organization {
     final class FlzOrganizationDefinition {
         public static function defaults(): self { return new self(); }
-        public function roleGroupIds(callable $filter): array {
+        public function roleGroupIds(?callable $filter = null): array {
             $roles = [
                 'role-a' => ['calendarVisible' => true],
                 'role-hidden' => ['calendarVisible' => false],
                 'missing' => ['calendarVisible' => true],
             ];
-            return array_keys(array_filter($roles, $filter));
+            return array_keys($filter === null ? $roles : array_filter($roles, $filter));
         }
     }
     final class FlzOrganizationSettingsService { public function definition(): FlzOrganizationDefinition { return FlzOrganizationDefinition::defaults(); } }
 }
 
 namespace OCA\FlzCalendar\Service {
-    final class TemporaryAdminAccessChecker {
-        public bool $active = false;
-        public function hasActiveGrant(string $uid): bool { return $this->active; }
-    }
     final class CalendarPermissionPolicy {
         public array $calls = [];
         public bool $allowed = true;
@@ -56,7 +52,6 @@ namespace {
     use OCA\FlzCalendar\Service\CalendarGroupProfile;
     use OCA\FlzCalendar\Service\CalendarPermissionPolicy;
     use OCA\FlzCalendar\Service\CalendarSettingsService;
-    use OCA\FlzCalendar\Service\TemporaryAdminAccessChecker;
     use OCA\LocalBase\Organization\FlzOrganizationSettingsService;
     use OCP\IGroupManager;
     use OCP\IUser;
@@ -71,6 +66,7 @@ namespace {
     $actor = $user('actor', 'Planner');
     $alpha = $user('alpha', 'Alpha');
     $zeta = $user('zeta', 'Zeta');
+    $outsider = $user('outsider', 'Outsider');
     $session = new class implements IUserSession {
         public ?IUser $user = null;
         public function getUser(): ?IUser { return $this->user; }
@@ -79,11 +75,12 @@ namespace {
         public array $users = [];
         public function get(string $uid): ?IUser { return $this->users[$uid] ?? null; }
     };
-    $users->users = ['actor' => $actor, 'alpha' => $alpha, 'zeta' => $zeta];
+    $users->users = ['actor' => $actor, 'alpha' => $alpha, 'zeta' => $zeta, 'outsider' => $outsider];
     $groups = new class implements IGroupManager {
         public array $members = [];
         public array $groupIds = [];
-        public function isAdmin(string $uid): bool { return $uid === 'actor'; }
+        public array $admins = [];
+        public function isAdmin(string $uid): bool { return in_array($uid, $this->admins, true); }
         public function getUserGroupIds(IUser $user): array { return $this->groupIds[$user->getUID()] ?? []; }
         public function get(string $gid): ?object {
             if (!array_key_exists($gid, $this->members)) return null;
@@ -92,12 +89,11 @@ namespace {
     };
     $groups->members = ['role-a' => [$zeta, $alpha, $alpha]];
     $groups->groupIds = [
-        'actor' => ['role-planner', 'area-a'],
+        'actor' => ['role-a', 'area-a'],
         'alpha' => ['role-a', 'area-a'],
         'zeta' => ['role-a', 'area-b'],
     ];
     $policy = new CalendarPermissionPolicy();
-    $adminAccess = new TemporaryAdminAccessChecker();
     $access = new CalendarAccessService(
         $groups,
         $session,
@@ -105,7 +101,6 @@ namespace {
         $policy,
         new CalendarSettingsService(),
         new CalendarGroupProfile(),
-        $adminAccess,
         new FlzOrganizationSettingsService(),
     );
 
@@ -116,18 +111,26 @@ namespace {
     }
 
     $session->user = $actor;
-    if (!$access->canView() || $access->canManage('unknown')) throw new RuntimeException('Angemeldete Sicht oder unbekanntes Ziel wird falsch bewertet.');
+    if (!$access->canView() || $access->canManage('unknown')) throw new RuntimeException('Organigramm-Sicht oder unbekanntes Ziel wird falsch bewertet.');
     if (!$access->canManage('alpha')) throw new RuntimeException('Policy-Ergebnis wird nicht für bekannte Zielkonten verwendet.');
     $policyCall = $policy->calls[0];
-    if ($policyCall[0] !== 'actor' || $policyCall[1] !== false || $policyCall[2] !== ['role-planner', 'area-a']
+    if ($policyCall[0] !== 'actor' || $policyCall[1] !== false || $policyCall[2] !== ['role-a', 'area-a']
         || $policyCall[3] !== 'alpha' || $policyCall[4] !== ['role-a', 'area-a'] || $policyCall[5] !== ['peer-a']) {
-        throw new RuntimeException('Native Administration darf ohne app-lokale Freigabe nicht als Fachadministration gelten.');
+        throw new RuntimeException('Organigrammrollen dürfen nicht versehentlich als native Adminausnahme gelten.');
     }
-    $adminAccess->active = true;
+    $groups->groupIds['actor'] = [];
+    if ($access->canView() || $access->canManage('actor')) throw new RuntimeException('Organisationsfremde Konten dürfen weder lesen noch eigene Einträge verwalten.');
+    $groups->admins = ['actor'];
+    if (!$access->canView()) throw new RuntimeException('Die ausdrücklich freigegebene native Adminausnahme muss die Kalenderverwaltung erreichbar machen.');
     $access->canManage('alpha');
-    if (($policy->calls[1][1] ?? null) !== true) throw new RuntimeException('Aktive app-lokale Freigabe muss die fachliche Adminbedingung erfüllen.');
+    if (($policy->calls[1][1] ?? null) !== true) throw new RuntimeException('Native Administration muss ohne app-lokale Freigabe die ausdrückliche Kalenderausnahme erfüllen.');
+    $groups->admins = [];
+    if ($access->canView() || $access->canManage('alpha')) {
+        throw new RuntimeException('Der Verlust des nativen Adminstatus muss die Kalenderausnahme beim nächsten Zugriff sofort entziehen.');
+    }
+    $groups->groupIds['actor'] = ['role-a', 'area-a'];
     $profile = $access->currentProfile();
-    if ($profile['roles'] !== ['role-planner'] || $profile['areas'] !== ['area-a']) throw new RuntimeException('Aktuelles Fachprofil wird nicht aus nativen Gruppen abgeleitet.');
+    if ($profile['roles'] !== ['role-a'] || $profile['areas'] !== ['area-a']) throw new RuntimeException('Aktuelles Fachprofil wird nicht aus nativen Gruppen abgeleitet.');
     $visible = $access->visibleEmployees();
     if (array_column($visible, 'uid') !== ['alpha', 'zeta'] || $visible[0]['roles'] !== ['role-a']
         || $visible[1]['areas'] !== ['area-b'] || $visible[0]['canManage'] !== true) {

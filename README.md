@@ -67,15 +67,17 @@ keine Daten in Files oder Team Folders.
 
 Der app-eigene Processing-Katalog beschreibt Kalenderplanung, persönliche
 Standards, externe Verbindungen, abgeleitete Kalenderveröffentlichungen und
-temporäre Adminfreigaben über den öffentlichen V1-Vertrag des
+historische, nicht mehr als Berechtigungsquelle verwendete Adminfreigaben über den öffentlichen V1-Vertrag des
 Datenschutz-Centers. Er enthält ausschließlich Policy-Metadaten und keine
 entschlüsselten Zugangsdaten oder personenbezogenen Laufzeitdatensätze.
 Offene Rechtsgrundlagen, Retention-, Backup-, Restore- und
 Drittlandentscheidungen bleiben als `PRIVACY-DECISION-REQUIRED` sichtbar.
 
-## Zeitlich begrenzter Admin-Vollzugriff
+## Rechte und Administration
 
-Ein Nextcloud-Administrationskonto erhält nicht automatisch Zugriff auf alle Mitarbeiterkalender. Ausschließlich Mitglieder der Nextcloud-Gruppe `Datenschutzbeauftragte` verwalten die app-lokale Freigabe im Hauptbereich von Filzmann Kalender für ein aktives Administrationskonto; der Datenschutzrolle muss selbst kein nativer Adminstatus zugewiesen sein. Die Freigabe gilt für 1, 4, 8 oder höchstens 24 Stunden und kann vorzeitig widerrufen werden. Native Administration allein genügt weder für die Freigabesteuerung noch für den fachlichen Zugriff. Beginn, geplantes Ende, Freigabe und Widerruf werden app-lokal protokolliert und in Datenschutz- sowie Berechtigungsprovider einbezogen. Technische OAuth-, CalDAV- und Kalenderdefault-Konfiguration bleibt davon getrennt.
+Kalenderansicht, eigene Einträge und Meetinglückensuche stehen Personen mit einer Rolle im kanonischen Organigramm offen. Fremde Kalender dürfen direkte Vorgesetzte sowie für ihre Fachrolle freigeschaltete Kolleg*innen bearbeiten; bei BO und EB bleibt ein gemeinsamer Bürobereich erforderlich. Gemeinsame Meetings leiten ihre Rechte vollständig aus den Rechten an allen beteiligten Kalendern ab.
+
+Als ausdrücklich dokumentierte App-Ausnahme dürfen aktuell bestätigte native Nextcloud-Admins alle Kalendereinträge verwalten und das synthetische Demo-Pack installieren. Eine temporäre app-lokale Freigabe ist dafür nicht mehr erforderlich und kann nicht mehr erteilt werden. Frühere Freigaben bleiben ausschließlich als subjectgebundene read-only Datenschutzprojektion erhalten. Technische OAuth-, CalDAV- und Kalenderdefault-Konfiguration bleibt im Nextcloud-Adminbereich; persönliche Konnektoren verwaltet jedes angemeldete Konto ausschließlich für sich selbst.
 
 ## Roadmap
 
