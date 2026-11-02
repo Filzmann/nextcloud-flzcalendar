@@ -90,7 +90,7 @@ namespace {
     $userConfig = new class implements IUserConfig {
         public array $values = [
             'self' => ['flzcalendar' => [
-                'filter_default' => '{"people":["other-person"],"roles":["flz-Buero"],"areas":["flz-Bereich-Sued"],"vertical":false,"period":"month","showLeadershipStaff":true,"leadershipStaffOnly":false}',
+                'filter_default' => '{"people":["other-person"],"roles":["Buero"],"areas":["Bereich-Sued"],"vertical":false,"period":"month","showLeadershipStaff":true,"leadershipStaffOnly":false}',
                 'shift_defaults' => '{"1":{"enabled":true,"start":"07:30","end":"15:30"}}',
                 'shift_calendar_sync_enabled' => '0',
                 'external_calendar_google' => 'cipher:access-token-secret',

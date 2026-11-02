@@ -34,7 +34,7 @@ namespace {
 
     $source = new class implements CalendarPermissionSourceInterface {
         public function definition(): FlzOrganizationDefinition { return FlzOrganizationDefinition::defaults(); }
-        public function peerGroups(): array { return ['flz-EB']; }
+        public function peerGroups(): array { return ['EB']; }
     };
     $provider = new CalendarPermissionProvider($source);
     $result = $provider->collect();
@@ -61,7 +61,7 @@ namespace {
         throw new RuntimeException('Persönliche Kalenderkonnektoren müssen als reiner Selbstbezug ausgewiesen werden.');
     }
     $peerGroups = array_map(static fn($rule) => $rule->condition->groupId, $byPermission['calendar.entry.manage-peer'] ?? []);
-    if ($peerGroups !== ['flz-EB']) throw new RuntimeException('Nur tatsächlich konfigurierte Peer-Gruppen dürfen projiziert werden.');
+    if ($peerGroups !== ['EB']) throw new RuntimeException('Nur tatsächlich konfigurierte Peer-Gruppen dürfen projiziert werden.');
     $subordinateScopes = array_column($byPermission['calendar.entry.manage-subordinate'] ?? [], 'scope');
     if (!in_array('target-role:pdl', $subordinateScopes, true) || in_array('target-role:pfk', array_slice($subordinateScopes, 0, 1), true)) {
         throw new RuntimeException('Die Rechteprojektion muss direkte statt transitive Hierarchiekanten ausweisen.');

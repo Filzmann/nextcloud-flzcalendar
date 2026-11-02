@@ -6,26 +6,26 @@ declare(strict_types=1);
 use OCA\FlzCalendar\Service\CalendarGroupProfile;
 
 $profiles = new CalendarGroupProfile();
-$pfk = $profiles->get(['flz-PFK', 'flz-Bereich-Sued']);
-if ($pfk['areas'] !== [] || $pfk['clusters'] !== ['flz-PFK']) throw new RuntimeException('PFK darf keinem Buerobereich zugeordnet werden.');
-$care = $profiles->get(['flz-PFK', 'flz-Bueroorganisation-Pflege', 'flz-StvPDL']);
-if ($care['roles'] !== ['flz-StvPDL', 'flz-Bueroorganisation-Pflege', 'flz-PFK'] || $care['areas'] !== []) throw new RuntimeException('Stv. PDL steht im globalen Pflegeblock nicht an erster Stelle.');
-$staff = $profiles->get(['flz-Stab-HR', 'flz-Bereich-West']);
-if ($staff['areas'] !== [] || $staff['clusters'] !== ['flz-Stab-HR']) throw new RuntimeException('Stabsstellen duerfen keinem Buerobereich zugeordnet werden.');
-$office = $profiles->get(['flz-Buero', 'flz-Bereich-Nordost']);
-if ($office['areas'] !== ['flz-Bereich-Nordost'] || $office['clusters'] !== ['flz-Buero#flz-Bereich-Nordost']) throw new RuntimeException('BO-Bereich wurde nicht dynamisch kombiniert.');
-$eb = $profiles->get(['flz-EB', 'flz-Bereich-West']);
-if ($eb['areas'] !== ['flz-Bereich-West']) throw new RuntimeException('EB-Bereich wurde nicht uebernommen.');
-$blNow = $profiles->get(['flz-BL', 'flz-Bereich-Nordost', 'flz-Bereich-West']);
-if ($blNow['roles'] !== ['flz-BL'] || $blNow['clusters'] !== ['flz-BL#flz-Bereich-Nordost', 'flz-BL#flz-Bereich-West']) throw new RuntimeException('BL NOW muss dynamisch in BL-NO und BL-W gefunden werden.');
-$blSouth = $profiles->get(['flz-BL', 'flz-Bereich-Sued']);
-if ($blSouth['clusters'] !== ['flz-BL#flz-Bereich-Sued']) throw new RuntimeException('BL Sued muss ihrem eigenen Buerobereich zugeordnet bleiben.');
-$deputyNortheast = $profiles->get(['flz-StvBL', 'flz-EB', 'flz-Bereich-Nordost']);
-if ($deputyNortheast['roles'] !== ['flz-StvBL', 'flz-EB'] || $deputyNortheast['clusters'] !== ['flz-StvBL#flz-Bereich-Nordost', 'flz-EB#flz-Bereich-Nordost']) {
+$pfk = $profiles->get(['PFK', 'Bereich-Sued']);
+if ($pfk['areas'] !== [] || $pfk['clusters'] !== ['PFK']) throw new RuntimeException('PFK darf keinem Buerobereich zugeordnet werden.');
+$care = $profiles->get(['PFK', 'Bueroorganisation-Pflege', 'StvPDL']);
+if ($care['roles'] !== ['StvPDL', 'Bueroorganisation-Pflege', 'PFK'] || $care['areas'] !== []) throw new RuntimeException('Stv. PDL steht im globalen Pflegeblock nicht an erster Stelle.');
+$staff = $profiles->get(['Stab-HR', 'Bereich-West']);
+if ($staff['areas'] !== [] || $staff['clusters'] !== ['Stab-HR']) throw new RuntimeException('Stabsstellen duerfen keinem Buerobereich zugeordnet werden.');
+$office = $profiles->get(['Buero', 'Bereich-Nordost']);
+if ($office['areas'] !== ['Bereich-Nordost'] || $office['clusters'] !== ['Buero#Bereich-Nordost']) throw new RuntimeException('BO-Bereich wurde nicht dynamisch kombiniert.');
+$eb = $profiles->get(['EB', 'Bereich-West']);
+if ($eb['areas'] !== ['Bereich-West']) throw new RuntimeException('EB-Bereich wurde nicht uebernommen.');
+$blNow = $profiles->get(['BL', 'Bereich-Nordost', 'Bereich-West']);
+if ($blNow['roles'] !== ['BL'] || $blNow['clusters'] !== ['BL#Bereich-Nordost', 'BL#Bereich-West']) throw new RuntimeException('BL NOW muss dynamisch in BL-NO und BL-W gefunden werden.');
+$blSouth = $profiles->get(['BL', 'Bereich-Sued']);
+if ($blSouth['clusters'] !== ['BL#Bereich-Sued']) throw new RuntimeException('BL Sued muss ihrem eigenen Buerobereich zugeordnet bleiben.');
+$deputyNortheast = $profiles->get(['StvBL', 'EB', 'Bereich-Nordost']);
+if ($deputyNortheast['roles'] !== ['StvBL', 'EB'] || $deputyNortheast['clusters'] !== ['StvBL#Bereich-Nordost', 'EB#Bereich-Nordost']) {
     throw new RuntimeException('Stellvertretende BL muss mit beiden Rollen dem passenden Buerobereich zugeordnet werden.');
 }
-$officeEb = $profiles->get(['flz-Buero', 'flz-EB', 'flz-Bereich-West']);
-if ($officeEb['roles'] !== ['flz-EB', 'flz-Buero'] || $officeEb['clusters'] !== ['flz-EB#flz-Bereich-West', 'flz-Buero#flz-Bereich-West']) {
+$officeEb = $profiles->get(['Buero', 'EB', 'Bereich-West']);
+if ($officeEb['roles'] !== ['EB', 'Buero'] || $officeEb['clusters'] !== ['EB#Bereich-West', 'Buero#Bereich-West']) {
     throw new RuntimeException('Kalenderprofile muessen der administrativen Organisationsreihenfolge folgen.');
 }
 

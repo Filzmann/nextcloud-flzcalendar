@@ -43,30 +43,30 @@ namespace {
     $source = new NextcloudCalendarPermissionSource($organization, $calendarSettings);
 
     $defaults = $source->peerGroups();
-    foreach (['flz-Buero', 'flz-EB', 'flz-PFK'] as $enabledByDefault) {
+    foreach (['Buero', 'EB', 'PFK'] as $enabledByDefault) {
         if (!in_array($enabledByDefault, $defaults, true)) {
             throw new RuntimeException('Der Kalender konsumiert den freigegebenen Peerdefault nicht: ' . $enabledByDefault);
         }
     }
-    foreach (['flz-Stab-HR', 'flz-Stab-QMB'] as $disabledByDefault) {
+    foreach (['Stab-HR', 'Stab-QMB'] as $disabledByDefault) {
         if (in_array($disabledByDefault, $defaults, true)) {
             throw new RuntimeException('Der Kalender aktiviert eine standardmäßig ausgeschaltete Peerrolle: ' . $disabledByDefault);
         }
     }
 
     $adminSettings->saveCalendarPeerEditing([
-        'flz-Buero' => false,
-        'flz-EB' => true,
-        'flz-PFK' => true,
-        'flz-Stab-HR' => true,
-        'flz-Stab-QMB' => false,
+        'Buero' => false,
+        'EB' => true,
+        'PFK' => true,
+        'Stab-HR' => true,
+        'Stab-QMB' => false,
     ]);
     $configured = $source->peerGroups();
-    if (in_array('flz-Buero', $configured, true)
-        || !in_array('flz-EB', $configured, true)
-        || !in_array('flz-PFK', $configured, true)
-        || !in_array('flz-Stab-HR', $configured, true)
-        || in_array('flz-Stab-QMB', $configured, true)) {
+    if (in_array('Buero', $configured, true)
+        || !in_array('EB', $configured, true)
+        || !in_array('PFK', $configured, true)
+        || !in_array('Stab-HR', $configured, true)
+        || in_array('Stab-QMB', $configured, true)) {
         throw new RuntimeException('Der Kalender respektiert explizite Peerentscheidungen aus dem LocalBase-Vertrag nicht vollständig.');
     }
 

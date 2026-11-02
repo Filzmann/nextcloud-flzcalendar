@@ -178,30 +178,30 @@ if (publicHolidays.name(new Date(2026, 4, 1)) !== 'Tag der Arbeit'
 }
 const clusterTable = Object.create(tableContext.window.FlzCalendar.components.WeekTable.prototype);
 clusterTable.organization = () => ({
-    staffRoleGroups: () => ['flz-IT'], leadershipStaffRoleGroups: () => [], staffBlockLabel: 'Leitungen',
-    roleLabel: value => ({'flz-EB':'Einsatzbegleitung','flz-StvBL':'Stellvertretende Büroleitung','flz-Buero':'Büroorganisation'}[value] || value),
-    areaLabel: value => ({'flz-Bereich-Nordost':'Nordost','flz-Bereich-West':'West'}[value] || value),
-    roleShortLabel: value => ({'flz-EB':'EB','flz-StvBL':'Stellvertretende Büroleitung','flz-Buero':'BO','flz-PFK':'PFK','flz-Bueroorganisation-Pflege':'BO-Pflege','flz-IT':'IT'}[value] || value),
-    areaShortLabel: value => ({'flz-Bereich-Nordost':'NO','flz-Bereich-West':'W'}[value] || value),
-    roleOrder: value => ({'flz-EB':10,'flz-Buero':20,'flz-StvBL':30}[value] ?? 999),
-    areaOrder: value => ({'flz-Bereich-West':10,'flz-Bereich-Nordost':20}[value] ?? 999),
+    staffRoleGroups: () => ['IT'], leadershipStaffRoleGroups: () => [], staffBlockLabel: 'Leitungen',
+    roleLabel: value => ({'EB':'Einsatzbegleitung','StvBL':'Stellvertretende Büroleitung','Buero':'Büroorganisation'}[value] || value),
+    areaLabel: value => ({'Bereich-Nordost':'Nordost','Bereich-West':'West'}[value] || value),
+    roleShortLabel: value => ({'EB':'EB','StvBL':'Stellvertretende Büroleitung','Buero':'BO','PFK':'PFK','Bueroorganisation-Pflege':'BO-Pflege','IT':'IT'}[value] || value),
+    areaShortLabel: value => ({'Bereich-Nordost':'NO','Bereich-West':'W'}[value] || value),
+    roleOrder: value => ({'EB':10,'Buero':20,'StvBL':30}[value] ?? 999),
+    areaOrder: value => ({'Bereich-West':10,'Bereich-Nordost':20}[value] ?? 999),
 });
-if (clusterTable.clusterLabel({ roles: ['flz-StvBL', 'flz-EB'], areas: ['flz-Bereich-Nordost', 'flz-Bereich-West'] }) !== 'EB (Stellvertretende Büroleitung)-W/NO') {
+if (clusterTable.clusterLabel({ roles: ['StvBL', 'EB'], areas: ['Bereich-Nordost', 'Bereich-West'] }) !== 'EB (Stellvertretende Büroleitung)-W/NO') {
     throw new Error('Mehrfachrollen und -bereiche folgen im Gruppentitel nicht der Backend-Reihenfolge.');
 }
 for (const [employee, expected] of [
-    [{ roles: ['flz-Buero'], areas: ['flz-Bereich-Nordost'] }, 'BO-NO'],
-    [{ roles: ['flz-EB'], areas: ['flz-Bereich-West'] }, 'EB-W'],
-    [{ roles: ['flz-PFK'], areas: [] }, 'PFK'],
-    [{ roles: ['flz-Bueroorganisation-Pflege'], areas: [] }, 'BO-Pflege'],
-    [{ roles: ['flz-IT'], areas: [] }, 'IT'],
+    [{ roles: ['Buero'], areas: ['Bereich-Nordost'] }, 'BO-NO'],
+    [{ roles: ['EB'], areas: ['Bereich-West'] }, 'EB-W'],
+    [{ roles: ['PFK'], areas: [] }, 'PFK'],
+    [{ roles: ['Bueroorganisation-Pflege'], areas: [] }, 'BO-Pflege'],
+    [{ roles: ['IT'], areas: [] }, 'IT'],
 ]) {
     if (clusterTable.clusterLabel(employee) !== expected) throw new Error(`Kalenderkürzel ${expected} fehlt in der Übersicht.`);
 }
 const backendOrderedEmployees = clusterTable.orderedEmployees([
-    { uid: 'office-ne', displayName: 'Büro Nordost', roles: ['flz-Buero'], areas: ['flz-Bereich-Nordost'] },
-    { uid: 'eb-ne', displayName: 'EB Nordost', roles: ['flz-EB'], areas: ['flz-Bereich-Nordost'] },
-    { uid: 'eb-west', displayName: 'EB West', roles: ['flz-EB'], areas: ['flz-Bereich-West'] },
+    { uid: 'office-ne', displayName: 'Büro Nordost', roles: ['Buero'], areas: ['Bereich-Nordost'] },
+    { uid: 'eb-ne', displayName: 'EB Nordost', roles: ['EB'], areas: ['Bereich-Nordost'] },
+    { uid: 'eb-west', displayName: 'EB West', roles: ['EB'], areas: ['Bereich-West'] },
 ]);
 if (backendOrderedEmployees.map(employee => employee.uid).join(',') !== 'eb-west,eb-ne,office-ne') {
     throw new Error('Kalendergruppen folgen nicht der im Backend festgelegten Rollen- und Bereichsreihenfolge.');
@@ -220,7 +220,7 @@ monthTable.setHolidays([{
     ],
 }]);
 const monthDate = tableContext.window.FlzCalendar.modules.CalendarDate;
-monthTable.render([{ uid: 'person-a', displayName: 'Person A', roles: ['flz-Buero'], areas: ['flz-Bereich-West'] }], {
+monthTable.render([{ uid: 'person-a', displayName: 'Person A', roles: ['Buero'], areas: ['Bereich-West'] }], {
     period: 'month', month: new Date(2026, 6, 1), vertical: false, selected: new Set(),
     data: { entries: [], absences: [] },
     visibleRange: () => monthDate.monthRange(new Date(2026, 6, 1)),
@@ -257,7 +257,7 @@ if (renderedNodes.some(node => node.tagName === 'TH' && node.scope === 'row' && 
 if (!renderedNodes.some(node => node.tagName === 'TH' && node.scope === 'row' && node.className.includes('flz-calendar-weekend') && node.textContent.includes('Samstag'))) throw new Error('Samstage werden nicht über den Wochentagsnamen gekennzeichnet.');
 if (renderedNodes.some(node => node.textContent.includes('Wochenende'))) throw new Error('Wochenendtage tragen weiterhin das redundante Zusatzwort „Wochenende“.');
 if (!renderedNodes.some(node => node.tagName === 'TD' && node.className.includes('flz-calendar-weekend'))) throw new Error('Wochenendspalten oder -zeilen werden in der Kalendermatrix nicht markiert.');
-monthTable.render([{ uid: 'person-a', displayName: 'Person A', roles: ['flz-Buero'], areas: ['flz-Bereich-West'] }], {
+monthTable.render([{ uid: 'person-a', displayName: 'Person A', roles: ['Buero'], areas: ['Bereich-West'] }], {
     period: 'month', month: new Date(2026, 6, 1), vertical: true, selected: new Set(),
     data: { entries: [], absences: [] },
     visibleRange: () => monthDate.monthRange(new Date(2026, 6, 1)),
@@ -277,7 +277,7 @@ if (monthTable.dayLabel(new Date(2026, 4, 1), { weekday: 'long', day: '2-digit',
     || !renderedNodes.some(node => node.tagName === 'TH' && node.title === 'Beispieltag')) {
     throw new Error('Feiertage müssen kompakt bleiben und ihren Namen außerhalb der Spaltenbreite als Tooltip tragen.');
 }
-monthTable.render([{ uid: 'person-a', displayName: 'Person A', roles: ['flz-Buero'], areas: ['flz-Bereich-West'] }], {
+monthTable.render([{ uid: 'person-a', displayName: 'Person A', roles: ['Buero'], areas: ['Bereich-West'] }], {
     period: 'month', month: new Date(2026, 6, 1), vertical: false, selected: new Set(),
     data: {
         entries: [{ employeeUid: 'person-a', type: 'shift', start: '2026-07-04T08:00:00', end: '2026-07-04T12:00:00' }],
@@ -299,7 +299,7 @@ if (occupiedWeekendNodes.some(node => node.tagName === 'TD' && node.dataset.day 
 if (!occupiedWeekendNodes.some(node => node.tagName === 'TD' && node.dataset.day === '2026-07-05' && node.className.includes('flz-calendar-compact-day'))) {
     throw new Error('Ein Urlaubsmarker verhindert die Kompaktklasse eines ansonsten leeren Sondertags.');
 }
-monthTable.render([{ uid: 'person-a', displayName: 'Person A', roles: ['flz-Buero'], areas: ['flz-Bereich-West'] }], {
+monthTable.render([{ uid: 'person-a', displayName: 'Person A', roles: ['Buero'], areas: ['Bereich-West'] }], {
     period: 'week', month: new Date(2026, 6, 1), vertical: false, selected: new Set(),
     data: { entries: [], absences: [] },
     visibleRange: () => ({
@@ -327,21 +327,21 @@ const organizationContext = { window: { LocalBase: { models: { Model: class {} }
 execute('../../js/models/organization.js', organizationModel, organizationContext);
 const sortableOrganization = new organizationContext.window.FlzCalendar.models.Organization({
     roles: {
-        pdl: { groupId: 'flz-PDL', label: 'PDL', sortOrder: 10, staffBlock: true },
-        staff_hr: { groupId: 'flz-Stab-HR', label: 'HR', sortOrder: 20, staffBlock: true },
-        finance: { groupId: 'flz-Finanzen', label: 'Finanzen', sortOrder: 30, staffBlock: true },
-        payroll: { groupId: 'flz-Lohn', label: 'Lohn', sortOrder: 40, staffBlock: true },
-        it: { groupId: 'flz-IT', label: 'IT', sortOrder: 50, staffBlock: true },
-        secretariat: { groupId: 'flz-Sekretariat', label: 'Sekretariat', sortOrder: 60, staffBlock: true },
-        office: { groupId: 'flz-Buero', label: 'Büro', shortLabel: 'BO', sortOrder: 70, areaScoped: true },
+        pdl: { groupId: 'PDL', label: 'PDL', sortOrder: 10, staffBlock: true },
+        staff_hr: { groupId: 'Stab-HR', label: 'HR', sortOrder: 20, staffBlock: true },
+        finance: { groupId: 'Finanzen', label: 'Finanzen', sortOrder: 30, staffBlock: true },
+        payroll: { groupId: 'Lohn', label: 'Lohn', sortOrder: 40, staffBlock: true },
+        it: { groupId: 'IT', label: 'IT', sortOrder: 50, staffBlock: true },
+        secretariat: { groupId: 'Sekretariat', label: 'Sekretariat', sortOrder: 60, staffBlock: true },
+        office: { groupId: 'Buero', label: 'Büro', shortLabel: 'BO', sortOrder: 70, areaScoped: true },
     },
-    areas: { northeast: { groupId: 'flz-Bereich-Nordost', label: 'Nordost', shortLabel: 'NO', sortOrder: 30 } },
+    areas: { northeast: { groupId: 'Bereich-Nordost', label: 'Nordost', shortLabel: 'NO', sortOrder: 30 } },
 });
-if (sortableOrganization.roleOrder('flz-Buero') !== 70 || sortableOrganization.areaOrder('flz-Bereich-Nordost') !== 30
-    || sortableOrganization.roleIsAreaScoped('flz-Buero') !== true || sortableOrganization.roleIsAreaScoped('flz-PDL') !== false) {
+if (sortableOrganization.roleOrder('Buero') !== 70 || sortableOrganization.areaOrder('Bereich-Nordost') !== 30
+    || sortableOrganization.roleIsAreaScoped('Buero') !== true || sortableOrganization.roleIsAreaScoped('PDL') !== false) {
     throw new Error('Das Kalender-Organisationsmodell übernimmt die Backend-Reihenfolge nicht.');
 }
-if (sortableOrganization.roleShortLabel('flz-Buero') !== 'BO' || sortableOrganization.areaShortLabel('flz-Bereich-Nordost') !== 'NO') {
+if (sortableOrganization.roleShortLabel('Buero') !== 'BO' || sortableOrganization.areaShortLabel('Bereich-Nordost') !== 'NO') {
     throw new Error('Das Kalender-Organisationsmodell übernimmt die zentralen Kürzel nicht.');
 }
 const legacyOrganization = new organizationContext.window.FlzCalendar.models.Organization({
@@ -351,7 +351,7 @@ const legacyOrganization = new organizationContext.window.FlzCalendar.models.Org
 if (legacyOrganization.roleShortLabel('legacy-office') !== 'Altes Büro' || legacyOrganization.areaShortLabel('legacy-north') !== 'Alter Norden') {
     throw new Error('Ältere Organisationsdefinitionen ohne Kürzelfelder fallen nicht auf ihre Langnamen zurück.');
 }
-if (sortableOrganization.leadershipStaffRoleGroups().join(',') !== 'flz-PDL,flz-Stab-HR') {
+if (sortableOrganization.leadershipStaffRoleGroups().join(',') !== 'PDL,Stab-HR') {
     throw new Error('IT, Sekretariat und Finanzen/Lohn bleiben ungewollt Teil des gemeinsamen Leitungs-/Stabsfilters.');
 }
 for (const contract of ['window.LocalBase.models.Model', 'extends BaseModel', 'toArray()', 'this.defaultDate', 'this.defaultModified', 'this.defaultDeleted', 'this.meetingUid', 'this.seriesUid', 'this.seriesTimezone', 'this.canManageMeeting']) {
@@ -581,13 +581,13 @@ const monthState = new CalendarState(new Set(), { search: '?period=month&month=2
 if (monthState.period !== 'month' || CalendarDate.monthValue(monthState.month) !== '2026-07') throw new Error('Monatsansicht wird nicht aus der URL wiederhergestellt.');
 monthState.persist();
 if (!monthHistoryCalls.at(-1)[2].includes('period=month') || !monthHistoryCalls.at(-1)[2].includes('month=2026-07')) throw new Error('Monatsansicht wird nicht in der URL persistiert.');
-const filterState = new CalendarState(new Set(['flz-PDL']), { search: '', pathname: '/apps/flzcalendar/' }, { replaceState: (...args) => historyCalls.push(args) }).restore();
+const filterState = new CalendarState(new Set(['PDL']), { search: '', pathname: '/apps/flzcalendar/' }, { replaceState: (...args) => historyCalls.push(args) }).restore();
 filterState.data = {
     defaultFilters: null,
-    currentUserProfile: { roles: ['flz-Buero'], areas: ['flz-Bereich-Sued'] },
+    currentUserProfile: { roles: ['Buero'], areas: ['Bereich-Sued'] },
     employees: [
-        { uid: 'bo', roles: ['flz-Buero'], areas: ['flz-Bereich-Sued'] },
-        { uid: 'pdl', roles: ['flz-PDL'], areas: [] },
+        { uid: 'bo', roles: ['Buero'], areas: ['Bereich-Sued'] },
+        { uid: 'pdl', roles: ['PDL'], areas: [] },
     ],
 };
 filterState.applyInitialFilters();
@@ -597,10 +597,10 @@ if (filterState.availableEmployees().map(employee => employee.uid).join(',') !==
 filterState.showLeadershipStaff = false; filterState.persist();
 if (filterState.availableEmployees().some(employee => employee.uid === 'pdl') || !historyCalls.at(-1)[2].includes('staff=hidden')) throw new Error('Stabsfilter oder URL-Persistenz wurde beim Refactoring verändert.');
 
-const staffDefaultState = new CalendarState(new Set(['flz-PDL']), { search: '', pathname: '/apps/flzcalendar/' }, { replaceState() {} }).restore();
+const staffDefaultState = new CalendarState(new Set(['PDL']), { search: '', pathname: '/apps/flzcalendar/' }, { replaceState() {} }).restore();
 staffDefaultState.data = {
     defaultFilters: null,
-    currentUserProfile: { roles: ['flz-PDL'], areas: [] },
+    currentUserProfile: { roles: ['PDL'], areas: [] },
     employees: filterState.data.employees,
 };
 staffDefaultState.applyInitialFilters();
@@ -609,29 +609,29 @@ const staffUrlCalls = [];
 staffDefaultState.history = { replaceState: (...args) => staffUrlCalls.push(args) };
 staffDefaultState.persist();
 if (!staffUrlCalls.at(-1)[2].includes('staffOnly=1')) throw new Error('Reiner Leitungs-/Stabsfilter wird nicht in der URL persistiert.');
-const restoredStaffState = new CalendarState(new Set(['flz-PDL']), { search: '?staff=visible&staffOnly=1', pathname: '/apps/flzcalendar/' }, { replaceState() {} }).restore();
+const restoredStaffState = new CalendarState(new Set(['PDL']), { search: '?staff=visible&staffOnly=1', pathname: '/apps/flzcalendar/' }, { replaceState() {} }).restore();
 restoredStaffState.data = staffDefaultState.data;
 restoredStaffState.applyInitialFilters();
 if (!restoredStaffState.leadershipStaffOnly || restoredStaffState.availableEmployees().map(employee => employee.uid).join(',') !== 'pdl') throw new Error('Reiner Leitungs-/Stabsfilter geht beim Seiten-Reload verloren.');
 
 const officeEmployees = [
-    { uid: 'bl-now', roles: ['flz-BL', 'flz-Buero'], areas: ['flz-Bereich-Nordost', 'flz-Bereich-West'] },
-    { uid: 'bl-south', roles: ['flz-BL', 'flz-Buero'], areas: ['flz-Bereich-Sued'] },
-    { uid: 'deputy-west', roles: ['flz-StvBL', 'flz-EB'], areas: ['flz-Bereich-West'] },
-    { uid: 'office-west', roles: ['flz-Buero'], areas: ['flz-Bereich-West'] },
-    { uid: 'eb-west', roles: ['flz-EB'], areas: ['flz-Bereich-West'] },
-    { uid: 'pfk', roles: ['flz-PFK'], areas: [] },
-    { uid: 'pdl', roles: ['flz-PDL'], areas: [] },
+    { uid: 'bl-now', roles: ['BL', 'Buero'], areas: ['Bereich-Nordost', 'Bereich-West'] },
+    { uid: 'bl-south', roles: ['BL', 'Buero'], areas: ['Bereich-Sued'] },
+    { uid: 'deputy-west', roles: ['StvBL', 'EB'], areas: ['Bereich-West'] },
+    { uid: 'office-west', roles: ['Buero'], areas: ['Bereich-West'] },
+    { uid: 'eb-west', roles: ['EB'], areas: ['Bereich-West'] },
+    { uid: 'pfk', roles: ['PFK'], areas: [] },
+    { uid: 'pdl', roles: ['PDL'], areas: [] },
 ];
-const areaScopedRoles = new Set(['flz-BL', 'flz-StvBL', 'flz-Buero', 'flz-EB']);
+const areaScopedRoles = new Set(['BL', 'StvBL', 'Buero', 'EB']);
 const westState = new CalendarState(
-    new Set(['flz-PDL']),
+    new Set(['PDL']),
     { search: '', pathname: '/apps/flzcalendar/' },
     { replaceState() {} },
     role => areaScopedRoles.has(role),
 ).restore();
 westState.data = {
-    defaultFilters: { people: [], roles: [], areas: ['flz-Bereich-West'], vertical: true, showLeadershipStaff: false },
+    defaultFilters: { people: [], roles: [], areas: ['Bereich-West'], vertical: true, showLeadershipStaff: false },
     currentUserProfile: { roles: [], areas: [] },
     employees: officeEmployees,
 };
@@ -641,13 +641,13 @@ if (westState.availableEmployees().map(employee => employee.uid).join(',') !== '
 }
 
 const globalRoleInAreaState = new CalendarState(
-    new Set(['flz-PDL']),
+    new Set(['PDL']),
     { search: '', pathname: '/apps/flzcalendar/' },
     { replaceState() {} },
     role => areaScopedRoles.has(role),
 ).restore();
 globalRoleInAreaState.data = {
-    defaultFilters: { people: [], roles: ['flz-PFK'], areas: ['flz-Bereich-West'], vertical: true, showLeadershipStaff: false },
+    defaultFilters: { people: [], roles: ['PFK'], areas: ['Bereich-West'], vertical: true, showLeadershipStaff: false },
     currentUserProfile: { roles: [], areas: [] },
     employees: officeEmployees,
 };
@@ -656,7 +656,7 @@ if (globalRoleInAreaState.availableEmployees().map(employee => employee.uid).joi
     throw new Error('Eine globale Rolle wird durch die manipulierte Kombination mit einem Bereich unberechtigt ausgeblendet.');
 }
 
-const staffSwitchState = new CalendarState(new Set(['flz-PDL']), { search: '', pathname: '/apps/flzcalendar/' }, { replaceState() {} }).restore();
+const staffSwitchState = new CalendarState(new Set(['PDL']), { search: '', pathname: '/apps/flzcalendar/' }, { replaceState() {} }).restore();
 staffSwitchState.data = { defaultFilters: null, currentUserProfile: { roles: [], areas: [] }, employees: officeEmployees };
 staffSwitchState.applyInitialFilters();
 staffSwitchState.showLeadershipStaff = false;
@@ -664,9 +664,9 @@ if (staffSwitchState.isUnfiltered() || staffSwitchState.availableEmployees().som
     throw new Error('Der allein bediente Leitungs-/Stabsschalter verändert die sichtbare Menge nicht.');
 }
 
-const officeRoleState = new CalendarState(new Set(['flz-PDL']), { search: '', pathname: '/apps/flzcalendar/' }, { replaceState() {} }).restore();
+const officeRoleState = new CalendarState(new Set(['PDL']), { search: '', pathname: '/apps/flzcalendar/' }, { replaceState() {} }).restore();
 officeRoleState.data = {
-    defaultFilters: { people: [], roles: ['flz-Buero'], areas: [], vertical: true, showLeadershipStaff: false },
+    defaultFilters: { people: [], roles: ['Buero'], areas: [], vertical: true, showLeadershipStaff: false },
     currentUserProfile: { roles: [], areas: [] },
     employees: officeEmployees,
 };
@@ -675,9 +675,9 @@ if (officeRoleState.availableEmployees().map(employee => employee.uid).join(',')
     throw new Error('Der reine Büromitarbeiter*innen-Filter zeigt Personen mit vorrangiger Büroleitungsrolle.');
 }
 
-const ebRoleState = new CalendarState(new Set(['flz-PDL']), { search: '', pathname: '/apps/flzcalendar/' }, { replaceState() {} }).restore();
+const ebRoleState = new CalendarState(new Set(['PDL']), { search: '', pathname: '/apps/flzcalendar/' }, { replaceState() {} }).restore();
 ebRoleState.data = {
-    defaultFilters: { people: [], roles: ['flz-EB'], areas: [], vertical: true, showLeadershipStaff: false },
+    defaultFilters: { people: [], roles: ['EB'], areas: [], vertical: true, showLeadershipStaff: false },
     currentUserProfile: { roles: [], areas: [] },
     employees: officeEmployees,
 };
@@ -686,7 +686,7 @@ if (ebRoleState.availableEmployees().map(employee => employee.uid).join(',') !==
     throw new Error('Der reine Einsatzbegleitungsfilter zeigt Personen mit vorrangiger Stellvertretungsrolle.');
 }
 
-const emptyFilterState = new CalendarState(new Set(['flz-PDL']), { search: '', pathname: '/apps/flzcalendar/' }, { replaceState() {} }).restore();
+const emptyFilterState = new CalendarState(new Set(['PDL']), { search: '', pathname: '/apps/flzcalendar/' }, { replaceState() {} }).restore();
 emptyFilterState.data = {
     defaultFilters: null,
     currentUserProfile: { roles: [], areas: [] },

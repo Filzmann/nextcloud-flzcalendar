@@ -35,7 +35,7 @@ Kernprozess:
 - Rollen und Bereiche werden jeweils als ODER-Auswahl und bei einer bereichsgebundenen vorrangigen Rolle miteinander als Schnittmenge ausgewertet. Globale Rollen ohne natürliche Bereichszuordnung bleiben von einer Bereichsauswahl unberührt. Ein expliziter Rollenfilter wertet nur die nach Organisationsreihenfolge vorrangige Rolle einer Person aus; eine zusätzliche unterstellte Rolle zieht BL oder StvBL nicht in den BO- beziehungsweise EB-Filter. Ohne Rollenwahl zeigen gewählte Bereiche die zugeordneten BL, stellvertretenden BL, BO und EB neben den globalen Rollen. Ohne Personen-, Rollen- und Bereichswahl erscheinen alle Personen mit einer im Filzmann Kalender sichtbaren Planerrolle.
 - Gruppenüberschriften und mobiler Organisationskontext verwenden die zentralen LocalBase-Kürzel. Bereichsrollen erscheinen beispielsweise als `BO-NO` oder `EB-W`, globale Rollen als `PFK`, `BO-Pflege` oder `IT`; Filter und Administration behalten die Langnamen.
 - Ohne bewusst gespeicherten Standard startet die Ansicht mit den Fachrollen und Bereichen des eingeloggten Kontos. Die aktuelle Filter-/Personen-/Ansichtskonfiguration wird nur ueber „Zum Standard machen“ als persoenlicher Nextcloud-Benutzerwert gespeichert.
-- `flz-Stab-HR`, `flz-Stab-QMB`, `flz-AsdGF-Digi`, `flz-PDL`, beide GF-Rollen und `flz-Sekretariat` werden im Rollenfilter ueber einen gemeinsamen Anzeigen-/Ausblenden-Schalter gesteuert; der Schalter ist Teil des persoenlichen Standards. Diese Personen stehen in einem gemeinsamen Block und werden entlang der GF-AS- und GF-Digi-Hierarchie sortiert.
+- `Stab-HR`, `Stab-QMB`, `AsdGF-Digi`, `PDL`, beide GF-Rollen und `Sekretariat` werden im Rollenfilter ueber einen gemeinsamen Anzeigen-/Ausblenden-Schalter gesteuert; der Schalter ist Teil des persoenlichen Standards. Diese Personen stehen in einem gemeinsamen Block und werden entlang der GF-AS- und GF-Digi-Hierarchie sortiert.
 - Eine Meeting-Lückensuche schneidet die Dienste der ausgewählten Personen innerhalb einer Kalenderwoche und zieht deren vorhandene Termine ab; die Mindestdauer ist frei wählbar und beträgt initial 60 Minuten. Bleibt eine Woche ohne Treffer, kann wochenweise weitergesucht oder eine Person direkt abgewählt werden.
 - Gefundene Slots können mit einem gemeinsamen Titel atomar für alle ausgewählten Personen blockiert werden, wenn der angemeldete Nutzer jeden Zielkalender nach dem normalen Hierarchie-/Peer-Vertrag bearbeiten darf. Die Funktion erweitert keine Fremdbearbeitungsrechte und prüft die Verfügbarkeit unmittelbar vor dem Speichern erneut.
 - Die dabei je Person gespeicherten Termine tragen eine gemeinsame Meeting-Kennung. Zeitraum und Titel werden für alle Beteiligten gemeinsam geändert, und das Meeting wird nur vollständig gelöscht. Beide Aktionen sind nur erlaubt, wenn der angemeldete Nutzer weiterhin jeden beteiligten Kalender bearbeiten darf; isolierte Änderungen über die allgemeine Eintrags-API werden abgewiesen.
@@ -60,33 +60,33 @@ Verbindliches Gruppenschema:
 
 Die folgenden Gruppen-IDs beschreiben ausschließlich die initiale Standardkonfiguration. Gruppen-IDs, sichtbare Namen, zentrale Kalenderkürzel, Bereiche, Reihenfolge, Peer-Fähigkeit, Assistenzteam-Konventionen und direkte Hierarchiekanten werden gemeinsam über `FlzOrganizationDefinition` geliefert. Bearbeitbare Organisationsfelder werden im Nextcloud-Adminbereich der OrgSuite gepflegt. App-Code darf daneben keine parallelen Rollenregister führen.
 
-- Rollen werden als eigenständige Nextcloud-Gruppen gepflegt. Bereichsgebundene Kalenderrollen sind insbesondere `flz-BL`, `flz-StvBL`, `flz-Buero` und `flz-EB`; `flz-StvPDL`, `flz-Bueroorganisation-Pflege`, `flz-PFK`, `flz-Fahrzeugverwaltung` und `flz-Empfang` bleiben global.
-- Bereiche werden separat als `flz-Bereich-<Name>` gepflegt.
-- `flz-BL`, `flz-StvBL`, `flz-Buero` und `flz-EB` werden einem oder mehreren Buero-Bereichen zugeordnet. `flz-PFK`, `flz-Stab-HR` und `flz-Stab-QMB` sind bereichsunabhaengig; versehentliche Bereichsmitgliedschaften duerfen ihre Kalenderdarstellung oder Rechte nicht veraendern.
-- Kombinierte Gruppen sind abgeleitete Schnittmengen, zum Beispiel Mitgliedschaft in `flz-EB` und `flz-Bereich-Nordost`; es werden keine Kombinationsgruppen dupliziert.
-- `flz-EB` und `flz-PFK` sind Zielrollen im Kalender; die EB-Rolle allein verleiht keine globale Fremdbearbeitung.
-- `flz-EB` und `flz-Bereich-*` sind derselbe kanonische Rollen-/Bereichsvertrag wie im FlzPlaner; kombinierte Altgruppen wie `flz-EB-*` werden nicht als Rollenquelle verwendet.
+- Rollen werden als eigenständige Nextcloud-Gruppen gepflegt. Bereichsgebundene Kalenderrollen sind insbesondere `BL`, `StvBL`, `Buero` und `EB`; `StvPDL`, `Bueroorganisation-Pflege`, `PFK`, `Fahrzeugverwaltung` und `Empfang` bleiben global.
+- Bereiche werden separat als `Bereich-<Name>` gepflegt.
+- `BL`, `StvBL`, `Buero` und `EB` werden einem oder mehreren Buero-Bereichen zugeordnet. `PFK`, `Stab-HR` und `Stab-QMB` sind bereichsunabhaengig; versehentliche Bereichsmitgliedschaften duerfen ihre Kalenderdarstellung oder Rechte nicht veraendern.
+- Kombinierte Gruppen sind abgeleitete Schnittmengen, zum Beispiel Mitgliedschaft in `EB` und `Bereich-Nordost`; es werden keine Kombinationsgruppen dupliziert.
+- `EB` und `PFK` sind Zielrollen im Kalender; die EB-Rolle allein verleiht keine globale Fremdbearbeitung.
+- `EB` und `Bereich-*` sind derselbe kanonische Rollen-/Bereichsvertrag wie im FlzPlaner; kombinierte Altgruppen wie `EB-*` werden nicht als Rollenquelle verwendet.
 - Alle Personen mit einer Rolle im kanonischen Organigramm dürfen alle Kalenderdaten lesen, eigene Einträge bearbeiten und aus den ohnehin sichtbaren Kalenderdaten gemeinsame Meetinglücken berechnen. Assistenzteam-Mitgliedschaften allein eröffnen den Kalender nicht.
 - Das gemeinsame Blockieren nutzt ausschließlich bestehende Bearbeitungsrechte für jede einzelne ausgewählte Person; fehlt eines davon, wird kein Teil des Meetings gespeichert.
-- `flz-PDL` führt `flz-StvPDL`, `flz-Bueroorganisation-Pflege` und `flz-PFK`. `flz-StvPDL` führt Büroorganisation Pflege sowie Pflegefachkräfte und steht im Pflegebereich des Kalenders an erster Stelle.
-- Bueroleitungen werden wie BO dynamisch aus `flz-BL` plus `flz-Bereich-*` gebildet. BL NOW ist Mitglied in `flz-BL`, `flz-Bereich-Nordost` und `flz-Bereich-West` und wird dadurch in BL-NO sowie BL-W gefunden.
-- Stellvertretungen werden aus `flz-StvBL` plus genau ihrem `flz-Bereich-*` gebildet; ihre zusaetzliche Hauptberufsrolle `flz-EB` bleibt davon getrennt.
+- `PDL` führt `StvPDL`, `Bueroorganisation-Pflege` und `PFK`. `StvPDL` führt Büroorganisation Pflege sowie Pflegefachkräfte und steht im Pflegebereich des Kalenders an erster Stelle.
+- Bueroleitungen werden wie BO dynamisch aus `BL` plus `Bereich-*` gebildet. BL NOW ist Mitglied in `BL`, `Bereich-Nordost` und `Bereich-West` und wird dadurch in BL-NO sowie BL-W gefunden.
+- Stellvertretungen werden aus `StvBL` plus genau ihrem `Bereich-*` gebildet; ihre zusaetzliche Hauptberufsrolle `EB` bleibt davon getrennt.
 - In der initialen Kalenderreihenfolge stehen Einsatzbegleitungen unter stellvertretenden Büroleitungen und über Büromitarbeiter*innen. Die im Adminbereich gespeicherte Organisationsreihenfolge ist maßgeblich; bei Mehrfachmitgliedschaft bleibt die erste passende Rolle die vorrangige Kalenderrolle.
 - Fahrzeugverwaltung folgt initial auf IT und ist GF-Digi unterstellt. Empfang folgt auf das Sekretariat und ist diesem direkt unterstellt. Beide Teams bleiben außerhalb des gemeinsamen Leitungs-/Stabsblocks.
 - Die Zahl der Bueroleitungen und Stellvertretungen wird nicht festgeschrieben. Eine bereichsuebergreifende BL erscheint als eine Person mit allen zugeordneten Bereichen und wird durch jeden passenden Bereichsfilter gefunden; sie wird nicht als doppelte Kalenderzeile dargestellt.
-- `flz-Stab-HR` und `flz-Stab-QMB` sind sichtbare Stabsstellen; gegenseitige Bearbeitung innerhalb der jeweiligen Gruppe wird ueber den Peer-Schalter gesteuert.
+- `Stab-HR` und `Stab-QMB` sind sichtbare Stabsstellen; gegenseitige Bearbeitung innerhalb der jeweiligen Gruppe wird ueber den Peer-Schalter gesteuert.
 - Peer-Bearbeitung wird im Nextcloud-Adminbereich der OrgSuite getrennt für die peer-fähigen Fachrollen konfiguriert. BO, EB und PFK sind standardmäßig aktiviert; HR, QMB und alle weiteren peer-fähigen Rollen standardmäßig deaktiviert. Bei BO und EB gilt sie nur innerhalb mindestens eines gemeinsamen Bürobereichs; PFK und Stabsstellen bleiben mangels Bürobereich innerhalb ihrer Fachgruppe berechtigt.
 - Assistent*innen erscheinen nicht in dieser App; ihre Planung bleibt im FlzPlaner.
 - Nextcloud-Admins duerfen alle Eintraege verwalten.
 
 Hierarchie fuer Fremdbearbeitung:
 
-- `flz-GF-AS` führt PDL, Büroleitungen, HR, QMB und das Sekretariat direkt. Die daraus folgenden indirekten Hierarchiebeziehungen erteilen im Kalender kein Bearbeitungsrecht.
-- `flz-GF-Digi` führt `flz-AsdGF-Digi`, `flz-Leitung-Finanzen-Lohn`, Fahrzeugverwaltung und das Sekretariat direkt. IT, Finanzen, Lohn und Empfang sind nur indirekt zugeordnet und werden dadurch nicht bearbeitbar.
-- `flz-AsdGF-Digi` fuehrt `flz-IT`; `flz-Leitung-Finanzen-Lohn` fuehrt `flz-Finanzen-Lohn`.
-- `flz-PDL` führt die stellvertretende PDL, Büroorganisation Pflege und PFK; die stellvertretende PDL führt Büroorganisation Pflege und PFK.
+- `GF-AS` führt PDL, Büroleitungen, HR, QMB und das Sekretariat direkt. Die daraus folgenden indirekten Hierarchiebeziehungen erteilen im Kalender kein Bearbeitungsrecht.
+- `GF-Digi` führt `AsdGF-Digi`, `Leitung-Finanzen-Lohn`, Fahrzeugverwaltung und das Sekretariat direkt. IT, Finanzen, Lohn und Empfang sind nur indirekt zugeordnet und werden dadurch nicht bearbeitbar.
+- `AsdGF-Digi` fuehrt `IT`; `Leitung-Finanzen-Lohn` fuehrt `Finanzen-Lohn`.
+- `PDL` führt die stellvertretende PDL, Büroorganisation Pflege und PFK; die stellvertretende PDL führt Büroorganisation Pflege und PFK.
 - Bueroleitungen und ihre bereichsbezogenen Stellvertretungen fuehren ausschliesslich BO und EB im passenden Buerobereich, nicht PFK.
-- `flz-Sekretariat` ist beiden Geschaeftsfuehrungen direkt zugeordnet.
+- `Sekretariat` ist beiden Geschaeftsfuehrungen direkt zugeordnet.
 - Leitungsrollen schuetzen immer vor Peer-Bearbeitung durch unterstellte Hauptberufsgruppen. Eine StvBL kann zum Beispiel zugleich EB sein, darf aber niemals durch normale EBs bearbeitet werden.
 - Vorgesetzte dürfen Kalenderdaten ausschließlich direkt unterstellter Personen bearbeiten; Untergebene und nur indirekt Vorgesetzte erhalten daraus kein Bearbeitungsrecht.
 
