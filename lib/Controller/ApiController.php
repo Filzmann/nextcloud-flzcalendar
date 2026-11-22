@@ -13,8 +13,8 @@ use OCA\FlzCalendar\Service\CalendarService;
 use OCA\FlzCalendar\Service\CalendarSettingsService;
 use OCA\FlzCalendar\Service\CalendarPreferenceService;
 use OCA\FlzCalendar\Service\RecurringAppointmentService;
+use OCA\FlzCalendar\Service\OrganizationHolidayCalendarService;
 use OCA\FlzCalendar\Service\ShiftCalendarSyncService;
-use OCA\LocalBase\Calendar\HolidayCalendarService;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\Attribute\NoAdminRequired;
@@ -32,7 +32,7 @@ final class ApiController extends Controller {
         private CalendarPreferenceService $preferences,
         private RecurringAppointmentService $recurrences,
         private ShiftCalendarSyncService $shiftSync,
-        private HolidayCalendarService $holidays,
+        private OrganizationHolidayCalendarService $holidays,
         private LoggerInterface $logger,
         private LocalizedErrorResponseFactory $errors,
     ) {

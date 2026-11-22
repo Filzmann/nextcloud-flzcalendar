@@ -7,6 +7,31 @@ Keine Passwörter, Tokens, personenbezogenen Echtdaten oder internen
 Kalenderkennungen eintragen. Für Screenshots ausschließlich neutrale
 Testkonten und synthetische Termine verwenden.
 
+## Technischer Organisationsnachweis vom 22. November 2026
+
+`php tests/run.php` und `node tests/run-js.mjs` bestehen mit dem
+öffentlichen V1-Provider von `flz_organization` als Organisationsquelle.
+Die vorhandenen Consumer-Tests belegen erlaubte und verweigerte Rechte,
+fehlende beziehungsweise inkompatible Provider und ausbleibende lokale
+Fallbacks. Der Browser-Build wurde zusätzlich aus der kanonischen
+Shared-Quelle neu erzeugt; alle sechs ausgelieferten Artefakte stimmen
+bytegenau einschließlich vollständiger AGPL-Lizenz überein.
+
+Die frühere Feiertagsadapterklasse aus `91c93b2` scheitert beim Laden am
+tatsächlich finalen LocalBase-Service (Exit 255). Der aktuelle Adapter lässt
+sich im echten lokalen Nextcloud-Container auflösen; Organisationsdefinition,
+Kalenderkontext, erlaubte und verweigerte synthetische Rollenentscheidung
+sowie Feiertagsprojektion wurden dort rein lesend erfolgreich geprüft.
+Dieser nachträgliche Regression-/Laufzeitnachweis rekonstruiert keinen
+ursprünglichen zeitlichen Red–Green-Ablauf. Dessen fehlender historischer
+Nachweis bleibt eine ausdrücklich begründete Abweichung bei der Übernahme
+des bereits bestehenden Integrationsstands. Die gebündelte
+Browser-Namespaceumstellung ist verhaltensbewahrend und durch die echten
+Consumer-VM-Smokes abgesichert.
+
+Die genannten technischen Prüfungen ersetzen keine erneute interaktive
+Browser- oder vollständige HTTP-CSRF-Abnahme.
+
 ## Kopfdaten
 
 | Feld | Eintrag |

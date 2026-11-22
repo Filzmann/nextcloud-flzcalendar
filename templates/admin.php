@@ -1,6 +1,6 @@
 <?php
 translation('flzcalendar');
-\OCP\Util::addScript('localbase', 'api/api-client');
+\OCP\Util::addScript('flzcalendar', 'shared/api-client');
 \OCP\Util::addScript('flzcalendar', 'modules/localization');
 \OCP\Util::addScript('flzcalendar', 'admin');
 \OCP\Util::addStyle('flzcalendar', 'admin');

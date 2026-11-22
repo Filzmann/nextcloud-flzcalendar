@@ -25,9 +25,9 @@ namespace OCP\AppFramework\Http {
 }
 namespace Psr\Log { interface LoggerInterface { public function error(string|\Stringable $message, array $context = []): void; } }
 namespace OCA\FlzCalendar\AppInfo { final class Application { public const APP_ID = 'flzcalendar'; } }
-namespace OCA\LocalBase\Calendar {
+namespace OCA\FlzCalendar\Service {
     class HolidayCalendar { public function __construct(private int $year) {} public function toArray(): array { return ['year' => $this->year, 'publicHolidays' => []]; } }
-    class HolidayCalendarService {
+    class OrganizationHolidayCalendarService {
         public array $calls = [];
         public function forYear(int $year): HolidayCalendar { $this->calls[] = $year; return new HolidayCalendar($year); }
     }
@@ -66,14 +66,14 @@ namespace {
     use OCA\FlzCalendar\Service\CalendarSettingsService;
     use OCA\FlzCalendar\Service\RecurringAppointmentService;
     use OCA\FlzCalendar\Service\ShiftCalendarSyncService;
-    use OCA\LocalBase\Calendar\HolidayCalendarService;
+    use OCA\FlzCalendar\Service\OrganizationHolidayCalendarService;
     use OCP\IRequest;
     use OCP\IL10N;
     use Psr\Log\LoggerInterface;
 
     $access = new CalendarAccessService();
     $calendar = new CalendarService();
-    $holidays = new HolidayCalendarService();
+    $holidays = new OrganizationHolidayCalendarService();
     $logger = new class implements LoggerInterface {
         public array $errors = [];
         public function error(string|\Stringable $message, array $context = []): void { $this->errors[] = (string)$message; }

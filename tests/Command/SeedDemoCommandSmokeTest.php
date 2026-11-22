@@ -4,11 +4,19 @@ declare(strict_types=1);
 
 
 use OCA\FlzCalendar\Service\DemoFixtureCatalog;
+use OCA\FlzCalendar\Service\CalendarOrganization;
+use OCA\FlzCalendar\Service\OrganizationRuntime;
 use OCA\LocalBase\Organization\FlzOrganizationDefinition;
 
-$fixtures = (new DemoFixtureCatalog())->all();
-if (count($fixtures) < 20) throw new RuntimeException('Der Demokatalog deckt die Organisationsstruktur nicht ausreichend ab.');
+$runtime = static function (CalendarOrganization $definition): OrganizationRuntime {
+    return new class($definition) extends OrganizationRuntime {
+        public function __construct(private CalendarOrganization $value) {}
+        public function organization(): ?CalendarOrganization { return $this->value; }
+    };
+};
 $definition = FlzOrganizationDefinition::defaults();
+$fixtures = (new DemoFixtureCatalog($runtime(new CalendarOrganization($definition->toArray()))))->all();
+if (count($fixtures) < 20) throw new RuntimeException('Der Demokatalog deckt die Organisationsstruktur nicht ausreichend ab.');
 $requiredGroups = array_merge($definition->roleGroupIds(), $definition->areaGroupIds());
 $covered = array_fill_keys(array_merge(...array_column($fixtures, 'groups')), true);
 foreach ($requiredGroups as $group) {
@@ -16,7 +24,8 @@ foreach ($requiredGroups as $group) {
 }
 $custom = $definition->toArray();
 $custom['roles']['office']['groupId'] = 'custom-office';
-$customFixtures = (new DemoFixtureCatalog(null, FlzOrganizationDefinition::get($custom)))->all();
+$customDefinition = new CalendarOrganization(FlzOrganizationDefinition::get($custom)->toArray());
+$customFixtures = (new DemoFixtureCatalog($runtime($customDefinition), $customDefinition))->all();
 if (!in_array('custom-office', array_merge(...array_column($customFixtures, 'groups')), true)) throw new RuntimeException('Demodaten verwenden nicht die konfigurierte Gruppen-ID.');
 $uids = [];
 foreach ($fixtures as $fixture) {

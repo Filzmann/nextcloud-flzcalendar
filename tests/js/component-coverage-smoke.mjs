@@ -74,7 +74,7 @@ class BaseRepository {
     encode(value) { return encodeURIComponent(String(value)); }
     request(path, options = {}) { this.calls.push([path, options]); return Promise.resolve({ path, options }); }
 }
-const repositoryContext = { window: { LocalBase: { repositories: { Repository: BaseRepository } }, FlzCalendar: {} }, JSON, Promise, encodeURIComponent };
+const repositoryContext = { window: { OCA: { FlzCalendar: { Shared: { repositories: { Repository: BaseRepository } } } }, FlzCalendar: {} }, JSON, Promise, encodeURIComponent };
 load('../../js/repositories/calendar-repository.js', repositoryContext);
 const repository = new repositoryContext.window.FlzCalendar.repositories.CalendarRepository({});
 await repository.week('2026-07-01');
@@ -104,7 +104,7 @@ if (repository.calls.length !== 16
 
 // CalendarEntry: server payload hydration and stable serialisation defaults.
 class BaseModel {}
-const modelContext = { window: { LocalBase: { models: { Model: BaseModel } }, FlzCalendar: {} }, Number, String, Boolean };
+const modelContext = { window: { OCA: { FlzCalendar: { Shared: { models: { Model: BaseModel } } } }, FlzCalendar: {} }, Number, String, Boolean };
 load('../../js/models/calendar-entry.js', modelContext);
 const CalendarEntry = modelContext.window.FlzCalendar.models.CalendarEntry;
 const hydratedEntry = new CalendarEntry({

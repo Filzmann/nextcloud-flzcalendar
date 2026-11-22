@@ -6,12 +6,6 @@ namespace OCP\EventDispatcher {
     class Event { public function __construct() {} }
     interface IEventListener { public function handle(Event $event): void; }
 }
-namespace OCP {
-    interface IAppConfig {
-        public function getValueString(string $appId, string $key, string $default = ''): string;
-        public function setValueString(string $appId, string $key, string $value): void;
-    }
-}
 namespace OCP\Config {
     if (!interface_exists(IUserConfig::class)) {
         interface IUserConfig {
@@ -70,7 +64,7 @@ namespace {
     use OCA\FlzCalendar\Repository\TemporaryAdminAccessRepository;
     use OCA\FlzCalendar\CalendarSync\ExternalCalendarConnectionStore;
     use OCA\FlzCalendar\Service\CalendarPreferenceService;
-    use OCA\LocalBase\Calendar\CalendarContextSettingsService;
+    use OCA\FlzCalendar\Service\OrganizationRuntime;
     use OCA\FlzDataProtection\PublicApi\V1\DataSubjectRef;
     use OCA\FlzDataProtection\PublicApi\V1\PersonalDataRequest;
     use OCA\FlzDataProtection\PublicApi\V1\RegisterPersonalDataProvidersEvent;
@@ -83,9 +77,11 @@ namespace {
         CalendarEntry::get(['id'=>2,'employeeUid'=>'self','start'=>'2026-08-13T06:00:00+00:00','end'=>'2026-08-13T14:00:00+00:00','type'=>'shift','title'=>'Frühdienst']),
         CalendarEntry::get(['id'=>3,'employeeUid'=>'other-person','start'=>'2026-08-12T08:00:00+00:00','end'=>'2026-08-12T09:00:00+00:00','type'=>'appointment','title'=>'Fremder Titel','meetingUid'=>'meeting-a']),
     ];
-    $config = new class implements OCP\IAppConfig {
-        public function getValueString(string $appId, string $key, string $default = ''): string { return $default; }
-        public function setValueString(string $appId, string $key, string $value): void {}
+    $organization = new class extends OrganizationRuntime {
+        public function __construct() {}
+        public function calendarContext(): ?object {
+            return new class { public function timezone(): string { return 'Europe/Berlin'; } };
+        }
     };
     $userConfig = new class implements IUserConfig {
         public array $values = [
@@ -114,7 +110,7 @@ namespace {
     ]];
     $provider = new CalendarPersonalDataProvider(
         $entries,
-        new CalendarContextSettingsService($config),
+        $organization,
         new CalendarPreferenceService($userConfig),
         new ExternalCalendarConnectionStore($userConfig, $crypto),
         $adminAccess,

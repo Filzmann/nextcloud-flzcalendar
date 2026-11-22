@@ -61,9 +61,9 @@ Kalendermatrix scrollt innerhalb des verfügbaren sichtbaren Bereichs in beide
 Richtungen. Ihre horizontale Scrollleiste bleibt unabhängig von der Höhe des
 Tabelleninhalts am unteren Rand des sichtbaren Kalender-Viewports; beide
 Scrollrichtungen sind dort jederzeit erreichbar.
-Gesetzliche Feiertage werden über den gemeinsamen read-only
-LocalBase-Kalendervertrag geliefert und verändern weder Einträge, Verfügbarkeit
-noch Rechte.
+Gesetzliche Feiertage werden über den öffentlichen read-only V1-Vertrag von
+`flz_organization` geliefert und verändern weder Einträge, Verfügbarkeit noch
+Rechte.
 
 Filter nach Personen, Rollen und Bereichen verwenden den konfigurierten
 Organisationsvertrag. Rollen und Bereiche werden jeweils als ODER-Auswahl und
@@ -82,8 +82,8 @@ nicht. Beim Öffnen erhält ein Bedienelement im Panel den Fokus; „Escape“ u
 Schließen-Aktion schließen das Panel und geben den Fokus an den Auslöser
 zurück.
 
-Gruppenüberschriften und der mobile Organisationskontext verwenden die vom
-LocalBase-Organisationsvertrag gelieferten Kürzel. Bereichsrollen verbinden
+Gruppenüberschriften und der mobile Organisationskontext verwenden die von
+`flz_organization` V1 gelieferten Kürzel. Bereichsrollen verbinden
 Rollen- und Bereichskürzel mit einem Bindestrich, beispielsweise `BO-NO` oder
 `EB-W`; globale Rollen erscheinen beispielsweise als `PFK`, `BO-Pflege` oder
 `IT`. Filter und Organisationsverwaltung verwenden weiterhin die Langnamen.
@@ -226,7 +226,9 @@ den erlaubten Personenkreis begrenzt.
 
 Rollen, Bereiche, sichtbare Bezeichnungen, Reihenfolge, Peer-Fähigkeit,
 Assistenzteam-Konventionen und Hierarchiekanten stammen aus
-`FlzOrganizationDefinition`. Fachcode führt kein paralleles Rollenregister.
+dem öffentlichen V1-Snapshot von `flz_organization`. Die Konfiguration liegt
+im Nextcloud-Adminbereich dieses Providers; Fachcode führt kein paralleles
+Rollenregister.
 Eine Änderung technischer Gruppen-IDs verschiebt keine bestehenden
 Nextcloud-Mitgliedschaften.
 

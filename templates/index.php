@@ -1,9 +1,9 @@
 <?php
 translation('flzcalendar');
-\OCP\Util::addScript('localbase', 'api/api-client');
-\OCP\Util::addScript('localbase', 'models/model');
-\OCP\Util::addScript('localbase', 'repositories/repository');
-\OCP\Util::addScript('localbase', 'ui/ui');
+\OCP\Util::addScript('flzcalendar', 'shared/api-client');
+\OCP\Util::addScript('flzcalendar', 'shared/model');
+\OCP\Util::addScript('flzcalendar', 'shared/repository');
+\OCP\Util::addScript('flzcalendar', 'shared/ui');
 \OCP\Util::addScript('flzcalendar', 'models/calendar-entry');
 \OCP\Util::addScript('flzcalendar', 'models/organization');
 \OCP\Util::addScript('flzcalendar', 'repositories/calendar-repository');

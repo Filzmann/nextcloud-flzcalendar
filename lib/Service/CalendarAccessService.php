@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace OCA\FlzCalendar\Service;
 
-use OCA\LocalBase\Organization\FlzOrganizationDefinition;
-use OCA\LocalBase\Organization\FlzOrganizationSettingsService;
 use OCP\IGroupManager;
 use OCP\IUser;
 use OCP\IUserManager;
@@ -22,11 +20,11 @@ final class CalendarAccessService {
         private IGroupManager $groups,
         private IUserSession $session,
         private IUserManager $users,
-        private CalendarPermissionPolicy $policy,
-        private CalendarSettingsService $settings,
         private CalendarGroupProfile $profiles,
-        private ?FlzOrganizationSettingsService $organization = null,
-    ) {}
+        private OrganizationRuntime $organization,
+    )
+    {
+    }
 
     public function currentUser(): ?IUser {
         return $this->session->getUser();
@@ -49,13 +47,11 @@ final class CalendarAccessService {
         if (!$isAdmin && !$this->isOrganizationMember($actorGroups)) return false;
         $targetGroups = $this->groupIds($target);
 
-        return $this->policy->canManage(
+        return $isAdmin || $this->organization->canManage(
             $user->getUID(),
-            $isAdmin,
             $actorGroups,
             $employeeUid,
             $targetGroups,
-            $this->settings->enabledPeerGroups(),
         );
     }
 
@@ -72,7 +68,12 @@ final class CalendarAccessService {
         if (!$this->canView()) return [];
 
         $byUid = [];
-        foreach ($this->definition()->roleGroupIds(static fn(array $role): bool => $role['calendarVisible']) as $role) {
+        $definition = $this->definition();
+        if ($definition === null)
+        {
+            return [];
+        }
+        foreach ($definition->roleGroupIds(static fn(array $role): bool => ($role['calendarVisible'] ?? false) === true) as $role) {
             $group = $this->groups->get($role);
             if ($group === null) continue;
 
@@ -105,10 +106,12 @@ final class CalendarAccessService {
     }
 
     private function isOrganizationMember(array $groupIds): bool {
-        return array_intersect($groupIds, $this->definition()->roleGroupIds()) !== [];
+        $definition = $this->definition();
+        return $definition !== null && array_intersect($groupIds, $definition->roleGroupIds()) !== [];
     }
 
-    private function definition(): FlzOrganizationDefinition {
-        return $this->organization?->definition() ?? FlzOrganizationDefinition::defaults();
+    private function definition(): ?CalendarOrganization
+    {
+        return $this->organization->organization();
     }
 }

@@ -323,7 +323,7 @@ for (const contract of ['extends BaseRepository', 'range(start, end)', 'savePref
 for (const contract of ['class Organization extends BaseModel', 'roleLabel(groupId)', 'areaLabel(groupId)', 'roleShortLabel(groupId)', 'areaShortLabel(groupId)', 'staffRoleGroups()', 'leadershipStaffRoleGroups()', 'roleIsAreaScoped(groupId)', 'roleOrder(groupId)', 'areaOrder(groupId)', 'toArray()']) {
     if (!organizationModel.includes(contract)) throw new Error(`Organisationsmodell-Vertrag fehlt: ${contract}`);
 }
-const organizationContext = { window: { LocalBase: { models: { Model: class {} } } }, Number, String, JSON };
+const organizationContext = { window: { OCA: { FlzCalendar: { Shared: { models: { Model: class {} } } } } }, Number, String, JSON };
 execute('../../js/models/organization.js', organizationModel, organizationContext);
 const sortableOrganization = new organizationContext.window.FlzCalendar.models.Organization({
     roles: {
@@ -354,7 +354,7 @@ if (legacyOrganization.roleShortLabel('legacy-office') !== 'Altes Büro' || lega
 if (sortableOrganization.leadershipStaffRoleGroups().join(',') !== 'PDL,Stab-HR') {
     throw new Error('IT, Sekretariat und Finanzen/Lohn bleiben ungewollt Teil des gemeinsamen Leitungs-/Stabsfilters.');
 }
-for (const contract of ['window.LocalBase.models.Model', 'extends BaseModel', 'toArray()', 'this.defaultDate', 'this.defaultModified', 'this.defaultDeleted', 'this.meetingUid', 'this.seriesUid', 'this.seriesTimezone', 'this.canManageMeeting']) {
+for (const contract of ['window.OCA.FlzCalendar.Shared.models.Model', 'extends BaseModel', 'toArray()', 'this.defaultDate', 'this.defaultModified', 'this.defaultDeleted', 'this.meetingUid', 'this.seriesUid', 'this.seriesTimezone', 'this.canManageMeeting']) {
     if (!model.includes(contract)) throw new Error(`Modell-Vertrag fehlt: ${contract}`);
 }
 for (const contract of ['class CalendarCell', 'flz-calendar-cell-actions', 'flz-calendar-entry__children', 'grid-template-rows:', 'grid-row:', 'entry.parentEntryId === shift.id', 'entry.canManageMeeting !== false', 'flz-calendar-entry__blocked-marker', 'flz-calendar-entry__series-marker', 'flz-calendar-entry--assistance', 'flz-calendar-assistance-label--full', 'flz-calendar-assistance-label--short', 'aria-hidden="true">🔒', "data-action=\"add-entry\"", "l10n.t('Create shift')", 'icon-calendar-dark']) {
@@ -429,7 +429,7 @@ for (const contract of ['class EntryDialog', 'this.returnFocus', 'this.dialog.sh
 }
 
 const componentContext = {
-    window: { LocalBase: { ui: { esc: value => String(value ?? '') } } },
+    window: { OCA: { FlzCalendar: { Shared: { ui: { esc: value => String(value ?? '') } } } } },
     Date,
 };
 execute('../../js/components/calendar-cell.js', calendarCell, componentContext);
@@ -510,13 +510,17 @@ const escapingContext = {
                 t: () => maliciousTranslation,
             },
         },
-        LocalBase: {
-            ui: {
+        OCA: {
+            FlzCalendar: {
+                Shared: {
+                    ui: {
                 esc: value => String(value ?? '')
                     .replaceAll('&', '&amp;')
                     .replaceAll('<', '&lt;')
                     .replaceAll('>', '&gt;')
                     .replaceAll('"', '&quot;'),
+                    },
+                },
             },
         },
     },

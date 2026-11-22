@@ -2,18 +2,27 @@
 
 Wochen- und monatsbasierte Dienst- und Terminplanung mit wiederkehrenden Terminen, Personensuche, Gruppenfiltern, Meetinglückensuche, Standarddienstzeiten, read-only Urlaubsmarkierungen und persönlichem Export eigener Dienste, Termine und Urlaube nach Nextcloud sowie dienst-only externe Kalender.
 
-Die Monatsansicht stellt den vollständigen sichtbaren Monatszeitraum in einer einzigen durchgehenden Planungsmatrix dar und lässt sich wie die Wochenansicht zwischen „Tage als Zeilen“ und „Personen als Zeilen“ umschalten. Sie wiederholt keine Wochenblöcke: Die gemeinsame Tagesachse wächst je nach Ausrichtung um Zeilen oder Spalten. Vor und nach dem gewählten Monat erscheinen jeweils höchstens drei abgedunkelte Randtage; die erste und letzte sichtbare Woche dürfen dadurch unvollständig sein. Die zu den Personen gehörende erste Spalte beziehungsweise Kopfzeile bleibt beim Scrollen sichtbar. Samstag und Sonntag werden ausschließlich über ihren Wochentagsnamen gekennzeichnet. Leere Wochenend- und Feiertagstage erscheinen kompakt und erhalten bei „Tage als Spalten“ eine feste schmale Breite. Sie wechseln nur bei vorhandenen Diensten oder Terminen automatisch auf Normalgröße; ein Urlaubsmarker allein verhindert die kompakte Darstellung nicht. Die Kalendermatrix scrollt innerhalb des sichtbaren Tabellenbereichs in beide Richtungen; ihre horizontale Leiste bleibt unabhängig von der Inhaltshöhe am unteren Rand dieses Bereichs erreichbar. Der geöffnete Filter liegt als eigenes scrollbar begrenztes Panel über der Übersicht und lässt sich per Escape schließen. Bereichsfilter schneiden nur bereichsgebundene Rollen; globale Rollen bleiben sichtbar. Der Leitungs-/Stabsblock ist ohne zusätzliche Bereichsauswahl schaltbar. Gesetzliche Feiertage der organisationsweit konfigurierten Kalenderregion werden über den gemeinsamen LocalBase-Kalendervertrag geliefert, namentlich gekennzeichnet und bleiben ohne Auswirkung auf Dienste, Termine oder Rechte. Berlin bleibt Bestandsdefault. Zeitraum und Ausrichtung können zusammen mit den Filtern als persönlicher Standard gespeichert werden.
+Die Monatsansicht stellt den vollständigen sichtbaren Monatszeitraum in einer einzigen durchgehenden Planungsmatrix dar und lässt sich wie die Wochenansicht zwischen „Tage als Zeilen“ und „Personen als Zeilen“ umschalten. Sie wiederholt keine Wochenblöcke: Die gemeinsame Tagesachse wächst je nach Ausrichtung um Zeilen oder Spalten. Vor und nach dem gewählten Monat erscheinen jeweils höchstens drei abgedunkelte Randtage; die erste und letzte sichtbare Woche dürfen dadurch unvollständig sein. Die zu den Personen gehörende erste Spalte beziehungsweise Kopfzeile bleibt beim Scrollen sichtbar. Samstag und Sonntag werden ausschließlich über ihren Wochentagsnamen gekennzeichnet. Leere Wochenend- und Feiertagstage erscheinen kompakt und erhalten bei „Tage als Spalten“ eine feste schmale Breite. Sie wechseln nur bei vorhandenen Diensten oder Terminen automatisch auf Normalgröße; ein Urlaubsmarker allein verhindert die kompakte Darstellung nicht. Die Kalendermatrix scrollt innerhalb des sichtbaren Tabellenbereichs in beide Richtungen; ihre horizontale Leiste bleibt unabhängig von der Inhaltshöhe am unteren Rand dieses Bereichs erreichbar. Der geöffnete Filter liegt als eigenes scrollbar begrenztes Panel über der Übersicht und lässt sich per Escape schließen. Bereichsfilter schneiden nur bereichsgebundene Rollen; globale Rollen bleiben sichtbar. Der Leitungs-/Stabsblock ist ohne zusätzliche Bereichsauswahl schaltbar. Gesetzliche Feiertage der organisationsweit konfigurierten Kalenderregion werden über den öffentlichen V1-Vertrag von `flz_organization` geliefert, namentlich gekennzeichnet und bleiben ohne Auswirkung auf Dienste, Termine oder Rechte. Zeitraum und Ausrichtung können zusammen mit den Filtern als persönlicher Standard gespeichert werden.
 
 ## Staging-Kompatibilität
 
 - Nextcloud 33 bis 35
 - PHP 8.3 oder neuer innerhalb des von Nextcloud 33 bis 35 unterstützten Bereichs
-- Laufzeitbasis: `localbase`; `orgsuite` ist ab zwei FLZ-Fachprodukten optional aktiv
+- Laufzeitbasis: `localbase` sowie ein kompatibles, aktiviertes
+  `flz_organization` mit öffentlichem V1-Vertrag; `orgsuite` ist ab zwei
+  FLZ-Fachprodukten optional aktiv
 - App-ID und Installationsordner: `flzcalendar`
 
 ## Installation
 
-Für Staging und Auslieferung das Produktbundle `flz-product-flzcalendar-<release>.tar.gz` und dessen enthaltenes `install.sh` verwenden. Es prüft und installiert LocalBase automatisch; ab dem zweiten FLZ-Fachprodukt aktiviert es OrgSuite.
+Das Produktbundle `flz-product-flzcalendar-<release>.tar.gz` ist erst wieder
+auslieferungsfähig, wenn sein `install.sh` neben LocalBase auch
+`flz_organization` in einer V1-kompatiblen Version prüft und installiert. Bis
+dahin muss `flz_organization` vor Filzmann Kalender separat kompatibel
+installiert und aktiviert werden. Ein fehlender, deaktivierter, inkompatibler
+oder ungültiger Organisationsprovider schließt Organisationssicht und
+organisationsbasierte Fachrechte kontrolliert; die ausdrücklich dokumentierte
+native Kalender-Adminausnahme bleibt davon getrennt.
 
 Filzmann Kalender funktioniert einzeln. Ohne Filzmann Urlaubsplanung stehen manuelle Sperrtermine zur Verfügung; die read-only Urlaubsmarkierungen entfallen.
 

@@ -1,12 +1,13 @@
 (function () {
     'use strict';
     const l10n = window.FlzCalendar.l10n;
-    const apiClient = new window.LocalBase.api.ApiClient({
+    const shared = window.OCA.FlzCalendar.Shared;
+    const apiClient = new shared.api.ApiClient({
         appId: 'flzcalendar',
         errorMessage: (data, status) => data?.error || data?.message || `HTTP ${status}`,
     });
     const repository = new window.FlzCalendar.repositories.CalendarRepository(apiClient);
-    const notice = new window.LocalBase.ui.Notice('flz-calendar-notice', { baseClass: 'flz-calendar-notice', typeClassPrefix: 'flz-calendar-notice--' });
+    const notice = new shared.ui.Notice('flz-calendar-notice', { baseClass: 'flz-calendar-notice', typeClassPrefix: 'flz-calendar-notice--' });
     const EntryModel = window.FlzCalendar.models.CalendarEntry;
     const OrganizationModel = window.FlzCalendar.models.Organization;
     const CalendarDate = window.FlzCalendar.modules.CalendarDate;

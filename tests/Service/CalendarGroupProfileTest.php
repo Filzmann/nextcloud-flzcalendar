@@ -4,8 +4,16 @@ declare(strict_types=1);
 
 
 use OCA\FlzCalendar\Service\CalendarGroupProfile;
+use OCA\FlzCalendar\Service\CalendarOrganization;
+use OCA\FlzCalendar\Service\OrganizationRuntime;
+use OCA\LocalBase\Organization\FlzOrganizationDefinition;
 
-$profiles = new CalendarGroupProfile();
+$definition = new CalendarOrganization(FlzOrganizationDefinition::defaults()->toArray());
+$organization = new class($definition) extends OrganizationRuntime {
+    public function __construct(private CalendarOrganization $value) {}
+    public function organization(): ?CalendarOrganization { return $this->value; }
+};
+$profiles = new CalendarGroupProfile($organization);
 $pfk = $profiles->get(['PFK', 'Bereich-Sued']);
 if ($pfk['areas'] !== [] || $pfk['clusters'] !== ['PFK']) throw new RuntimeException('PFK darf keinem Buerobereich zugeordnet werden.');
 $care = $profiles->get(['PFK', 'Bueroorganisation-Pflege', 'StvPDL']);

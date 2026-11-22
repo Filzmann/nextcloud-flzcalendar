@@ -1,7 +1,7 @@
 (function() {
     'use strict';
 
-    const { esc } = window.LocalBase.ui;
+    const { esc } = window.OCA.FlzCalendar.Shared.ui;
     const l10n = window.FlzCalendar.l10n;
 
     /**

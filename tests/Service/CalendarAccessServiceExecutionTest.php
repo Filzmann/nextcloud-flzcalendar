@@ -13,9 +13,8 @@ namespace OCP {
     }
 }
 
-namespace OCA\LocalBase\Organization {
-    final class FlzOrganizationDefinition {
-        public static function defaults(): self { return new self(); }
+namespace OCA\FlzCalendar\Service {
+    final class CalendarOrganization {
         public function roleGroupIds(?callable $filter = null): array {
             $roles = [
                 'role-a' => ['calendarVisible' => true],
@@ -25,16 +24,12 @@ namespace OCA\LocalBase\Organization {
             return array_keys($filter === null ? $roles : array_filter($roles, $filter));
         }
     }
-    final class FlzOrganizationSettingsService { public function definition(): FlzOrganizationDefinition { return FlzOrganizationDefinition::defaults(); } }
-}
-
-namespace OCA\FlzCalendar\Service {
-    final class CalendarPermissionPolicy {
+    final class OrganizationRuntime {
         public array $calls = [];
         public bool $allowed = true;
+        public function organization(): ?CalendarOrganization { return new CalendarOrganization(); }
         public function canManage(...$arguments): bool { $this->calls[] = $arguments; return $this->allowed; }
     }
-    final class CalendarSettingsService { public function enabledPeerGroups(): array { return ['peer-a']; } }
     final class CalendarGroupProfile {
         public function get(array $groups): array {
             return [
@@ -50,9 +45,7 @@ namespace {
 
     use OCA\FlzCalendar\Service\CalendarAccessService;
     use OCA\FlzCalendar\Service\CalendarGroupProfile;
-    use OCA\FlzCalendar\Service\CalendarPermissionPolicy;
-    use OCA\FlzCalendar\Service\CalendarSettingsService;
-    use OCA\LocalBase\Organization\FlzOrganizationSettingsService;
+    use OCA\FlzCalendar\Service\OrganizationRuntime;
     use OCP\IGroupManager;
     use OCP\IUser;
     use OCP\IUserManager;
@@ -93,15 +86,13 @@ namespace {
         'alpha' => ['role-a', 'area-a'],
         'zeta' => ['role-a', 'area-b'],
     ];
-    $policy = new CalendarPermissionPolicy();
+    $organization = new OrganizationRuntime();
     $access = new CalendarAccessService(
         $groups,
         $session,
         $users,
-        $policy,
-        new CalendarSettingsService(),
         new CalendarGroupProfile(),
-        new FlzOrganizationSettingsService(),
+        $organization,
     );
 
     if ($access->currentUser() !== null || $access->canView() || $access->canManage('alpha')
@@ -113,17 +104,16 @@ namespace {
     $session->user = $actor;
     if (!$access->canView() || $access->canManage('unknown')) throw new RuntimeException('Organigramm-Sicht oder unbekanntes Ziel wird falsch bewertet.');
     if (!$access->canManage('alpha')) throw new RuntimeException('Policy-Ergebnis wird nicht für bekannte Zielkonten verwendet.');
-    $policyCall = $policy->calls[0];
-    if ($policyCall[0] !== 'actor' || $policyCall[1] !== false || $policyCall[2] !== ['role-a', 'area-a']
-        || $policyCall[3] !== 'alpha' || $policyCall[4] !== ['role-a', 'area-a'] || $policyCall[5] !== ['peer-a']) {
+    $policyCall = $organization->calls[0];
+    if ($policyCall[0] !== 'actor' || $policyCall[1] !== ['role-a', 'area-a']
+        || $policyCall[2] !== 'alpha' || $policyCall[3] !== ['role-a', 'area-a']) {
         throw new RuntimeException('Organigrammrollen dürfen nicht versehentlich als native Adminausnahme gelten.');
     }
     $groups->groupIds['actor'] = [];
     if ($access->canView() || $access->canManage('actor')) throw new RuntimeException('Organisationsfremde Konten dürfen weder lesen noch eigene Einträge verwalten.');
     $groups->admins = ['actor'];
     if (!$access->canView()) throw new RuntimeException('Die ausdrücklich freigegebene native Adminausnahme muss die Kalenderverwaltung erreichbar machen.');
-    $access->canManage('alpha');
-    if (($policy->calls[1][1] ?? null) !== true) throw new RuntimeException('Native Administration muss ohne app-lokale Freigabe die ausdrückliche Kalenderausnahme erfüllen.');
+    if (!$access->canManage('alpha')) throw new RuntimeException('Native Administration muss ohne app-lokale Freigabe die ausdrückliche Kalenderausnahme erfüllen.');
     $groups->admins = [];
     if ($access->canView() || $access->canManage('alpha')) {
         throw new RuntimeException('Der Verlust des nativen Adminstatus muss die Kalenderausnahme beim nächsten Zugriff sofort entziehen.');
@@ -136,7 +126,7 @@ namespace {
         || $visible[1]['areas'] !== ['area-b'] || $visible[0]['canManage'] !== true) {
         throw new RuntimeException('Sichtbare Kalenderkonten werden nicht dedupliziert, profiliert und natürlich sortiert.');
     }
-    $policy->allowed = false;
+    $organization->allowed = false;
     if ($access->canManage('zeta')) throw new RuntimeException('Verweigertes Policy-Ergebnis wird nicht durchgesetzt.');
 
     echo "CalendarAccessServiceExecutionTest: OK\n";

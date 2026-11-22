@@ -1,11 +1,11 @@
 (function() {
     'use strict';
 
-    const BaseModel = window.LocalBase.models.Model;
+    const BaseModel = window.OCA.FlzCalendar.Shared.models.Model;
 
     /**
      * Zweck: Stellt den serverseitig konfigurierten FLZ-Organisationsvertrag für Filter, Gruppierung und Einstellungen bereit.
-     * Spiegelung: PHP: OCA\LocalBase\Organization\FlzOrganizationDefinition.
+     * Spiegelung: öffentlicher Organisationssnapshot aus flz_organization V1.
      */
     class Organization extends BaseModel {
         constructor(data = {}) {

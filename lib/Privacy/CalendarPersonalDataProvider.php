@@ -13,7 +13,7 @@ use OCA\FlzCalendar\Model\CalendarEntry;
 use OCA\FlzCalendar\Repository\CalendarEntryRepository;
 use OCA\FlzCalendar\Repository\TemporaryAdminAccessRepository;
 use OCA\FlzCalendar\Service\CalendarPreferenceService;
-use OCA\LocalBase\Calendar\CalendarContextSettingsService;
+use OCA\FlzCalendar\Service\OrganizationRuntime;
 use OCA\FlzDataProtection\PublicApi\V1\PersonalDataEntry;
 use OCA\FlzDataProtection\PublicApi\V1\PersonalDataPage;
 use OCA\FlzDataProtection\PublicApi\V1\PersonalDataProvider;
@@ -23,7 +23,7 @@ use OCA\FlzDataProtection\PublicApi\V1\ProviderDescriptor;
 final class CalendarPersonalDataProvider implements PersonalDataProvider {
     public function __construct(
         private CalendarEntryRepository $entries,
-        private CalendarContextSettingsService $calendarContext,
+        private OrganizationRuntime $organization,
         private CalendarPreferenceService $preferences,
         private ExternalCalendarConnectionStore $externalConnections,
         private TemporaryAdminAccessRepository $adminAccess,
@@ -36,7 +36,12 @@ final class CalendarPersonalDataProvider implements PersonalDataProvider {
     public function collect(PersonalDataRequest $request): PersonalDataPage {
         if ($request->subject()->subjectType() !== 'nextcloud-user') return new PersonalDataPage('not_applicable');
         if ($request->cursor() !== null) throw new InvalidArgumentException('Filzmann Kalender does not support cursor paging.');
-        $timezone = $this->calendarContext->context()->timezone();
+        $timezoneName = $this->organization->calendarContext()?->timezone();
+        if (!is_string($timezoneName) || $timezoneName === '')
+        {
+            return new PersonalDataPage('partial', [], ['Organisationszeitzone ist nicht verfügbar.']);
+        }
+        $timezone = new DateTimeZone($timezoneName);
         $subjectUid = $request->subject()->subjectId();
         $entries = $this->entries->findByEmployeeUid($subjectUid, $request->pageLimit() + 1);
         $meetingUids = array_values(array_unique(array_filter(array_map(static fn(CalendarEntry $entry): ?string => $entry->meetingUid(), $entries))));

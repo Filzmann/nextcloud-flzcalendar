@@ -2,73 +2,51 @@
 
 declare(strict_types=1);
 
-namespace OCP {
-    if (!interface_exists(IAppConfig::class)) {
-        interface IAppConfig {
-            public function getValueString(string $appId, string $key, string $default = ''): string;
-            public function setValueString(string $appId, string $key, string $value): void;
-        }
+use OCA\FlzCalendar\Permission\NextcloudCalendarPermissionSource;
+use OCA\FlzCalendar\Service\CalendarOrganization;
+use OCA\FlzCalendar\Service\CalendarSettingsService;
+use OCA\FlzCalendar\Service\OrganizationRuntime;
+use OCA\LocalBase\Organization\FlzOrganizationDefinition;
+
+$definition = new CalendarOrganization(FlzOrganizationDefinition::defaults()->toArray());
+$organization = new class($definition) extends OrganizationRuntime {
+    /** @var list<string> */
+    public array $groups = ['Buero', 'EB', 'PFK'];
+    public function __construct(private CalendarOrganization $value) {}
+    public function organization(): ?CalendarOrganization { return $this->value; }
+    public function peerGroups(): array { return $this->groups; }
+};
+$calendarSettings = new CalendarSettingsService($organization);
+$source = new NextcloudCalendarPermissionSource($organization);
+
+$defaults = $source->peerGroups();
+foreach (['Buero', 'EB', 'PFK'] as $enabledByDefault) {
+    if (!in_array($enabledByDefault, $defaults, true)) {
+        throw new RuntimeException('Der Kalender konsumiert den freigegebenen Peerdefault nicht: ' . $enabledByDefault);
+    }
+}
+foreach (['Stab-HR', 'Stab-QMB'] as $disabledByDefault) {
+    if (in_array($disabledByDefault, $defaults, true)) {
+        throw new RuntimeException('Der Kalender aktiviert eine standardmäßig ausgeschaltete Peerrolle: ' . $disabledByDefault);
     }
 }
 
-namespace OCA\LocalBase\AppInfo {
-    if (!class_exists(Application::class, false)) {
-        final class Application { public const APP_ID = 'localbase'; }
-    }
+$organization->groups = ['EB', 'PFK', 'Stab-HR'];
+$configured = $source->peerGroups();
+if (in_array('Buero', $configured, true)
+    || !in_array('EB', $configured, true)
+    || !in_array('PFK', $configured, true)
+    || !in_array('Stab-HR', $configured, true)
+    || in_array('Stab-QMB', $configured, true)) {
+    throw new RuntimeException('Der Kalender respektiert explizite Peerentscheidungen aus flz_organization V1 nicht vollständig.');
+}
+$projection = $calendarSettings->peerEditing();
+if (($projection['Buero'] ?? null) !== false
+    || ($projection['EB'] ?? null) !== true
+    || ($projection['PFK'] ?? null) !== true
+    || ($projection['Stab-HR'] ?? null) !== true
+    || ($projection['Stab-QMB'] ?? null) !== false) {
+    throw new RuntimeException('Die read-only Peerprojektion entspricht nicht dem öffentlichen Autorisierungsvertrag.');
 }
 
-namespace {
-    use OCA\FlzCalendar\Permission\NextcloudCalendarPermissionSource;
-    use OCA\FlzCalendar\Service\CalendarSettingsService;
-    use OCA\LocalBase\Organization\FlzOrganizationSettingsService;
-    use OCA\LocalBase\Organization\FlzSuiteAdminSettingsService;
-    use OCP\IAppConfig;
-
-    $config = new class implements IAppConfig {
-        /** @var array<string,array<string,string>> */
-        public array $values = [];
-
-        public function getValueString(string $appId, string $key, string $default = ''): string {
-            return $this->values[$appId][$key] ?? $default;
-        }
-
-        public function setValueString(string $appId, string $key, string $value): void {
-            $this->values[$appId][$key] = $value;
-        }
-    };
-
-    $organization = new FlzOrganizationSettingsService($config);
-    $adminSettings = new FlzSuiteAdminSettingsService($config, $organization);
-    $calendarSettings = new CalendarSettingsService($adminSettings, $organization);
-    $source = new NextcloudCalendarPermissionSource($organization, $calendarSettings);
-
-    $defaults = $source->peerGroups();
-    foreach (['Buero', 'EB', 'PFK'] as $enabledByDefault) {
-        if (!in_array($enabledByDefault, $defaults, true)) {
-            throw new RuntimeException('Der Kalender konsumiert den freigegebenen Peerdefault nicht: ' . $enabledByDefault);
-        }
-    }
-    foreach (['Stab-HR', 'Stab-QMB'] as $disabledByDefault) {
-        if (in_array($disabledByDefault, $defaults, true)) {
-            throw new RuntimeException('Der Kalender aktiviert eine standardmäßig ausgeschaltete Peerrolle: ' . $disabledByDefault);
-        }
-    }
-
-    $adminSettings->saveCalendarPeerEditing([
-        'Buero' => false,
-        'EB' => true,
-        'PFK' => true,
-        'Stab-HR' => true,
-        'Stab-QMB' => false,
-    ]);
-    $configured = $source->peerGroups();
-    if (in_array('Buero', $configured, true)
-        || !in_array('EB', $configured, true)
-        || !in_array('PFK', $configured, true)
-        || !in_array('Stab-HR', $configured, true)
-        || in_array('Stab-QMB', $configured, true)) {
-        throw new RuntimeException('Der Kalender respektiert explizite Peerentscheidungen aus dem LocalBase-Vertrag nicht vollständig.');
-    }
-
-    echo "CalendarPeerSettingsConsumerContractTest: OK\n";
-}
+echo "CalendarPeerSettingsConsumerContractTest: OK\n";

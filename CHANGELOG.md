@@ -2,6 +2,17 @@
 
 ## Unreleased
 
+- Der isolierte Browser-Consumer-Smoke verwendet absolute Quelldateipfade in
+  der VM, damit die Coverage-Messung ausgeführte Kategorie-A-Dateien eindeutig
+  zuordnet.
+- Die gemeinsamen Browser-Primitives als reproduzierbares, app-lokal
+  isoliertes Kategorie-A-Bundle eingebunden und die Laufzeitabhängigkeit von
+  privaten LocalBase-Assets sowie `window.LocalBase` entfernt.
+- Organisationsdefinition, Kalenderrechte, Peerfreigaben, Kalenderkontext,
+  Feiertage, Demo-Projektion und PermissionProvider auf den öffentlichen,
+  aktivierungs- und versionsgeprüften V1-Vertrag von `flz_organization`
+  umgestellt; fehlende oder fehlerhafte Provider schließen
+  organisationsbasierte Fachzugriffe.
 - Kalenderrechte von Organisationsgruppen getrennt: Lesen, Eigenbearbeitung
   und Meetinglückensuche auf Organigrammrollen begrenzt, Fremdbearbeitung auf
   direkte Hierarchiekanten und konfigurierte Peer-Berechtigungen reduziert.

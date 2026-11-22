@@ -1,7 +1,7 @@
 (function() {
     'use strict';
 
-    const client = new window.LocalBase.api.ApiClient({ appId: 'flzcalendar' });
+    const client = new window.OCA.FlzCalendar.Shared.api.ApiClient({ appId: 'flzcalendar' });
     const l10n = window.FlzCalendar.l10n;
 
     function initCalendarDefaults() {

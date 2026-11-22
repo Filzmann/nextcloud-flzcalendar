@@ -74,7 +74,7 @@ const l10n = { t(key, parameters = {}) {
     return `translated:${key}`.replace(/\{(\w+)\}/g, (_, name) => String(parameters[name] ?? `{${name}}`));
 } };
 const context = {
-    window: { LocalBase: { api: { ApiClient } }, FlzCalendar: { l10n }, confirm: () => true },
+    window: { OCA: { FlzCalendar: { Shared: { api: { ApiClient } } } }, FlzCalendar: { l10n }, confirm: () => true },
     document: { getElementById: id => elements[id] || null },
     navigator: { clipboard: { writeText: async value => { copied = value; } } },
 };

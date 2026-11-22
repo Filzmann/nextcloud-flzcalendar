@@ -145,7 +145,7 @@ const l10n = {
 const context = {
     window: {
         location: { search: '?calendarConnection=google-connected' },
-        LocalBase: { api: { ApiClient }, ui: { Notice } },
+        OCA: { FlzCalendar: { Shared: { api: { ApiClient }, ui: { Notice } } } },
         FlzCalendar: {
             l10n,
             repositories: { CalendarRepository }, models: { CalendarEntry, Organization },
