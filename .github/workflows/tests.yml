@@ -8,6 +8,9 @@ on:
 permissions:
   contents: read
 
+env:
+  ORGANIZATION_TEST_REF: 82c48b1abdd274fcf70159d6acc107d18006ce98
+
 concurrency:
   group: tests-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -48,6 +51,12 @@ jobs:
           php-version: ${{ matrix.php-version }}
           coverage: ${{ matrix.php-version == '8.3' && 'xdebug' || 'none' }}
           tools: none
+      - name: Organisations-Testvertrag auschecken
+        uses: actions/checkout@v7
+        with:
+          repository: Filzmann/nextcloud-flz-organization
+          ref: ${{ env.ORGANIZATION_TEST_REF }}
+          path: flz_organization
       - name: PHP-Tests
         if: matrix.php-version == '8.5'
         working-directory: app

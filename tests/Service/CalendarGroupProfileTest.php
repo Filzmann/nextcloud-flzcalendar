@@ -6,9 +6,9 @@ declare(strict_types=1);
 use OCA\FlzCalendar\Service\CalendarGroupProfile;
 use OCA\FlzCalendar\Service\CalendarOrganization;
 use OCA\FlzCalendar\Service\OrganizationRuntime;
-use OCA\LocalBase\Organization\FlzOrganizationDefinition;
+use OCA\FlzOrganization\Organization\OrganizationDefinition;
 
-$definition = new CalendarOrganization(FlzOrganizationDefinition::defaults()->toArray());
+$definition = new CalendarOrganization(OrganizationDefinition::defaults()->toArray());
 $organization = new class($definition) extends OrganizationRuntime {
     public function __construct(private CalendarOrganization $value) {}
     public function organization(): ?CalendarOrganization { return $this->value; }

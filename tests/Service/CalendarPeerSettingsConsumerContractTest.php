@@ -6,9 +6,9 @@ use OCA\FlzCalendar\Permission\NextcloudCalendarPermissionSource;
 use OCA\FlzCalendar\Service\CalendarOrganization;
 use OCA\FlzCalendar\Service\CalendarSettingsService;
 use OCA\FlzCalendar\Service\OrganizationRuntime;
-use OCA\LocalBase\Organization\FlzOrganizationDefinition;
+use OCA\FlzOrganization\Organization\OrganizationDefinition;
 
-$definition = new CalendarOrganization(FlzOrganizationDefinition::defaults()->toArray());
+$definition = new CalendarOrganization(OrganizationDefinition::defaults()->toArray());
 $organization = new class($definition) extends OrganizationRuntime {
     /** @var list<string> */
     public array $groups = ['Buero', 'EB', 'PFK'];

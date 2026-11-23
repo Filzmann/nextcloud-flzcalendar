@@ -30,11 +30,11 @@ namespace {
     use OCA\FlzCalendar\Permission\CalendarPermissionSourceInterface;
     use OCA\FlzCalendar\Service\CalendarOrganization;
     use OCA\FlzPermissionMatrix\PublicApi\V1\RegisterPermissionProvidersEvent;
-    use OCA\LocalBase\Organization\FlzOrganizationDefinition;
+    use OCA\FlzOrganization\Organization\OrganizationDefinition;
     use OCP\EventDispatcher\IEventListener;
 
     $source = new class implements CalendarPermissionSourceInterface {
-        public function definition(): ?CalendarOrganization { return new CalendarOrganization(FlzOrganizationDefinition::defaults()->toArray()); }
+        public function definition(): ?CalendarOrganization { return new CalendarOrganization(OrganizationDefinition::defaults()->toArray()); }
         public function peerGroups(): array { return ['EB']; }
     };
     $provider = new CalendarPermissionProvider($source);
