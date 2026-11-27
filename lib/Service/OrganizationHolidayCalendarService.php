@@ -20,7 +20,7 @@ final class OrganizationHolidayCalendarService
         $snapshot = $this->organization->holidayCalendar($year);
         if ($snapshot === null)
         {
-            throw new RuntimeException('Organization holiday calendar is unavailable.');
+            throw new RuntimeException('Der Organisations-Ferienkalender ist nicht verfügbar.');
         }
         return $snapshot;
     }
@@ -34,7 +34,7 @@ final class OrganizationHolidayCalendarService
         $context = $this->organization->calendarContext();
         if ($context === null)
         {
-            throw new RuntimeException('Organization calendar context is unavailable.');
+            throw new RuntimeException('Der Organisations-Kalenderkontext ist nicht verfügbar.');
         }
         return $context->timezone();
     }

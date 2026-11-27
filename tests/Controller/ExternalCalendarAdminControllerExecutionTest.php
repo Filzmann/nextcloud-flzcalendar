@@ -60,14 +60,14 @@ namespace {
     }
     $groups->admin = true;
     $result = $controller->testCalDav('https://calendar.example.test', 'person-a', 'secret');
-    if ($result->getStatus() !== 200 || ($result->getData()['message'] ?? '') !== 'Kopano CalDAV connection successfully tested (HTTP 207).' || $calendars->calls !== [['kopano', 'https://calendar.example.test', 'person-a', 'secret']] || str_contains(json_encode($result->getData()), 'secret')) {
+    if ($result->getStatus() !== 200 || ($result->getData()['message'] ?? '') !== 'Kopano-CalDAV-Verbindung erfolgreich geprüft (HTTP 207).' || $calendars->calls !== [['kopano', 'https://calendar.example.test', 'person-a', 'secret']] || str_contains(json_encode($result->getData()), 'secret')) {
         throw new RuntimeException('Administrativer Kopano-Test ist fehlerhaft oder gibt Zugangsdaten zurück.');
     }
     $calendars->blocked = true;
     $blocked = $controller->testCalDav('https://calendar.example.test', 'person-a', 'secret');
     if ($blocked->getStatus() !== 400
         || ($blocked->getData()['code'] ?? '') !== 'caldav_provider_rejected'
-        || ($blocked->getData()['error'] ?? '') !== 'The calendar provider rejected the CalDAV connection (HTTP 405). Please contact its administration.') {
+        || ($blocked->getData()['error'] ?? '') !== 'Der Kalenderanbieter hat die CalDAV-Verbindung abgewiesen (HTTP 405). Bitte wende dich an dessen Administration.') {
         throw new RuntimeException('Administrativer Kopano-Test erklärt HTTP 405 nicht sicher.');
     }
     if (($logger->entries[0][1] ?? null) !== ['provider' => 'kopano', 'status' => 405]) {

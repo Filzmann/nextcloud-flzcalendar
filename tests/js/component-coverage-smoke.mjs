@@ -350,7 +350,7 @@ workflowContext.window.confirm = () => true;
 await workflow.remove({ id: 13, type: 'appointment', meetingUid: null, seriesUid: null });
 workflow.seriesChoice = async () => 'series';
 await workflow.remove({ id: 14, type: 'appointment', meetingUid: null, seriesUid: 'series-1' });
-if (!String(workflowMessages.at(-1)[0]).includes('Recurring appointment deleted')) throw new Error('Vollständige Serie meldet keinen passenden Löschstatus.');
+if (!String(workflowMessages.at(-1)[0]).includes('Serientermin deleted')) throw new Error('Vollständige Serie meldet keinen passenden Löschstatus.');
 await workflow.removeMeeting({ meetingUid: 'm-denied', canManageMeeting: false });
 workflowContext.window.confirm = () => false;
 await workflow.removeMeeting({ meetingUid: 'm-cancel', canManageMeeting: true });

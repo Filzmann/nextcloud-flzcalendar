@@ -17,6 +17,6 @@ final class StandaloneNavigationListener implements IEventListener {
 
     public function handle(Event $event): void {
         if (!$event instanceof LoadAdditionalEntriesEvent) return;
-        $this->navigation->addWhenStandalone('flzcalendar', $this->l10n->t('Calendar'), 'flzcalendar.page.index', 'app.svg', 80);
+        $this->navigation->addWhenStandalone('flzcalendar', $this->l10n->t('Kalender'), 'flzcalendar.page.index', 'app.svg', 80);
     }
 }

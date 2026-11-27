@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- L10N-Migration (ZM-06): sichtbare Texte über Nextcloud-l10n (deutsche Quelltexte, Kataloge `l10n/en.*` + `l10n/en_GB.*`), inkl. `tests/Ui/L10nCatalogContractTest.php` und `docs/l10n-inventory.md`.
+
 - Der isolierte Browser-Consumer-Smoke verwendet absolute Quelldateipfade in
   der VM, damit die Coverage-Messung ausgeführte Kategorie-A-Dateien eindeutig
   zuordnet.

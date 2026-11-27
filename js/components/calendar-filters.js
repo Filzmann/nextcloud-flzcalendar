@@ -63,7 +63,7 @@
                 if (!input.checked) for (const role of this.leadershipStaffRoles) this.state.roles.delete(role);
                 this.changed(true);
             });
-            label.append(input, document.createTextNode(` ${l10n.t('Show {label}', { label: this.organization().staffBlockLabel })}`));
+            label.append(input, document.createTextNode(` ${l10n.t('{label} anzeigen', { label: this.organization().staffBlockLabel })}`));
             this.roles.append(label);
         }
 
@@ -87,12 +87,12 @@
             const people = (this.state.data?.employees || []).filter(employee => this.state.selected.has(employee.uid));
             this.reset.hidden = people.length === 0;
             if (!people.length) {
-                this.selectedPeople.replaceChildren(this.node('li', l10n.t('No explicit selection – group filters apply.')));
+                this.selectedPeople.replaceChildren(this.node('li', l10n.t('Keine explizite Auswahl – Gruppenfilter gelten.')));
                 return;
             }
             this.selectedPeople.replaceChildren(...people.map(employee => {
                 const item = this.node('li');
-                const button = this.node('button', l10n.t('Remove {employee}', { employee: employee.displayName }));
+                const button = this.node('button', l10n.t('{employee} entfernen', { employee: employee.displayName }));
                 button.type = 'button';
                 button.addEventListener('click', () => {
                     this.state.selected.delete(employee.uid);
@@ -110,7 +110,7 @@
                 .slice(0, 12) : [];
             this.searchResults.replaceChildren(...matches.map(employee => {
                 const item = this.node('li');
-                const button = this.node('button', l10n.t('Select {employee}', { employee: employee.displayName }));
+                const button = this.node('button', l10n.t('{employee} auswählen', { employee: employee.displayName }));
                 button.type = 'button';
                 button.addEventListener('click', () => {
                     this.state.leadershipStaffOnly = false;

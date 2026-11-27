@@ -105,7 +105,7 @@ if (defaultsUrl.value !== 'https://calendar.example.test/caldav/' || defaultsNam
     || defaultsSubmit.disabled || !defaultsStatus.textContent.includes('saved')) {
     throw new Error('Kalenderdefaults aktualisieren Adminformular und Status nicht sicher.');
 }
-if (!translationCalls.some(([key]) => key === 'The calendar defaults were saved. Existing app-owned calendars will be renamed during the next synchronisation.')) {
+if (!translationCalls.some(([key]) => key === 'Die Kalenderdefaults wurden gespeichert. Vorhandene app-eigene Kalender werden beim nächsten Abgleich umbenannt.')) {
     throw new Error('Adminerfolg wird nicht als stabiler englischer L10N-Schlüssel delegiert.');
 }
 

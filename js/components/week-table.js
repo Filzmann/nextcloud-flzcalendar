@@ -38,7 +38,7 @@
             wrap.className = 'flz-calendar-table-wrap';
             const table = document.createElement('table');
             table.className = 'flz-calendar-calendar';
-            const caption = this.node('caption', l10n.t('Scheduled shifts and appointments per employee'));
+            const caption = this.node('caption', l10n.t('Geplante Dienste und Termine je Mitarbeiter*in'));
             const head = document.createElement('thead');
             const body = document.createElement('tbody');
             table.append(caption, head, body);
@@ -58,7 +58,7 @@
             const list = document.createElement('div');
             list.className = 'flz-calendar-mobile-calendar';
             if (employees.length === 0) {
-                list.append(this.node('p', l10n.t('No people match the current filters.'), 'flz-calendar-mobile-empty'));
+                list.append(this.node('p', l10n.t('Keine Personen entsprechen den aktuellen Filtern.'), 'flz-calendar-mobile-empty'));
                 return list;
             }
             for (const day of days) {
@@ -103,7 +103,7 @@
         }
 
         vertical(employees, state, days, head, body, activeMonth = null, compactDays = new Set()) {
-            const header = document.createElement('tr'); header.append(this.node('th', l10n.t('Employee')));
+            const header = document.createElement('tr'); header.append(this.node('th', l10n.t('Mitarbeiter*in')));
             for (const day of days) {
                 const compact = compactDays.has(CalendarDate.isoDay(day));
                 const dayHeading = this.node('th', this.dayLabel(day, { weekday: 'short', day: '2-digit', month: '2-digit' }), this.dayClasses(day, activeMonth, compact));
@@ -136,7 +136,7 @@
         }
 
         horizontal(employees, state, days, head, body, activeMonth = null, compactDays = new Set()) {
-            const header = document.createElement('tr'); header.append(this.node('th', l10n.t('Day')));
+            const header = document.createElement('tr'); header.append(this.node('th', l10n.t('Tag')));
             for (const employee of employees) {
                 const name = this.node('th', employee.displayName, this.classes('flz-calendar-person-heading', state.selected.has(employee.uid) ? 'flz-calendar-selected' : ''));
                 name.scope = 'col'; header.append(name);
@@ -218,7 +218,7 @@
             const roleNames = employee.roles.slice()
                 .sort((a, b) => organization.roleOrder(a) - organization.roleOrder(b))
                 .map(value => organization.roleShortLabel(value));
-            const roles = roleNames.length > 1 ? `${roleNames[0]} (${roleNames.slice(1).join(', ')})` : roleNames[0] || l10n.t('Without specialist role');
+            const roles = roleNames.length > 1 ? `${roleNames[0]} (${roleNames.slice(1).join(', ')})` : roleNames[0] || l10n.t('Ohne Fachrolle');
             const areas = employee.areas.slice()
                 .sort((a, b) => organization.areaOrder(a) - organization.areaOrder(b))
                 .map(value => organization.areaShortLabel(value)).join('/');

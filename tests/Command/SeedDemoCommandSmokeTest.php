@@ -37,7 +37,7 @@ foreach ($fixtures as $fixture) {
 $source = file_get_contents(__DIR__ . '/../../lib/Command/SeedDemoCommand.php');
 $service = file_get_contents(__DIR__ . '/../../lib/Service/CalendarDemoPackService.php');
 if ($source === false || $service === false) throw new RuntimeException('Demo-Pack-Code konnte nicht gelesen werden.');
-foreach (['CalendarDemoPackService', '->install()', 'IL10N', "l10n->t('Creates complete Filzmann Calendar demo accounts and demo data.')", "l10n->t('%s demo accounts synchronised; calendar entries created for %s, %s already existed.'"] as $contract) {
+foreach (['CalendarDemoPackService', '->install()', 'IL10N', "l10n->t('Erzeugt vollständige Filzmann-Kalender-Demokonten und Demodaten.')", "l10n->t('%s Demokonten synchronisiert; Kalendereinträge für %s erzeugt, %s bereits vorhanden.'"] as $contract) {
     if (!str_contains($source, $contract)) throw new RuntimeException("Demo-Command delegiert nicht sicher: {$contract}");
 }
 foreach (['DemoAccountProvisioningService', '->provision(', 'existsCreatedByForEmployee', "'parentEntryId' => \$shiftId"] as $contract) {

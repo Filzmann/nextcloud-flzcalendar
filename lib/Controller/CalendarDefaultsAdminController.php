@@ -31,15 +31,15 @@ final class CalendarDefaultsAdminController extends Controller {
 
     public function save(string $kopanoUrl, string $calendarName): JSONResponse {
         if (!$this->isAdmin()) {
-            return $this->errors->create('forbidden', 'You are not allowed to perform this action.', Http::STATUS_FORBIDDEN);
+            return $this->errors->create('forbidden', 'Keine Berechtigung.', Http::STATUS_FORBIDDEN);
         }
         try {
             return new JSONResponse(['calendarDefaults' => $this->targets->save($kopanoUrl, $calendarName)]);
         } catch (InvalidArgumentException) {
-            return $this->errors->create('invalid_calendar_defaults', 'The calendar defaults are invalid.', Http::STATUS_BAD_REQUEST);
+            return $this->errors->create('invalid_calendar_defaults', 'Die Kalendervorgaben sind ungültig.', Http::STATUS_BAD_REQUEST);
         } catch (\Throwable $error) {
             $this->logger->error('Kalenderdefaults konnten nicht gespeichert werden.', ['exception' => $error]);
-            return $this->errors->create('calendar_defaults_save_failed', 'The calendar defaults could not be saved.', Http::STATUS_BAD_REQUEST);
+            return $this->errors->create('calendar_defaults_save_failed', 'Die Kalendervorgaben konnten nicht gespeichert werden.', Http::STATUS_BAD_REQUEST);
         }
     }
 

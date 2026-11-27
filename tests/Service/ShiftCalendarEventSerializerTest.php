@@ -14,8 +14,8 @@ use OCP\IL10N;
 $l10n = new class implements IL10N {
     public function t(string $text, array $parameters = []): string {
         return match ($text) {
-            'Shift' => 'Übersetzter Dienst',
-            'Automatically synchronised from Filzmann Calendar. Please make changes there.' => 'Übersetzte Kalenderbeschreibung.',
+            'Dienst' => 'Übersetzter Dienst',
+            'Automatisch aus Filzmann Kalender synchronisiert. Änderungen bitte dort vornehmen.' => 'Übersetzte Kalenderbeschreibung.',
             default => strtr($text, $parameters),
         };
     }

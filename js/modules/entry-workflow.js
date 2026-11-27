@@ -20,11 +20,11 @@
         async save(data) {
             try {
                 const existing = this.state.data.entries.find(entry => entry.id === Number(data.id));
-                let message = l10n.t('Entry saved.');
+                let message = l10n.t('Eintrag gespeichert.');
                 if (existing?.meetingUid) {
-                    if (!existing.canManageMeeting) throw new Error(l10n.t('The shared meeting may only be edited if all participating calendars can be edited.'));
+                    if (!existing.canManageMeeting) throw new Error(l10n.t('Das gemeinsame Meeting darf nur bearbeitet werden, wenn alle beteiligten Kalender bearbeitet werden dürfen.'));
                     await this.repository.updateMeeting(existing.meetingUid, data.start, data.end, data.title);
-                    message = l10n.t('Meeting saved for all participants.');
+                    message = l10n.t('Meeting für alle Beteiligten gespeichert.');
                 } else {
                     const seriesScope = existing?.seriesUid ? await this.seriesChoice('edit') : 'occurrence';
                     if (seriesScope === null) return;
@@ -40,8 +40,8 @@
                         recurrenceWeekdays: data.recurrenceWeekdays,
                         recurrenceTimezone: data.recurrenceTimezone,
                     }, data.id, seriesScope);
-                    if (result?.seriesCount > 1) message = l10n.n('{count} recurring appointment saved.', '{count} recurring appointments saved.', result.seriesCount, { count: result.seriesCount });
-                    else if (existing?.seriesUid) message = l10n.t('Recurring appointment saved.');
+                    if (result?.seriesCount > 1) message = l10n.n('{count} Serientermin gespeichert.', '{count} Serientermine gespeichert.', result.seriesCount, { count: result.seriesCount });
+                    else if (existing?.seriesUid) message = l10n.t('Serientermin gespeichert.');
                 }
                 this.dialog.close();
                 this.show(message);
@@ -62,7 +62,7 @@
             if (entry.type === 'shift') {
                 try {
                     await this.repository.remove(entry.id);
-                    this.show(l10n.t('Shift deleted.'));
+                    this.show(l10n.t('Dienst gelöscht.'));
                     await this.reload();
                     return;
                 } catch (error) {
@@ -73,12 +73,12 @@
                     mode = await this.deletionChoice(error.data.children.length);
                 }
                 if (mode === null) return;
-            } else if (!entry.seriesUid && !window.confirm(l10n.t('Really delete the appointment?'))) {
+            } else if (!entry.seriesUid && !window.confirm(l10n.t('Termin wirklich löschen?'))) {
                 return;
             }
             try {
                 await this.repository.remove(entry.id, mode, seriesScope);
-                this.show(seriesScope === 'series' ? l10n.t('Recurring appointment deleted.') : mode === 'detach' ? l10n.t('Shift deleted; appointments are now blocked times.') : l10n.t('Entry deleted.'));
+                this.show(seriesScope === 'series' ? l10n.t('Serientermin gelöscht.') : mode === 'detach' ? l10n.t('Dienst gelöscht; Termine sind jetzt Sperrtermine.') : l10n.t('Eintrag gelöscht.'));
                 await this.reload();
             } catch (error) {
                 this.show(error, true);
@@ -87,13 +87,13 @@
 
         async removeMeeting(entry) {
             if (!entry.canManageMeeting) {
-                this.show(l10n.t('The shared meeting may only be deleted if all participating calendars can be edited.'), true);
+                this.show(l10n.t('Das gemeinsame Meeting darf nur gelöscht werden, wenn alle beteiligten Kalender bearbeitet werden dürfen.'), true);
                 return;
             }
-            if (!window.confirm(l10n.t('Really delete the meeting for all participants?'))) return;
+            if (!window.confirm(l10n.t('Meeting wirklich für alle Beteiligten löschen?'))) return;
             try {
                 await this.repository.removeMeeting(entry.meetingUid);
-                this.show(l10n.t('Meeting deleted for all participants.'));
+                this.show(l10n.t('Meeting für alle Beteiligten gelöscht.'));
                 await this.reload();
             } catch (error) {
                 this.show(error, true);
@@ -132,10 +132,10 @@
                     if (returnFocus?.isConnected !== false && typeof returnFocus?.focus === 'function') returnFocus.focus();
                     resolve(value);
                 };
-                const title = this.node('h2', l10n.t('Delete shift with appointments'));
+                const title = this.node('h2', l10n.t('Dienst mit Terminen löschen'));
                 title.id = 'flz-calendar-delete-title';
-                dialog.append(title, this.node('p', l10n.n('The shift contains {count} appointment. What should happen to it?', 'The shift contains {count} appointments. What should happen to them?', count, { count })));
-                [['delete', l10n.t('Delete shift and appointments')], ['detach', l10n.t('Delete only the shift; keep appointments as blocked times')], [null, l10n.t('Cancel')]]
+                dialog.append(title, this.node('p', l10n.n('Der Dienst enthält {count} Termin. Was soll damit geschehen?', 'Der Dienst enthält {count} Termine. Was soll damit geschehen?', count, { count })));
+                [['delete', l10n.t('Dienst und Termine löschen')], ['detach', l10n.t('Nur Dienst löschen; Termine als Sperrtermine behalten')], [null, l10n.t('Abbrechen')]]
                     .forEach(([value, label]) => {
                         const button = this.node('button', label);
                         button.type = 'button';
@@ -163,10 +163,10 @@
                     if (returnFocus?.isConnected !== false && typeof returnFocus?.focus === 'function') returnFocus.focus();
                     resolve(value);
                 };
-                const title = this.node('h2', action === 'edit' ? l10n.t('Edit recurring appointment') : l10n.t('Delete recurring appointment'));
+                const title = this.node('h2', action === 'edit' ? l10n.t('Serientermin bearbeiten') : l10n.t('Serientermin löschen'));
                 title.id = 'flz-calendar-series-scope-title';
-                dialog.append(title, this.node('p', action === 'edit' ? l10n.t('Should only this occurrence or the entire series be edited?') : l10n.t('Should only this occurrence or the entire series be deleted?')));
-                [['occurrence', l10n.t('Only this occurrence')], ['series', l10n.t('Entire series')], [null, l10n.t('Cancel')]]
+                dialog.append(title, this.node('p', action === 'edit' ? l10n.t('Soll nur dieses Vorkommen oder die gesamte Serie bearbeitet werden?') : l10n.t('Soll nur dieses Vorkommen oder die gesamte Serie gelöscht werden?')));
+                [['occurrence', l10n.t('Nur dieses Vorkommen')], ['series', l10n.t('Gesamte Serie')], [null, l10n.t('Abbrechen')]]
                     .forEach(([value, label]) => {
                         const button = this.node('button', label);
                         button.type = 'button';

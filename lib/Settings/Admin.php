@@ -25,7 +25,7 @@ final class Admin implements ISettings {
 
     public function getForm(): TemplateResponse {
         $status = $this->calendarSyncStatus->status();
-        $status['lastRunLabel'] = $status['hasRun'] ? $this->dateTimeFormatter->formatDateTime($status['lastRunAt']) : $this->l10n->t('No background run recorded');
+        $status['lastRunLabel'] = $status['hasRun'] ? $this->dateTimeFormatter->formatDateTime($status['lastRunAt']) : $this->l10n->t('Noch kein Hintergrundlauf erfasst');
         return new TemplateResponse(Application::APP_ID, 'admin', [
             'calendarSyncStatus' => $status,
             'googleOAuth' => $this->googleOAuth->adminStatus(),

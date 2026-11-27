@@ -44,7 +44,7 @@
     const meetingFinder = new window.FlzCalendar.components.MeetingFinder({
         repository,
         onError: error => show(error, true),
-        onBlocked: async () => { await load(); show(l10n.t('The meeting was blocked for all selected people.')); },
+        onBlocked: async () => { await load(); show(l10n.t('Das Meeting wurde für alle ausgewählten Personen blockiert.')); },
     });
     const shiftDefaults = new window.FlzCalendar.components.ShiftDefaults({ onSave: saveShiftDefaults });
     const shiftCalendarSync = new window.FlzCalendar.components.ShiftCalendarSync({ onSave: saveCalendarSync });
@@ -79,7 +79,7 @@
         shiftCalendarSync.set(state.data.calendarSync || {});
         const meetingButton = document.getElementById('flz-calendar-open-meeting-finder');
         meetingButton.disabled = state.period === 'month';
-        meetingButton.title = state.period === 'month' ? l10n.t('Meeting gap search is available in the weekly view.') : '';
+        meetingButton.title = state.period === 'month' ? l10n.t('Die Meetinglückensuche ist in der Wochenansicht verfügbar.') : '';
     }
 
     async function saveShiftDefaults(defaults) {
@@ -88,7 +88,7 @@
             state.data.shiftDefaults = response.shiftDefaults;
             shiftDefaults.set(response.shiftDefaults);
             await load();
-            show(l10n.t('Personal default shift times saved.'));
+            show(l10n.t('Persönliche Standard-Dienstzeiten gespeichert.'));
         } catch (error) { show(error, true); }
     }
 
@@ -98,8 +98,8 @@
             state.data.calendarSync = response.calendarSync;
             shiftCalendarSync.set(response.calendarSync);
             show(enabled
-                ? l10n.t('The private calendar “{calendar}” is enabled.', { calendar: response.calendarSync.calendarName || 'Filzmann Dienste' })
-                : l10n.t('Private shift calendar synchronisation is disabled.'));
+                ? l10n.t('Der private Kalender „{calendar}“ ist aktiviert.', { calendar: response.calendarSync.calendarName || 'Filzmann Dienste' })
+                : l10n.t('Die private Dienstkalender-Synchronisation ist deaktiviert.'));
         } catch (error) { show(error, true); }
     }
 
@@ -112,8 +112,8 @@
     function renderTable() {
         const employees = state.availableEmployees();
         elements['filter-status'].textContent = state.selected.size
-            ? l10n.n('{count} selected', '{count} selected', employees.length, { count: employees.length })
-            : state.isUnfiltered() ? l10n.t('All people') : l10n.n('{count} filtered', '{count} filtered', employees.length, { count: employees.length });
+            ? l10n.n('{count} ausgewählt', '{count} ausgewählt', employees.length, { count: employees.length })
+            : state.isUnfiltered() ? l10n.t('Alle Personen') : l10n.n('{count} gefiltert', '{count} gefiltert', employees.length, { count: employees.length });
         weekTable.render(employees, state);
     }
 
@@ -160,12 +160,12 @@
     document.getElementById('flz-calendar-save-default').addEventListener('click', async () => {
         try {
             await repository.savePreferences(state.toPreference());
-            show(l10n.t('The current filters and view were made your personal default.'));
+            show(l10n.t('Aktuelle Filter und Ansicht wurden zum persönlichen Standard gemacht.'));
         } catch (error) { show(error, true); }
     });
     externalCalendars.load();
     const connectionResult = new URLSearchParams(window.location.search).get('calendarConnection');
-    if (connectionResult === 'google-connected') show(l10n.t('Google Calendar was connected.'));
-    else if (connectionResult === 'google-error') show(l10n.t('The Google connection could not be completed.'), true);
+    if (connectionResult === 'google-connected') show(l10n.t('Google-Kalender wurde verbunden.'));
+    else if (connectionResult === 'google-error') show(l10n.t('Die Google-Verbindung konnte nicht abgeschlossen werden.'), true);
     load();
 }());

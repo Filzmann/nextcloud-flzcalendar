@@ -9,8 +9,8 @@
             this.form = document.getElementById('flz-calendar-shift-defaults-form');
             this.onSave = options.onSave;
             this.weekdays = ['',
-                l10n.t('Monday'), l10n.t('Tuesday'), l10n.t('Wednesday'), l10n.t('Thursday'),
-                l10n.t('Friday'), l10n.t('Saturday'), l10n.t('Sunday'),
+                l10n.t('Montag'), l10n.t('Dienstag'), l10n.t('Mittwoch'), l10n.t('Donnerstag'),
+                l10n.t('Freitag'), l10n.t('Samstag'), l10n.t('Sonntag'),
             ];
             this.form.addEventListener('submit', event => this.submit(event));
         }

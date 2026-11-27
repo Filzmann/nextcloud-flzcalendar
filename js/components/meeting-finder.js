@@ -52,7 +52,7 @@
         }
 
         renderWeek() {
-            this.week.textContent = l10n.t('Calendar week from {date}', { date: l10n.date(new Date(`${this.start}T12:00:00`)) });
+            this.week.textContent = l10n.t('Kalenderwoche ab {date}', { date: l10n.date(new Date(`${this.start}T12:00:00`)) });
         }
 
         renderPeople() {
@@ -79,11 +79,11 @@
             const employeeUids = [...this.selected];
             const durationMinutes = Number(this.duration.value);
             if (employeeUids.length < 2) {
-                this.results.textContent = l10n.t('Please select at least two people.');
+                this.results.textContent = l10n.t('Bitte mindestens zwei Personen auswählen.');
                 return;
             }
             if (!Number.isInteger(durationMinutes) || durationMinutes < 15 || durationMinutes > 480) {
-                this.results.textContent = l10n.t('Please select a duration between 15 and 480 minutes.');
+                this.results.textContent = l10n.t('Bitte eine Dauer zwischen 15 und 480 Minuten auswählen.');
                 return;
             }
             try {
@@ -99,7 +99,7 @@
                 this.renderNoResults();
                 return;
             }
-            const heading = document.createElement('h3'); heading.textContent = l10n.n('{count} matching gap', '{count} matching gaps', gaps.length, { count: gaps.length });
+            const heading = document.createElement('h3'); heading.textContent = l10n.n('{count} passende Lücke', '{count} passende Lücken', gaps.length, { count: gaps.length });
             const list = document.createElement('ul');
             list.className = 'flz-calendar-meeting-gap-list';
             for (const gap of gaps) {
@@ -111,7 +111,7 @@
                 item.append(label);
                 if (canBlockAll) {
                     const block = document.createElement('button');
-                    block.type = 'button'; block.textContent = l10n.t('Block for everyone');
+                    block.type = 'button'; block.textContent = l10n.t('Für alle blocken');
                     block.addEventListener('click', () => this.block(start, end, block));
                     item.append(block);
                 }
@@ -120,7 +120,7 @@
             const nodes = [heading, list];
             if (!canBlockAll) {
                 const note = document.createElement('p');
-                note.textContent = l10n.t('Direct blocking is only possible if you may edit every selected calendar.');
+                note.textContent = l10n.t('Direktes Blockieren ist nur möglich, wenn du alle ausgewählten Kalender bearbeiten darfst.');
                 nodes.push(note);
             }
             this.results.replaceChildren(...nodes);
@@ -128,11 +128,11 @@
 
         renderNoResults() {
             const message = document.createElement('p');
-            message.textContent = l10n.t('No matching common gap was found in this calendar week.');
+            message.textContent = l10n.t('In dieser Kalenderwoche wurde keine passende gemeinsame Lücke gefunden.');
             const actions = document.createElement('div');
             actions.className = 'flz-calendar-meeting-result-actions';
             const nextWeek = document.createElement('button');
-            nextWeek.type = 'button'; nextWeek.textContent = l10n.t('Search in the next week');
+            nextWeek.type = 'button'; nextWeek.textContent = l10n.t('In der nächsten Woche suchen');
             nextWeek.addEventListener('click', async () => {
                 const date = new Date(`${this.start}T12:00:00`); date.setDate(date.getDate() + 7);
                 this.start = CalendarDate.isoDay(date); this.renderWeek(); await this.searchWeek();
@@ -142,11 +142,11 @@
                 const employee = this.employees.find(item => item.uid === uid);
                 if (!employee) continue;
                 const remove = document.createElement('button');
-                remove.type = 'button'; remove.textContent = l10n.t('Deselect {employee}', { employee: employee.displayName });
+                remove.type = 'button'; remove.textContent = l10n.t('{employee} abwählen', { employee: employee.displayName });
                 remove.addEventListener('click', async () => {
                     this.selected.delete(uid); this.renderPeople();
                     if (this.selected.size >= 2) await this.searchWeek();
-                    else this.results.textContent = l10n.t('Please select at least two people.');
+                    else this.results.textContent = l10n.t('Bitte mindestens zwei Personen auswählen.');
                 });
                 actions.append(remove);
             }
@@ -156,7 +156,7 @@
         async block(start, end, button) {
             const title = this.title.value.trim();
             if (!title) {
-                this.title.setCustomValidity(l10n.t('Please enter a title for the block.'));
+                this.title.setCustomValidity(l10n.t('Bitte einen Titel für die Blockierung eingeben.'));
                 this.title.reportValidity();
                 return;
             }
@@ -164,7 +164,7 @@
             button.disabled = true;
             try {
                 await this.repository.blockMeeting(start.toISOString(), end.toISOString(), [...this.selected], title);
-                this.results.textContent = l10n.t('The appointment was blocked for all selected people.');
+                this.results.textContent = l10n.t('Der Termin wurde für alle ausgewählten Personen blockiert.');
                 await this.onBlocked();
             } catch (error) {
                 button.disabled = false;

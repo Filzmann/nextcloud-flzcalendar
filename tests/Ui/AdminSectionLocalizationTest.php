@@ -23,7 +23,7 @@ namespace {
         public function t(string $text, array $parameters = []): string { $this->calls[] = [$text, $parameters]; return "translated:{$text}"; }
     };
     $section = new AdminSection($urls, $l10n);
-    if ($section->getName() !== 'translated:Filzmann Calendar' || $l10n->calls !== [['Filzmann Calendar', []]]) {
+    if ($section->getName() !== 'translated:Filzmann Kalender' || $l10n->calls !== [['Filzmann Kalender', []]]) {
         throw new RuntimeException('Adminabschnitt verwendet nicht Nextcloud IL10N.');
     }
     if ($section->getID() !== 'flzcalendar' || $section->getIcon() !== '/flzcalendar/app.svg' || $section->getPriority() !== 62) {

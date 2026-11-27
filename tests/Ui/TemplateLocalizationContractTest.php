@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 $root = dirname(__DIR__, 2);
 $templates = [
-    'templates/index.php' => ['Filzmann Calendar', 'Settings', 'Filter and compare people', 'Data is being loaded.'],
-    'templates/partials/entry-dialog.php' => ['Entry', 'Employee', 'Recurrence', 'Save'],
-    'templates/partials/meeting-dialog.php' => ['Find a meeting gap', 'Search participants', 'Search gaps'],
-    'templates/partials/settings.php' => ['My shifts in Nextcloud Calendar', 'External calendars', 'My default shift times', 'Connect calendar'],
-    'templates/admin.php' => ['Shift calendar synchronisation', 'Kopano and CalDAV', 'Google Calendar OAuth', 'Demo pack'],
+    'templates/index.php' => ['Filzmann Kalender', 'Einstellungen', 'Filter und Personenvergleich', 'Daten werden geladen.'],
+    'templates/partials/entry-dialog.php' => ['Eintrag', 'Mitarbeiter*in', 'Wiederholung', 'Speichern'],
+    'templates/partials/meeting-dialog.php' => ['Meetinglücke finden', 'Teilnehmende suchen', 'Lücken suchen'],
+    'templates/partials/settings.php' => ['Meine Dienste im Nextcloud-Kalender', 'Externe Kalender', 'Meine Standard-Dienstzeiten', 'Kalender verbinden'],
+    'templates/admin.php' => ['Dienstkalender-Abgleich', 'Kopano und CalDAV', 'Google Calendar OAuth', 'Demo-Pack'],
 ];
 
 foreach ($templates as $file => $messages) {

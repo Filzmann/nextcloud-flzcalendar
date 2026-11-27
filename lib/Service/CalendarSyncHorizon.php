@@ -21,7 +21,7 @@ final class CalendarSyncHorizon {
         $timezone = $this->organization->calendarContext()?->timezone();
         if (!is_string($timezone) || $timezone === '')
         {
-            throw new RuntimeException('Organization calendar context is unavailable.');
+            throw new RuntimeException('Der Organisations-Kalenderkontext ist nicht verfügbar.');
         }
         $now = (new DateTimeImmutable('@' . $this->time->getTime()))->setTimezone(new DateTimeZone($timezone));
         $start = $now->setDate((int)$now->format('Y'), 1, 1)->setTime(0, 0);

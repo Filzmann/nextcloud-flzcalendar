@@ -158,8 +158,8 @@ final class GoogleCalendarClient {
     private function event(CalendarEntry $shift, string $eventId): array {
         return [
             'id' => $eventId,
-            'summary' => $shift->title() !== '' ? $shift->title() : $this->l10n->t('Shift'),
-            'description' => $this->l10n->t('Automatically synchronised from Filzmann Calendar. Please make changes there.'),
+            'summary' => $shift->title() !== '' ? $shift->title() : $this->l10n->t('Dienst'),
+            'description' => $this->l10n->t('Automatisch aus Filzmann Kalender synchronisiert. Änderungen bitte dort vornehmen.'),
             'start' => ['dateTime' => $shift->start()->format(DATE_RFC3339)],
             'end' => ['dateTime' => $shift->end()->format(DATE_RFC3339)],
             'transparency' => 'opaque',
