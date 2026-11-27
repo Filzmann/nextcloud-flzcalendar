@@ -14,6 +14,6 @@ final class AdminSection implements IIconSection {
     public function __construct(private IURLGenerator $url, private IL10N $l10n) {}
     public function getIcon(): string { return $this->url->imagePath(Application::APP_ID, 'app.svg'); }
     public function getID(): string { return Application::APP_ID; }
-    public function getName(): string { return $this->l10n->t('Filzmann Calendar'); }
+    public function getName(): string { return $this->l10n->t('Filzmann Kalender'); }
     public function getPriority(): int { return 62; }
 }

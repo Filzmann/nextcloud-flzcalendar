@@ -25,8 +25,8 @@ namespace OCP\AppFramework\Http {
 }
 namespace Psr\Log { interface LoggerInterface { public function error(string|\Stringable $message, array $context = []): void; } }
 namespace OCA\FlzCalendar\AppInfo { final class Application { public const APP_ID = 'flzcalendar'; } }
-namespace OCA\LocalBase\Calendar { class HolidayCalendarService {} }
 namespace OCA\FlzCalendar\Service {
+    class OrganizationHolidayCalendarService {}
     class CalendarAccessService {
         public ?\OCP\IUser $user = null;
         public function currentUser(): ?\OCP\IUser { return $this->user; }
@@ -56,7 +56,7 @@ namespace {
     use OCA\FlzCalendar\Service\CalendarSettingsService;
     use OCA\FlzCalendar\Service\RecurringAppointmentService;
     use OCA\FlzCalendar\Service\ShiftCalendarSyncService;
-    use OCA\LocalBase\Calendar\HolidayCalendarService;
+    use OCA\FlzCalendar\Service\OrganizationHolidayCalendarService;
     use OCP\IRequest;
     use OCP\IL10N;
     use OCP\IUser;
@@ -70,7 +70,7 @@ namespace {
         public function error(string|\Stringable $message, array $context = []): void { $this->errors[] = [(string)$message, $context]; }
     };
     $errors = new LocalizedErrorResponseFactory(new class implements IL10N { public function t(string $text, array $parameters = []): string { return strtr($text, $parameters); } });
-    $controller = new ApiController($request, $access, new CalendarService(), new CalendarSettingsService(), new CalendarPreferenceService(), new RecurringAppointmentService(), $sync, new HolidayCalendarService(), $logger, $errors);
+    $controller = new ApiController($request, $access, new CalendarService(), new CalendarSettingsService(), new CalendarPreferenceService(), new RecurringAppointmentService(), $sync, new OrganizationHolidayCalendarService(), $logger, $errors);
 
     if ($controller->saveCalendarSync(true)->getStatus() !== 403) throw new RuntimeException('Nicht angemeldete Person kann die Synchronisation aktivieren.');
     $access->user = new class implements IUser { public function getUID(): string { return 'sync-person'; } };

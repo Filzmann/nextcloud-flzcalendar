@@ -25,10 +25,11 @@ namespace OCP\AppFramework\Http {
 }
 namespace Psr\Log { interface LoggerInterface { public function error(string|\Stringable $message, array $context = []): void; } }
 namespace OCA\FlzCalendar\AppInfo { final class Application { public const APP_ID = 'flzcalendar'; } }
-namespace OCA\LocalBase\Calendar { class HolidayCalendarService {} }
 namespace OCA\FlzCalendar\Service {
     use OCA\FlzCalendar\Model\CalendarEntry;
     use OCP\IUser;
+
+    final class OrganizationHolidayCalendarService {}
 
     final class CalendarAccessService {
         public bool $view = false;
@@ -129,7 +130,7 @@ namespace {
     use OCA\FlzCalendar\Service\CalendarSettingsService;
     use OCA\FlzCalendar\Service\RecurringAppointmentService;
     use OCA\FlzCalendar\Service\ShiftCalendarSyncService;
-    use OCA\LocalBase\Calendar\HolidayCalendarService;
+    use OCA\FlzCalendar\Service\OrganizationHolidayCalendarService;
     use OCP\IL10N;
     use OCP\IRequest;
     use OCP\IUser;
@@ -164,7 +165,7 @@ namespace {
     });
     $controller = new ApiController(
         new class implements IRequest {}, $access, $calendar, new CalendarSettingsService(), $preferences,
-        $recurrences, new ShiftCalendarSyncService(), new HolidayCalendarService(), $logger, $errors,
+        $recurrences, new ShiftCalendarSyncService(), new OrganizationHolidayCalendarService(), $logger, $errors,
     );
 
     $createArguments = ['person-a', '2026-07-06T08:00:00+02:00', '2026-07-06T16:00:00+02:00', 'shift'];

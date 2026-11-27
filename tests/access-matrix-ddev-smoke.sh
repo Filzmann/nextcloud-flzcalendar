@@ -54,19 +54,19 @@ bl_target="${prefix}-bl-target"
 eb_south="${prefix}-eb-south"
 deputy_bl_eb_south="${prefix}-stvbl-eb-south"
 
-create_user "$pdl" flz-PDL
-create_user "$bl_now" flz-BL flz-Bereich-Nordost flz-Bereich-West
-create_user "$bo_actor" flz-Buero flz-Bereich-Nordost
-create_user "$pfk_actor" flz-PFK
-create_user "$pfk_target" flz-PFK
-create_user "$eb_west" flz-EB flz-Bereich-West
-create_user "$bo_no" flz-Buero flz-Bereich-Nordost
-create_user "$bo_west" flz-Buero flz-Bereich-West
-create_user "$bo_south" flz-Buero flz-Bereich-Sued
-create_user "$pdl_target" flz-PDL
-create_user "$bl_target" flz-BL flz-Bereich-Nordost flz-Bereich-West
-create_user "$eb_south" flz-EB flz-Bereich-Sued
-create_user "$deputy_bl_eb_south" flz-StvBL flz-EB flz-Bereich-Sued
+create_user "$pdl" PDL
+create_user "$bl_now" BL Bereich-Nordost Bereich-West
+create_user "$bo_actor" Buero Bereich-Nordost
+create_user "$pfk_actor" PFK
+create_user "$pfk_target" PFK
+create_user "$eb_west" EB Bereich-West
+create_user "$bo_no" Buero Bereich-Nordost
+create_user "$bo_west" Buero Bereich-West
+create_user "$bo_south" Buero Bereich-Sued
+create_user "$pdl_target" PDL
+create_user "$bl_target" BL Bereich-Nordost Bereich-West
+create_user "$eb_south" EB Bereich-Sued
+create_user "$deputy_bl_eb_south" StvBL EB Bereich-Sued
 
 assert_access "$pdl" "$pdl=true,$pfk_target=true,$eb_west=false"
 assert_access "$bl_now" "$bl_now=true,$bo_no=true,$bo_west=true,$bo_south=false,$pfk_target=false"

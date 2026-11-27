@@ -10,6 +10,7 @@ spl_autoload_register(static function (string $class) use ($root): void {
     foreach ([
         'OCA\\FlzCalendar\\' => $root . '/lib/',
         'OCA\\FlzDataProtection\\' => $root . '/tests/stubs/FlzDataProtection/',
+        'OCA\\FlzOrganization\\Organization\\' => $root . '/../flz_organization/lib/Organization/',
     ] as $prefix => $directory) {
         if (!str_starts_with($class, $prefix)) continue;
         $relative = str_replace('\\', '/', substr($class, strlen($prefix)));

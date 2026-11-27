@@ -70,20 +70,20 @@ if (fallback.locale !== 'de-DE'
 const missingLocale = load(undefined, false).l10n;
 if (missingLocale.locale !== 'de-DE') throw new Error('Ohne Locale ist Deutsch nicht der Standard.');
 
-for (const locale of ['de', 'en_GB']) {
+for (const locale of ['en', 'en_GB']) {
     const catalog = JSON.parse(readFileSync(new URL(`../../l10n/${locale}.json`, import.meta.url), 'utf8'));
     if (typeof catalog.translations !== 'object' || !String(catalog.pluralForm).includes('nplurals=2')) {
         throw new Error(`Nextcloud-Katalog für ${locale} ist unvollständig.`);
     }
 }
-const germanCatalog = JSON.parse(readFileSync(new URL('../../l10n/de.json', import.meta.url), 'utf8')).translations;
-if (germanCatalog.Monday !== 'Montag'
-    || germanCatalog['Calendar week from {date}'] !== 'Kalenderwoche ab {date}'
-    || germanCatalog['_{count} matching gap_::_{count} matching gaps_'][1] !== '{count} passende Lücken') {
-    throw new Error('Deutscher Katalog enthält Wochentage, Platzhalter oder Plural nicht korrekt.');
+const englishCatalog = JSON.parse(readFileSync(new URL('../../l10n/en.json', import.meta.url), 'utf8')).translations;
+if (englishCatalog.Montag !== 'Monday'
+    || englishCatalog['Kalenderwoche ab {date}'] !== 'Calendar week from {date}'
+    || englishCatalog['{count} passende Lücke:::{count} passende Lücken'][1] !== '{count} matching gaps') {
+    throw new Error('Deutscher Quelltext wird im englischen Katalog nicht korrekt abgebildet (Wochentage, Platzhalter, Plural).');
 }
-const englishCatalog = JSON.parse(readFileSync(new URL('../../l10n/en_GB.json', import.meta.url), 'utf8')).translations;
-if (englishCatalog.Monday !== 'Monday' || englishCatalog['Calendar week from {date}'] !== 'Calendar week from {date}') {
+const englishGbCatalog = JSON.parse(readFileSync(new URL('../../l10n/en_GB.json', import.meta.url), 'utf8')).translations;
+if (englishGbCatalog.Montag !== 'Monday' || englishGbCatalog['Kalenderwoche ab {date}'] !== 'Calendar week from {date}') {
     throw new Error('Englischer Zweitkatalog ist nicht vollständig prüfbar.');
 }
 
@@ -93,9 +93,9 @@ for (const relativePath of readdirSync(jsRoot, { recursive: true })) {
     if (!String(relativePath).endsWith('.js')) continue;
     const clientSource = readFileSync(new URL(`../../js/${relativePath}`, import.meta.url), 'utf8');
     for (const match of clientSource.matchAll(/l10n\.t\('([^']+)'/g)) clientKeys.add(match[1]);
-    for (const match of clientSource.matchAll(/l10n\.n\('([^']+)',\s*'([^']+)'/g)) clientKeys.add(`_${match[1]}_::_${match[2]}_`);
+    for (const match of clientSource.matchAll(/l10n\.n\('([^']+)',\s*'([^']+)'/g)) clientKeys.add(`${match[1]}:::${match[2]}`);
 }
-for (const locale of ['de', 'en_GB']) {
+for (const locale of ['en', 'en_GB']) {
     const json = JSON.parse(readFileSync(new URL(`../../l10n/${locale}.json`, import.meta.url), 'utf8')).translations;
     let registered = null;
     const catalogSource = readFileSync(new URL(`../../l10n/${locale}.js`, import.meta.url), 'utf8');
@@ -124,8 +124,8 @@ for (const relativePath of [
 }
 
 const shiftDefaultsSource = readFileSync(new URL('../../js/components/shift-defaults.js', import.meta.url), 'utf8');
-if (shiftDefaultsSource.includes("'Montag'") || !shiftDefaultsSource.includes("l10n.t('Monday')")) {
-    throw new Error('Standarddienstzeiten verwenden weiterhin eine feste deutsche Wochentagsliste.');
+if (shiftDefaultsSource.includes("l10n.t('Monday')") || !shiftDefaultsSource.includes("l10n.t('Montag')")) {
+    throw new Error('Standarddienstzeiten verwenden weiterhin eine feste englische Wochentagsliste.');
 }
 
 const visibleSourceContracts = new Map([
@@ -142,7 +142,8 @@ for (const [relativePath, forbiddenTexts] of visibleSourceContracts) {
     const component = readFileSync(new URL(relativePath, import.meta.url), 'utf8');
     if (!component.includes('l10n.t(')) throw new Error(`Sichtbare Komponente verwendet den L10N-Adapter nicht: ${relativePath}`);
     for (const text of forbiddenTexts) {
-        if (component.includes(`'${text}`) || component.includes(`\`${text}`)) {
+    const stripped = component.replace(/l10n\.t\('[^']*'/g, '').replace(/l10n\.n\('[^']*',\s*'[^']*'/g, '');
+        if (stripped.includes(`'${text}`) || stripped.includes(`\`${text}`)) {
             throw new Error(`Komponente enthält noch festen deutschen UI-Text: ${relativePath}: ${text}`);
         }
     }

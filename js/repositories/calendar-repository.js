@@ -1,9 +1,9 @@
 (function() {
     'use strict';
 
-    const BaseRepository = window.LocalBase.repositories.Repository;
+    const BaseRepository = window.OCA.FlzCalendar.Shared.repositories.Repository;
 
-    /** Zweck: Kapselt alle Filzmann-Kalender-API-Pfade hinter dem gemeinsamen LocalBase-Client. */
+    /** Zweck: Kapselt alle Filzmann-Kalender-API-Pfade hinter dem app-lokal gebündelten Shared-Client. */
     class CalendarRepository extends BaseRepository {
         week(start) {
             return this.request(`/api/week?start=${this.encode(start)}`);

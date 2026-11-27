@@ -145,7 +145,7 @@ const l10n = {
 const context = {
     window: {
         location: { search: '?calendarConnection=google-connected' },
-        LocalBase: { api: { ApiClient }, ui: { Notice } },
+        OCA: { FlzCalendar: { Shared: { api: { ApiClient }, ui: { Notice } } } },
         FlzCalendar: {
             l10n,
             repositories: { CalendarRepository }, models: { CalendarEntry, Organization },
@@ -181,7 +181,7 @@ const repository = CalendarRepository.last;
 if (!calls.some(call => call[0] === 'week') || !state.data?.entries[0].hydrated
     || WeekTable.last.renders.length !== 1 || CalendarFilters.last.renders !== 1
     || ShiftDefaults.last.values.length !== 1 || ShiftCalendarSync.last.values.length !== 1
-    || ExternalCalendars.last.loads !== 1 || !Notice.last.messages.some(item => item[1] === 'Google Calendar was connected.')) {
+    || ExternalCalendars.last.loads !== 1 || !Notice.last.messages.some(item => item[1] === 'Google-Kalender wurde verbunden.')) {
     throw new Error('Initiale App-Orchestrierung lädt, hydriert oder rendert den Wochenzustand nicht vollständig.');
 }
 if (ApiClient.last.options.errorMessage({ error: 'safe error' }, 400) !== 'safe error'
@@ -201,10 +201,10 @@ if (backToTopCall?.top !== 0 || backToTopCall?.behavior !== 'smooth') {
 }
 state.selected.add('a');
 CalendarFilters.last.options.onChange();
-if (!elements.get('flz-calendar-filter-status').textContent.includes('1 selected')) throw new Error('Explizite Auswahl wird nicht im Filterstatus gerendert.');
+if (!elements.get('flz-calendar-filter-status').textContent.includes('1 ausgewählt')) throw new Error('Explizite Auswahl wird nicht im Filterstatus gerendert.');
 state.selected.clear(); state.forceFiltered = true;
 CalendarFilters.last.options.onChange();
-if (!elements.get('flz-calendar-filter-status').textContent.includes('1 filtered')) throw new Error('Gruppenfilter wird nicht im Filterstatus gerendert.');
+if (!elements.get('flz-calendar-filter-status').textContent.includes('1 gefiltert')) throw new Error('Gruppenfilter wird nicht im Filterstatus gerendert.');
 WeekNavigation.last.options.onViewChange();
 
 repository.deferWeek = true;
@@ -237,13 +237,13 @@ state.period = 'week';
 await WeekNavigation.last.options.onPeriodChange();
 
 await ShiftDefaults.last.options.onSave({ 1: { enabled: true, start: '09:00', end: '17:00' } });
-if (!calls.some(call => call[0] === 'saveShiftDefaults') || !Notice.last.messages.some(item => item[1] === 'Personal default shift times saved.')) {
+if (!calls.some(call => call[0] === 'saveShiftDefaults') || !Notice.last.messages.some(item => item[1] === 'Persönliche Standard-Dienstzeiten gespeichert.')) {
     throw new Error('Persönliche Standarddienste werden nicht gespeichert, neu geladen und bestätigt.');
 }
 await ShiftCalendarSync.last.options.onSave(false);
 await ShiftCalendarSync.last.options.onSave(true);
-if (!Notice.last.messages.some(item => String(item[1]).includes('disabled'))
-    || !Notice.last.messages.some(item => String(item[1]).includes('Team calendar'))) {
+if (!Notice.last.messages.some(item => String(item[1]).includes('deaktiviert'))
+    || !Notice.last.messages.some(item => String(item[1]).includes('ist aktiviert'))) {
     throw new Error('Kalendersynchronisation zeigt Aktivierung und Opt-out nicht an.');
 }
 await elements.get('flz-calendar-save-default').fire('click');
@@ -266,7 +266,7 @@ if (Notice.last.messages.filter(item => item[0] === 'error').length < 4) {
 MeetingFinder.last.options.onError(new Error('meeting failed'));
 repository.fail = null;
 await MeetingFinder.last.options.onBlocked();
-if (!Notice.last.messages.some(item => item[1] === 'The meeting was blocked for all selected people.')) {
+if (!Notice.last.messages.some(item => item[1] === 'Das Meeting wurde für alle ausgewählten Personen blockiert.')) {
     throw new Error('Erfolgreiche Meetingblockierung lädt den Kalender nicht neu und bestätigt sie nicht.');
 }
 TabNavigation.last.options.onChange('settings');

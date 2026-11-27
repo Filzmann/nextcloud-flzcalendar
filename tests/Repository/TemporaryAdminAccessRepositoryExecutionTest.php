@@ -85,54 +85,15 @@ namespace {
         'revoked_at' => null,
         'revoked_by' => null,
     ], $overrides);
-    $startsAt = new DateTimeImmutable('2026-10-08T10:00:00+00:00');
-    $endsAt = new DateTimeImmutable('2026-10-08T12:00:00+00:00');
-
     $db = new TemporaryAdminConnection();
-    $db->queue(new TemporaryAdminQueryBuilder(new TemporaryAdminResult()));
-    $db->queue(new TemporaryAdminQueryBuilder(new TemporaryAdminResult(), 1, 91));
     $repository = new TemporaryAdminAccessRepository($db);
-    $grant = $repository->replaceActive('admin-target', 'privacy-officer', $startsAt, $endsAt);
-    if ($grant['id'] !== 91 || $grant['targetUid'] !== 'admin-target' || $grant['revokedAt'] !== null
-        || $db->begun !== 1 || $db->committed !== 1 || $db->rolledBack !== 0) {
-        throw new RuntimeException('Das atomare Ersetzen einer Adminfreigabe verliert Zustand oder Auditdaten.');
-    }
-
-    $failingDb = new TemporaryAdminConnection();
-    $failingDb->queue(new TemporaryAdminQueryBuilder(new TemporaryAdminResult(), new RuntimeException('write failed')));
-    try {
-        (new TemporaryAdminAccessRepository($failingDb))->replaceActive('admin-target', 'privacy-officer', $startsAt, $endsAt);
-        throw new RuntimeException('Ein fehlgeschlagenes Ersetzen wurde bestätigt.');
-    } catch (RuntimeException $error) {
-        if ($error->getMessage() !== 'write failed' || $failingDb->rolledBack !== 1 || $failingDb->committed !== 0) throw $error;
-    }
-
-    $db->queue(new TemporaryAdminQueryBuilder(new TemporaryAdminResult(), 1));
-    $db->queue(new TemporaryAdminQueryBuilder(new TemporaryAdminResult(), 0));
-    if (!$repository->revokeActive('admin-target', 'privacy-officer', $endsAt)
-        || $repository->revokeActive('missing-admin', 'privacy-officer', $endsAt)) {
-        throw new RuntimeException('Widerruf unterscheidet aktive und fehlende Freigaben nicht.');
-    }
-
-    $db->queue(new TemporaryAdminQueryBuilder(new TemporaryAdminResult(single: false)));
-    $db->queue(new TemporaryAdminQueryBuilder(new TemporaryAdminResult(single: $row())));
-    if ($repository->activeFor('missing-admin', $startsAt) !== null) {
-        throw new RuntimeException('Eine fehlende Freigabe wird nicht als fehlend ausgewiesen.');
-    }
-    $active = $repository->activeFor('admin-target', $startsAt);
-    if ($active === null || $active['id'] !== 17 || $active['startsAt']->getTimezone()->getName() !== '+00:00'
-        || !$active['endsAt'] instanceof DateTimeImmutable) {
-        throw new RuntimeException('Eine aktive Freigabe wird nicht stabil typisiert.');
-    }
 
     $revoked = $row(['id' => 18, 'revoked_at' => '2026-10-08T11:00:00+00:00', 'revoked_by' => 'privacy-officer']);
-    $db->queue(new TemporaryAdminQueryBuilder(new TemporaryAdminResult(rows: [$revoked, $row()])));
     $db->queue(new TemporaryAdminQueryBuilder(new TemporaryAdminResult(rows: [$revoked])));
-    $history = $repository->history();
     $subjectHistory = $repository->historyForUid('privacy-officer', 25);
-    if (count($history) !== 2 || $history[0]['revokedAt']?->format(DATE_ATOM) !== '2026-10-08T11:00:00+00:00'
-        || $history[0]['revokedBy'] !== 'privacy-officer' || count($subjectHistory) !== 1) {
-        throw new RuntimeException('Freigabehistorie verliert Widerruf oder Betroffenenbezug.');
+    if (count($subjectHistory) !== 1 || $subjectHistory[0]['revokedAt']?->format(DATE_ATOM) !== '2026-10-08T11:00:00+00:00'
+        || $subjectHistory[0]['revokedBy'] !== 'privacy-officer') {
+        throw new RuntimeException('Read-only-Freigabehistorie verliert Widerruf oder Betroffenenbezug.');
     }
 
     echo "TemporaryAdminAccessRepositoryExecutionTest: OK\n";

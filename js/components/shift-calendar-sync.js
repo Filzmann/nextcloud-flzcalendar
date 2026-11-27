@@ -16,8 +16,8 @@
             this.input.checked = Boolean(status.enabled);
             const name = status.calendarName || 'Filzmann Dienste';
             this.status.textContent = status.enabled
-                ? l10n.t('Calendar is active: {calendar}.', { calendar: name })
-                : l10n.t('Calendar is not active: {calendar}.', { calendar: name });
+                ? l10n.t('Kalender ist aktiv: {calendar}.', { calendar: name })
+                : l10n.t('Kalender ist nicht aktiv: {calendar}.', { calendar: name });
         }
 
         async submit(event) {

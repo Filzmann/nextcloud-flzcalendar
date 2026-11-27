@@ -4,16 +4,23 @@ declare(strict_types=1);
 
 namespace OCA\FlzCalendar\Permission;
 
-use OCA\FlzCalendar\Service\CalendarSettingsService;
-use OCA\LocalBase\Organization\FlzOrganizationDefinition;
-use OCA\LocalBase\Organization\FlzOrganizationSettingsService;
+use OCA\FlzCalendar\Service\CalendarOrganization;
+use OCA\FlzCalendar\Service\OrganizationRuntime;
 
 final class NextcloudCalendarPermissionSource implements CalendarPermissionSourceInterface {
     public function __construct(
-        private FlzOrganizationSettingsService $organization,
-        private CalendarSettingsService $settings,
-    ) {}
+        private OrganizationRuntime $organization,
+    )
+    {
+    }
 
-    public function definition(): FlzOrganizationDefinition { return $this->organization->definition(); }
-    public function peerGroups(): array { return $this->settings->enabledPeerGroups(); }
+    public function definition(): ?CalendarOrganization
+    {
+        return $this->organization->organization();
+    }
+
+    public function peerGroups(): array
+    {
+        return $this->organization->peerGroups();
+    }
 }

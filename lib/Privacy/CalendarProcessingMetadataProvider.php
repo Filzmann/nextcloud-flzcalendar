@@ -19,16 +19,16 @@ final class CalendarProcessingMetadataProvider implements ProcessingMetadataProv
 
     public function catalog(): ProcessingMetadataCatalog {
         $path = dirname(__DIR__, 2) . '/resources/privacy-processing.json';
-        if (!is_file($path)) throw new DomainException('Processing metadata catalog unavailable.');
+        if (!is_file($path)) throw new DomainException('Der Metadatenkatalog der Verarbeitung ist nicht verfügbar.');
 
         try {
             $content = file_get_contents($path);
-            if ($content === false) throw new DomainException('Processing metadata catalog unavailable.');
+            if ($content === false) throw new DomainException('Der Metadatenkatalog der Verarbeitung ist nicht verfügbar.');
             $payload = json_decode($content, true, 512, JSON_THROW_ON_ERROR);
-            if (!is_array($payload)) throw new DomainException('Processing metadata catalog is invalid.');
+            if (!is_array($payload)) throw new DomainException('Der Metadatenkatalog der Verarbeitung ist ungültig.');
             return ProcessingMetadataCatalog::fromArray($payload);
         } catch (JsonException|InvalidArgumentException) {
-            throw new DomainException('Processing metadata catalog is invalid.');
+            throw new DomainException('Der Metadatenkatalog der Verarbeitung ist ungültig.');
         }
     }
 }

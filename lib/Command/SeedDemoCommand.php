@@ -18,13 +18,13 @@ final class SeedDemoCommand extends Command {
     ) { parent::__construct(); }
 
     protected function configure(): void {
-        $this->setName('flzcalendar:demo:seed')->setDescription($this->l10n->t('Creates complete Filzmann Calendar demo accounts and demo data.'));
+        $this->setName('flzcalendar:demo:seed')->setDescription($this->l10n->t('Erzeugt vollständige Filzmann-Kalender-Demokonten und Demodaten.'));
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int {
         $result = $this->demoPack->install();
         $accountCount = $result['accounts']['createdUsers'] + $result['accounts']['reusedUsers'];
-        $message = $this->l10n->t('%s demo accounts synchronised; calendar entries created for %s, %s already existed.', [
+        $message = $this->l10n->t('%s Demokonten synchronisiert; Kalendereinträge für %s erzeugt, %s bereits vorhanden.', [
             $accountCount,
             $result['createdCalendars'],
             $result['skippedCalendars'],

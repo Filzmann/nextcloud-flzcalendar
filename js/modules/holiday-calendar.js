@@ -1,7 +1,7 @@
 (function () {
     'use strict';
 
-    /** Datengetriebener read-only Lookup der vom gemeinsamen LocalBase-Vertrag gelieferten Feiertage. */
+    /** Datengetriebener read-only Lookup der über flz_organization gelieferten Feiertage. */
     class HolidayCalendar {
         constructor(calendars = []) {
             this.names = new Map();

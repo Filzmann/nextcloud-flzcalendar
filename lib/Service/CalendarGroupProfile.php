@@ -4,15 +4,19 @@ declare(strict_types=1);
 
 namespace OCA\FlzCalendar\Service;
 
-use OCA\LocalBase\Organization\FlzOrganizationDefinition;
-use OCA\LocalBase\Organization\FlzOrganizationSettingsService;
-
 /** Zweck: Leitet sichtbare Fachrollen und nur für BO/EB gültige Bürobereiche aus Nextcloud-Gruppen ab. */
-final class CalendarGroupProfile {
-    public function __construct(private ?FlzOrganizationSettingsService $organization = null) {}
+final class CalendarGroupProfile
+{
+    public function __construct(private OrganizationRuntime $organization)
+    {
+    }
 
     public function get(array $groupIds): array {
-        $definition = $this->definition();
+        $definition = $this->organization->organization();
+        if ($definition === null)
+        {
+            return ['roles' => [], 'areas' => [], 'clusters' => []];
+        }
         $calendarRoles = array_filter($definition->roles(), static fn(array $role): bool => $role['calendarVisible']);
         uasort($calendarRoles, static function (array $left, array $right): int {
             $order = $left['sortOrder'] <=> $right['sortOrder'];
@@ -29,6 +33,4 @@ final class CalendarGroupProfile {
         }
         return ['roles' => $roles, 'areas' => $areas, 'clusters' => $clusters];
     }
-
-    private function definition(): FlzOrganizationDefinition { return $this->organization?->definition() ?? FlzOrganizationDefinition::defaults(); }
 }

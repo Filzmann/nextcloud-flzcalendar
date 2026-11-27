@@ -74,7 +74,7 @@ class BaseRepository {
     encode(value) { return encodeURIComponent(String(value)); }
     request(path, options = {}) { this.calls.push([path, options]); return Promise.resolve({ path, options }); }
 }
-const repositoryContext = { window: { LocalBase: { repositories: { Repository: BaseRepository } }, FlzCalendar: {} }, JSON, Promise, encodeURIComponent };
+const repositoryContext = { window: { OCA: { FlzCalendar: { Shared: { repositories: { Repository: BaseRepository } } } }, FlzCalendar: {} }, JSON, Promise, encodeURIComponent };
 load('../../js/repositories/calendar-repository.js', repositoryContext);
 const repository = new repositoryContext.window.FlzCalendar.repositories.CalendarRepository({});
 await repository.week('2026-07-01');
@@ -104,7 +104,7 @@ if (repository.calls.length !== 16
 
 // CalendarEntry: server payload hydration and stable serialisation defaults.
 class BaseModel {}
-const modelContext = { window: { LocalBase: { models: { Model: BaseModel } }, FlzCalendar: {} }, Number, String, Boolean };
+const modelContext = { window: { OCA: { FlzCalendar: { Shared: { models: { Model: BaseModel } } } }, FlzCalendar: {} }, Number, String, Boolean };
 load('../../js/models/calendar-entry.js', modelContext);
 const CalendarEntry = modelContext.window.FlzCalendar.models.CalendarEntry;
 const hydratedEntry = new CalendarEntry({
@@ -153,6 +153,7 @@ if (savedDefaults.length !== 1 || savedDefaults[0]['1'].start !== '09:00' || sav
 // CalendarFilters: ordered facets, leadership switch, search selection and reset.
 const filterElements = Object.fromEntries([
     'flz-calendar-role-filters', 'flz-calendar-area-filters', 'flz-calendar-person-search', 'flz-calendar-search-results', 'flz-calendar-selected-people', 'flz-calendar-reset-selection',
+    'flz-calendar-filters', 'flz-calendar-filter-heading', 'flz-calendar-filter-panel', 'flz-calendar-close-filters',
 ].map(id => [id, new FakeNode()]));
 const filterState = {
     data: { employees: [
@@ -161,7 +162,7 @@ const filterState = {
     ] },
     roles: new Set(['staff']), areas: new Set(), selected: new Set(),
     showLeadershipStaff: true, leadershipStaffOnly: true, persisted: 0,
-    isUnfiltered: () => false,
+    isUnfiltered: () => true,
     persist() { this.persisted += 1; },
 };
 const organization = {
@@ -182,6 +183,7 @@ if (filterElements['flz-calendar-role-filters'].children.length !== 3
     throw new Error('Rollenfilter werden nicht ohne Stabsrollen in Organisationsreihenfolge gerendert.');
 }
 const leadershipInput = filterElements['flz-calendar-role-filters'].children[2].children[0];
+if (leadershipInput.disabled) throw new Error('Der Leitungs-/Stabsschalter setzt weiterhin eine weitere Filterauswahl voraus.');
 leadershipInput.checked = false;
 await leadershipInput.fire('change');
 if (filterState.roles.has('staff') || filterState.leadershipStaffOnly || filterState.showLeadershipStaff) {
@@ -197,6 +199,13 @@ await removeAlpha.fire('click');
 filterState.selected.add('b');
 await filterElements['flz-calendar-reset-selection'].fire('click');
 if (filterState.selected.size !== 0 || filterState.persisted < 4 || filterChanges < 4) throw new Error('Filteränderungen werden nicht persistiert und gemeldet.');
+filterElements['flz-calendar-filters'].open = true;
+await filterElements['flz-calendar-filters'].fire('toggle');
+if (!filterElements['flz-calendar-person-search'].focused) throw new Error('Das geöffnete Filterpanel erhält keinen definierten Tastaturfokus.');
+await filterElements['flz-calendar-filters'].fire('keydown', { key: 'Escape' });
+if (filterElements['flz-calendar-filters'].open || !filterElements['flz-calendar-filter-heading'].focused) {
+    throw new Error('Escape schließt das Filterpanel nicht mit Fokus-Rückgabe an den Auslöser.');
+}
 
 // MeetingFinder: validation, search, permission note, week advance, deselection and blocking.
 const meetingIds = [
@@ -226,10 +235,10 @@ if (!meetingElements['flz-calendar-meeting-dialog'].open || !meetingElements['fl
     throw new Error('Meetingdialog initialisiert Auswahl, Fokus oder Modalzustand nicht.');
 }
 await finder.searchWeek();
-if (!meetingElements['flz-calendar-meeting-results'].textContent.includes('at least two')) throw new Error('Meeting-Suche akzeptiert zu wenige Personen.');
+if (!meetingElements['flz-calendar-meeting-results'].textContent.includes('mindestens zwei Personen')) throw new Error('Meeting-Suche akzeptiert zu wenige Personen.');
 finder.selected.add('b'); meetingElements['flz-calendar-meeting-duration'].value = '10';
 await finder.searchWeek();
-if (!meetingElements['flz-calendar-meeting-results'].textContent.includes('15 and 480')) throw new Error('Meeting-Suche akzeptiert eine ungültige Dauer.');
+if (!meetingElements['flz-calendar-meeting-results'].textContent.includes('zwischen 15 und 480 Minuten')) throw new Error('Meeting-Suche akzeptiert eine ungültige Dauer.');
 meetingElements['flz-calendar-meeting-duration'].value = '30';
 gapResponse = { gaps: [{ start: '2026-07-06T10:00:00Z' }], canBlockAll: true };
 await finder.searchWeek();
@@ -238,7 +247,7 @@ await blockButton.fire('click');
 if (!meetingElements['flz-calendar-meeting-title'].reported) throw new Error('Leerer Meetingtitel wird nicht validiert.');
 meetingElements['flz-calendar-meeting-title'].value = 'Planning';
 await blockButton.fire('click');
-if (blockCalls.length !== 1 || blocked !== 1 || !meetingElements['flz-calendar-meeting-results'].textContent.includes('blocked')) {
+if (blockCalls.length !== 1 || blocked !== 1 || !meetingElements['flz-calendar-meeting-results'].textContent.includes('blockiert')) {
     throw new Error('Gemeinsame Meetingblockierung wird nicht vollständig ausgeführt.');
 }
 gapResponse = { gaps: [{ start: '2026-07-06T11:00:00Z' }], canBlockAll: false };
@@ -295,7 +304,7 @@ const entryPayload = {
     recurrenceFrequency: 'weekly', recurrenceInterval: 1, recurrenceUntil: '2026-08-01', recurrenceWeekdays: [1], recurrenceTimezone: 'Europe/Berlin',
 };
 await workflow.save(entryPayload);
-if (workflowCalls[0][0] !== 'save' || !String(workflowMessages[0][0]).includes('3 recurring') || workflowDialog.closed !== 1) {
+if (workflowCalls[0][0] !== 'save' || !String(workflowMessages[0][0]).includes('3 Serientermine gespeichert.') || workflowDialog.closed !== 1) {
     throw new Error('Eintragsworkflow speichert neue Terminserien nicht vollständig.');
 }
 workflowState.data.entries = [{ id: 8, meetingUid: 'meeting-1', canManageMeeting: false }];
@@ -315,7 +324,7 @@ if (workflowCalls.length !== callsBeforeCancelledSave) throw new Error('Abgebroc
 
 workflowFailure = null;
 await workflow.remove({ id: 10, type: 'shift', meetingUid: null, seriesUid: null });
-if (workflowCalls.at(-1)[0] !== 'remove' || !String(workflowMessages.at(-1)[0]).includes('Shift deleted')) {
+if (workflowCalls.at(-1)[0] !== 'remove' || !String(workflowMessages.at(-1)[0]).includes('Dienst gelöscht.')) {
     throw new Error('Einfacher Dienst wird nicht direkt gelöscht.');
 }
 workflowFailure = Object.assign(new Error('confirmation'), { status: 409, data: { confirmationRequired: true, children: [1, 2] } });
@@ -341,7 +350,7 @@ workflowContext.window.confirm = () => true;
 await workflow.remove({ id: 13, type: 'appointment', meetingUid: null, seriesUid: null });
 workflow.seriesChoice = async () => 'series';
 await workflow.remove({ id: 14, type: 'appointment', meetingUid: null, seriesUid: 'series-1' });
-if (!String(workflowMessages.at(-1)[0]).includes('Recurring appointment deleted')) throw new Error('Vollständige Serie meldet keinen passenden Löschstatus.');
+if (!String(workflowMessages.at(-1)[0]).includes('Serientermin gelöscht.')) throw new Error('Vollständige Serie meldet keinen passenden Löschstatus.');
 await workflow.removeMeeting({ meetingUid: 'm-denied', canManageMeeting: false });
 workflowContext.window.confirm = () => false;
 await workflow.removeMeeting({ meetingUid: 'm-cancel', canManageMeeting: true });

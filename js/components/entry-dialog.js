@@ -74,13 +74,13 @@
             const appointment = this.fields.type.value === 'appointment';
             const editing = this.fields['entry-id'].value !== '';
             this.fields['entry-dialog-title'].textContent = l10n.t('{action}: {type}', {
-                action: editing ? l10n.t('Edit') : l10n.t('Create'),
-                type: appointment ? l10n.t('Appointment / blocked time') : l10n.t('Shift'),
+                action: editing ? l10n.t('Bearbeiten') : l10n.t('Anlegen'),
+                type: appointment ? l10n.t('Termin / Sperrtermin') : l10n.t('Dienst'),
             });
-            this.fields['title-label'].textContent = appointment ? l10n.t('Title (required)') : l10n.t('Title (optional)');
+            this.fields['title-label'].textContent = appointment ? l10n.t('Titel (erforderlich)') : l10n.t('Titel (optional)');
             this.fields['title-help'].textContent = appointment
-                ? l10n.t('Outside a shift, the appointment is displayed as blocked time.')
-                : l10n.t('A shift can be saved without a title.');
+                ? l10n.t('Außerhalb eines Dienstes wird der Termin als Sperrtermin angezeigt.')
+                : l10n.t('Ein Dienst kann ohne Titel gespeichert werden.');
             this.fields.title.required = appointment;
             const recurrenceAvailable = appointment && !editing;
             this.fields['recurrence-fields'].hidden = !recurrenceAvailable;
@@ -128,7 +128,7 @@
                 && start < new Date(entry.end)
                 && end > new Date(entry.start));
             if (!conflict) return true;
-            const message = l10n.t('Overlap with shift {start}–{end}.', { start: this.time(conflict.start), end: this.time(conflict.end) });
+            const message = l10n.t('Überschneidung mit Dienst {start}–{end}.', { start: this.time(conflict.start), end: this.time(conflict.end) });
             this.fields.start.setCustomValidity(message);
             this.fields.end.setCustomValidity(message);
             this.fields['time-help'].textContent = message;
@@ -139,7 +139,7 @@
             event.preventDefault();
             const frequency = this.fields['recurrence-frequency'].value;
             if (frequency === 'weekly' && !this.weekdays.some(input => input.checked)) {
-                this.fields['recurrence-frequency'].setCustomValidity(l10n.t('Please select at least one weekday.'));
+                this.fields['recurrence-frequency'].setCustomValidity(l10n.t('Bitte mindestens einen Wochentag auswählen.'));
             } else {
                 this.fields['recurrence-frequency'].setCustomValidity('');
             }

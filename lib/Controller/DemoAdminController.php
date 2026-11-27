@@ -7,7 +7,6 @@ namespace OCA\FlzCalendar\Controller;
 use OCA\FlzCalendar\AppInfo\Application;
 use OCA\FlzCalendar\Http\LocalizedErrorResponseFactory;
 use OCA\FlzCalendar\Service\CalendarDemoPackService;
-use OCA\FlzCalendar\Service\TemporaryAdminAccessChecker;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\JSONResponse;
@@ -18,7 +17,7 @@ use Psr\Log\LoggerInterface;
 
 /**
  * Zweck: Installiert das Kalender-Demo-Pack ausschließlich nach einer bestätigten Adminaktion.
- * Vertrag: Nextcloud-Admin- und CSRF-Schutz bleiben aktiv; zusätzlich wird die aktive Sitzung serverseitig geprüft.
+ * Vertrag: Nextcloud-Admin- und CSRF-Schutz bleiben aktiv; die aktive Sitzung wird serverseitig geprüft.
  */
 final class DemoAdminController extends Controller {
     public function __construct(
@@ -28,25 +27,22 @@ final class DemoAdminController extends Controller {
         private CalendarDemoPackService $demoPack,
         private LoggerInterface $logger,
         private LocalizedErrorResponseFactory $errors,
-        private TemporaryAdminAccessChecker $temporaryAdminAccess,
     ) {
         parent::__construct(Application::APP_ID, $request);
     }
 
     public function install(): JSONResponse {
-        if (!$this->isAdmin()) return $this->errors->create('forbidden', 'You are not allowed to perform this action.', Http::STATUS_FORBIDDEN);
+        if (!$this->isAdmin()) return $this->errors->create('forbidden', 'Keine Berechtigung.', Http::STATUS_FORBIDDEN);
         try {
             return new JSONResponse(['result' => $this->demoPack->install()]);
         } catch (\Throwable $error) {
             $this->logger->error('Kalender-Demo-Pack konnte nicht installiert werden.', ['exception' => $error]);
-            return $this->errors->create('demo_pack_install_failed', 'The calendar demo pack could not be installed.', Http::STATUS_BAD_REQUEST);
+            return $this->errors->create('demo_pack_install_failed', 'Das Kalender-Demo-Pack konnte nicht installiert werden.', Http::STATUS_BAD_REQUEST);
         }
     }
 
     private function isAdmin(): bool {
         $user = $this->session->getUser();
-        return $user !== null
-            && $this->groups->isAdmin($user->getUID())
-            && $this->temporaryAdminAccess->hasActiveGrant($user->getUID());
+        return $user !== null && $this->groups->isAdmin($user->getUID());
     }
 }

@@ -17,8 +17,10 @@ festgestellter Kontolöschung. Abgeleitete Kalender führen keine unabhängige
 Historie und werden bei Quelländerung, Opt-out oder Trennung abgeglichen oder
 entfernt. Externe Kalenderanbieter bleiben in Produktion deaktiviert, bis der
 jeweilige Anbieter einzeln fachlich und datenschutzrechtlich freigegeben ist.
-Adminfreigabehistorien werden sechs Monate nach ihrem tatsächlichen Ende
-vollständig gelöscht und durch Restore nie reaktiviert.
+Historische Adminfreigaben aus dem abgelösten Freigabeverfahren werden sechs
+Monate nach ihrem tatsächlichen Ende vollständig gelöscht und durch Restore
+nie reaktiviert. Sie besitzen keinen schreibenden oder autorisierenden
+Laufzeitpfad mehr.
 
 Die Regeln sind Policy, kein Implementierungs- oder Rechtsnachweis. Löschung,
 Restore, Holds, Backups und Providerverträge müssen app-lokal getestet werden;
@@ -59,19 +61,32 @@ Kalendermatrix scrollt innerhalb des verfügbaren sichtbaren Bereichs in beide
 Richtungen. Ihre horizontale Scrollleiste bleibt unabhängig von der Höhe des
 Tabelleninhalts am unteren Rand des sichtbaren Kalender-Viewports; beide
 Scrollrichtungen sind dort jederzeit erreichbar.
-Gesetzliche Feiertage werden über den gemeinsamen read-only
-LocalBase-Kalendervertrag geliefert und verändern weder Einträge, Verfügbarkeit
-noch Rechte.
+Gesetzliche Feiertage werden über den öffentlichen read-only V1-Vertrag von
+`flz_organization` geliefert und verändern weder Einträge, Verfügbarkeit noch
+Rechte.
 
 Filter nach Personen, Rollen und Bereichen verwenden den konfigurierten
 Organisationsvertrag. Rollen und Bereiche werden jeweils als ODER-Auswahl und
-miteinander als Schnittmenge ausgewertet. Die im Organisationsvertrag erste
-passende Rolle ist die vorrangige Kalenderrolle. Persönliche Filter-,
-Zeitraum- und Ausrichtungskonfigurationen werden nur durch „Zum Standard
-machen“ als Nextcloud-Benutzerwert gespeichert.
+bei einer bereichsgebundenen vorrangigen Rolle miteinander als Schnittmenge
+ausgewertet. Globale Rollen ohne natürliche Bereichszuordnung bleiben von
+einer Bereichsauswahl unberührt; auch eine versehentliche Bereichsmitgliedschaft
+macht sie nicht bereichsgebunden. Die im Organisationsvertrag erste passende
+Rolle ist die vorrangige Kalenderrolle. Der Leitungs-/Stabsblock lässt sich
+ohne weitere Rollen- oder Bereichsauswahl ein- und ausblenden. Eine explizite
+Personenauswahl ersetzt die Rollen-, Bereichs- und Stabsfilter: Markierte
+Personen bleiben auch dann sichtbar, wenn ihre Gruppe nicht gecheckt ist.
+Persönliche
+Filter-, Zeitraum- und Ausrichtungskonfigurationen werden nur durch „Zum
+Standard machen“ als Nextcloud-Benutzerwert gespeichert.
 
-Gruppenüberschriften und der mobile Organisationskontext verwenden die vom
-LocalBase-Organisationsvertrag gelieferten Kürzel. Bereichsrollen verbinden
+Der geöffnete Filterinhalt liegt als begrenztes, selbst scrollbar bleibendes
+Panel über der Kalenderübersicht und verändert deren verfügbaren Matrixraum
+nicht. Beim Öffnen erhält ein Bedienelement im Panel den Fokus; „Escape“ und die
+Schließen-Aktion schließen das Panel und geben den Fokus an den Auslöser
+zurück.
+
+Gruppenüberschriften und der mobile Organisationskontext verwenden die von
+`flz_organization` V1 gelieferten Kürzel. Bereichsrollen verbinden
 Rollen- und Bereichskürzel mit einem Bindestrich, beispielsweise `BO-NO` oder
 `EB-W`; globale Rollen erscheinen beispielsweise als `PFK`, `BO-Pflege` oder
 `IT`. Filter und Organisationsverwaltung verwenden weiterhin die Langnamen.
@@ -203,16 +218,20 @@ Providerfehler bleiben voneinander und von der führenden FLZ-Mutation isoliert.
 
 ## Organisation, Rechte und optionale Urlaube und Planungskonflikte
 
-Alle angemeldeten Nutzer*innen dürfen Kalenderdaten lesen und eigene Einträge
-bearbeiten. Fremdbearbeitung folgt ausschließlich der konfigurierten
-Organisationshierarchie und freigegebenen Peergrenzen; Nextcloud-Admins dürfen
-alle Einträge verwalten. Jeder API-Endpunkt erzwingt dies serverseitig über
+Personen mit einer Rolle im kanonischen Organigramm dürfen Kalenderdaten lesen,
+eigene Einträge bearbeiten und Meetinglücken suchen. Assistenzteam-Zugehörigkeit
+allein reicht nicht. Fremdbearbeitung folgt ausschließlich direkten Kanten der
+konfigurierten Organisationshierarchie und freigegebenen Peergrenzen;
+Nextcloud-Admins dürfen aufgrund der ausdrücklich dokumentierten
+Kalenderausnahme alle Einträge verwalten. Jeder API-Endpunkt erzwingt dies serverseitig über
 den zentralen `CalendarAccessService`. Listen werden bereits serverseitig auf
 den erlaubten Personenkreis begrenzt.
 
 Rollen, Bereiche, sichtbare Bezeichnungen, Reihenfolge, Peer-Fähigkeit,
 Assistenzteam-Konventionen und Hierarchiekanten stammen aus
-`FlzOrganizationDefinition`. Fachcode führt kein paralleles Rollenregister.
+dem öffentlichen V1-Snapshot von `flz_organization`. Die Konfiguration liegt
+im Nextcloud-Adminbereich dieses Providers; Fachcode führt kein paralleles
+Rollenregister.
 Eine Änderung technischer Gruppen-IDs verschiebt keine bestehenden
 Nextcloud-Mitgliedschaften.
 
@@ -235,22 +254,22 @@ Leseantwort als `unavailable` ausgewiesen und verhindern neue Dienste, statt
 Konfliktfreiheit zu behaupten. Umgekehrt publiziert Filzmann Kalender seine Dienste
 datensparsam als `Dienst/Büro`; private Termintitel verlassen die App nicht.
 
-## Zeitlich begrenzter fachlicher Admin-Vollzugriff
+## Native Adminausnahme und historische Freigaben
 
-Native Nextcloud-Administration bleibt von fachlicher Kalenderberechtigung
-getrennt. Vollzugriff entsteht nur für ein aktuell natives Administrationskonto
-mit aktiver app-lokaler Freigabe und endet spätestens nach 24 Stunden. Nur
-Mitglieder der kanonischen Nextcloud-Gruppe `Datenschutzbeauftragte` dürfen
-Freigaben erteilen, widerrufen und deren Historie lesen; ein nativer Admin ohne
-diese Rolle und gewöhnliche Konten werden ohne Zustandsänderung abgewiesen.
+Filzmann Kalender ist die eng begrenzte, ausdrücklich entschiedene Ausnahme
+zum systemweiten temporären Adminvertrag: Ein bei jedem Zugriff aktuell
+bestätigtes natives Nextcloud-Administrationskonto darf alle Kalendereinträge
+verwalten und das ausschließlich synthetische Demo-Pack installieren. Die
+Ausnahme gilt weder für andere Apps noch für deren Daten, Freigaben oder
+Adminbereiche. Serverprüfungen bleiben zentral in `CalendarAccessService` und
+den technischen Admincontrollern; UI-Sichtbarkeit erteilt keine Rechte.
 
-Die Steuerung liegt im authentifizierten Filzmann-Kalender-Hauptbereich und bleibt
-außerhalb der technischen Nextcloud-Administration. Schreibende Requests
-verwenden den Nextcloud-CSRF-Schutz. Ein natives Administrationskonto ohne
-aktive Freigabe sieht eine sichere Hinweismeldung; der Direktlink zur
-Freigabesteuerung erscheint nur bei gleichzeitiger DPO-Rolle. Audit- und
-Art.-15-Projektionen geben ausschließlich die subjectgebundene Beteiligung und
-Zeitpunkte aus und neutralisieren Kennungen anderer beteiligter Personen.
+Die frühere app-lokale Freigabesteuerung ist entfernt. Es existieren keine
+Freigabe-, Widerrufs- oder Historienrouten und keine daraus abgeleitete
+Kalenderberechtigung mehr. Bereits vorhandene Historieneinträge werden nicht
+destruktiv gelöscht, nicht reaktiviert und ausschließlich subjectgebunden über
+den PersonalDataProvider ausgegeben; Kennungen anderer Beteiligter bleiben
+neutralisiert.
 
 ## Processing-Metadaten
 
@@ -258,7 +277,7 @@ Der zusätzliche `ProcessingMetadataProvider` veröffentlicht den app-eigenen
 Katalog `resources/privacy-processing.json` lazy über den öffentlichen
 Standalone-V1-Vertrag des Datenschutz-Centers. Er trennt führende
 Kalendereinträge, persönliche UserConfig-Werte, verschlüsselte externe
-Verbindungen, abgeleitete Zielkalender und temporäre Adminfreigaben. Der
+Verbindungen, abgeleitete Zielkalender und historische Adminfreigaben. Der
 Katalog enthält keine personenbezogenen Laufzeitdaten oder entschlüsselten
 Secrets und ersetzt fehlende fachliche Entscheidungen nicht durch technische
 Defaults.

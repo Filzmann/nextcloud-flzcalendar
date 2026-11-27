@@ -25,7 +25,7 @@ final class ShiftCalendarEventSerializer {
         $dateStamp ??= (new DateTimeImmutable('now', new DateTimeZone('UTC')))->format('Ymd\THis\Z');
         $this->assertDateStamp($dateStamp);
 
-        $title = $entry->title() !== '' ? $entry->title() : $this->l10n->t('Shift');
+        $title = $entry->title() !== '' ? $entry->title() : $this->l10n->t('Dienst');
         $lines = [
             'BEGIN:VCALENDAR',
             'VERSION:2.0',
@@ -37,7 +37,7 @@ final class ShiftCalendarEventSerializer {
             'DTSTART:' . $this->utc($entry->start()),
             'DTEND:' . $this->utc($entry->end()),
             'SUMMARY:' . $this->text($title),
-            'DESCRIPTION:' . $this->text($this->l10n->t('Automatically synchronised from Filzmann Calendar. Please make changes there.')),
+            'DESCRIPTION:' . $this->text($this->l10n->t('Automatisch aus Filzmann Kalender synchronisiert. Änderungen bitte dort vornehmen.')),
             'CLASS:PRIVATE',
             'TRANSP:OPAQUE',
             'X-FLZ-CALENDAR-SOURCE:flzcalendar',
@@ -68,8 +68,8 @@ final class ShiftCalendarEventSerializer {
             'DTSTAMP:' . $dateStamp,
             'DTSTART;VALUE=DATE:' . $absence->start()->format('Ymd'),
             'DTEND;VALUE=DATE:' . $absence->end()->format('Ymd'),
-            'SUMMARY:' . $this->text($planned ? $this->l10n->t('Planned vacation') : $this->l10n->t('Vacation')),
-            'DESCRIPTION:' . $this->text($this->l10n->t('Automatically synchronised from Filzmann Calendar. Please make changes there.')),
+            'SUMMARY:' . $this->text($planned ? $this->l10n->t('Geplanter Urlaub') : $this->l10n->t('Urlaub')),
+            'DESCRIPTION:' . $this->text($this->l10n->t('Automatisch aus Filzmann Kalender synchronisiert. Änderungen bitte dort vornehmen.')),
             'CLASS:PRIVATE',
             'STATUS:' . ($planned ? 'TENTATIVE' : 'CONFIRMED'),
             'TRANSP:' . ($planned ? 'TRANSPARENT' : 'OPAQUE'),

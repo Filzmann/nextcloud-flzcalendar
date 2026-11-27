@@ -23,7 +23,7 @@ Filzmann Kalender uebertraegt den fachlichen Kern des bisherigen WordPress-Plugi
 Kernprozess:
 
 - Eine Wochenansicht zeigt Mitarbeiter*innen als Zeilen und Kalendertage als Spalten.
-- Eine umschaltbare Monatsansicht zeigt den gesamten sichtbaren Monatszeitraum in einer einzigen durchgehenden Planungsmatrix und unterstützt wie die Wochenansicht „Tage als Zeilen“ sowie „Personen als Zeilen“. Sie wiederholt weder Wochenplanung noch Tabellenköpfe je Kalenderwoche: Bei „Tage als Zeilen“ wächst die gemeinsame Tagesachse um Zeilen, bei „Personen als Zeilen“ um Spalten. Vor und nach dem gewählten Monat erscheinen jeweils höchstens drei gedimmte Randtage; dafür dürfen die erste und letzte sichtbare Kalenderwoche unvollständig sein. Die zu den Personen gehörende erste Spalte beziehungsweise Kopfzeile bleibt beim Scrollen sichtbar. Samstag und Sonntag werden flächig sowie ausschließlich über ihren Wochentagsnamen gekennzeichnet. Leere Wochenend- und Feiertagstage werden in beiden Ausrichtungen platzsparend dargestellt; bei „Tage als Spalten“ besitzen sie eine feste kompakte Spaltenbreite. Sobald für eine sichtbare Person ein Dienst oder Termin vorliegt, verwendet der gesamte Tag wieder die normale Größe. Ein Urlaubsmarker allein verhindert die kompakte Darstellung nicht. Gesetzliche Feiertage der organisationsweit konfigurierten Kalenderregion werden serverseitig über den gemeinsamen read-only LocalBase-Vertrag geliefert und erscheinen mit ihrem Namen als reine Anzeigeebene. `DE`, `DE-BE` und `Europe/Berlin` bleiben Bestandsdefaults; persönliche Zeitzonen beeinflussen nur individuelle Terminanzeigen. Feiertage verändern weder Einträge noch Verfügbarkeit oder Rechte.
+- Eine umschaltbare Monatsansicht zeigt den gesamten sichtbaren Monatszeitraum in einer einzigen durchgehenden Planungsmatrix und unterstützt wie die Wochenansicht „Tage als Zeilen“ sowie „Personen als Zeilen“. Sie wiederholt weder Wochenplanung noch Tabellenköpfe je Kalenderwoche: Bei „Tage als Zeilen“ wächst die gemeinsame Tagesachse um Zeilen, bei „Personen als Zeilen“ um Spalten. Vor und nach dem gewählten Monat erscheinen jeweils höchstens drei gedimmte Randtage; dafür dürfen die erste und letzte sichtbare Kalenderwoche unvollständig sein. Die zu den Personen gehörende erste Spalte beziehungsweise Kopfzeile bleibt beim Scrollen sichtbar. Samstag und Sonntag werden flächig sowie ausschließlich über ihren Wochentagsnamen gekennzeichnet. Leere Wochenend- und Feiertagstage werden in beiden Ausrichtungen platzsparend dargestellt; bei „Tage als Spalten“ besitzen sie eine feste kompakte Spaltenbreite. Sobald für eine sichtbare Person ein Dienst oder Termin vorliegt, verwendet der gesamte Tag wieder die normale Größe. Ein Urlaubsmarker allein verhindert die kompakte Darstellung nicht. Gesetzliche Feiertage der organisationsweit konfigurierten Kalenderregion werden serverseitig über den öffentlichen read-only V1-Vertrag von `flz_organization` geliefert und erscheinen mit ihrem Namen als reine Anzeigeebene. Persönliche Zeitzonen beeinflussen nur individuelle Terminanzeigen. Feiertage verändern weder Einträge noch Verfügbarkeit oder Rechte.
 - Dienste besitzen Mitarbeiter*in, Beginn und Ende. Der Titel bleibt bei Diensten optional.
 - Die Mitarbeiter*innen-Zuordnung eines Eintrags wird durch die angeklickte Kalenderzelle festgelegt und bleibt nach dem Anlegen unveränderlich. Eine spätere Verschiebefunktion benötigt einen eigenen ausdrücklich freigegebenen Fachvertrag.
 - Termine besitzen zusaetzlich einen sprechenden Titel.
@@ -32,10 +32,10 @@ Kernprozess:
 - Die Wochenmatrix verwendet für alle sichtbaren Zellen ein gemeinsames komprimiertes Tages-Zeitraster. Einträge werden dadurch zeitlich vergleichbar ausgerichtet; freie Intervalle erscheinen als Abstand, ohne die Ansicht auf eine starre 24-Stunden-Höhe aufzublähen.
 - Pro Mitarbeiter*in werden Dienstanzahl und gesamte Dienstzeit fuer den sichtbaren Zeitraum ausgewiesen.
 - Filter nach Mitarbeiter*innen und Nextcloud-Gruppen sollen die Ansicht begrenzen.
-- Rollen und Bereiche werden jeweils als ODER-Auswahl und miteinander als Schnittmenge ausgewertet. Ein expliziter Rollenfilter wertet nur die nach Organisationsreihenfolge vorrangige Rolle einer Person aus; eine zusätzliche unterstellte Rolle zieht BL oder StvBL nicht in den BO- beziehungsweise EB-Filter. Ohne Rollenwahl zeigen gewählte Bereiche alle zugeordneten BL, stellvertretenden BL, BO und EB. Ohne Personen-, Rollen- und Bereichswahl erscheinen alle Personen mit einer im Filzmann Kalender sichtbaren Planerrolle.
-- Gruppenüberschriften und mobiler Organisationskontext verwenden die zentralen LocalBase-Kürzel. Bereichsrollen erscheinen beispielsweise als `BO-NO` oder `EB-W`, globale Rollen als `PFK`, `BO-Pflege` oder `IT`; Filter und Administration behalten die Langnamen.
+- Rollen und Bereiche werden jeweils als ODER-Auswahl und bei einer bereichsgebundenen vorrangigen Rolle miteinander als Schnittmenge ausgewertet. Globale Rollen ohne natürliche Bereichszuordnung bleiben von einer Bereichsauswahl unberührt. Ein expliziter Rollenfilter wertet nur die nach Organisationsreihenfolge vorrangige Rolle einer Person aus; eine zusätzliche unterstellte Rolle zieht BL oder StvBL nicht in den BO- beziehungsweise EB-Filter. Ohne Rollenwahl zeigen gewählte Bereiche die zugeordneten BL, stellvertretenden BL, BO und EB neben den globalen Rollen. Ohne Personen-, Rollen- und Bereichswahl erscheinen alle Personen mit einer im Filzmann Kalender sichtbaren Planerrolle.
+- Gruppenüberschriften und mobiler Organisationskontext verwenden die über `flz_organization` V1 gelieferten zentralen Kürzel. Bereichsrollen erscheinen beispielsweise als `BO-NO` oder `EB-W`, globale Rollen als `PFK`, `BO-Pflege` oder `IT`; Filter und Administration behalten die Langnamen.
 - Ohne bewusst gespeicherten Standard startet die Ansicht mit den Fachrollen und Bereichen des eingeloggten Kontos. Die aktuelle Filter-/Personen-/Ansichtskonfiguration wird nur ueber „Zum Standard machen“ als persoenlicher Nextcloud-Benutzerwert gespeichert.
-- `flz-Stab-HR`, `flz-Stab-QMB`, `flz-AsdGF-Digi`, `flz-PDL`, beide GF-Rollen und `flz-Sekretariat` werden im Rollenfilter ueber einen gemeinsamen Anzeigen-/Ausblenden-Schalter gesteuert; der Schalter ist Teil des persoenlichen Standards. Diese Personen stehen in einem gemeinsamen Block und werden entlang der GF-AS- und GF-Digi-Hierarchie sortiert.
+- `Stab-HR`, `Stab-QMB`, `AsdGF-Digi`, `PDL`, beide GF-Rollen und `Sekretariat` werden im Rollenfilter ueber einen gemeinsamen Anzeigen-/Ausblenden-Schalter gesteuert; der Schalter ist Teil des persoenlichen Standards. Diese Personen stehen in einem gemeinsamen Block und werden entlang der GF-AS- und GF-Digi-Hierarchie sortiert.
 - Eine Meeting-Lückensuche schneidet die Dienste der ausgewählten Personen innerhalb einer Kalenderwoche und zieht deren vorhandene Termine ab; die Mindestdauer ist frei wählbar und beträgt initial 60 Minuten. Bleibt eine Woche ohne Treffer, kann wochenweise weitergesucht oder eine Person direkt abgewählt werden.
 - Gefundene Slots können mit einem gemeinsamen Titel atomar für alle ausgewählten Personen blockiert werden, wenn der angemeldete Nutzer jeden Zielkalender nach dem normalen Hierarchie-/Peer-Vertrag bearbeiten darf. Die Funktion erweitert keine Fremdbearbeitungsrechte und prüft die Verfügbarkeit unmittelbar vor dem Speichern erneut.
 - Die dabei je Person gespeicherten Termine tragen eine gemeinsame Meeting-Kennung. Zeitraum und Titel werden für alle Beteiligten gemeinsam geändert, und das Meeting wird nur vollständig gelöscht. Beide Aktionen sind nur erlaubt, wenn der angemeldete Nutzer weiterhin jeden beteiligten Kalender bearbeiten darf; isolierte Änderungen über die allgemeine Eintrags-API werden abgewiesen.
@@ -58,38 +58,37 @@ Kernprozess:
 
 Verbindliches Gruppenschema:
 
-Die folgenden Gruppen-IDs beschreiben ausschließlich die initiale Standardkonfiguration. Gruppen-IDs, sichtbare Namen, zentrale Kalenderkürzel, Bereiche, Reihenfolge, Peer-Fähigkeit, Assistenzteam-Konventionen und direkte Hierarchiekanten werden gemeinsam über `FlzOrganizationDefinition` geliefert. Bearbeitbare Organisationsfelder werden im Nextcloud-Adminbereich der OrgSuite gepflegt. App-Code darf daneben keine parallelen Rollenregister führen.
+Die folgenden Gruppen-IDs beschreiben ausschließlich die initiale Standardkonfiguration. Gruppen-IDs, sichtbare Namen, zentrale Kalenderkürzel, Bereiche, Reihenfolge, Peer-Fähigkeit, Assistenzteam-Konventionen und direkte Hierarchiekanten werden gemeinsam über den öffentlichen V1-Snapshot von `flz_organization` geliefert. Bearbeitbare Organisationsfelder werden im zugehörigen Nextcloud-Adminbereich von `flz_organization` gepflegt. App-Code darf daneben keine parallelen Rollenregister führen.
 
-- Rollen werden als eigenständige Nextcloud-Gruppen gepflegt. Bereichsgebundene Kalenderrollen sind insbesondere `flz-BL`, `flz-StvBL`, `flz-Buero` und `flz-EB`; `flz-StvPDL`, `flz-Bueroorganisation-Pflege`, `flz-PFK`, `flz-Fahrzeugverwaltung` und `flz-Empfang` bleiben global.
-- Bereiche werden separat als `flz-Bereich-<Name>` gepflegt.
-- `flz-BL`, `flz-StvBL`, `flz-Buero` und `flz-EB` werden einem oder mehreren Buero-Bereichen zugeordnet. `flz-PFK`, `flz-Stab-HR` und `flz-Stab-QMB` sind bereichsunabhaengig; versehentliche Bereichsmitgliedschaften duerfen ihre Kalenderdarstellung oder Rechte nicht veraendern.
-- Kombinierte Gruppen sind abgeleitete Schnittmengen, zum Beispiel Mitgliedschaft in `flz-EB` und `flz-Bereich-Nordost`; es werden keine Kombinationsgruppen dupliziert.
-- `flz-EB` und `flz-PFK` sind Zielrollen im Kalender; die EB-Rolle allein verleiht keine globale Fremdbearbeitung.
-- `flz-EB` und `flz-Bereich-*` sind derselbe kanonische Rollen-/Bereichsvertrag wie im FlzPlaner; kombinierte Altgruppen wie `flz-EB-*` werden nicht als Rollenquelle verwendet.
-- Alle angemeldeten Nutzer*innen duerfen alle Kalenderdaten lesen; alle duerfen eigene Eintraege bearbeiten.
-- Alle angemeldeten Nutzer*innen duerfen aus den ohnehin sichtbaren Kalenderdaten gemeinsame Meetingluecken berechnen.
+- Rollen werden als eigenständige Nextcloud-Gruppen gepflegt. Bereichsgebundene Kalenderrollen sind insbesondere `BL`, `StvBL`, `Buero` und `EB`; `StvPDL`, `Bueroorganisation-Pflege`, `PFK`, `Fahrzeugverwaltung` und `Empfang` bleiben global.
+- Bereiche werden separat als `Bereich-<Name>` gepflegt.
+- `BL`, `StvBL`, `Buero` und `EB` werden einem oder mehreren Buero-Bereichen zugeordnet. `PFK`, `Stab-HR` und `Stab-QMB` sind bereichsunabhaengig; versehentliche Bereichsmitgliedschaften duerfen ihre Kalenderdarstellung oder Rechte nicht veraendern.
+- Kombinierte Gruppen sind abgeleitete Schnittmengen, zum Beispiel Mitgliedschaft in `EB` und `Bereich-Nordost`; es werden keine Kombinationsgruppen dupliziert.
+- `EB` und `PFK` sind Zielrollen im Kalender; die EB-Rolle allein verleiht keine globale Fremdbearbeitung.
+- `EB` und `Bereich-*` sind derselbe kanonische Rollen-/Bereichsvertrag wie im FlzPlaner; kombinierte Altgruppen wie `EB-*` werden nicht als Rollenquelle verwendet.
+- Alle Personen mit einer Rolle im kanonischen Organigramm dürfen alle Kalenderdaten lesen, eigene Einträge bearbeiten und aus den ohnehin sichtbaren Kalenderdaten gemeinsame Meetinglücken berechnen. Assistenzteam-Mitgliedschaften allein eröffnen den Kalender nicht.
 - Das gemeinsame Blockieren nutzt ausschließlich bestehende Bearbeitungsrechte für jede einzelne ausgewählte Person; fehlt eines davon, wird kein Teil des Meetings gespeichert.
-- `flz-PDL` führt `flz-StvPDL`, `flz-Bueroorganisation-Pflege` und `flz-PFK`. `flz-StvPDL` führt Büroorganisation Pflege sowie Pflegefachkräfte und steht im Pflegebereich des Kalenders an erster Stelle.
-- Bueroleitungen werden wie BO dynamisch aus `flz-BL` plus `flz-Bereich-*` gebildet. BL NOW ist Mitglied in `flz-BL`, `flz-Bereich-Nordost` und `flz-Bereich-West` und wird dadurch in BL-NO sowie BL-W gefunden.
-- Stellvertretungen werden aus `flz-StvBL` plus genau ihrem `flz-Bereich-*` gebildet; ihre zusaetzliche Hauptberufsrolle `flz-EB` bleibt davon getrennt.
+- `PDL` führt `StvPDL`, `Bueroorganisation-Pflege` und `PFK`. `StvPDL` führt Büroorganisation Pflege sowie Pflegefachkräfte und steht im Pflegebereich des Kalenders an erster Stelle.
+- Bueroleitungen werden wie BO dynamisch aus `BL` plus `Bereich-*` gebildet. BL NOW ist Mitglied in `BL`, `Bereich-Nordost` und `Bereich-West` und wird dadurch in BL-NO sowie BL-W gefunden.
+- Stellvertretungen werden aus `StvBL` plus genau ihrem `Bereich-*` gebildet; ihre zusaetzliche Hauptberufsrolle `EB` bleibt davon getrennt.
 - In der initialen Kalenderreihenfolge stehen Einsatzbegleitungen unter stellvertretenden Büroleitungen und über Büromitarbeiter*innen. Die im Adminbereich gespeicherte Organisationsreihenfolge ist maßgeblich; bei Mehrfachmitgliedschaft bleibt die erste passende Rolle die vorrangige Kalenderrolle.
 - Fahrzeugverwaltung folgt initial auf IT und ist GF-Digi unterstellt. Empfang folgt auf das Sekretariat und ist diesem direkt unterstellt. Beide Teams bleiben außerhalb des gemeinsamen Leitungs-/Stabsblocks.
 - Die Zahl der Bueroleitungen und Stellvertretungen wird nicht festgeschrieben. Eine bereichsuebergreifende BL erscheint als eine Person mit allen zugeordneten Bereichen und wird durch jeden passenden Bereichsfilter gefunden; sie wird nicht als doppelte Kalenderzeile dargestellt.
-- `flz-Stab-HR` und `flz-Stab-QMB` sind sichtbare Stabsstellen; gegenseitige Bearbeitung innerhalb der jeweiligen Gruppe wird ueber den Peer-Schalter gesteuert.
-- Peer-Bearbeitung kann im Nextcloud-Adminbereich der OrgSuite getrennt fuer die peer-fähigen Fachrollen aktiviert werden. Sie ist standardmaessig aus. Bei BO und EB gilt sie nur innerhalb mindestens eines gemeinsamen Buerobereichs; PFK und Stabsstellen bleiben mangels Buerobereich innerhalb ihrer Fachgruppe berechtigt.
+- `Stab-HR` und `Stab-QMB` sind sichtbare Stabsstellen; gegenseitige Bearbeitung innerhalb der jeweiligen Gruppe wird ueber den Peer-Schalter gesteuert.
+- Peer-Bearbeitung wird im Nextcloud-Adminbereich von `flz_organization` getrennt für die peer-fähigen Fachrollen konfiguriert. BO, EB und PFK sind standardmäßig aktiviert; HR, QMB und alle weiteren peer-fähigen Rollen standardmäßig deaktiviert. Bei BO und EB gilt sie nur innerhalb mindestens eines gemeinsamen Bürobereichs; PFK und Stabsstellen bleiben mangels Bürobereich innerhalb ihrer Fachgruppe berechtigt.
 - Assistent*innen erscheinen nicht in dieser App; ihre Planung bleibt im FlzPlaner.
 - Nextcloud-Admins duerfen alle Eintraege verwalten.
 
 Hierarchie fuer Fremdbearbeitung:
 
-- `flz-GF-AS` fuehrt PDL, beide Bueroleitungen, deren Stellvertretungen, PFK, BO, EB, HR, QMB und das Sekretariat direkt oder indirekt.
-- `flz-GF-Digi` führt `flz-AsdGF-Digi`, `flz-Leitung-Finanzen-Lohn`, `flz-Finanzen-Lohn`, IT, Fahrzeugverwaltung, das Sekretariat und darüber den Empfang direkt oder indirekt.
-- `flz-AsdGF-Digi` fuehrt `flz-IT`; `flz-Leitung-Finanzen-Lohn` fuehrt `flz-Finanzen-Lohn`.
-- `flz-PDL` führt die stellvertretende PDL, Büroorganisation Pflege und PFK; die stellvertretende PDL führt Büroorganisation Pflege und PFK.
+- `GF-AS` führt PDL, Büroleitungen, HR, QMB und das Sekretariat direkt. Die daraus folgenden indirekten Hierarchiebeziehungen erteilen im Kalender kein Bearbeitungsrecht.
+- `GF-Digi` führt `AsdGF-Digi`, `Leitung-Finanzen-Lohn`, Fahrzeugverwaltung und das Sekretariat direkt. IT, Finanzen, Lohn und Empfang sind nur indirekt zugeordnet und werden dadurch nicht bearbeitbar.
+- `AsdGF-Digi` fuehrt `IT`; `Leitung-Finanzen-Lohn` fuehrt `Finanzen-Lohn`.
+- `PDL` führt die stellvertretende PDL, Büroorganisation Pflege und PFK; die stellvertretende PDL führt Büroorganisation Pflege und PFK.
 - Bueroleitungen und ihre bereichsbezogenen Stellvertretungen fuehren ausschliesslich BO und EB im passenden Buerobereich, nicht PFK.
-- `flz-Sekretariat` ist beiden Geschaeftsfuehrungen direkt zugeordnet.
+- `Sekretariat` ist beiden Geschaeftsfuehrungen direkt zugeordnet.
 - Leitungsrollen schuetzen immer vor Peer-Bearbeitung durch unterstellte Hauptberufsgruppen. Eine StvBL kann zum Beispiel zugleich EB sein, darf aber niemals durch normale EBs bearbeitet werden.
-- Vorgesetzte duerfen Kalenderdaten aller direkt und indirekt unterstellten Personen bearbeiten; Untergebene duerfen keine uebergeordneten Rollen bearbeiten.
+- Vorgesetzte dürfen Kalenderdaten ausschließlich direkt unterstellter Personen bearbeiten; Untergebene und nur indirekt Vorgesetzte erhalten daraus kein Bearbeitungsrecht.
 
 Offene Fachentscheidungen:
 - Dienste derselben Person duerfen sich nicht ueberschneiden; dadurch bleibt die Terminzuordnung eindeutig.
@@ -110,7 +109,7 @@ Es gilt deny by default fuer schreibende Zugriffe:
 - Mitarbeiter*innen und Gruppenzuordnung verwalten: nur App-Administration.
 - Jeder API-Endpunkt prueft die Berechtigung serverseitig ueber einen zentralen `CalendarAccessService`.
 - UI-Ausblendungen sind Komfort und niemals die einzige Zugriffskontrolle.
-- Der Einstellungs-Tab ist fuer alle sichtbar und enthält nur persönliche Einstellungen des eingeloggten Kontos. Organisationsweite Gruppenbearbeitungsrechte werden ausschließlich im Nextcloud-Adminbereich der OrgSuite gelesen und geändert.
+- Der Einstellungs-Tab ist fuer alle sichtbar und enthält nur persönliche Einstellungen des eingeloggten Kontos. Organisationsweite Gruppenbearbeitungsrechte werden ausschließlich im Nextcloud-Adminbereich von `flz_organization` gelesen und geändert.
 - Die persönliche Kalenderaktivierung kann ausschließlich für das angemeldete Konto geändert werden. Sie ist standardmäßig aktiv, kann als Opt-out deaktiviert werden und erweitert keine Planungs- oder Leserechte; berechtigte Fremdänderungen lösen nur die Veröffentlichung des ohnehin erlaubten Dienstes im aktiven Kalender der Zielperson aus.
 - Listen werden bereits serverseitig auf den erlaubten Personenkreis eingeschraenkt.
 - Allow- und Deny-Faelle sowie direkte unberechtigte API-Aufrufe werden getestet.
@@ -160,7 +159,11 @@ Urlaubsansichten sind dynamisch ergänzbare Rollen-/Bereichsschnitte. Die Standa
 - Ein über Mitternacht reichender Dienst bleibt ein einziges Fachobjekt, wird in jeder betroffenen Tageszelle jedoch nur mit seinem dortigen Teilzeitraum dargestellt: am Starttag bis `24:00`, am Folgetag ab `00:00`, jeweils mit sicht- und zugänglicher Fortsetzungskennzeichnung.
 - Beim Loeschen eines Dienstes muss zwischen gemeinsamem Loeschen der Termine und deren Erhalt als Sperrtermine gewaehlt werden.
 - API-Zugriffe liegen im Frontend in Repositories, Daten in Modellen/ViewModels und Rendering/Eventbindung in Komponenten.
-- Der Frontend-Unterbau nutzt die vorhandenen LocalBase-Vertraege `ApiClient`, `Repository`, `Model` und `Notice`; Filzmann-Kalender-spezifische API-Pfade, Modelle und Renderinglogik bleiben in diesem Repo.
+- Der Frontend-Unterbau nutzt die app-lokal gebündelten Kategorie-A-Verträge
+  `ApiClient`, `Repository`, `Model` und `Notice` aus `flz_shared` unter
+  `window.OCA.FlzCalendar.Shared`; Filzmann-Kalender-spezifische API-Pfade,
+  Modelle und Renderinglogik bleiben in diesem Repo. Zur Laufzeit werden weder
+  das Nachbarrepository noch private LocalBase-Browserassets geladen.
 - Sichtbare Gruppenbezeichnungen, Filter, Leitungsblock, Hierarchiedarstellung und Demo-Gruppenzuordnungen werden aus der gemeinsamen Organisationsdefinition abgeleitet.
 - Die Fachschicht spricht für den privaten Nextcloud-Kalender ausschließlich `PersonalCalendarPublisher` an; dienst-only externe Ziele bleiben hinter `ShiftCalendarPublisher` beziehungsweise ihren Provideradaptern. Der bewusst freigegebene interne Nextcloud-DAV-Vertrag `OCA\DAV\CalDAV\CalDavBackend` bleibt auf `NextcloudDavShiftCalendarPublisher` begrenzt und kann durch einen anderen Provideradapter ersetzt werden.
 - Externe Provideradapter verwenden ausschließlich den Nextcloud-HTTP-Client. Nutzerkonfigurierte CalDAV-Adressen müssen HTTPS nutzen, bleiben auf denselben Ursprung begrenzt und unterliegen zusätzlich Nextclouds SSRF-Schutz; Zugangsdaten werden nie an einen Discovery-Ursprung auf einem anderen Host weitergereicht.
@@ -171,6 +174,9 @@ Urlaubsansichten sind dynamisch ergänzbare Rollen-/Bereichsschnitte. Die Standa
 - Keine vorsorgliche gemeinsame Library und keine WordPress-Kompatibilitaetsschicht.
 
 ## Repository und gemeinsamer Arbeitsablauf
+
+- Lokalisierung (ZM-06): Sichtbare Texte ausschließlich über Nextcloud-l10n — deutsche Quelltexte via `IL10N::t()`/`window.t('flzcalendar', …)`, Kataloge `l10n/en.*` und `l10n/en_GB.*` (Englisch als Bonus); technische IDs bleiben unübersetzt. `tests/Ui/L10nCatalogContractTest.php` erzwingt das Rohtext-Gate (siehe `docs/l10n-inventory.md`).
+
 
 - Dieses Verzeichnis ist ein eigenstaendiges Git-Repository.
 - Diese Datei und lokal referenzierte Skills bilden bei einem direkten Start in diesem Repository die vollständige Repository-Steuerung.
@@ -208,10 +214,10 @@ Geplante Checks:
 - Das Template stellt den optionalen Menühost mit `data-suite="flz"` und `data-current-app="flzcalendar"` bereit, lädt aber keine OrgSuite-Assets direkt.
 - Ohne Filzmann Urlaubsplanung bleiben Sperrtermine der manuelle Abwesenheitsweg; fehlende optionale Provider dürfen die Wochenansicht nicht verhindern.
 - Fachliche Lese- und Bearbeitungsrechte bleiben ausschliesslich serverseitig im Filzmann Kalender; Menuesichtbarkeit ist keine Berechtigung.
-- Native Nextcloud-Administration erteilt keinen fachlichen Kalender-Vollzugriff. Er setzt pro Administrationskonto eine aktive, app-lokale Freigabe von höchstens 24 Stunden voraus; Beginn, geplantes Ende und Widerruf bleiben historisch protokolliert. Ausschließlich Mitglieder der Nextcloud-Gruppe `Datenschutzbeauftragte` verwalten Freigaben und Historie im Filzmann-Kalender-Hauptbereich; native Administration allein genügt weder für die Steuerung noch für den fachlichen Zugriff.
-- Ein natives Administrationskonto ohne aktive Freigabe erhält im Hauptbereich eine sichere Hinweismeldung. Der Direktlink zur Freigabesteuerung erscheint nur, wenn dasselbe Konto zugleich Mitglied von `Datenschutzbeauftragte` ist.
-- Technische Appkonfiguration wie OAuth und CalDAV bleibt native Administration. Das Installieren fachlicher Demodaten benötigt dagegen die aktive app-lokale Vollzugriffsfreigabe.
-- Änderungen an Freigabehistorie oder Kalenderrechten werden gleichzeitig im PersonalDataProvider und PermissionProvider nachgeführt.
+- Filzmann Kalender ist die ausdrücklich dokumentierte Ausnahme zu ADR 0004: Ein aktuell bestätigtes natives Nextcloud-Administrationskonto darf alle Kalendereinträge verwalten und synthetische Demodaten installieren, ohne app-lokale temporäre Freigabe. Diese Ausnahme gilt ausschließlich in dieser App und erweitert keine Rechte in anderen Fachapps.
+- Die frühere Freigabesteuerung besitzt keine Route, UI oder schreibende Laufzeitverwendung mehr. Bereits vorhandene Historieneinträge bleiben unverändert und ausschließlich subjectgebunden read-only im PersonalDataProvider sichtbar; sie erteilen und reaktivieren keine Rechte.
+- Technische Appkonfiguration wie OAuth, CalDAV und Kalenderdefaults bleibt native Administration. Persönliche Konnektoren können ausschließlich für das eigene angemeldete Konto verwaltet werden.
+- Änderungen an Kalenderrechten und historischen Freigabedaten werden gleichzeitig im PersonalDataProvider, Processing-Katalog und PermissionProvider nachgeführt.
 
 ## Dokumentenverantwortung
 

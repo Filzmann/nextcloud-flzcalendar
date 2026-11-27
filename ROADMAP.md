@@ -14,27 +14,19 @@ erledigte Änderungen in `CHANGELOG.md` und geltende Architektur in
 - Globale Rollen, Backend-Reihenfolge und Hierarchie sichtbar abnehmen.
 - Internen DAV-Abgleich, administrativen Zielkalendernamen,
   Bestandsumbenennung und datensparsame Jobstatusanzeige prüfen.
-- Die DPO-gesteuerte Adminfreigabe mit getrennten Konten für DPO, nativen
-  Admin ohne DPO-Rolle und gewöhnliche Nutzung in DDEV oder Staging prüfen;
-  Ablauf, Widerruf, Rollenverlust, CSRF und Tastaturbedienung einschließen.
+- Die ausdrücklich entschiedene native Kalender-Adminausnahme mit einem
+  neutralen Admin- und einem Nichtadmin-Konto in DDEV oder Staging prüfen;
+  direkte API-Aufrufe, Rollenverlust und ausbleibende Seiteneffekte einschließen.
 - Ergebnisse ausschließlich in `docs/manual-acceptance.md` dokumentieren.
 
 ### FLZC-STAGING-FOLLOWUP – Abweichungen der laufenden Abnahme schließen
 
-- Den geöffneten Filter als überlagerndes Panel ausführen, damit er die
-  Kalendermatrix auch bei kleinen Viewports nicht verdrängt; Fokus,
-  Escape-Verhalten und erreichbare Scrollleisten mitprüfen.
-- Den gemeinsamen Leitungs-/Stabs-Schalter ohne vorausgesetzte zusätzliche
-  Bereichsauswahl bedienbar machen.
-- Bereichsfilter für bereichsgebundene Rollen weiterhin als Schnittmenge
-  anwenden, globale Rollen ohne natürliche Bereichszuordnung jedoch nicht
-  allein wegen einer Bereichsauswahl ausblenden.
+- Die lokal automatisiert abgesicherte Nacharbeit für Filter-Overlay,
+  Fokus/Escape, Leitungs-/Stabsschalter und bereichsabhängige Filtersemantik
+  auf Staging über die Fälle A5, B7 und C1 erneut prüfen.
 - Neutrale Testkonten für jeden konfigurierten Bereich und die relevanten
   Hierarchiepfade bereitstellen, damit Rollen-, Bereichs- und Deny-Fälle
   vollständig abgenommen werden können.
-- Die systemweite UI-Nacharbeit der temporären Adminfreigabe folgt
-  `DP-11` im Parent-Zukunftsplan; die app-lokalen Rechte- und Auditgrenzen
-  bleiben unverändert.
 
 ### FLZC-L10N-ACCEPTANCE – deutsche und englische Oberfläche prüfen
 

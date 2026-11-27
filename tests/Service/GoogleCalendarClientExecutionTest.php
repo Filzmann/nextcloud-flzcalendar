@@ -107,7 +107,7 @@ namespace {
         throw new RuntimeException('Paginierter Google-Abgleich bereinigt veraltete App-Ereignisse nicht gezielt.');
     }
     $published = json_decode((string)($syncClient->calls[6][2]['body'] ?? ''), true);
-    if (($published['summary'] ?? '') !== 'L10N:Shift') throw new RuntimeException('Titelloser Google-Dienst erhält keinen lokalisierten Standardtitel.');
+    if (($published['summary'] ?? '') !== 'L10N:Dienst') throw new RuntimeException('Titelloser Google-Dienst erhält keinen lokalisierten Standardtitel.');
 
     $emptyClient = $clientFor([]);
     [$emptyGoogle] = $googleFor($emptyClient);

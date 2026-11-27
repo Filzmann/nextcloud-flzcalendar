@@ -48,10 +48,10 @@
             this.toggleView.hidden = false;
             this.weekButton.setAttribute('aria-pressed', String(!isMonth));
             this.monthButton.setAttribute('aria-pressed', String(isMonth));
-            this.previous.textContent = isMonth ? l10n.t('Previous month') : l10n.t('Previous week');
-            this.next.textContent = isMonth ? l10n.t('Next month') : l10n.t('Next week');
-            this.heading.textContent = isMonth ? l10n.t('Monthly schedule') : l10n.t('Weekly schedule');
-            this.toggleView.textContent = this.state.vertical ? l10n.t('Days as rows') : l10n.t('People as rows');
+            this.previous.textContent = isMonth ? l10n.t('Vorheriger Monat') : l10n.t('Vorherige Woche');
+            this.next.textContent = isMonth ? l10n.t('Nächster Monat') : l10n.t('Nächste Woche');
+            this.heading.textContent = isMonth ? l10n.t('Monatsplan') : l10n.t('Wochenplan');
+            this.toggleView.textContent = this.state.vertical ? l10n.t('Tage als Zeilen') : l10n.t('Personen als Zeilen');
             this.toggleView.setAttribute('aria-pressed', String(!this.state.vertical));
         }
 

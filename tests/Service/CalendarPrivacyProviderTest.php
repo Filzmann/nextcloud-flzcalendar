@@ -6,12 +6,6 @@ namespace OCP\EventDispatcher {
     class Event { public function __construct() {} }
     interface IEventListener { public function handle(Event $event): void; }
 }
-namespace OCP {
-    interface IAppConfig {
-        public function getValueString(string $appId, string $key, string $default = ''): string;
-        public function setValueString(string $appId, string $key, string $value): void;
-    }
-}
 namespace OCP\Config {
     if (!interface_exists(IUserConfig::class)) {
         interface IUserConfig {
@@ -70,7 +64,7 @@ namespace {
     use OCA\FlzCalendar\Repository\TemporaryAdminAccessRepository;
     use OCA\FlzCalendar\CalendarSync\ExternalCalendarConnectionStore;
     use OCA\FlzCalendar\Service\CalendarPreferenceService;
-    use OCA\LocalBase\Calendar\CalendarContextSettingsService;
+    use OCA\FlzCalendar\Service\OrganizationRuntime;
     use OCA\FlzDataProtection\PublicApi\V1\DataSubjectRef;
     use OCA\FlzDataProtection\PublicApi\V1\PersonalDataRequest;
     use OCA\FlzDataProtection\PublicApi\V1\RegisterPersonalDataProvidersEvent;
@@ -83,14 +77,16 @@ namespace {
         CalendarEntry::get(['id'=>2,'employeeUid'=>'self','start'=>'2026-08-13T06:00:00+00:00','end'=>'2026-08-13T14:00:00+00:00','type'=>'shift','title'=>'Frühdienst']),
         CalendarEntry::get(['id'=>3,'employeeUid'=>'other-person','start'=>'2026-08-12T08:00:00+00:00','end'=>'2026-08-12T09:00:00+00:00','type'=>'appointment','title'=>'Fremder Titel','meetingUid'=>'meeting-a']),
     ];
-    $config = new class implements OCP\IAppConfig {
-        public function getValueString(string $appId, string $key, string $default = ''): string { return $default; }
-        public function setValueString(string $appId, string $key, string $value): void {}
+    $organization = new class extends OrganizationRuntime {
+        public function __construct() {}
+        public function calendarContext(): ?object {
+            return new class { public function timezone(): string { return 'Europe/Berlin'; } };
+        }
     };
     $userConfig = new class implements IUserConfig {
         public array $values = [
             'self' => ['flzcalendar' => [
-                'filter_default' => '{"people":["other-person"],"roles":["flz-Buero"],"areas":["flz-Bereich-Sued"],"vertical":false,"period":"month","showLeadershipStaff":true,"leadershipStaffOnly":false}',
+                'filter_default' => '{"people":["other-person"],"roles":["Buero"],"areas":["Bereich-Sued"],"vertical":false,"period":"month","showLeadershipStaff":true,"leadershipStaffOnly":false}',
                 'shift_defaults' => '{"1":{"enabled":true,"start":"07:30","end":"15:30"}}',
                 'shift_calendar_sync_enabled' => '0',
                 'external_calendar_google' => 'cipher:access-token-secret',
@@ -114,7 +110,7 @@ namespace {
     ]];
     $provider = new CalendarPersonalDataProvider(
         $entries,
-        new CalendarContextSettingsService($config),
+        $organization,
         new CalendarPreferenceService($userConfig),
         new ExternalCalendarConnectionStore($userConfig, $crypto),
         $adminAccess,
@@ -138,9 +134,10 @@ namespace {
     $syncPreference = array_values(array_filter($items, static fn(array $item): bool => $item['categoryId'] === 'calendar_sync_preference'))[0] ?? null;
     $externalConnections = array_values(array_filter($items, static fn(array $item): bool => $item['categoryId'] === 'external_calendar_connections'))[0] ?? null;
     $adminGrant = array_values(array_filter($items, static fn(array $item): bool => $item['categoryId'] === 'admin-access'))[0] ?? null;
-    if ($adminGrant === null || str_contains(json_encode($adminGrant), 'other-admin')) throw new RuntimeException('App-lokale Adminfreigabe fehlt oder legt fremde Admin-IDs offen.');
+    if ($adminGrant === null || str_contains(json_encode($adminGrant), 'other-admin')) throw new RuntimeException('Historische Adminfreigabe fehlt oder legt fremde Admin-IDs offen.');
     $adminGrantJson=json_encode($adminGrant,JSON_THROW_ON_ERROR|JSON_UNESCAPED_UNICODE);
-    foreach(['Freigebendes Mitglied von Datenschutzbeauftragte','App-lokale Freigabesteuerung im Filzmann Kalender','Datenschutz-Prüfrolle'] as $expected)if(!str_contains($adminGrantJson,$expected))throw new RuntimeException("Adminfreigabe projiziert Rolle oder Quelle nicht korrekt: {$expected}");
+    foreach(['Freigebendes Mitglied von Datenschutzbeauftragte','Frühere app-lokale Freigabesteuerung im Filzmann Kalender','Historischer Nachweis; keine erneute Aktivierung'] as $expected)if(!str_contains($adminGrantJson,$expected))throw new RuntimeException("Historische Adminfreigabe projiziert Rolle oder Quelle nicht korrekt: {$expected}");
+    if(str_contains($adminGrantJson,'Datenschutz-Prüfrolle'))throw new RuntimeException('Die entfernte administrative Historienansicht wird noch als Empfänger behauptet.');
     if ($appointment === null || $shift === null) throw new RuntimeException('Termin und Dienst sind nicht getrennt ausgewiesen.');
     if (array_key_exists('Art', $appointment['attributes']) || array_key_exists('Art', $shift['attributes'])) throw new RuntimeException('Der bereits als Tabellenabschnitt ausgewiesene Datentyp wird redundant als Art-Spalte ausgegeben.');
     foreach (['Termin', 'Gemeinsamer Termin', '12.08.26, 10:00 bis 11:00 Uhr', 'Termin- und Verfügbarkeitsplanung', 'Keine feste Löschfrist'] as $expected) {

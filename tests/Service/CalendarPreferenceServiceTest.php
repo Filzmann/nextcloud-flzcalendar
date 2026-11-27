@@ -34,7 +34,7 @@ $config = new class implements IUserConfig {
     }
 };
 $service = new CalendarPreferenceService($config);
-if ($service->filterDefault('demo', ['a'], ['flz-Buero'], ['flz-Bereich-Sued']) !== null) throw new RuntimeException('Fehlender persoenlicher Standard muss null bleiben.');
+if ($service->filterDefault('demo', ['a'], ['Buero'], ['Bereich-Sued']) !== null) throw new RuntimeException('Fehlender persoenlicher Standard muss null bleiben.');
 if ($service->storedShiftDefaults('demo') !== null) throw new RuntimeException('Nicht gespeicherte Dienstzeiten duerfen keine Kalenderdienste erzeugen.');
 if (!$service->shiftCalendarSyncEnabled('demo')) throw new RuntimeException('Private Dienstkalendersynchronisation ist ohne gespeicherten Opt-out nicht standardmäßig aktiv.');
 if (!$service->saveShiftCalendarSyncEnabled('demo', true) || !$service->shiftCalendarSyncEnabled('demo')) throw new RuntimeException('Persönliche Kalenderaktivierung wurde nicht gespeichert.');
@@ -44,22 +44,22 @@ $service->saveShiftCalendarSyncEnabled('eins', true);
 $service->saveShiftCalendarSyncEnabled('aus', false);
 if ($service->shiftCalendarSyncEmployeeUids() !== ['eins', 'zwei']) throw new RuntimeException('Periodischer Abgleich erhält explizit aktivierte Konten nicht in stabiler Reihenfolge.');
 $saved = $service->saveFilterDefault('demo', [
-    'people' => ['a', 'fremd'], 'roles' => ['flz-Buero', 'flz-Unbekannt'],
-    'areas' => ['flz-Bereich-Sued', 'flz-Bereich-Fremd'], 'vertical' => false, 'period' => 'month', 'empty' => true, 'showLeadershipStaff' => false,
-], ['a'], ['flz-Buero'], ['flz-Bereich-Sued']);
-if ($saved !== ['people' => ['a'], 'roles' => ['flz-Buero'], 'areas' => ['flz-Bereich-Sued'], 'vertical' => false, 'period' => 'month', 'showLeadershipStaff' => false, 'leadershipStaffOnly' => false]) {
+    'people' => ['a', 'fremd'], 'roles' => ['Buero', 'flz-Unbekannt'],
+    'areas' => ['Bereich-Sued', 'Bereich-Fremd'], 'vertical' => false, 'period' => 'month', 'empty' => true, 'showLeadershipStaff' => false,
+], ['a'], ['Buero'], ['Bereich-Sued']);
+if ($saved !== ['people' => ['a'], 'roles' => ['Buero'], 'areas' => ['Bereich-Sued'], 'vertical' => false, 'period' => 'month', 'showLeadershipStaff' => false, 'leadershipStaffOnly' => false]) {
     throw new RuntimeException('Persoenlicher Filterstandard wurde nicht auf erlaubte Werte begrenzt.');
 }
-if ($service->filterDefault('demo', ['a'], ['flz-Buero'], ['flz-Bereich-Sued']) !== $saved) throw new RuntimeException('Gespeicherter Filterstandard ist nicht lesbar.');
-$invalidPeriod = $service->saveFilterDefault('period', ['period' => 'jahr'], ['a'], ['flz-Buero'], ['flz-Bereich-Sued']);
+if ($service->filterDefault('demo', ['a'], ['Buero'], ['Bereich-Sued']) !== $saved) throw new RuntimeException('Gespeicherter Filterstandard ist nicht lesbar.');
+$invalidPeriod = $service->saveFilterDefault('period', ['period' => 'jahr'], ['a'], ['Buero'], ['Bereich-Sued']);
 if ($invalidPeriod['period'] !== 'week') throw new RuntimeException('Unbekannter Ansichtszeitraum wurde als persönlicher Standard akzeptiert.');
 $staffOnly = $service->saveFilterDefault('staff', [
     'people' => [], 'roles' => [], 'areas' => [], 'empty' => 'true', 'showLeadershipStaff' => true,
-], ['a'], ['flz-Buero'], ['flz-Bereich-Sued']);
+], ['a'], ['Buero'], ['Bereich-Sued']);
 if (!$staffOnly['leadershipStaffOnly']) throw new RuntimeException('Gespeicherter Leitungs-/Stabsstandard wurde nicht aus dem bisherigen Filtervertrag uebernommen.');
 $inconsistent = $service->saveFilterDefault('staff', [
     'people' => ['a'], 'roles' => [], 'areas' => [], 'leadershipStaffOnly' => true, 'showLeadershipStaff' => true,
-], ['a'], ['flz-Buero'], ['flz-Bereich-Sued']);
+], ['a'], ['Buero'], ['Bereich-Sued']);
 if ($inconsistent['leadershipStaffOnly']) throw new RuntimeException('Ein Personenfilter darf nicht zugleich als reiner Leitungs-/Stabsfilter gespeichert werden.');
 $shiftDefaults = $service->saveShiftDefaults('demo', [
     '1' => ['enabled' => true, 'start' => '07:30', 'end' => '15:45'],
@@ -73,8 +73,8 @@ if ($service->storedShiftDefaults('demo') !== $shiftDefaults) throw new RuntimeE
 
 $projection = $service->personalDataProjection('demo');
 if (($projection['filter']['selectedPeopleCount'] ?? null) !== 1
-    || ($projection['filter']['roles'] ?? null) !== ['flz-Buero']
-    || ($projection['filter']['areas'] ?? null) !== ['flz-Bereich-Sued']
+    || ($projection['filter']['roles'] ?? null) !== ['Buero']
+    || ($projection['filter']['areas'] ?? null) !== ['Bereich-Sued']
     || ($projection['filter']['period'] ?? null) !== 'month'
     || ($projection['shiftDefaults']['1']['start'] ?? null) !== '07:30'
     || ($projection['calendarSyncEnabled'] ?? null) !== false) {

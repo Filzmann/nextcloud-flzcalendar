@@ -33,10 +33,10 @@ final class GoogleOAuthAdminController extends Controller {
         try {
             return new JSONResponse(['googleOAuth' => $this->oauth->saveConfiguration($clientId, $clientSecret)]);
         } catch (\InvalidArgumentException) {
-            return $this->errors->create('invalid_google_oauth_configuration', 'The Google OAuth configuration is invalid.', Http::STATUS_BAD_REQUEST);
+            return $this->errors->create('invalid_google_oauth_configuration', 'Die Google-OAuth-Konfiguration ist ungültig.', Http::STATUS_BAD_REQUEST);
         } catch (\Throwable $error) {
             $this->logger->error('Google-OAuth-Konfiguration konnte nicht gespeichert werden.', ['exception' => $error]);
-            return $this->errors->create('google_oauth_save_failed', 'The Google OAuth configuration could not be saved.', Http::STATUS_BAD_REQUEST);
+            return $this->errors->create('google_oauth_save_failed', 'Die Google-OAuth-Konfiguration konnte nicht gespeichert werden.', Http::STATUS_BAD_REQUEST);
         }
     }
 
@@ -46,7 +46,7 @@ final class GoogleOAuthAdminController extends Controller {
             return new JSONResponse(['googleOAuth' => $this->oauth->removeConfiguration()]);
         } catch (\Throwable $error) {
             $this->logger->error('Google-OAuth-Konfiguration konnte nicht entfernt werden.', ['exception' => $error]);
-            return $this->errors->create('google_oauth_remove_failed', 'The Google OAuth configuration could not be removed.', Http::STATUS_BAD_REQUEST);
+            return $this->errors->create('google_oauth_remove_failed', 'Die Google-OAuth-Konfiguration konnte nicht entfernt werden.', Http::STATUS_BAD_REQUEST);
         }
     }
 
@@ -56,6 +56,6 @@ final class GoogleOAuthAdminController extends Controller {
     }
 
     private function denied(): JSONResponse {
-        return $this->errors->create('forbidden', 'You are not allowed to perform this action.', Http::STATUS_FORBIDDEN);
+        return $this->errors->create('forbidden', 'Keine Berechtigung.', Http::STATUS_FORBIDDEN);
     }
 }

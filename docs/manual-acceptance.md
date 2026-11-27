@@ -7,6 +7,31 @@ Keine Passwörter, Tokens, personenbezogenen Echtdaten oder internen
 Kalenderkennungen eintragen. Für Screenshots ausschließlich neutrale
 Testkonten und synthetische Termine verwenden.
 
+## Technischer Organisationsnachweis vom 22. November 2026
+
+`php tests/run.php` und `node tests/run-js.mjs` bestehen mit dem
+öffentlichen V1-Provider von `flz_organization` als Organisationsquelle.
+Die vorhandenen Consumer-Tests belegen erlaubte und verweigerte Rechte,
+fehlende beziehungsweise inkompatible Provider und ausbleibende lokale
+Fallbacks. Der Browser-Build wurde zusätzlich aus der kanonischen
+Shared-Quelle neu erzeugt; alle sechs ausgelieferten Artefakte stimmen
+bytegenau einschließlich vollständiger AGPL-Lizenz überein.
+
+Die frühere Feiertagsadapterklasse aus `91c93b2` scheitert beim Laden am
+tatsächlich finalen LocalBase-Service (Exit 255). Der aktuelle Adapter lässt
+sich im echten lokalen Nextcloud-Container auflösen; Organisationsdefinition,
+Kalenderkontext, erlaubte und verweigerte synthetische Rollenentscheidung
+sowie Feiertagsprojektion wurden dort rein lesend erfolgreich geprüft.
+Dieser nachträgliche Regression-/Laufzeitnachweis rekonstruiert keinen
+ursprünglichen zeitlichen Red–Green-Ablauf. Dessen fehlender historischer
+Nachweis bleibt eine ausdrücklich begründete Abweichung bei der Übernahme
+des bereits bestehenden Integrationsstands. Die gebündelte
+Browser-Namespaceumstellung ist verhaltensbewahrend und durch die echten
+Consumer-VM-Smokes abgesichert.
+
+Die genannten technischen Prüfungen ersetzen keine erneute interaktive
+Browser- oder vollständige HTTP-CSRF-Abnahme.
+
 ## Kopfdaten
 
 | Feld | Eintrag |
@@ -34,7 +59,7 @@ Ergebnisse zu unverändertem Verhalten bleiben bestehen.
 | A2 | Durchgehende Monatsmatrix, Tage als Spalten | „Monat“ und anschließend „Tage als Zeilen“ wählen, sodass Personen die Zeilen bilden. Vorherigen und nächsten Monat aufrufen. | Der gesamte Zeitraum erscheint als eine Matrix ohne KW-Blöcke oder wiederholte Tabellenköpfe. Randtage sind gedimmt. | [x] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
 | A3 | Durchgehende Monatsmatrix, Tage als Zeilen | Auf „Personen als Zeilen“ umschalten, sodass Tage die Zeilen bilden. Vorherigen und nächsten Monat aufrufen. | Der gesamte Zeitraum erscheint als eine Matrix ohne KW-Blöcke oder wiederholte Tabellenköpfe. | [x] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
 | A4 | Erreichbare horizontale Scrollleiste | Einen Monat und so viele Personen anzeigen, dass die Matrix breiter und höher als das Fenster ist. Ohne zum Inhaltsende zu scrollen die horizontale Leiste am unteren Rand des sichtbaren Kalenderbereichs suchen und bis ganz rechts sowie zurück bewegen. Danach die Ausrichtung wechseln und wiederholen. | Die horizontale Leiste bleibt unabhängig von der Inhaltshöhe am unteren Rand des sichtbaren Kalender-Viewports erreichbar. Die vertikale Leiste bleibt ebenfalls bedienbar. | [x] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
-| A5 | Scrollen bei geöffnetem Filter und kleinem Viewport | Filter öffnen, Browserfenster verkleinern und A4 wiederholen. Filter schließen und erneut prüfen. | Navigation und Scrollleisten bleiben sichtbar und erreichbar; es entsteht kein zweiter horizontaler Seiten-Scrollbar. | [x] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | Der Filterbereich verdrängte den Kalenderinhalt statt ihn zu überlagern; siehe `FLZC-STAGING-FOLLOWUP` in `ROADMAP.md`. |
+| A5 | Scrollen bei geöffnetem Filter und kleinem Viewport | Filter öffnen, Browserfenster verkleinern und A4 wiederholen. Filter schließen und erneut prüfen. | Navigation und Scrollleisten bleiben sichtbar und erreichbar; es entsteht kein zweiter horizontaler Seiten-Scrollbar. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
 | A6 | Fixierte Personenachse | Eine große Matrix horizontal und vertikal scrollen. | Die zu Personen gehörende erste Spalte beziehungsweise Kopfzeile bleibt sichtbar; Inhalte überdecken sie nicht. | [x] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
 | A7 | Wochenendbezeichnung | Samstag und Sonntag in beiden Ausrichtungen ansehen. | Es stehen nur Wochentag und Datum dort; das zusätzliche Wort „Wochenende“ erscheint nicht. | [x] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
 | A8 | Kompakte leere Sondertage | Einen leeren Samstag, Sonntag und gesetzlichen Feiertag in beiden Ausrichtungen anzeigen. | Leere Sondertage sind deutlich platzsparender; bei Tagen als Spalten besitzen sie eine feste schmale Breite. | [x] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
@@ -52,14 +77,14 @@ Ergebnisse zu unverändertem Verhalten bleiben bestehen.
 | B4 | Schnittmenge Rolle und Bereich | Eine bereichsgebundene Rolle und genau einen Bereich auswählen. | Nur Personen erscheinen, die beide Kriterien erfüllen. | [x] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
 | B5 | Vorrangige Rolle | Ein Testkonto mit Leitungsrolle und zusätzlicher unterstellter Rolle über beide Rollenfilter suchen. | Die Person wird nur über ihre nach Organisationsreihenfolge vorrangige Rolle gefunden. | [x] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
 | B6 | Bereichsübergreifende Büroleitung | Eine Büroleitung mit Nordost und West nacheinander über beide Bereichsfilter sowie gemeinsam anzeigen. | Sie wird über beide Bereiche gefunden, erscheint in der Matrix aber nur einmal. | [x] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
-| B7 | Leitungs-/Stabsblock | Den gemeinsamen Anzeigen-/Ausblenden-Schalter für GF, PDL, Sekretariat, HR, QMB und Assistenz GF Digi betätigen. | Der Block wird vollständig ein- beziehungsweise ausgeblendet und gemäß Organisationshierarchie sortiert. | [ ] erfolgreich [x] nicht erfolgreich [ ] nicht geprüft | Der Schalter war nur bei zusätzlicher Bereichsauswahl bedienbar; siehe `FLZC-STAGING-FOLLOWUP` in `ROADMAP.md`. |
+| B7 | Leitungs-/Stabsblock | Den gemeinsamen Anzeigen-/Ausblenden-Schalter für GF, PDL, Sekretariat, HR, QMB und Assistenz GF Digi betätigen. | Der Block wird vollständig ein- beziehungsweise ausgeblendet und gemäß Organisationshierarchie sortiert. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
 | B8 | Persönlicher Standard | Filter, Zeitraum und Ausrichtung wählen, „Zum Standard machen“ drücken, App neu laden und anschließend eine andere Konfiguration ohne Speichern testen. | Nur bewusst gespeicherte Werte werden nach dem Neuladen wiederhergestellt. | [x] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
 
 ## C. Reihenfolge, Hierarchie und Bearbeitungsrechte
 
 | ID | Was wird geprüft? | Auszuführende Schritte | Erwartetes Ergebnis | Ergebnis | Warum/Beleg/Abweichung |
 |---|---|---|---|---|---|
-| C1 | Gruppenreihenfolge und Betriebskürzel | BO und EB aus mehreren Bereichen sowie PFK, Büroorganisation Pflege, IT, Stv. PDL, Fahrzeugverwaltung und Empfang gemeinsam anzeigen. | Die Übersicht zeigt unter anderem `BO-NO`, `EB-W`, `PFK`, `BO-Pflege` und `IT`; Stv. PDL steht vor Büroorganisation Pflege und PFK, Fahrzeugverwaltung folgt auf IT und Empfang auf Sekretariat. Filter und Administration behalten die Langnamen. | [ ] erfolgreich [x] nicht erfolgreich [ ] nicht geprüft | Bei gewähltem Bereich fehlten globale Rollen ohne natürliche Bereichszuordnung, darunter IT und PFK; siehe `FLZC-STAGING-FOLLOWUP` in `ROADMAP.md`. |
+| C1 | Gruppenreihenfolge und Betriebskürzel | BO und EB aus mehreren Bereichen sowie PFK, Büroorganisation Pflege, IT, Stv. PDL, Fahrzeugverwaltung und Empfang gemeinsam anzeigen. | Die Übersicht zeigt unter anderem `BO-NO`, `EB-W`, `PFK`, `BO-Pflege` und `IT`; Stv. PDL steht vor Büroorganisation Pflege und PFK, Fahrzeugverwaltung folgt auf IT und Empfang auf Sekretariat. Filter und Administration behalten die Langnamen. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
 | C2 | Hierarchie der globalen Gruppen | Mit passenden neutralen Leitungskonten Einträge der jeweils unterstellten Testkonten anlegen oder ändern. Gegenrichtung ebenfalls versuchen. | PDL/Stv. PDL, GF Digi/Fahrzeugverwaltung und Sekretariat/Empfang folgen der festgelegten Hierarchie; Untergebene dürfen Vorgesetzte nicht bearbeiten. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
 | C3 | Bereichsgebundene Führung | Mit BL und StvBL BO/EB im eigenen und in einem fremden Bereich bearbeiten. PFK ebenfalls versuchen. | BO/EB im passenden Bereich sind bearbeitbar; fremder Bereich und PFK sind nicht bearbeitbar. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
 | C4 | Schutz bei Mehrfachrollen | Mit einem normalen EB-Konto versuchen, eine StvBL zu bearbeiten, die zusätzlich EB ist. | Die Leitungsrolle schützt die Person; Bearbeitung wird serverseitig abgewiesen. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
@@ -148,19 +173,19 @@ konfigurierte Eigennamen dürfen sich nicht ändern.
 | I5 | Veröffentlichte Dienstereignisse | Einen betitelten und einen unbetitelten synthetischen Dienst in den privaten Nextcloud-Kalender sowie – sobald H1 freigegeben ist – nach Google synchronisieren. | Eigene Titel bleiben unverändert. Fallbacktitel und Beschreibung folgen der aktiven Locale; technische Event-ID, Eigentumsmarker und konfigurierter Kalendername bleiben stabil. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
 | I6 | Sprachwechsel ohne fachliche Zustandsänderung | Zeitraum, Ausrichtung, Filter, Serienstatus und Providerverbindungen merken, Sprache wechseln und dieselben Objekte erneut öffnen. | Nur die Darstellung ändert sich. Rechte, Auswahl, technische Statuswerte, Termine, Serien und Verbindungen bleiben unverändert. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
 
-## J. DPO-gesteuerte Adminfreigabe
+## J. Native Kalender-Adminausnahme
 
-Diese Runtime-Abnahme verwendet ausschließlich neutrale Testkonten. Sie bleibt
-offen, bis eine ausdrücklich freigegebene DDEV- oder Staging-Umgebung verfügbar
-ist.
+Diese Runtime-Abnahme verwendet ausschließlich neutrale Testkonten und prüft
+die ausdrücklich auf Filzmann Kalender begrenzte Ausnahme. Sie bleibt offen,
+bis eine ausdrücklich freigegebene DDEV- oder Staging-Umgebung verfügbar ist.
 
 | ID | Was wird geprüft? | Auszuführende Schritte | Erwartetes Ergebnis | Ergebnis | Warum/Beleg/Abweichung |
 |---|---|---|---|---|---|
-| J1 | DPO ohne native Adminrolle | Mit einem Mitglied von `Datenschutzbeauftragte` ohne Adminrolle Filzmann Kalender öffnen, Historie laden und einem aktiven nativen Testadmin für eine Stunde Zugriff erteilen. | Steuerung und Historie sind erreichbar; die Freigabe wird genau einmal protokolliert. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
-| J2 | Nativer Admin ohne DPO-Rolle | Als nativer Testadmin ohne DPO-Rolle Filzmann Kalender ohne aktive Freigabe öffnen und die Freigabe-API direkt lesen sowie schreibend aufrufen. | Sichere Hinweismeldung ohne Direktlink; Historie und Mutation werden verweigert und bleiben unverändert. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
-| J3 | Gewöhnliches Konto und ungültige Ziele | Als gewöhnliches Konto direkte API-Aufrufe versuchen; als DPO ein Nichtadmin-Ziel und eine Dauer über 24 Stunden senden. | Keine Steuerung oder Historie wird offengelegt; alle Aufrufe werden ohne Mutation verweigert. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
-| J4 | CSRF, Ablauf, Widerruf und Rollenverlust | Schreibenden Request ohne CSRF senden, eine aktive Freigabe widerrufen, Ablauf abwarten beziehungsweise kontrolliert simulieren und Ziel-Adminstatus sowie DPO-Rolle jeweils entziehen. | Fehlendes CSRF mutiert nicht; Widerruf, Ablauf und Verlust des Ziel-Adminstatus beenden den fachlichen Zugriff; ohne DPO-Rolle sind Steuerung und Historie nicht mehr erreichbar. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
-| J5 | Tastaturbedienung und Fokus | Steuerung, Dauer, Bestätigung, Absenden, Historie und Widerruf nur per Tastatur bedienen; Fehlermeldung auslösen. | Alle Funktionen sind erreichbar, Fokus sichtbar, Status verständlich und Fehler werden als Alert ausgegeben. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
+| J1 | Nativer Admin | Mit einem neutralen nativen Testadmin Kalender öffnen und einen fremden synthetischen Eintrag anlegen, ändern und löschen. | Alle Aktionen gelingen ohne app-lokale Freigabe; jede Aktion bleibt auf Filzmann Kalender begrenzt. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
+| J2 | Nichtadmin außerhalb des Organigramms | Mit einem gewöhnlichen Konto ohne Organigrammrolle Kalenderseite und Lese-/Schreib-API direkt aufrufen. | Ansicht und Mutationen werden serverseitig verweigert; keine Daten ändern sich. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
+| J3 | Rollenverlust | Ein neutrales Organigrammkonto öffnen, danach seine letzte Organigrammrolle entfernen und dieselben Lese-/Schreibaufrufe wiederholen. | Nach Rollenverlust werden Lesen, Eigenbearbeitung und Meetinglückensuche verweigert; vorhandene Daten bleiben unverändert. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
+| J4 | Nur direkte Hierarchie | Mit einer direkten und einer ausschließlich indirekten vorgesetzten Rolle denselben synthetischen Zielkalender bearbeiten. | Die direkte Führung darf bearbeiten; die nur indirekte Führung wird ohne Seiteneffekt abgewiesen. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
+| J5 | Entfallene Freigabesteuerung | Hauptbereich, Routen und direkte Requests auf den früheren Pfad `/api/admin/full-access` prüfen. | Keine Freigabeoberfläche und keine aktive API sind vorhanden; frühere Historie erteilt keine Rechte. | [ ] erfolgreich [ ] nicht erfolgreich [ ] nicht geprüft | |
 
 
 
@@ -171,8 +196,8 @@ ist.
 | Anzahl erfolgreich | |
 | Anzahl nicht erfolgreich | |
 | Anzahl nicht geprüft | |
-| Kritische Abweichungen / Ticketreferenzen | A5, B7 und C1: siehe `FLZC-STAGING-FOLLOWUP` in `ROADMAP.md`. Die UI-Nacharbeit zur temporären Adminfreigabe ist systemweit als `DP-11` im Parent-Zukunftsplan erfasst. |
+| Kritische Abweichungen / Ticketreferenzen | Die native Kalender-Adminausnahme und die Organigrammgrenze benötigen noch die Runtime-Abnahme J1 bis J5. |
 | Erneute Prüfung erforderlich bis | |
 | Gesamtentscheidung | [ ] abgenommen [ ] mit Auflagen abgenommen [x] nicht abgenommen |
-| Begründung der Gesamtentscheidung | Nicht abgenommen wegen der dokumentierten Filterabweichungen, der noch nicht zusammengeführten Adminfreigabe-Oberfläche und fehlender neutraler Testkonten für alle Bereiche. |
+| Begründung der Gesamtentscheidung | Nicht abgenommen bis zur erneuten Prüfung von A5, B7, C1 und J1 bis J5 sowie wegen fehlender neutraler Testkonten für alle Bereiche. |
 | Name / Datum | |

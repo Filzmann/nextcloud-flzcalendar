@@ -59,7 +59,7 @@ namespace {
 
     $denied = $controller->save('https://calendar.example.test', 'Teamdienste');
     if ($denied->getStatus() !== 403
-        || $denied->getData() !== ['code' => 'forbidden', 'error' => 'translated:You are not allowed to perform this action.']
+        || $denied->getData() !== ['code' => 'forbidden', 'error' => 'translated:Keine Berechtigung.']
         || $targets->calls !== []) {
         throw new RuntimeException('Nicht-Admins können Kalenderdefaults verändern.');
     }
@@ -78,7 +78,7 @@ namespace {
     $targets->failure = 'invalid';
     $invalid = $controller->save('http://unsicher.example.test', '');
     if ($invalid->getStatus() !== 400
-        || $invalid->getData() !== ['code' => 'invalid_calendar_defaults', 'error' => 'translated:The calendar defaults are invalid.']
+        || $invalid->getData() !== ['code' => 'invalid_calendar_defaults', 'error' => 'translated:Die Kalendervorgaben sind ungültig.']
         || count($targets->calls) !== 1
         || str_contains(json_encode($invalid->getData()), 'Interner Validierungstext')) {
         throw new RuntimeException('Validierungsfehler wird nicht ohne Zustandsänderung behandelt.');
@@ -86,7 +86,7 @@ namespace {
     $targets->failure = 'unexpected';
     $failed = $controller->save('https://calendar.example.test', 'Teamdienste');
     if ($failed->getStatus() !== 400
-        || $failed->getData() !== ['code' => 'calendar_defaults_save_failed', 'error' => 'translated:The calendar defaults could not be saved.']
+        || $failed->getData() !== ['code' => 'calendar_defaults_save_failed', 'error' => 'translated:Die Kalendervorgaben konnten nicht gespeichert werden.']
         || $logger->errors === []
         || str_contains(json_encode($failed->getData()), 'Vertraulicher interner Fehler')) {
         throw new RuntimeException('Unerwarteter Speicherfehler wird nicht stabil codiert, lokalisiert und sicher protokolliert.');

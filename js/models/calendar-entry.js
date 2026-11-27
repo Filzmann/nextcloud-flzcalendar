@@ -1,7 +1,7 @@
 (function() {
     'use strict';
 
-    const BaseModel = window.LocalBase.models.Model;
+    const BaseModel = window.OCA.FlzCalendar.Shared.models.Model;
 
     /**
      * Zweck: Hydriert den serverseitigen CalendarEntry-Vertrag für Komponenten und Workflows.

@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace OCA\FlzCalendar\Service;
 
-use OCA\LocalBase\Organization\FlzOrganizationDefinition;
-use OCA\LocalBase\Organization\FlzOrganizationSettingsService;
 use OCP\IGroupManager;
 use OCP\IUser;
 use OCP\IUserManager;
@@ -14,19 +12,19 @@ use OCP\IUserSession;
 /**
  * Zweck: Erzwingt den gemeinsamen Rollen-/Bereichsvertrag serverseitig.
  * Zusammenspiel: Controller -> CalendarAccessService -> zentrale Organisationspolicy und dynamische Gruppenprofile.
- * Vertrag: Alle angemeldeten Nutzer*innen lesen; eigene Einträge und fachlich delegierte Ziele werden bearbeitet.
+ * Vertrag: Organigrammmitglieder lesen und bearbeiten eigene Einträge; direkte Vorgesetzte,
+ * freigeschaltete Peers und native Nextcloud-Admins bearbeiten fremde Einträge.
  */
 final class CalendarAccessService {
     public function __construct(
         private IGroupManager $groups,
         private IUserSession $session,
         private IUserManager $users,
-        private CalendarPermissionPolicy $policy,
-        private CalendarSettingsService $settings,
         private CalendarGroupProfile $profiles,
-        private TemporaryAdminAccessChecker $temporaryAdminAccess,
-        private ?FlzOrganizationSettingsService $organization = null,
-    ) {}
+        private OrganizationRuntime $organization,
+    )
+    {
+    }
 
     public function currentUser(): ?IUser {
         return $this->session->getUser();
@@ -34,7 +32,8 @@ final class CalendarAccessService {
 
     public function canView(): bool {
         $user = $this->currentUser();
-        return $user !== null;
+        if ($user === null) return false;
+        return $this->groups->isAdmin($user->getUID()) || $this->isOrganizationMember($this->groupIds($user));
     }
 
     public function canManage(string $employeeUid): bool {
@@ -44,15 +43,15 @@ final class CalendarAccessService {
         if ($target === null) return false;
 
         $actorGroups = $this->groupIds($user);
+        $isAdmin = $this->groups->isAdmin($user->getUID());
+        if (!$isAdmin && !$this->isOrganizationMember($actorGroups)) return false;
         $targetGroups = $this->groupIds($target);
 
-        return $this->policy->canManage(
+        return $isAdmin || $this->organization->canManage(
             $user->getUID(),
-            $this->groups->isAdmin($user->getUID()) && $this->temporaryAdminAccess->hasActiveGrant($user->getUID()),
             $actorGroups,
             $employeeUid,
             $targetGroups,
-            $this->settings->enabledPeerGroups(),
         );
     }
 
@@ -69,7 +68,12 @@ final class CalendarAccessService {
         if (!$this->canView()) return [];
 
         $byUid = [];
-        foreach ($this->definition()->roleGroupIds(static fn(array $role): bool => $role['calendarVisible']) as $role) {
+        $definition = $this->definition();
+        if ($definition === null)
+        {
+            return [];
+        }
+        foreach ($definition->roleGroupIds(static fn(array $role): bool => ($role['calendarVisible'] ?? false) === true) as $role) {
             $group = $this->groups->get($role);
             if ($group === null) continue;
 
@@ -101,7 +105,13 @@ final class CalendarAccessService {
         return array_map('strval', $this->groups->getUserGroupIds($user));
     }
 
-    private function definition(): FlzOrganizationDefinition {
-        return $this->organization?->definition() ?? FlzOrganizationDefinition::defaults();
+    private function isOrganizationMember(array $groupIds): bool {
+        $definition = $this->definition();
+        return $definition !== null && array_intersect($groupIds, $definition->roleGroupIds()) !== [];
+    }
+
+    private function definition(): ?CalendarOrganization
+    {
+        return $this->organization->organization();
     }
 }

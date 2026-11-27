@@ -1,7 +1,7 @@
 (function() {
     'use strict';
 
-    const client = new window.LocalBase.api.ApiClient({ appId: 'flzcalendar' });
+    const client = new window.OCA.FlzCalendar.Shared.api.ApiClient({ appId: 'flzcalendar' });
     const l10n = window.FlzCalendar.l10n;
 
     function initCalendarDefaults() {
@@ -26,9 +26,9 @@
                 });
                 kopanoUrl.value = response.calendarDefaults.kopanoUrl;
                 calendarName.value = response.calendarDefaults.calendarName;
-                showStatus(l10n.t('The calendar defaults were saved. Existing app-owned calendars will be renamed during the next synchronisation.'));
+                showStatus(l10n.t('Die Kalenderdefaults wurden gespeichert. Vorhandene app-eigene Kalender werden beim nächsten Abgleich umbenannt.'));
             } catch (error) {
-                showStatus(error.message || l10n.t('The calendar defaults could not be saved.'), true);
+                showStatus(error.message || l10n.t('Die Kalendervorgaben konnten nicht gespeichert werden.'), true);
             } finally {
                 submit.disabled = false;
             }
@@ -55,7 +55,7 @@
             secret.required = !googleOAuth.secretConfigured;
             remove.disabled = !googleOAuth.configured;
             status.dataset.configured = String(Boolean(googleOAuth.configured));
-            showStatus(googleOAuth.configured ? l10n.t('Google OAuth is configured.') : l10n.t('Google OAuth is not configured yet.'), !googleOAuth.configured);
+            showStatus(googleOAuth.configured ? l10n.t('Google OAuth ist konfiguriert.') : l10n.t('Google OAuth ist noch nicht konfiguriert.'), !googleOAuth.configured);
         };
 
         form.addEventListener('submit', async event => {
@@ -69,7 +69,7 @@
                 });
                 applyStatus(response.googleOAuth);
             } catch (error) {
-                showStatus(error.message || l10n.t('The Google OAuth configuration could not be saved.'), true);
+                showStatus(error.message || l10n.t('Die Google-OAuth-Konfiguration konnte nicht gespeichert werden.'), true);
             } finally {
                 secret.value = '';
                 if (submit) submit.disabled = false;
@@ -79,20 +79,20 @@
         copy.addEventListener('click', async () => {
             try {
                 await navigator.clipboard.writeText(redirect.value);
-                showStatus(l10n.t('The redirect URI was copied.'));
+                showStatus(l10n.t('Die Weiterleitungs-URI wurde kopiert.'));
             } catch (error) {
-                showStatus(l10n.t('The redirect URI could not be copied.'), true);
+                showStatus(l10n.t('Die Weiterleitungs-URI konnte nicht kopiert werden.'), true);
             }
         });
 
         remove.addEventListener('click', async () => {
-            if (!window.confirm(l10n.t('Remove the Google OAuth configuration? Grants already issued by Google will not be revoked.'))) return;
+            if (!window.confirm(l10n.t('Google-OAuth-Konfiguration entfernen? Bereits erteilte Freigaben bei Google werden dadurch nicht widerrufen.'))) return;
             remove.disabled = true;
             try {
                 const response = await client.request('/api/admin/google-oauth', { method: 'DELETE', body: '{}' });
                 applyStatus(response.googleOAuth);
             } catch (error) {
-                showStatus(error.message || l10n.t('The Google OAuth configuration could not be removed.'), true);
+                showStatus(error.message || l10n.t('Die Google-OAuth-Konfiguration konnte nicht entfernt werden.'), true);
                 remove.disabled = status.dataset.configured !== 'true';
             } finally {
                 secret.value = '';
@@ -118,15 +118,15 @@
         form.addEventListener('submit', async event => {
             event.preventDefault();
             submit.disabled = true;
-            showStatus(l10n.t('The Kopano CalDAV connection is being tested.'));
+            showStatus(l10n.t('Die Kopano-CalDAV-Verbindung wird geprüft.'));
             try {
                 const response = await client.request('/api/admin/external-calendars/caldav/test', {
                     method: 'POST',
                     body: JSON.stringify({ serverUrl: serverUrl.value, username: username.value, password: password.value }),
                 });
-                showStatus(response.message || l10n.t('The Kopano CalDAV connection was tested successfully.'));
+                showStatus(response.message || l10n.t('Die Kopano-CalDAV-Verbindung wurde erfolgreich geprüft.'));
             } catch (error) {
-                showStatus(error.message || l10n.t('The Kopano CalDAV connection could not be tested.'), true);
+                showStatus(error.message || l10n.t('Die Kopano-CalDAV-Verbindung konnte nicht geprüft werden.'), true);
             } finally {
                 password.value = '';
                 submit.disabled = false;
@@ -146,12 +146,12 @@
             button.disabled = true;
             notice.hidden = false;
             notice.className = 'flz-calendar-admin-notice';
-            notice.textContent = l10n.t('The demo pack is being checked and installed …');
+            notice.textContent = l10n.t('Das Demo-Pack wird geprüft und installiert …');
             try {
                 const response = await client.request('/api/admin/demo-pack/install', { method: 'POST', body: '{}' });
                 const result = response.result;
                 notice.classList.add('is-success');
-                notice.textContent = l10n.t('{users} accounts and {groups} groups created; calendar data generated for {people} people.', {
+                notice.textContent = l10n.t('{users} Konten und {groups} Gruppen angelegt; Kalenderdaten für {people} Personen erzeugt.', {
                     users: result.accounts.createdUsers,
                     groups: result.accounts.createdGroups,
                     people: result.createdCalendars,
@@ -159,7 +159,7 @@
                 confirmation.checked = false;
             } catch (error) {
                 notice.classList.add('is-error');
-                notice.textContent = error.message || l10n.t('The demo pack could not be installed.');
+                notice.textContent = error.message || l10n.t('Das Demo-Pack konnte nicht installiert werden.');
                 button.disabled = false;
             }
         });

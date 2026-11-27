@@ -37,7 +37,11 @@ namespace {
         throw new RuntimeException('Der Processing-Katalog enthält personenbezogene Laufzeitdaten.');
     }
     $encodedCatalog=json_encode($catalog->toArray(),JSON_THROW_ON_ERROR|JSON_UNESCAPED_UNICODE);
-    if(!str_contains($encodedCatalog,'App-lokaler Freigabevorgang durch Datenschutzbeauftragte im Filzmann Kalender')||str_contains($encodedCatalog,'Laufzeitdurchsetzung der Ziel- und Gruppenbedingungen sowie Allow-, Deny- und Manipulationsprüfungen stehen aus'))throw new RuntimeException('Der Processing-Katalog projiziert den umgesetzten DPO-Freigabevertrag nicht korrekt.');
+    if(!str_contains($encodedCatalog,'Historische, nicht mehr erteilbare Kalender-Adminfreigaben')
+        || !str_contains($encodedCatalog,'Keine schreibende oder autorisierende Laufzeitverwendung')
+        || str_contains($encodedCatalog,'Erteilen und Widerrufen:')) {
+        throw new RuntimeException('Der Processing-Katalog projiziert die nur noch read-only erhaltene Freigabehistorie nicht korrekt.');
+    }
 
     $registration = new RegisterProcessingMetadataProvidersEvent();
     $listener = new CalendarProcessingMetadataProviderListener($provider);

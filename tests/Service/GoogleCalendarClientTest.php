@@ -41,7 +41,7 @@ namespace {
     $clients = new class($client) implements IClientService { public function __construct(private IClient $client) {} public function newClient(): IClient { return $this->client; } };
     $l10n = new class implements IL10N {
         public function t(string $text, array $parameters = []): string {
-            return $text === 'Automatically synchronised from Filzmann Calendar. Please make changes there.'
+            return $text === 'Automatisch aus Filzmann Kalender synchronisiert. Änderungen bitte dort vornehmen.'
                 ? 'Translated provider description.'
                 : strtr($text, $parameters);
         }

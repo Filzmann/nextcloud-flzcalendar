@@ -1,7 +1,7 @@
 (function() {
     'use strict';
 
-    const { esc } = window.LocalBase.ui;
+    const { esc } = window.OCA.FlzCalendar.Shared.ui;
     const l10n = window.FlzCalendar.l10n;
 
     /**
@@ -46,20 +46,20 @@
         }
 
         actions(canManage, canCreateShift) {
-            const addShift = l10n.t('Create shift');
-            const addAppointment = l10n.t('Create appointment');
+            const addShift = l10n.t('Dienst anlegen');
+            const addAppointment = l10n.t('Termin anlegen');
             const buttons = canManage ? `
                 ${canCreateShift ? `<button type="button" class="flz-calendar-quick-add flz-calendar-icon-button icon-add" data-action="add-entry" data-entry-type="shift" data-tooltip="${esc(addShift)}" aria-label="${esc(addShift)}" title="${esc(addShift)}"></button>` : ''}
                 <button type="button" class="flz-calendar-quick-add flz-calendar-icon-button icon-calendar-dark" data-action="add-entry" data-entry-type="appointment" data-tooltip="${esc(addAppointment)}" aria-label="${esc(addAppointment)}" title="${esc(addAppointment)}"></button>` : '';
 
-            return `<div class="flz-calendar-cell-actions" aria-label="${esc(l10n.t('Create entry'))}">${buttons}</div>`;
+            return `<div class="flz-calendar-cell-actions" aria-label="${esc(l10n.t('Eintrag anlegen'))}">${buttons}</div>`;
         }
 
         absenceMarkers(absences) {
             return absences.map(absence => {
                 const description = absence.blocks
-                    ? l10n.t('Approved absence – shifts are blocked, appointments remain possible')
-                    : l10n.t('Planned absence – shifts are blocked, appointments remain possible');
+                    ? l10n.t('Genehmigter Urlaub – Dienste sind gesperrt, Termine bleiben möglich')
+                    : l10n.t('Geplanter Urlaub – Dienste sind gesperrt, Termine bleiben möglich');
 
                 return `<span class="flz-calendar-absence flz-calendar-absence--${esc(absence.status)}" title="${esc(description)}" aria-label="${esc(description)}">${esc(absence.marker)}</span>`;
             }).join('');
@@ -68,7 +68,7 @@
         shift(shift, entries, canManage, style = '', day = null) {
             const children = entries.filter(entry => entry.type === 'appointment' && entry.parentEntryId === shift.id);
             const childEntries = children.length
-                ? `<div class="flz-calendar-entry__children" aria-label="${esc(l10n.t('Appointments within the shift'))}">${children.map(entry => this.entry(
+                ? `<div class="flz-calendar-entry__children" aria-label="${esc(l10n.t('Termine innerhalb des Dienstes'))}">${children.map(entry => this.entry(
                     entry,
                     'appointment',
                     canManage && (!entry.meetingUid || entry.canManageMeeting !== false),
@@ -76,13 +76,13 @@
                 : '';
 
             return `<article class="flz-calendar-entry flz-calendar-entry--shift" data-entry-id="${esc(shift.id)}"${style}>
-                ${this.header(shift, l10n.t('Shift'), canManage, false, day)}
+                ${this.header(shift, l10n.t('Dienst'), canManage, false, day)}
                 ${childEntries}
             </article>`;
         }
 
         entry(entry, kind, canManage, style = '') {
-            const label = kind === 'blocked' ? l10n.t('Blocked time') : l10n.t('Appointment');
+            const label = kind === 'blocked' ? l10n.t('Sperrtermin') : l10n.t('Termin');
             const manageable = canManage && (!entry.meetingUid || entry.canManageMeeting !== false);
             return `<article class="flz-calendar-entry flz-calendar-entry--${kind}" data-entry-id="${esc(entry.id)}"${style}>${this.header(entry, label, manageable, kind === 'blocked')}</article>`;
         }
@@ -91,7 +91,7 @@
             const label = l10n.t('Assistenz');
             const shortLabel = l10n.t('AS');
             const period = this.dayPeriod(conflict, day);
-            const accessible = l10n.t('Assistenz – blocked time from {start} to {end}', { start: period.start, end: period.end });
+            const accessible = l10n.t('Assistenz – Sperrzeit von {start} bis {end}', { start: period.start, end: period.end });
             return `<article class="flz-calendar-entry flz-calendar-entry--assistance" aria-label="${esc(accessible)}"${style}>
                 <header class="flz-calendar-entry__header"><span><strong>
                     <span class="flz-calendar-assistance-label flz-calendar-assistance-label--full">${esc(label)}</span>
@@ -108,14 +108,14 @@
         header(entry, label, canManage, blocked = false, day = null) {
             const title = entry.title ? `<span class="flz-calendar-entry__title">${esc(entry.title)}</span>` : '';
             const blockedMarker = blocked ? '<span class="flz-calendar-entry__blocked-marker" aria-hidden="true">🔒</span>' : '';
-            const recurring = esc(l10n.t('Recurring appointment'));
+            const recurring = esc(l10n.t('Serientermin'));
             const seriesMarker = entry.seriesUid ? `<span class="flz-calendar-entry__series-marker" title="${recurring}"><span aria-hidden="true">↻</span><span class="hidden-visually">${recurring}</span></span>` : '';
-            const editLabel = l10n.t('Edit {type}', { type: label });
-            const deleteLabel = l10n.t('Delete {type}', { type: label });
+            const editLabel = l10n.t('{type} bearbeiten', { type: label });
+            const deleteLabel = l10n.t('{type} löschen', { type: label });
             const controls = canManage
                 ? `<span class="flz-calendar-entry__actions">
-                    <button type="button" class="flz-calendar-icon-button icon-rename" data-action="edit-entry" data-entry-id="${esc(entry.id)}" aria-label="${esc(editLabel)}" title="${esc(l10n.t('Edit'))}"></button>
-                    <button type="button" class="flz-calendar-icon-button icon-delete" data-action="delete-entry" data-entry-id="${esc(entry.id)}" aria-label="${esc(deleteLabel)}" title="${esc(l10n.t('Delete'))}"></button>
+                    <button type="button" class="flz-calendar-icon-button icon-rename" data-action="edit-entry" data-entry-id="${esc(entry.id)}" aria-label="${esc(editLabel)}" title="${esc(l10n.t('Bearbeiten'))}"></button>
+                    <button type="button" class="flz-calendar-icon-button icon-delete" data-action="delete-entry" data-entry-id="${esc(entry.id)}" aria-label="${esc(deleteLabel)}" title="${esc(l10n.t('Löschen'))}"></button>
                 </span>`
                 : '';
 
@@ -132,8 +132,8 @@
             const startsBefore = new Date(entry.start) < dayStart;
             const endsAfter = new Date(entry.end) >= dayEnd;
             const markers = [];
-            if (startsBefore) markers.push(this.continuation('←', l10n.t('Continued from previous day')));
-            if (endsAfter) markers.push(this.continuation('→', l10n.t('Continues on next day')));
+            if (startsBefore) markers.push(this.continuation('←', l10n.t('Fortsetzung vom Vortag')));
+            if (endsAfter) markers.push(this.continuation('→', l10n.t('Fortsetzung am Folgetag')));
             return {
                 start: startsBefore ? '00:00' : this.time(entry.start),
                 end: endsAfter ? '24:00' : this.time(entry.end),

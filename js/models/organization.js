@@ -1,11 +1,11 @@
 (function() {
     'use strict';
 
-    const BaseModel = window.LocalBase.models.Model;
+    const BaseModel = window.OCA.FlzCalendar.Shared.models.Model;
 
     /**
      * Zweck: Stellt den serverseitig konfigurierten FLZ-Organisationsvertrag für Filter, Gruppierung und Einstellungen bereit.
-     * Spiegelung: PHP: OCA\LocalBase\Organization\FlzOrganizationDefinition.
+     * Spiegelung: öffentlicher Organisationssnapshot aus flz_organization V1.
      */
     class Organization extends BaseModel {
         constructor(data = {}) {
@@ -49,6 +49,10 @@
                 .filter(([key, role]) => role.staffBlock && !separateRoleKeys.has(key))
                 .sort(([, left], [, right]) => Number(left.sortOrder) - Number(right.sortOrder))
                 .map(([, role]) => role.groupId);
+        }
+
+        roleIsAreaScoped(groupId) {
+            return Boolean(Object.values(this.roles).find(role => role.groupId === groupId)?.areaScoped);
         }
 
         roleOrder(groupId) {

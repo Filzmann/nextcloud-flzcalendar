@@ -2,6 +2,34 @@
 
 ## Unreleased
 
+- L10N-Migration (ZM-06): sichtbare Texte über Nextcloud-l10n (deutsche Quelltexte, Kataloge `l10n/en.*` + `l10n/en_GB.*`), inkl. `tests/Ui/L10nCatalogContractTest.php` und `docs/l10n-inventory.md`.
+
+- Der isolierte Browser-Consumer-Smoke verwendet absolute Quelldateipfade in
+  der VM, damit die Coverage-Messung ausgeführte Kategorie-A-Dateien eindeutig
+  zuordnet.
+- Die gemeinsamen Browser-Primitives als reproduzierbares, app-lokal
+  isoliertes Kategorie-A-Bundle eingebunden und die Laufzeitabhängigkeit von
+  privaten LocalBase-Assets sowie `window.LocalBase` entfernt.
+- Organisationsdefinition, Kalenderrechte, Peerfreigaben, Kalenderkontext,
+  Feiertage, Demo-Projektion und PermissionProvider auf den öffentlichen,
+  aktivierungs- und versionsgeprüften V1-Vertrag von `flz_organization`
+  umgestellt; fehlende oder fehlerhafte Provider schließen
+  organisationsbasierte Fachzugriffe.
+- Kalenderrechte von Organisationsgruppen getrennt: Lesen, Eigenbearbeitung
+  und Meetinglückensuche auf Organigrammrollen begrenzt, Fremdbearbeitung auf
+  direkte Hierarchiekanten und konfigurierte Peer-Berechtigungen reduziert.
+- Die ausdrücklich entschiedene native Kalender-Adminausnahme serverseitig
+  umgesetzt und die frühere temporäre Freigabe-UI, API und schreibende
+  Laufzeitverwendung entfernt; vorhandene Historie bleibt read-only in der
+  subjectgebundenen Datenschutzprojektion.
+- Technische OAuth-/CalDAV-/Kalenderdefault-Rechte und persönliche
+  Konnektoren im PermissionProvider getrennt ausgewiesen.
+
+- Den Personenfilter als überlagerndes, begrenzt scrollbar bleibendes Panel
+  mit definiertem Öffnungsfokus, Escape-Schließen und Fokus-Rückgabe
+  umgesetzt. Der Leitungs-/Stabsblock ist ohne Zusatzfilter schaltbar;
+  Bereichsauswahlen schneiden nur bereichsgebundene Rollen und blenden
+  globale Rollen nicht mehr aus.
 - Nextcloud 35.0.1 durch Fresh Install, Upgrade 34→35 sowie Provider-,
   Berechtigungs-, Runtime-, UI-/API- und Asset-Smokes nachgewiesen und den
   unterstützten Bereich auf die lückenlosen Hauptversionen 33 bis 35
