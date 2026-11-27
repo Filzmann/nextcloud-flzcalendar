@@ -90,7 +90,7 @@
             if (this.isUnfiltered()) return this.data.employees;
             return this.data.employees.filter(employee => {
                 const isLeadershipStaff = employee.roles.some(role => this.leadershipStaffRoles.has(role));
-                if (this.selected.size) return this.selected.has(employee.uid) && (!isLeadershipStaff || this.showLeadershipStaff);
+                if (this.selected.size) return this.selected.has(employee.uid);
                 if (this.leadershipStaffOnly) return isLeadershipStaff;
                 if (isLeadershipStaff) return this.showLeadershipStaff;
                 const primaryRole = employee.roles[0] || '';

@@ -3,7 +3,7 @@ import { fileURLToPath } from 'node:url';
 import { runInNewContext } from 'node:vm';
 
 const source = readFileSync(new URL('../../js/admin.js', import.meta.url), 'utf8');
-if (!source.includes('window.FlzCalendar.l10n') || !source.includes("l10n.t('The calendar defaults were saved.")) {
+if (!source.includes('window.FlzCalendar.l10n') || !source.includes("l10n.t('Die Kalenderdefaults wurden gespeichert. Vorhandene app-eigene Kalender werden beim nächsten Abgleich umbenannt.')")) {
     throw new Error('Admininteraktionen verwenden nicht den zentralen L10N-Adapter.');
 }
 const element = (value = '') => ({
@@ -82,7 +82,7 @@ runInNewContext(source, context, { filename: fileURLToPath(new URL('../../js/adm
 
 await form.listeners.submit({ preventDefault() {} });
 if (calls[0][0] !== '/api/admin/google-oauth' || calls[0][1].method !== 'PUT' || JSON.parse(calls[0][1].body).clientSecret !== 'new-secret') throw new Error('Google-OAuth-Adminformular speichert nicht über den geschützten API-Pfad.');
-if (secret.value !== '' || remove.disabled || !status.textContent.includes('configured')) throw new Error('Google-OAuth-Adminformular behält das Secret oder aktualisiert den Status nicht.');
+if (secret.value !== '' || remove.disabled || !status.textContent.includes('ist konfiguriert')) throw new Error('Google-OAuth-Adminformular behält das Secret oder aktualisiert den Status nicht.');
 await copy.listeners.click();
 if (copied !== redirect.value) throw new Error('Google-Redirect-URI kann nicht kopiert werden.');
 await remove.listeners.click();
@@ -102,11 +102,11 @@ if (defaultsCall[0] !== '/api/admin/calendar-defaults' || defaultsCall[1].method
     throw new Error('Kalenderdefaults werden nicht über den geschützten Adminpfad gespeichert.');
 }
 if (defaultsUrl.value !== 'https://calendar.example.test/caldav/' || defaultsName.value !== 'Team & Dienst'
-    || defaultsSubmit.disabled || !defaultsStatus.textContent.includes('saved')) {
+    || defaultsSubmit.disabled || !defaultsStatus.textContent.includes('wurden gespeichert')) {
     throw new Error('Kalenderdefaults aktualisieren Adminformular und Status nicht sicher.');
 }
 if (!translationCalls.some(([key]) => key === 'Die Kalenderdefaults wurden gespeichert. Vorhandene app-eigene Kalender werden beim nächsten Abgleich umbenannt.')) {
-    throw new Error('Adminerfolg wird nicht als stabiler englischer L10N-Schlüssel delegiert.');
+    throw new Error('Adminerfolg wird nicht als stabiler L10N-Schlüssel delegiert.');
 }
 
 console.log('Admin settings smoke: OK');

@@ -54,14 +54,14 @@ for (const contract of [
     "state.period === 'month'",
     'meetingCapabilities.apply(data.entries, data.employees)',
     'weekTable.setHolidays(data.holidayCalendars || [])',
-    "state.isUnfiltered() ? l10n.t('All people')",
+    "state.isUnfiltered() ? l10n.t('Alle Personen')",
     'const sequence = ++loadSequence',
     'if (sequence !== loadSequence) return;',
     'if (sequence === loadSequence) show(error, true)',
 ]) {
     if (!source.includes(contract)) throw new Error(`Frontend-Vertrag fehlt: ${contract}`);
 }
-for (const contract of ['class EntryWorkflow', "['delete', l10n.t('Delete shift and appointments')]", "['detach', l10n.t('Delete only the shift; keep appointments as blocked times')]", "dialog.addEventListener('cancel'", 'document.activeElement', 'returnFocus.focus()', 'this.dialog.open({ employee', 'this.repository.updateMeeting(existing.meetingUid', 'this.repository.removeMeeting(entry.meetingUid)', 'existing?.seriesUid', "['occurrence', l10n.t('Only this occurrence')]", "['series', l10n.t('Entire series')]", 'if (!employee?.canManage) return;', 'this.show(error, true)']) {
+for (const contract of ['class EntryWorkflow', "['delete', l10n.t('Dienst und Termine löschen')]", "['detach', l10n.t('Nur Dienst löschen; Termine als Sperrtermine behalten')]", "dialog.addEventListener('cancel'", 'document.activeElement', 'returnFocus.focus()', 'this.dialog.open({ employee', 'this.repository.updateMeeting(existing.meetingUid', 'this.repository.removeMeeting(entry.meetingUid)', 'existing?.seriesUid', "['occurrence', l10n.t('Nur dieses Vorkommen')]", "['series', l10n.t('Gesamte Serie')]", 'if (!employee?.canManage) return;', 'this.show(error, true)']) {
     if (!entryWorkflow.includes(contract)) throw new Error(`Eintragsworkflow-Vertrag fehlt: ${contract}`);
 }
 if (!entryWorkflow.includes("button.closest('[data-employee-uid][data-day]')")) {
@@ -85,7 +85,7 @@ if (mixedMeeting.some(entry => entry.canManageMeeting !== false)) throw new Erro
 const manageableMeeting = [{ employeeUid: 'a', meetingUid: 'meeting-2' }, { employeeUid: 'b', meetingUid: 'meeting-2' }];
 capabilities.apply(manageableMeeting, [{ uid: 'a', canManage: true }, { uid: 'b', canManage: true }]);
 if (manageableMeeting.some(entry => entry.canManageMeeting !== true)) throw new Error('Vollständig bearbeitbares Meeting wurde in der UI gesperrt.');
-for (const contract of ['class CalendarFilters', 'this.renderLeadershipStaffCheckbox()', 'this.state.selected.clear()', 'this.state.persist()', 'this.onChange()', "l10n.t('No explicit selection – group filters apply.')", 'this.organization().staffBlockLabel', 'organization.areaOrder(a) - organization.areaOrder(b)']) {
+for (const contract of ['class CalendarFilters', 'this.renderLeadershipStaffCheckbox()', 'this.state.selected.clear()', 'this.state.persist()', 'this.onChange()', "l10n.t('Keine explizite Auswahl – Gruppenfilter gelten.')", 'this.organization().staffBlockLabel', 'organization.areaOrder(a) - organization.areaOrder(b)']) {
     if (!calendarFilters.includes(contract)) throw new Error(`Kalenderfilter-Komponentenvertrag fehlt: ${contract}`);
 }
 for (const contract of ['class TabNavigation', "addEventListener('click'", "this.show('settings')", "this.onChange(active)"]) {
@@ -107,7 +107,7 @@ const calendarLayout = calendarTimeline.layout(timelineEntries, [timelineDay]);
 if (calendarTimeline.gridRow(calendarLayout, timelineEntries[0], timelineDay) !== '2 / 5' || !calendarLayout.rows.includes('64px')) {
     throw new Error('Kalendereinträge werden nicht hoch genug für Zeit und Titel auf das gemeinsame Zeitraster abgebildet.');
 }
-for (const contract of ['class WeekNavigation', "this.setPeriod('week')", "this.setPeriod('month')", 'this.move(-7)', 'this.moveMonth(', 'this.state.persist()', 'this.onWeekChange', 'this.onViewChange', 'CalendarDate.isoWeekValue', 'CalendarDate.monthValue', "l10n.t('Days as rows')", "l10n.t('People as rows')"]) {
+for (const contract of ['class WeekNavigation', "this.setPeriod('week')", "this.setPeriod('month')", 'this.move(-7)', 'this.moveMonth(', 'this.state.persist()', 'this.onWeekChange', 'this.onViewChange', 'CalendarDate.isoWeekValue', 'CalendarDate.monthValue', "l10n.t('Tage als Zeilen')", "l10n.t('Personen als Zeilen')"]) {
     if (!weekNavigation.includes(contract)) throw new Error(`Wochennavigations-Komponentenvertrag fehlt: ${contract}`);
 }
 const navigationContext = { window: {}, document: {}, Date, Number, String };
@@ -140,7 +140,7 @@ const monthNavigation = Object.create(navigationContext.window.FlzCalendar.compo
 monthNavigation.state = { monday: new Date(2026, 6, 13), month: new Date(2026, 6, 1), period: 'month', vertical: false };
 for (const property of ['label', 'weekNumber', 'monthNumber', 'weekPicker', 'monthPicker', 'previous', 'next', 'weekButton', 'monthButton', 'toggleView', 'heading']) monthNavigation[property] = navigationElement();
 monthNavigation.render();
-if (monthNavigation.toggleView.hidden !== false || monthNavigation.toggleView.textContent !== 'People as rows' || monthNavigation.toggleView.attributes['aria-pressed'] !== 'true') {
+if (monthNavigation.toggleView.hidden !== false || monthNavigation.toggleView.textContent !== 'Personen als Zeilen' || monthNavigation.toggleView.attributes['aria-pressed'] !== 'true') {
     throw new Error('Ausrichtungsumschalter bleibt in der Monatsansicht nicht sichtbar oder verliert seinen Zustand.');
 }
 class FakeNode {
@@ -357,22 +357,22 @@ if (sortableOrganization.leadershipStaffRoleGroups().join(',') !== 'PDL,Stab-HR'
 for (const contract of ['window.OCA.FlzCalendar.Shared.models.Model', 'extends BaseModel', 'toArray()', 'this.defaultDate', 'this.defaultModified', 'this.defaultDeleted', 'this.meetingUid', 'this.seriesUid', 'this.seriesTimezone', 'this.canManageMeeting']) {
     if (!model.includes(contract)) throw new Error(`Modell-Vertrag fehlt: ${contract}`);
 }
-for (const contract of ['class CalendarCell', 'flz-calendar-cell-actions', 'flz-calendar-entry__children', 'grid-template-rows:', 'grid-row:', 'entry.parentEntryId === shift.id', 'entry.canManageMeeting !== false', 'flz-calendar-entry__blocked-marker', 'flz-calendar-entry__series-marker', 'flz-calendar-entry--assistance', 'flz-calendar-assistance-label--full', 'flz-calendar-assistance-label--short', 'aria-hidden="true">🔒', "data-action=\"add-entry\"", "l10n.t('Create shift')", 'icon-calendar-dark']) {
+for (const contract of ['class CalendarCell', 'flz-calendar-cell-actions', 'flz-calendar-entry__children', 'grid-template-rows:', 'grid-row:', 'entry.parentEntryId === shift.id', 'entry.canManageMeeting !== false', 'flz-calendar-entry__blocked-marker', 'flz-calendar-entry__series-marker', 'flz-calendar-entry--assistance', 'flz-calendar-assistance-label--full', 'flz-calendar-assistance-label--short', 'aria-hidden="true">🔒', "data-action=\"add-entry\"", "l10n.t('Dienst anlegen')", 'icon-calendar-dark']) {
     if (!calendarCell.includes(contract)) throw new Error(`Kalenderzellen-Vertrag fehlt: ${contract}`);
 }
 for (const contract of ['const previousWrap = this.container.querySelector', 'previousWrap?.scrollLeft', 'wrap.scrollLeft = previousScroll.left', 'wrap.scrollTop = previousScroll.top']) {
     if (!weekTable.includes(contract)) throw new Error(`Scrollpositionsvertrag fehlt: ${contract}`);
 }
-for (const contract of ['class MeetingFinder', 'this.returnFocus', 'this.selected = new Set(selected)', 'employeeUids.length < 2', 'this.repository.meetingGaps', 'renderResults(gaps, canBlockAll)', "l10n.t('Search in the next week')", "l10n.t('Deselect {employee}'", 'this.repository.blockMeeting', 'Number(this.duration.value)']) {
+for (const contract of ['class MeetingFinder', 'this.returnFocus', 'this.selected = new Set(selected)', 'employeeUids.length < 2', 'this.repository.meetingGaps', 'renderResults(gaps, canBlockAll)', "l10n.t('In der nächsten Woche suchen')", "l10n.t('{employee} abwählen'", 'this.repository.blockMeeting', 'Number(this.duration.value)']) {
     if (!meetingFinder.includes(contract)) throw new Error(`Meeting-Finder-Vertrag fehlt: ${contract}`);
 }
 for (const contract of ['class ShiftDefaults', 'Array.from({ length: 7 }', 'data-field="enabled"', 'this.onSave(this.collect())']) {
     if (!shiftDefaults.includes(contract)) throw new Error(`Dienstzeiten-Komponentenvertrag fehlt: ${contract}`);
 }
-for (const contract of ['class ShiftCalendarSync', 'this.onSave(this.input.checked)', 'status.calendarName', "l10n.t('Calendar is active: {calendar}.'"]) {
+for (const contract of ['class ShiftCalendarSync', 'this.onSave(this.input.checked)', 'status.calendarName', "l10n.t('Kalender ist aktiv: {calendar}.'"]) {
     if (!shiftCalendarSync.includes(contract)) throw new Error(`Dienstkalender-Komponentenvertrag fehlt: ${contract}`);
 }
-for (const contract of ['class ExternalCalendars', 'this.returnFocus', "provider === 'google'", 'window.location.assign(response.authorizationUrl)', 'this.dialog.showModal()', 'this.repository.connectCalDav', 'this.repository.disconnectExternalCalendar', 'window.confirm(', 'this.password.value = \'\'', 'the Kopano provider must allow CalDAV']) {
+for (const contract of ['class ExternalCalendars', 'this.returnFocus', "provider === 'google'", 'window.location.assign(response.authorizationUrl)', 'this.dialog.showModal()', 'this.repository.connectCalDav', 'this.repository.disconnectExternalCalendar', 'window.confirm(', 'this.password.value = \'\'', 'Der Kopano-Betreiber muss CalDAV per HTTPS erlauben']) {
     if (!externalCalendars.includes(contract)) throw new Error(`Externe-Kalender-Komponentenvertrag fehlt: ${contract}`);
 }
 const externalElements = {};
@@ -445,13 +445,13 @@ if ((cellHtml.match(/Teamtermin/g) || []).length !== 1) throw new Error('Enthalt
 const overnightShift = { id: 3, type: 'shift', start: '2026-07-06T20:00:00Z', end: '2026-07-07T08:00:00Z', title: '', parentEntryId: null };
 const overnightFirstDay = cell.render([overnightShift], { canManage: true }, [], null, new Date('2026-07-06T00:00:00Z'));
 const overnightSecondDay = cell.render([overnightShift], { canManage: true }, [], null, new Date('2026-07-07T00:00:00Z'));
-if (!overnightFirstDay.includes('20:00–24:00') || !overnightFirstDay.includes('Continues on next day')) {
+if (!overnightFirstDay.includes('20:00–24:00') || !overnightFirstDay.includes('Fortsetzung am Folgetag')) {
     throw new Error('Der erste Kalendertag eines Nachtdiensts zeigt keinen gekappten Zeitraum mit Fortsetzung.');
 }
-if (!overnightSecondDay.includes('00:00–08:00') || !overnightSecondDay.includes('Continued from previous day')) {
+if (!overnightSecondDay.includes('00:00–08:00') || !overnightSecondDay.includes('Fortsetzung vom Vortag')) {
     throw new Error('Der zweite Kalendertag eines Nachtdiensts zeigt keinen gekappten Zeitraum mit Fortsetzung.');
 }
-if (!cellHtml.includes('08:00–16:00') || cellHtml.includes('Continues on next day') || cellHtml.includes('Continued from previous day')) {
+if (!cellHtml.includes('08:00–16:00') || cellHtml.includes('Fortsetzung am Folgetag') || cellHtml.includes('Fortsetzung vom Vortag')) {
     throw new Error('Ein taggleicher Dienst wird durch die Nachtdienstprojektion verändert.');
 }
 const midnightDay = new Date(2026, 6, 6);
@@ -459,7 +459,7 @@ const midnightEnd = new Date(midnightDay); midnightEnd.setDate(midnightEnd.getDa
 const midnightStart = new Date(midnightEnd.getTime() - 4 * 60 * 60 * 1000);
 const midnightEndingShift = { ...overnightShift, start: midnightStart.toISOString(), end: midnightEnd.toISOString() };
 const midnightEndingHtml = cell.render([midnightEndingShift], { canManage: true }, [], null, midnightDay);
-if (!midnightEndingHtml.includes('–24:00') || !midnightEndingHtml.includes('Continues on next day')) {
+if (!midnightEndingHtml.includes('–24:00') || !midnightEndingHtml.includes('Fortsetzung am Folgetag')) {
     throw new Error('Ein exakt um Mitternacht endender Dienst wird am Starttag irreführend als 00:00 dargestellt.');
 }
 const timedCellHtml = cell.render(timelineEntries.map((entry, index) => ({ ...entry, id: index + 10, type: index === 0 ? 'shift' : 'appointment', parentEntryId: index === 0 ? null : 10, title: index === 0 ? '' : 'Zeitachsentermin' })), { canManage: true }, [], calendarLayout, timelineDay, calendarTimeline);
@@ -467,18 +467,18 @@ if (!timedCellHtml.includes('grid-template-rows:') || !timedCellHtml.includes('g
 const blockedHtml = cell.render([
     { id: 3, type: 'appointment', start: '2026-07-06T18:00:00Z', end: '2026-07-06T19:00:00Z', title: 'Blockiert', parentEntryId: null },
 ], { canManage: true });
-if (!blockedHtml.includes('flz-calendar-entry--blocked') || !blockedHtml.includes('flz-calendar-entry__blocked-marker') || !blockedHtml.includes('Blocked time')) throw new Error('Sperrtermin wird nicht kräftig und textlich als Sperre gekennzeichnet.');
+if (!blockedHtml.includes('flz-calendar-entry--blocked') || !blockedHtml.includes('flz-calendar-entry__blocked-marker') || !blockedHtml.includes('Sperrtermin')) throw new Error('Sperrtermin wird nicht kräftig und textlich als Sperre gekennzeichnet.');
 const seriesHtml = cell.render([
     { id: 4, type: 'appointment', start: '2026-07-06T10:00:00Z', end: '2026-07-06T11:00:00Z', title: 'Serie', parentEntryId: null, seriesUid: 'series-demo' },
 ], { canManage: true });
-if (!seriesHtml.includes('flz-calendar-entry__series-marker') || !seriesHtml.includes('Recurring appointment')) throw new Error('Serientermin wird nicht zusätzlich zur visuellen Markierung textlich gekennzeichnet.');
+if (!seriesHtml.includes('flz-calendar-entry__series-marker') || !seriesHtml.includes('Serientermin')) throw new Error('Serientermin wird nicht zusätzlich zur visuellen Markierung textlich gekennzeichnet.');
 const vacationHtml = cell.render([
     { id: 5, type: 'appointment', start: '2026-07-06T10:00:00Z', end: '2026-07-06T11:00:00Z', title: 'Erlaubter Sperrtermin', parentEntryId: null },
 ], { canManage: true }, [{ status: 'planned', marker: 'U?', blocks: false }]);
 if (vacationHtml.includes('data-entry-type="shift"') || !vacationHtml.includes('data-entry-type="appointment"')) {
     throw new Error('Urlaub muss Dienste blockieren, Sperrtermine aber weiterhin erlauben.');
 }
-if (!vacationHtml.includes('>U?</') || vacationHtml.includes('Planned absence</div>')) {
+if (!vacationHtml.includes('>U?</') || vacationHtml.includes('Geplanter Urlaub – Dienste sind gesperrt, Termine bleiben möglich</span>')) {
     throw new Error('Urlaubsmarker ist nicht als kompakter, read-only Marker gerendert.');
 }
 if (!vacationHtml.includes('data-action="edit-entry"')) throw new Error('Sperrtermine bleiben während Urlaub bearbeitbar.');
@@ -688,6 +688,27 @@ ebRoleState.data = {
 ebRoleState.applyInitialFilters();
 if (ebRoleState.availableEmployees().map(employee => employee.uid).join(',') !== 'eb-west') {
     throw new Error('Der reine Einsatzbegleitungsfilter zeigt Personen mit vorrangiger Stellvertretungsrolle.');
+}
+
+// Explizite Personenauswahl schlägt Gruppenfilter: markierte Personen bleiben sichtbar,
+// auch wenn ihre Rolle, ihr Bereich oder der Leitungs-/Stabsblock nicht gecheckt ist.
+const explicitSelectionState = new CalendarState(
+    new Set(['PDL']),
+    { search: '?people=pfk,pdl&roles=Buero&areas=Bereich-West&staff=hidden', pathname: '/apps/flzcalendar/' },
+    { replaceState() {} },
+    role => areaScopedRoles.has(role),
+).restore();
+explicitSelectionState.data = {
+    defaultFilters: null,
+    currentUserProfile: { roles: [], areas: [] },
+    employees: officeEmployees,
+};
+explicitSelectionState.applyInitialFilters();
+if (explicitSelectionState.availableEmployees().map(employee => employee.uid).sort().join(',') !== 'pdl,pfk') {
+    throw new Error('Explizit markierte Personen werden trotz nicht gecheckter Rollen-/Bereichs-/Stabsfilter ausgeblendet.');
+}
+if (explicitSelectionState.availableEmployees().some(employee => !['pfk', 'pdl'].includes(employee.uid))) {
+    throw new Error('Bei expliziter Personenauswahl dürfen nicht markierte Personen nicht zusätzlich erscheinen.');
 }
 
 const emptyFilterState = new CalendarState(new Set(['PDL']), { search: '', pathname: '/apps/flzcalendar/' }, { replaceState() {} }).restore();

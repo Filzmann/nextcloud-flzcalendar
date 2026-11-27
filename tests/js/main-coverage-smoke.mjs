@@ -201,10 +201,10 @@ if (backToTopCall?.top !== 0 || backToTopCall?.behavior !== 'smooth') {
 }
 state.selected.add('a');
 CalendarFilters.last.options.onChange();
-if (!elements.get('flz-calendar-filter-status').textContent.includes('1 selected')) throw new Error('Explizite Auswahl wird nicht im Filterstatus gerendert.');
+if (!elements.get('flz-calendar-filter-status').textContent.includes('1 ausgewählt')) throw new Error('Explizite Auswahl wird nicht im Filterstatus gerendert.');
 state.selected.clear(); state.forceFiltered = true;
 CalendarFilters.last.options.onChange();
-if (!elements.get('flz-calendar-filter-status').textContent.includes('1 filtered')) throw new Error('Gruppenfilter wird nicht im Filterstatus gerendert.');
+if (!elements.get('flz-calendar-filter-status').textContent.includes('1 gefiltert')) throw new Error('Gruppenfilter wird nicht im Filterstatus gerendert.');
 WeekNavigation.last.options.onViewChange();
 
 repository.deferWeek = true;
@@ -242,8 +242,8 @@ if (!calls.some(call => call[0] === 'saveShiftDefaults') || !Notice.last.message
 }
 await ShiftCalendarSync.last.options.onSave(false);
 await ShiftCalendarSync.last.options.onSave(true);
-if (!Notice.last.messages.some(item => String(item[1]).includes('disabled'))
-    || !Notice.last.messages.some(item => String(item[1]).includes('Team calendar'))) {
+if (!Notice.last.messages.some(item => String(item[1]).includes('deaktiviert'))
+    || !Notice.last.messages.some(item => String(item[1]).includes('ist aktiviert'))) {
     throw new Error('Kalendersynchronisation zeigt Aktivierung und Opt-out nicht an.');
 }
 await elements.get('flz-calendar-save-default').fire('click');

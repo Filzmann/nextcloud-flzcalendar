@@ -235,10 +235,10 @@ if (!meetingElements['flz-calendar-meeting-dialog'].open || !meetingElements['fl
     throw new Error('Meetingdialog initialisiert Auswahl, Fokus oder Modalzustand nicht.');
 }
 await finder.searchWeek();
-if (!meetingElements['flz-calendar-meeting-results'].textContent.includes('at least two')) throw new Error('Meeting-Suche akzeptiert zu wenige Personen.');
+if (!meetingElements['flz-calendar-meeting-results'].textContent.includes('mindestens zwei Personen')) throw new Error('Meeting-Suche akzeptiert zu wenige Personen.');
 finder.selected.add('b'); meetingElements['flz-calendar-meeting-duration'].value = '10';
 await finder.searchWeek();
-if (!meetingElements['flz-calendar-meeting-results'].textContent.includes('15 and 480')) throw new Error('Meeting-Suche akzeptiert eine ungültige Dauer.');
+if (!meetingElements['flz-calendar-meeting-results'].textContent.includes('zwischen 15 und 480 Minuten')) throw new Error('Meeting-Suche akzeptiert eine ungültige Dauer.');
 meetingElements['flz-calendar-meeting-duration'].value = '30';
 gapResponse = { gaps: [{ start: '2026-07-06T10:00:00Z' }], canBlockAll: true };
 await finder.searchWeek();
@@ -247,7 +247,7 @@ await blockButton.fire('click');
 if (!meetingElements['flz-calendar-meeting-title'].reported) throw new Error('Leerer Meetingtitel wird nicht validiert.');
 meetingElements['flz-calendar-meeting-title'].value = 'Planning';
 await blockButton.fire('click');
-if (blockCalls.length !== 1 || blocked !== 1 || !meetingElements['flz-calendar-meeting-results'].textContent.includes('blocked')) {
+if (blockCalls.length !== 1 || blocked !== 1 || !meetingElements['flz-calendar-meeting-results'].textContent.includes('blockiert')) {
     throw new Error('Gemeinsame Meetingblockierung wird nicht vollständig ausgeführt.');
 }
 gapResponse = { gaps: [{ start: '2026-07-06T11:00:00Z' }], canBlockAll: false };
@@ -304,7 +304,7 @@ const entryPayload = {
     recurrenceFrequency: 'weekly', recurrenceInterval: 1, recurrenceUntil: '2026-08-01', recurrenceWeekdays: [1], recurrenceTimezone: 'Europe/Berlin',
 };
 await workflow.save(entryPayload);
-if (workflowCalls[0][0] !== 'save' || !String(workflowMessages[0][0]).includes('3 recurring') || workflowDialog.closed !== 1) {
+if (workflowCalls[0][0] !== 'save' || !String(workflowMessages[0][0]).includes('3 Serientermine gespeichert.') || workflowDialog.closed !== 1) {
     throw new Error('Eintragsworkflow speichert neue Terminserien nicht vollständig.');
 }
 workflowState.data.entries = [{ id: 8, meetingUid: 'meeting-1', canManageMeeting: false }];
@@ -324,7 +324,7 @@ if (workflowCalls.length !== callsBeforeCancelledSave) throw new Error('Abgebroc
 
 workflowFailure = null;
 await workflow.remove({ id: 10, type: 'shift', meetingUid: null, seriesUid: null });
-if (workflowCalls.at(-1)[0] !== 'remove' || !String(workflowMessages.at(-1)[0]).includes('Shift deleted')) {
+if (workflowCalls.at(-1)[0] !== 'remove' || !String(workflowMessages.at(-1)[0]).includes('Dienst gelöscht.')) {
     throw new Error('Einfacher Dienst wird nicht direkt gelöscht.');
 }
 workflowFailure = Object.assign(new Error('confirmation'), { status: 409, data: { confirmationRequired: true, children: [1, 2] } });
@@ -350,7 +350,7 @@ workflowContext.window.confirm = () => true;
 await workflow.remove({ id: 13, type: 'appointment', meetingUid: null, seriesUid: null });
 workflow.seriesChoice = async () => 'series';
 await workflow.remove({ id: 14, type: 'appointment', meetingUid: null, seriesUid: 'series-1' });
-if (!String(workflowMessages.at(-1)[0]).includes('Serientermin deleted')) throw new Error('Vollständige Serie meldet keinen passenden Löschstatus.');
+if (!String(workflowMessages.at(-1)[0]).includes('Serientermin gelöscht.')) throw new Error('Vollständige Serie meldet keinen passenden Löschstatus.');
 await workflow.removeMeeting({ meetingUid: 'm-denied', canManageMeeting: false });
 workflowContext.window.confirm = () => false;
 await workflow.removeMeeting({ meetingUid: 'm-cancel', canManageMeeting: true });

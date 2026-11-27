@@ -88,7 +88,7 @@ namespace {
     $blocked = $controller->connectCalDav('kopano', 'https://calendar.example.test', 'person-a', 'secret');
     if ($blocked->getStatus() !== 400
         || ($blocked->getData()['code'] ?? '') !== 'external_calendar_provider_rejected'
-        || ($blocked->getData()['error'] ?? '') !== 'The calendar provider rejected the CalDAV connection (HTTP 405). Please contact its administration.') {
+        || ($blocked->getData()['error'] ?? '') !== 'Der Kalenderanbieter hat die CalDAV-Verbindung abgewiesen (HTTP 405). Bitte wende dich an dessen Administration.') {
         throw new RuntimeException('Sichere HTTP-405-Diagnose erreicht den persönlichen Kopano-Connector nicht.');
     }
     if (($logger->entries[0][1] ?? null) !== ['provider' => 'kopano', 'status' => 405]) {

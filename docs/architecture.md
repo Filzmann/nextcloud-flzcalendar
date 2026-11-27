@@ -72,7 +72,10 @@ ausgewertet. Globale Rollen ohne natürliche Bereichszuordnung bleiben von
 einer Bereichsauswahl unberührt; auch eine versehentliche Bereichsmitgliedschaft
 macht sie nicht bereichsgebunden. Die im Organisationsvertrag erste passende
 Rolle ist die vorrangige Kalenderrolle. Der Leitungs-/Stabsblock lässt sich
-ohne weitere Rollen- oder Bereichsauswahl ein- und ausblenden. Persönliche
+ohne weitere Rollen- oder Bereichsauswahl ein- und ausblenden. Eine explizite
+Personenauswahl ersetzt die Rollen-, Bereichs- und Stabsfilter: Markierte
+Personen bleiben auch dann sichtbar, wenn ihre Gruppe nicht gecheckt ist.
+Persönliche
 Filter-, Zeitraum- und Ausrichtungskonfigurationen werden nur durch „Zum
 Standard machen“ als Nextcloud-Benutzerwert gespeichert.
 

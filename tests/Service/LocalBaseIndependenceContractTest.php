@@ -31,7 +31,7 @@ foreach ($roots as $relativeRoot) {
     }
 }
 
-foreach (['api-client.js', 'model.js', 'repository.js', 'ui.js', 'LICENSE', 'flz-shared.lock.json'] as $asset) {
+foreach (['api-client.js', 'model.js', 'overlay.js', 'repository.js', 'ui.js', 'LICENSE', 'flz-shared.lock.json'] as $asset) {
     if (!is_file($root . '/js/shared/' . $asset)) {
         $violations[] = 'js/shared/' . $asset . ': app-lokales Kategorie-A-Artefakt fehlt';
     }

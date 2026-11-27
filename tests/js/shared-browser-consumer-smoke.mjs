@@ -40,6 +40,7 @@ const context = vm.createContext({
 for (const relative of [
     'js/shared/api-client.js',
     'js/shared/model.js',
+    'js/shared/overlay.js',
     'js/shared/repository.js',
     'js/shared/ui.js',
     'js/models/calendar-entry.js',
@@ -52,7 +53,7 @@ for (const relative of [
 }
 
 const shared = window.OCA?.FlzCalendar?.Shared;
-if (!shared?.api?.ApiClient || !shared?.models?.Model || !shared?.repositories?.Repository || !shared?.ui?.Notice) {
+if (!shared?.api?.ApiClient || !shared?.models?.Model || !shared?.repositories?.Repository || !shared?.ui?.Notice || !shared?.ui?.Overlay || !shared?.ui?.AdminAccessOverlay) {
     throw new Error('Das app-lokale Kategorie-A-Bundle ist nicht vollständig unter OCA.FlzCalendar.Shared verfügbar.');
 }
 if ('LocalBase' in window) {
