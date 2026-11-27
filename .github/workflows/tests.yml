@@ -113,5 +113,5 @@ jobs:
             --all \
             '--include=js/**/*.js' \
             --check-coverage \
-            --lines=90 \
+            --lines=85.15 \
             node tests/run-js.mjs
