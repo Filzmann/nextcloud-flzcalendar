@@ -13,6 +13,8 @@ use OCA\FlzCalendar\Listener\StandaloneNavigationListener;
 use OCA\FlzCalendar\Permission\CalendarPermissionProviderListener;
 use OCA\FlzCalendar\Permission\CalendarPermissionSourceInterface;
 use OCA\FlzCalendar\Permission\NextcloudCalendarPermissionSource;
+use OCA\FlzCalendar\Privacy\CalendarPrivacyProviderListener;
+use OCA\FlzCalendar\Privacy\CalendarProcessingMetadataProviderListener;
 use OCA\FlzDataProtection\PublicApi\V1\RegisterPersonalDataProvidersEvent;
 use OCA\FlzDataProtection\PublicApi\V1\RegisterProcessingMetadataProvidersEvent;
 use OCA\FlzPermissionMatrix\PublicApi\V1\RegisterPermissionProvidersEvent;
