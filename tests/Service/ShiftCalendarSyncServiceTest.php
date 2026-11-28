@@ -24,7 +24,7 @@ namespace OCA\FlzCalendar\Service {
     final class CalendarTargetConfig { public function calendarName(): string { return 'Team & Dienst'; } }
     final class AbsenceService {
         public function query(\DateTimeImmutable $start, \DateTimeImmutable $end, array $uids): array {
-            return [new \OCA\LocalBase\Calendar\AbsenceInterval($uids[0], $start, $start->modify('+1 day'), 'planned')];
+            return [new \OCA\FlzOrganization\PublicApi\V1\AbsenceInterval($uids[0], $start, $start->modify('+1 day'), 'planned')];
         }
     }
     final class CalendarSyncHorizon {

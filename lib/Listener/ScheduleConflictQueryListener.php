@@ -6,8 +6,8 @@ namespace OCA\FlzCalendar\Listener;
 
 use OCA\FlzCalendar\Model\CalendarEntry;
 use OCA\FlzCalendar\Repository\CalendarEntryRepository;
-use OCA\LocalBase\Calendar\ScheduleConflict;
-use OCA\LocalBase\Calendar\ScheduleConflictQueryEvent;
+use OCA\FlzOrganization\PublicApi\V1\ScheduleConflict;
+use OCA\FlzOrganization\PublicApi\V1\ScheduleConflictQueryEvent;
 use OCP\EventDispatcher\Event;
 use OCP\EventDispatcher\IEventListener;
 

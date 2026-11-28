@@ -8,7 +8,7 @@ namespace {
 
 use OCA\FlzCalendar\CalendarSync\ShiftCalendarEventSerializer;
 use OCA\FlzCalendar\Model\CalendarEntry;
-use OCA\LocalBase\Calendar\AbsenceInterval;
+use OCA\FlzOrganization\PublicApi\V1\AbsenceInterval;
 use OCP\IL10N;
 
 $l10n = new class implements IL10N {

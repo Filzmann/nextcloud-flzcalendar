@@ -35,7 +35,7 @@ namespace OCA\FlzCalendar\Repository {
 namespace {
     use OCA\FlzCalendar\Listener\ScheduleConflictQueryListener;
     use OCA\FlzCalendar\Repository\CalendarEntryRepository;
-    use OCA\LocalBase\Calendar\ScheduleConflictQueryEvent;
+    use OCA\FlzOrganization\PublicApi\V1\ScheduleConflictQueryEvent;
 
     $start = new DateTimeImmutable('2026-08-10T00:00:00Z');
     $end = $start->modify('+1 day');

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace OCA\FlzCalendar\CalendarSync;
 
 use OCA\FlzCalendar\Model\CalendarEntry;
-use OCA\LocalBase\Calendar\AbsenceInterval;
+use OCA\FlzOrganization\PublicApi\V1\AbsenceInterval;
 
 /** Vertrag für den privaten Nextcloud-Kalender mit eigenen Einträgen und read-only Urlauben. */
 interface PersonalCalendarPublisher {

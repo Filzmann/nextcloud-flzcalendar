@@ -8,7 +8,7 @@ use DateTimeImmutable;
 use DateTimeZone;
 use InvalidArgumentException;
 use OCA\FlzCalendar\Model\CalendarEntry;
-use OCA\LocalBase\Calendar\AbsenceInterval;
+use OCA\FlzOrganization\PublicApi\V1\AbsenceInterval;
 use OCP\IL10N;
 
 /** Zweck: Serialisiert eigene persistierte FLZ-Einträge und datensparsame Urlaube als private VEVENTs. */

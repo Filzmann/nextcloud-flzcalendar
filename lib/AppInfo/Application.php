@@ -18,8 +18,8 @@ use OCA\FlzCalendar\Privacy\CalendarProcessingMetadataProviderListener;
 use OCA\FlzDataProtection\PublicApi\V1\RegisterPersonalDataProvidersEvent;
 use OCA\FlzDataProtection\PublicApi\V1\RegisterProcessingMetadataProvidersEvent;
 use OCA\FlzPermissionMatrix\PublicApi\V1\RegisterPermissionProvidersEvent;
-use OCA\LocalBase\Calendar\ScheduleConflictQueryEvent;
-use OCA\LocalBase\Integration\IntegrationCapabilityQueryEvent;
+use OCA\FlzOrganization\PublicApi\V1\ScheduleConflictQueryEvent;
+use OCA\FlzOrganization\PublicApi\V1\IntegrationCapabilityQueryEvent;
 use OCP\AppFramework\App;
 use OCP\AppFramework\Bootstrap\IBootContext;
 use OCP\AppFramework\Bootstrap\IBootstrap;
@@ -31,6 +31,7 @@ class Application extends App implements IBootstrap {
     public const APP_ID = AppId::VALUE;
 
     public function __construct(array $urlParams = []) {
+        require_once dirname(__DIR__, 2) . '/vendor/flz-shared/php/vendor/autoload.php';
         parent::__construct(self::APP_ID, $urlParams);
     }
     public function register(IRegistrationContext $context): void {

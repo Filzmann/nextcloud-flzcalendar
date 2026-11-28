@@ -12,8 +12,8 @@ namespace Psr\Log {
 
 namespace {
     use OCA\FlzCalendar\Service\PlanningConflictService;
-    use OCA\LocalBase\Calendar\ScheduleConflict;
-    use OCA\LocalBase\Calendar\ScheduleConflictQueryEvent;
+    use OCA\FlzOrganization\PublicApi\V1\ScheduleConflict;
+    use OCA\FlzOrganization\PublicApi\V1\ScheduleConflictQueryEvent;
     use OCP\EventDispatcher\Event;
     use OCP\EventDispatcher\IEventDispatcher;
     use Psr\Log\LoggerInterface;

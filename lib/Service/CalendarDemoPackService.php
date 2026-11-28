@@ -8,12 +8,12 @@ use DateTimeImmutable;
 use DateTimeZone;
 use OCA\FlzCalendar\Model\CalendarEntry;
 use OCA\FlzCalendar\Repository\CalendarEntryRepository;
-use OCA\LocalBase\Service\DemoAccountProvisioningService;
+use OCA\FlzCalendar\Vendor\Filzmann\Shared\Service\DemoAccountProvisioningService;
 
 /**
  * Zweck: Installiert das neutrale Kalender-Demo-Pack idempotent und ohne bestehende Konten zu übernehmen.
- * Zusammenspiel: Admin-Endpunkt oder OCC-Command -> CalendarDemoPackService -> LocalBase-Provisioning und CalendarEntryRepository.
- * Vertrag: Konten und Gruppen werden vollständig geprüft, bevor LocalBase die erste Änderung ausführt.
+ * Zusammenspiel: Admin-Endpunkt oder OCC-Command -> CalendarDemoPackService -> gebündeltes flz_shared-Provisioning und CalendarEntryRepository.
+ * Vertrag: Konten und Gruppen werden vollständig geprüft, bevor das Provisioning die erste Änderung ausführt.
  */
 final class CalendarDemoPackService {
     public function __construct(
@@ -25,7 +25,7 @@ final class CalendarDemoPackService {
     /** @return array{accounts:array{createdUsers:int,reusedUsers:int,createdGroups:int},createdCalendars:int,skippedCalendars:int} */
     public function install(): array {
         $fixtures = $this->fixtures->all();
-        $accounts = $this->accounts->provision('flz-full-suite-demo', array_map(static fn(array $fixture): array => [
+        $accounts = $this->accounts->provision('flzcalendar-demo', array_map(static fn(array $fixture): array => [
             'uid' => $fixture['uid'],
             'displayName' => $fixture['name'],
             'groups' => $fixture['groups'],

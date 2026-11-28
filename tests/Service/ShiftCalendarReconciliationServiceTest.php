@@ -36,7 +36,7 @@ namespace OCA\FlzCalendar\Service {
         }
         public function query(\DateTimeImmutable $start, \DateTimeImmutable $end, array $uids): array {
             $this->queried[] = [$start, $end, $uids];
-            return $uids === ['vacation-only'] ? [new \OCA\LocalBase\Calendar\AbsenceInterval('vacation-only', $start, $start->modify('+1 day'), 'approved')] : [];
+            return $uids === ['vacation-only'] ? [new \OCA\FlzOrganization\PublicApi\V1\AbsenceInterval('vacation-only', $start, $start->modify('+1 day'), 'approved')] : [];
         }
     }
     final class CalendarSyncHorizon {
