@@ -15,7 +15,7 @@ namespace Psr\Log {
 }
 
 namespace OCA\FlzOrganization\PublicApi\V1 {
-    if (!class_exists(Contract::class)) {
+    {
         final class Contract {
             public const APP_ID = 'flz_organization';
             public static function supports(string $version): bool { return $version === '1.0'; }

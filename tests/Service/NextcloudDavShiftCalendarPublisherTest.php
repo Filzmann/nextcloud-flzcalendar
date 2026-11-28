@@ -88,7 +88,7 @@ namespace {
     use OCA\FlzCalendar\CalendarSync\ShiftCalendarEventSerializer;
     use OCA\FlzCalendar\Model\CalendarEntry;
     use OCA\FlzCalendar\Service\CalendarTargetConfig;
-    use OCA\LocalBase\Calendar\AbsenceInterval;
+    use OCA\FlzOrganization\PublicApi\V1\AbsenceInterval;
     use OCA\DAV\CalDAV\CalDavBackend;
     use OCP\IL10N;
 

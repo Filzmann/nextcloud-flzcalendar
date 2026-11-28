@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OCA\LocalBase\Service {
+namespace OCA\FlzCalendar\Vendor\Filzmann\Shared\Service {
     final class DemoAccountProvisioningService {
         public array $calls = [];
         public function provision(string $pack, array $fixtures): array {
@@ -44,14 +44,14 @@ namespace {
     use OCA\FlzCalendar\Repository\CalendarEntryRepository;
     use OCA\FlzCalendar\Service\CalendarDemoPackService;
     use OCA\FlzCalendar\Service\DemoFixtureCatalog;
-    use OCA\LocalBase\Service\DemoAccountProvisioningService;
+    use OCA\FlzCalendar\Vendor\Filzmann\Shared\Service\DemoAccountProvisioningService;
 
     $accounts = new DemoAccountProvisioningService();
     $entries = new CalendarEntryRepository();
     $result = (new CalendarDemoPackService($accounts, $entries, new DemoFixtureCatalog()))->install();
 
     if ($accounts->calls !== [[
-        'flz-full-suite-demo',
+        'flzcalendar-demo',
         [
             ['uid' => 'demo-a', 'displayName' => 'Demo A', 'groups' => ['role-a']],
             ['uid' => 'demo-b', 'displayName' => 'Demo B', 'groups' => ['role-b', 'area-b']],

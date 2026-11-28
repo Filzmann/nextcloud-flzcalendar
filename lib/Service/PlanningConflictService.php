@@ -6,13 +6,13 @@ namespace OCA\FlzCalendar\Service;
 
 use DateTimeImmutable;
 use InvalidArgumentException;
-use OCA\LocalBase\Calendar\ScheduleConflict;
-use OCA\LocalBase\Calendar\ScheduleConflictQueryEvent;
+use OCA\FlzOrganization\PublicApi\V1\ScheduleConflict;
+use OCA\FlzOrganization\PublicApi\V1\ScheduleConflictQueryEvent;
 use OCP\EventDispatcher\IEventDispatcher;
 use Psr\Log\LoggerInterface;
 
 /**
- * Zweck: Kapselt die optionale read-only Abfrage von Assistenzschichten hinter dem LocalBase-Konfliktvertrag.
+ * Zweck: Kapselt die optionale read-only Abfrage von Assistenzschichten hinter dem öffentlichen V1-Konfliktvertrag.
  * Vertrag: Fehlende Listener ergeben eine leere, gültige Antwort; Providerfehler werden lesend sichtbar und schreibend fail-closed behandelt.
  */
 final class PlanningConflictService {

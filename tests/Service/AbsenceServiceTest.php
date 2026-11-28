@@ -14,9 +14,9 @@ namespace OCP\EventDispatcher {
 namespace {
 
     use OCA\FlzCalendar\Service\AbsenceService;
-    use OCA\LocalBase\Calendar\AbsenceEmployeeDiscoveryEvent;
-    use OCA\LocalBase\Calendar\AbsenceInterval;
-    use OCA\LocalBase\Calendar\AbsenceQueryEvent;
+    use OCA\FlzOrganization\PublicApi\V1\AbsenceEmployeeDiscoveryEvent;
+    use OCA\FlzOrganization\PublicApi\V1\AbsenceInterval;
+    use OCA\FlzOrganization\PublicApi\V1\AbsenceQueryEvent;
     use OCP\EventDispatcher\Event;
     use OCP\EventDispatcher\IEventDispatcher;
 

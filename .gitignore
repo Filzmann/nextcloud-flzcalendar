@@ -1,4 +1,6 @@
-/vendor/
+/vendor/*
+!/vendor/flz-shared/
+!/vendor/flz-shared/**
 /node_modules/
 /.phpunit.cache/
 /.idea/

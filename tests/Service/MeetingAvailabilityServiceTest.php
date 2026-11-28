@@ -5,7 +5,7 @@ declare(strict_types=1);
 
 use OCA\FlzCalendar\Model\CalendarEntry;
 use OCA\FlzCalendar\Service\MeetingAvailabilityService;
-use OCA\LocalBase\Calendar\AbsenceInterval;
+use OCA\FlzOrganization\PublicApi\V1\AbsenceInterval;
 
 $entry = static fn(string $uid, string $start, string $end, string $type, string $title = ''): CalendarEntry => CalendarEntry::get(compact('uid', 'start', 'end', 'type', 'title') + ['employeeUid' => $uid]);
 $shift = CalendarEntry::TYPE_SHIFT;
